@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 module.exports = {
   env: {
     browser: true,
@@ -20,6 +21,8 @@ module.exports = {
   },
   plugins: ["react", "jsx-a11y", "react-hooks", "prettier"],
   rules: {
-    "prettier/prettier": "error"
+    "prettier/prettier": "error",
+    "react/react-in-jsx-scope": 0,
+    "react/prop-types": 0
   }
 };
