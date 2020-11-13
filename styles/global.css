@@ -1,0 +1,166 @@
+html {
+  box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+@font-face {
+  font-family: "Wotfard";
+  src: url("/fonts/Wotfard/wotfard-thin-webfont.eot");
+  src: url("/fonts/Wotfard/wotfard-thin-webfont.eot?#iefix")
+      format("embedded-opentype"),
+    url("/fonts/Wotfard/wotfard-thin-webfont.ttf") format("truetype");
+  font-weight: 100;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Wotfard";
+  src: url("/fonts/Wotfard/wotfard-extralight-webfont.eot");
+  src: url("/fonts/Wotfard/wotfard-extralight-webfont.eot?#iefix")
+      format("embedded-opentype"),
+    url("/fonts/Wotfard/wotfard-extralight-webfont.ttf") format("truetype");
+  font-weight: 200;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Wotfard";
+  src: url("/fonts/Wotfard/wotfard-light-webfont.eot");
+  src: url("/fonts/Wotfard/wotfard-light-webfont.eot?#iefix")
+      format("embedded-opentype"),
+    url("/fonts/Wotfard/wotfard-light-webfont.ttf") format("truetype");
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Wotfard";
+  src: url("/fonts/Wotfard/wotfard-regular-webfont.eot");
+  src: url("/fonts/Wotfard/wotfard-regular-webfont.eot?#iefix")
+      format("embedded-opentype"),
+    url("/fonts/Wotfard/wotfard-regular-webfont.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Wotfard";
+  src: url("/fonts/Wotfard/wotfard-semibold-webfont.eot");
+  src: url("/fonts/Wotfard/wotfard-semibold-webfont.eot?#iefix")
+      format("embedded-opentype"),
+    url("/fonts/Wotfard/wotfard-semibold-webfont.ttf") format("truetype");
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Wotfard";
+  src: url("/fonts/Wotfard/wotfard-bold-webfont.eot");
+  src: url("/fonts/Wotfard/wotfard-bold-webfont.eot?#iefix")
+      format("embedded-opentype"),
+    url("/fonts/Wotfard/wotfard-bold-webfont.ttf") format("truetype");
+  font-weight: 800;
+  font-display: swap;
+}
+
+:root {
+  --measure: 60ch;
+
+  /* Modular scale points */
+  --ratio: 1.5;
+  --s-6: calc(var(--s-5) / var(--ratio));
+  --s-5: calc(var(--s-4) / var(--ratio));
+  --s-4: calc(var(--s-3) / var(--ratio));
+  --s-3: calc(var(--s-2) / var(--ratio));
+  --s-2: calc(var(--s-1) / var(--ratio));
+  --s-1: calc(var(--s0) / var(--ratio));
+  --s0: 1rem;
+  --s1: calc(var(--s0) * var(--ratio));
+  --s2: calc(var(--s1) * var(--ratio));
+  --s3: calc(var(--s2) * var(--ratio));
+  --s4: calc(var(--s3) * var(--ratio));
+  --s5: calc(var(--s4) * var(--ratio));
+
+  --font-size-small: var(--s-2);
+  --font-size-smallish: var(--s-1);
+  --font-size-base: var(--s0);
+  --font-size-biggish: var(--s1);
+  --font-size-big: var(--s2);
+  --font-size-biggest: var(--s3);
+
+  --border-thin: var(--s-6);
+}
+
+body {
+  font-size: 62.5%;
+  font-family: "Wotfard";
+}
+
+/* exception-based limit for width is a measure (60ch) */
+* {
+  max-width: var(--measure);
+}
+
+html,
+body,
+div,
+header,
+nav,
+main,
+footer {
+  max-width: none;
+}
+
+h1 {
+  font-size: var(--font-size-biggest);
+}
+h2 {
+  font-size: var(--font-size-big);
+}
+h3 {
+  font-size: var(--font-size-biggish);
+}
+
+body[data-theme="light"] {
+  --colors-primary: black;
+  --colors-background: white;
+  --colors-fun: purple;
+  --navfade: url("/fadelight.png");
+}
+body[data-theme="dark"] {
+  --colors-primary: rgb(231, 231, 231);
+  --colors-background: #1a1a2e;
+  --colors-fun: yellow;
+  --navfade: url("/fadedark.png");
+}
+
+/* utility classes */
+.font-size\:small {
+  font-size: var(--font-size-small) !important;
+}
+
+.font-size\:smallish {
+  font-size: var(--font-size-smallish) !important;
+}
+
+.font-size\:base {
+  font-size: var(--font-size-base) !important;
+}
+
+.font-size\:biggish {
+  font-size: var(--font-size-biggish) !important;
+}
+
+.font-size\:big {
+  font-size: var(--font-size-big) !important;
+}
+
+.font-size\:biggest {
+  font-size: var(--font-size-biggest) !important;
+}
+
+body {
+  color: var(--colors-primary);
+  background-color: var(--colors-background);
+  transition: background-color 0.5s;
+}
