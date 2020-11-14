@@ -1,22 +1,25 @@
 import React from "react";
 import styled from "@emotion/styled";
-import Link from "next/link";
+import Link from "../components/link";
 import { isSafari } from "react-device-detect";
+import { Center, Box } from "./layouts";
 import { useLocalStorageState, useCounter } from "../utils/hooks";
 
 export default function Header() {
   const [actionIndex, setActionIndex] = React.useState(0);
   const [addTransition, setAddTransition] = React.useState(true);
+  const [spin, setSpin] = React.useState(false);
+  // This counter simulates the irregular frencuency of a human typing.
   const [count, resetCount] = useCounter(0, Math.random() * 300 + 90);
   const [isDark, setIsDark] = useLocalStorageState("theme", false);
 
-  console.log(isSafari);
+  const toggleTheme = () => setIsDark((prev) => !prev);
 
+  // The css needed for fading the header background image needs help singling out
+  // only safari browsers, we will use addTransition as an argument to a styled component.
   React.useEffect(() => {
     if (isSafari) setAddTransition(false);
   }, [addTransition]);
-
-  const toggleTheme = () => setIsDark((prev) => !prev);
 
   React.useEffect(() => {
     document.body.dataset.theme = isDark ? "dark" : "light";
@@ -30,110 +33,162 @@ export default function Header() {
   }, [count, resetCount, actionIndex]);
 
   return (
-    <HeaderContainer>
-      <HeaderBar addTransition={addTransition}>
-        <img src="/worldblot.png" alt="ink blot" width={60} height={60} />
-        <div className="callout">
-          <div>gustavo.is</div>
-          <div className="typewrite">
-            <div>{actions[actionIndex].slice(0, count)}</div>
-            <div>⎽</div>
-          </div>
-        </div>
-        <nav>
-          <div>
-            <Link href="/">Portfolio</Link>
-          </div>
-          <div>
-            <Link href="/test">Blog</Link>
-          </div>
-          <div>About</div>
-          <button aria-pressed={isDark} onClick={toggleTheme}>
-            <span role="img" aria-label="color theme icon">
-              {isDark ? "☀️" : "🌜"}
-            </span>
-          </button>
-        </nav>
-      </HeaderBar>
+    <HeaderContainer addTransition={addTransition}>
+      <Center maxWidth="1100px">
+        <HeaderBar>
+          <Logo spin={spin} aria-pressed={spin} onClick={() => setSpin(!spin)}>
+            <img src="/worldblot.png" alt="ink blot" width={60} height={60} />
+          </Logo>
+          <Legend padding="0">
+            <div className="gustavo">gustavo.is</div>
+            <div className="typewritten">
+              <div>{actions[actionIndex].slice(0, count)}</div>
+              <div>⎽</div>
+            </div>
+          </Legend>
+          <Nav>
+            <Box padding="var(--s0)">
+              <Link href="/">
+                <a>Portfolio</a>
+              </Link>
+            </Box>
+            <Box padding="var(--s0)">
+              <Link href="/fonts">
+                <a>Blog</a>
+              </Link>
+            </Box>
+            <Box padding="var(--s0)">
+              <a>About</a>
+            </Box>
+            <Box padding="var(--s0)">
+              <button aria-pressed={isDark} onClick={toggleTheme}>
+                <span role="img" aria-label="color theme icon">
+                  {isDark ? "☀️" : "🌜"}
+                </span>
+              </button>
+            </Box>
+          </Nav>
+        </HeaderBar>
+      </Center>
     </HeaderContainer>
   );
 }
 //
 export { Header };
 
+// Creates the container fixed to the top of the screen with the fade image
 const HeaderContainer = styled.div`
+  --border-debug: none;
+
   position: fixed;
   top: 0;
   width: 100vw;
+  background: var(--navfade) bottom center no-repeat;
+  background-size: 100% 100%;
+  border: var(--border-debug);
+  /* fade-in and out is jerky if we add this transition on safari but fully breaks if we omit it in chrome */
+  ${(props) => (props.addTransition ? "transition: background 0.5s;" : "")}
 `;
 
+// Grid container for three header sections: image, legend and nav
 const HeaderBar = styled.div`
   display: grid;
   grid-template-columns: auto 1fr 1fr;
   align-items: center;
-  background: var(--navfade) bottom center no-repeat;
-  background-size: 100% 100%;
-  padding: var(--s1);
-  max-width: 1200px;
-  ${(props) => (props.addTransition ? "transition: background 0.5s;" : "")}
-  img {
-    margin-right: var(--s1);
-  }
 
-  nav {
-    display: flex;
-    align-items: center;
-    justify-self: right;
+  border: var(--border-debug);
 
-    div {
-      padding: 0 var(--s1);
-      font-size: var(--font-size-base);
-    }
-    button {
-      font-size: var(--font-size-base);
-      width: var(--s2);
-      height: var(--s2);
-      border-radius: 999px;
-      color: white;
-      border: 1px dotted var(--colors-background);
-      background-color: var(--colors-secondary);
-      :hover {
-        border: 1px dotted gray;
-      }
-    }
-    
+  ${Box} {
+    border: var(--border-debug);
   }
-  div.callout {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: baseline;
-    font-family: "Wotfard";
-    font-weight: 400;
+`;
+
+const Logo = styled.button`
+  border: none;
+  padding: var(--s1) var(--s-1) var(--s1) var(--s1);
+  background-color: transparent;
+  border: var(--border-debug);
+  ${(props) =>
+    props.spin
+      ? `
+    img { 
+      animation: spin 200s linear infinite;
+    }`
+      : ""};
+`;
+
+// flexbox container for the site name and typewritten message
+const Legend = styled(Box)`
+  display: flex;
+  flex-flow: row nowrap;
+  flex-basis: 1;
+  border: var(--border-debug);
+
+  .gustavo {
     font-size: var(--font-size-biggish);
+    font-weight: 400;
   }
-  div.typewrite {
-    display: float;
+
+  /* typewritten message + cursor container*/
+  .typewritten {
+    display: flex;
     letter-spacing: normal;
     font-family: "Indie Flower", sans-serif;
     font-size: var(--font-size-base);
     font-weight: 400;
     color: var(--colors-fun);
-    margin-left: var(--s-2);
-    text-decoration: underline dashed;
-    @keyframes blinker {
-      50% {
-        opacity: 0;
-      }
+    padding-left: var(--s-2);
+
+    text-decoration: underline dotted;
+
+    div {
+      padding-top: 0.6em;
     }
+    /* blinking cursor at the end of the sentence */
     div:last-of-type {
       animation: blinker 1s linear infinite;
       margin-left: -0.5em;
-      margin-top: 0.1em;
     }
+  }
+`;
+
+const Nav = styled.nav`
+  justify-self: right;
+  align-items: center;
+  font-weight: 600;
+  display: flex;
+  flex-flow: row nowrap;
+
+  .current {
+    background: url("/stars2.png") left center no-repeat;
+    background-size: 1em;
+  }
+
+  a {
+    text-decoration: none;
+    padding-left: 1em;
+  }
+
+  button {
+    font-size: var(--font-size-base);
+    width: var(--s2);
+    height: var(--s2);
+    align-self: bottom;
+    border-radius: 25px;
+    color: white;
+    border: 1px dotted var(--colors-background);
+    background-color: var(--colors-secondary);
+    :hover {
+      border: 1px dotted gray;
+    }
+    :active {
+      animation: font-bounce 0.5s 0s cubic-bezier(0.18, 1.06, 0.6, 0.95) none; /*cubic-bezier(0.47, 0, 0.745, 0.715)*/
+    }
+  }
 `;
 
 const actions = [
-  "ready for something new...      ",
+  "ready for new ideas...      ",
   "glad you are here...      ",
   "coding...      ",
   "typing furiously...      ",

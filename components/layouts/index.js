@@ -1,3 +1,5 @@
 import { Box } from "./box";
+import { Center } from "./center";
+import { Switcher } from "./switcher";
 
-export { Box };
+export { Box, Center, Switcher };

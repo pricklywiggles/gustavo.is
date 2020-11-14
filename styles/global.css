@@ -8,12 +8,21 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+@font-face {
+  font-family: "Wotfard";
+  src: url("/fonts/Wotfard/wotfard-thin-webfont.ttf");
+  src: url("/fonts/Wotfard/wotfard-extralight-webfont.ttf");
+  src: url("/fonts/Wotfard/wotfard-light-webfont.ttf");
+  src: url("/fonts/Wotfard/wotfard-regular-webfont.ttf");
+  src: url("/fonts/Wotfard/wotfard-semibold-webfont.ttf");
+  src: url("/fonts/Wotfard/wotfard-bold-webfont.ttf");
+}
+
 @font-face {
   font-family: "Wotfard";
   src: url("/fonts/Wotfard/wotfard-thin-webfont.eot");
-  src: url("/fonts/Wotfard/wotfard-thin-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("/fonts/Wotfard/wotfard-thin-webfont.ttf") format("truetype");
+  src: url("/fonts/Wotfard/wotfard-thin-webfont.ttf");
   font-weight: 100;
   font-display: swap;
 }
@@ -63,6 +72,44 @@ html {
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Archia";
+  src: url("/fonts/Archia/archia-regular-webfont.eot");
+  src: url("/fonts/Archia/archia-regular-webfont.eot?#iefix")
+      format("embedded-opentype"),
+    url("/fonts/Archia/archia-regular-webfont.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Basier";
+  src: url("/fonts/BasierMono/basiercirclemono-regular-webfont.eot");
+  src: url("/fonts/BasierMono/basiercirclemono-regular-webfont.eot?#iefix")
+      format("embedded-opentype"),
+    url("/fonts/BasierMono/basiercirclemono-regular-webfont.ttf")
+      format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Parking";
+  src: url("/fonts/Parking/parking-regular-webfont.eot");
+  src: url("/fonts/Parking/parking-regular-webfont.eot?#iefix")
+      format("embedded-opentype"),
+    url("/fonts/Parking/parking-regular-webfont.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Silka";
+  src: url("/fonts/Silka/silka-regular-webfont.eot");
+  src: url("/fonts/Silka/silka-regular-webfont.eot?#iefix")
+      format("embedded-opentype"),
+    url("/fonts/Silka/silka-regular-webfont.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+
 :root {
   --measure: 60ch;
 
@@ -74,7 +121,7 @@ html {
   --s-3: calc(var(--s-2) / var(--ratio));
   --s-2: calc(var(--s-1) / var(--ratio));
   --s-1: calc(var(--s0) / var(--ratio));
-  --s0: 1rem;
+  --s0: 1.1rem;
   --s1: calc(var(--s0) * var(--ratio));
   --s2: calc(var(--s1) * var(--ratio));
   --s3: calc(var(--s2) * var(--ratio));
@@ -89,11 +136,6 @@ html {
   --font-size-biggest: var(--s3);
 
   --border-thin: var(--s-6);
-}
-
-body {
-  font-size: 62.5%;
-  font-family: "Wotfard";
 }
 
 /* exception-based limit for width is a measure (60ch) */
@@ -111,6 +153,15 @@ footer {
   max-width: none;
 }
 
+body {
+  font-family: Wotfard, Silka, Futura, --apple-system, sans-serif;
+}
+
+p {
+  font-size: var(--font-size-base);
+  line-height: 140%;
+}
+
 h1 {
   font-size: var(--font-size-biggest);
 }
@@ -121,17 +172,26 @@ h3 {
   font-size: var(--font-size-biggish);
 }
 
+/* theme based colors and values. -transitional vars are for the header fade transition */
 body[data-theme="light"] {
   --colors-primary: black;
   --colors-background: white;
+  --colors-background-gradient: rgba(255, 255, 255, 0);
+  --colors-background-transitional: rgba(26, 26, 46);
+  --colors-background-gradient-transitional: rgba(26, 26, 46, 0);
   --colors-fun: purple;
   --navfade: url("/fadelight.png");
+  --light-header-opacity: 1;
 }
 body[data-theme="dark"] {
   --colors-primary: rgb(231, 231, 231);
-  --colors-background: #1a1a2e;
+  --colors-background: rgba(26, 26, 46);
+  --colors-background-gradient: rgba(26, 26, 46, 0);
+  --colors-background-transitional: white;
+  --colors-background-gradient-transitional: rgba(255, 255, 255, 0);
   --colors-fun: yellow;
   --navfade: url("/fadedark.png");
+  --light-header-opacity: 0;
 }
 
 /* utility classes */
@@ -163,4 +223,33 @@ body {
   color: var(--colors-primary);
   background-color: var(--colors-background);
   transition: background-color 0.5s;
+}
+
+/* animations */
+
+@keyframes font-bounce {
+  0% {
+    font-size: var(--font-size-base);
+  }
+  50% {
+    font-size: var(--font-size-big);
+  }
+  100% {
+    font-size: var(--font-size-base);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
 }

@@ -28,5 +28,5 @@ Box.propTypes = {
 
 Box.defaultProps = {
   padding: "var(--s1)",
-  borderWidth: "var(--border-thin)"
+  borderWidth: "0"
 };
