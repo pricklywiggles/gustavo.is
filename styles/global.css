@@ -180,8 +180,8 @@ body[data-theme="light"] {
   --colors-background-transitional: rgba(26, 26, 46);
   --colors-background-gradient-transitional: rgba(26, 26, 46, 0);
   --colors-fun: purple;
-  --navfade: url("/fadelight.png");
   --light-header-opacity: 1;
+  --theme-switch-icon: "🌜";
 }
 body[data-theme="dark"] {
   --colors-primary: rgb(231, 231, 231);
@@ -190,8 +190,8 @@ body[data-theme="dark"] {
   --colors-background-transitional: white;
   --colors-background-gradient-transitional: rgba(255, 255, 255, 0);
   --colors-fun: yellow;
-  --navfade: url("/fadedark.png");
   --light-header-opacity: 0;
+  --theme-switch-icon: "☀️";
 }
 
 /* utility classes */

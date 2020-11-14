@@ -62,9 +62,9 @@ export default function Header() {
             </Box>
             <Box padding="var(--s0)">
               <button aria-pressed={isDark} onClick={toggleTheme}>
-                <span role="img" aria-label="color theme icon">
+                {/* <span role="img" aria-label="color theme icon">
                   {isDark ? "☀️" : "🌜"}
-                </span>
+                </span> */}
               </button>
             </Box>
           </Nav>
@@ -83,11 +83,49 @@ const HeaderContainer = styled.div`
   position: fixed;
   top: 0;
   width: 100vw;
-  background: var(--navfade) bottom center no-repeat;
-  background-size: 100% 100%;
-  border: var(--border-debug);
-  /* fade-in and out is jerky if we add this transition on safari but fully breaks if we omit it in chrome */
-  ${(props) => (props.addTransition ? "transition: background 0.5s;" : "")}
+
+  * {
+    z-index: 3;
+  }
+
+  ::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    background: linear-gradient(
+      to bottom,
+      white,
+      white,
+      white,
+      rgba(255, 255, 255, 0)
+    );
+    transition: opacity 0.5s;
+    opacity: var(--light-header-opacity);
+  }
+
+  ::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+
+    background: linear-gradient(
+      to bottom,
+      rgba(26, 26, 46),
+      rgba(26, 26, 46),
+      rgba(26, 26, 46),
+      rgba(26, 26, 46, 0)
+    );
+    transition: opacity 0.5s;
+    opacity: calc(1 - var(--light-header-opacity));
+  }
 `;
 
 // Grid container for three header sections: image, legend and nav
@@ -170,6 +208,9 @@ const Nav = styled.nav`
   }
 
   button {
+    ::before {
+      content: var(--theme-switch-icon);
+    }
     font-size: var(--font-size-base);
     width: var(--s2);
     height: var(--s2);
