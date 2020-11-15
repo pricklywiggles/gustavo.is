@@ -182,6 +182,7 @@ body[data-theme="light"] {
   --colors-fun: purple;
   --light-header-opacity: 1;
   --theme-switch-icon: "🌜";
+  --highlight-icon: url("/cloud.png");
 }
 body[data-theme="dark"] {
   --colors-primary: rgb(231, 231, 231);
@@ -192,6 +193,7 @@ body[data-theme="dark"] {
   --colors-fun: yellow;
   --light-header-opacity: 0;
   --theme-switch-icon: "☀️";
+  --highlight-icon: url("/stars.png");
 }
 
 /* utility classes */

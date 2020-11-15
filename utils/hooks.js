@@ -62,3 +62,22 @@ export function useCounter(initialValue = 0, tick = 1000) {
 
   return [counter, reset];
 }
+
+export function useWindowWidth() {
+  const [width, setWidth] = React.useState(() =>
+    typeof window !== "undefined" ? window.innerWidth : 800
+  );
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const handleResize = () => {
+        console.log("width resized to", window.innerWidth);
+        setWidth(window.innerWidth);
+      };
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }
+  }, []);
+
+  return width;
+}

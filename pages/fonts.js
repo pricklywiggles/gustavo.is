@@ -1,7 +1,6 @@
 import Head from "next/head";
 import React from "react";
 import { css } from "@emotion/core";
-import { Header } from "../components/header";
 import { Box, Center } from "../components/layouts";
 import styled from "@emotion/styled";
 
@@ -13,7 +12,6 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div>
-        <Header />
         <Center
           gutterWidth="var(--s1)"
           css={css`

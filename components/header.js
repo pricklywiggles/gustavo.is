@@ -21,7 +21,7 @@ export default function Header() {
     if (isSafari) setAddTransition(false);
   }, [addTransition]);
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     document.body.dataset.theme = isDark ? "dark" : "light";
   }, [isDark]);
 
@@ -37,7 +37,7 @@ export default function Header() {
       <Center maxWidth="1100px">
         <HeaderBar>
           <Logo spin={spin} aria-pressed={spin} onClick={() => setSpin(!spin)}>
-            <img src="/worldblot.png" alt="ink blot" width={60} height={60} />
+            <img src="/worldblot.png" alt="ink blot" />
           </Logo>
           <Legend padding="0">
             <div className="gustavo">gustavo.is</div>
@@ -47,20 +47,20 @@ export default function Header() {
             </div>
           </Legend>
           <Nav>
-            <Box padding="var(--s0)">
+            <Box>
               <Link href="/">
                 <a>Portfolio</a>
               </Link>
             </Box>
-            <Box padding="var(--s0)">
+            <Box>
               <Link href="/fonts">
                 <a>Blog</a>
               </Link>
             </Box>
-            <Box padding="var(--s0)">
+            <Box>
               <a>About</a>
             </Box>
-            <Box padding="var(--s0)">
+            <Box>
               <button aria-pressed={isDark} onClick={toggleTheme}>
                 {/* <span role="img" aria-label="color theme icon">
                   {isDark ? "☀️" : "🌜"}
@@ -134,6 +134,14 @@ const HeaderBar = styled.div`
   grid-template-columns: auto 1fr 1fr;
   align-items: center;
 
+  --local-font-size: var(--font-size-smallish);
+  --local-space: var(--s-3);
+
+  @media (min-width: 768px) {
+    --local-font-size: var(--font-size-base);
+    --local-space: var(--s0);
+  }
+
   border: var(--border-debug);
 
   ${Box} {
@@ -142,10 +150,20 @@ const HeaderBar = styled.div`
 `;
 
 const Logo = styled.button`
-  border: none;
+  border: var(--border-debug);
   padding: var(--s1) var(--s-1) var(--s1) var(--s1);
   background-color: transparent;
-  border: var(--border-debug);
+
+  --logo-size: var(--s2);
+  @media (min-width: 768px) {
+    --logo-size: var(--s3);
+  }
+
+  img {
+    height: var(--logo-size);
+    width: var(--logo-size);
+  }
+
   ${(props) =>
     props.spin
       ? `
@@ -157,22 +175,25 @@ const Logo = styled.button`
 
 // flexbox container for the site name and typewritten message
 const Legend = styled(Box)`
+  border: var(--border-debug);
   display: flex;
   flex-flow: row nowrap;
-  flex-basis: 1;
-  border: var(--border-debug);
 
   .gustavo {
-    font-size: var(--font-size-biggish);
+    font-size: calc(var(--local-font-size) * var(--ratio));
     font-weight: 400;
   }
 
   /* typewritten message + cursor container*/
   .typewritten {
-    display: flex;
+    display: none;
+
+    @media (min-width: 768px) {
+      display: flex;
+    }
     letter-spacing: normal;
     font-family: "Indie Flower", sans-serif;
-    font-size: var(--font-size-base);
+    font-size: var(--local-font-size);
     font-weight: 400;
     color: var(--colors-fun);
     padding-left: var(--s-2);
@@ -196,10 +217,16 @@ const Nav = styled.nav`
   font-weight: 600;
   display: flex;
   flex-flow: row nowrap;
+  font-size: var(--local-font-size);
+
+  ${Box} {
+    padding: var(--local-space);
+    ${"" /* padding: var(--s0); */}
+  }
 
   .current {
-    background: url("/stars2.png") left center no-repeat;
-    background-size: 1em;
+    background: var(--highlight-icon) left center no-repeat;
+    background-size: 0.8em;
   }
 
   a {
@@ -211,11 +238,10 @@ const Nav = styled.nav`
     ::before {
       content: var(--theme-switch-icon);
     }
-    font-size: var(--font-size-base);
     width: var(--s2);
     height: var(--s2);
     align-self: bottom;
-    border-radius: 25px;
+    border-radius: 25px;dd
     color: white;
     border: 1px dotted var(--colors-background);
     background-color: var(--colors-secondary);
