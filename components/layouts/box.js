@@ -9,7 +9,6 @@ import PropTypes from "prop-types";
 export const Box = styled.div`
   padding: ${(props) => props.padding};
   border: ${(props) => props.borderWidth} solid;
-  color: var(--colors-dark);
   background-color: inherit;
   outline: 0.125rem solid transparent;
   outline-offset: -0.125rem;
@@ -28,5 +27,5 @@ Box.propTypes = {
 
 Box.defaultProps = {
   padding: "var(--s1)",
-  borderWidth: "0"
+  borderWidth: "0px"
 };

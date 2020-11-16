@@ -3,6 +3,7 @@ import React from "react";
 import { css } from "@emotion/core";
 import { Header } from "../components/header";
 import { Box, Center } from "../components/layouts";
+import { headerRoom } from "../styles/util";
 import styled from "@emotion/styled";
 
 export default function Home() {
@@ -12,14 +13,7 @@ export default function Home() {
         <title>Hello World</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Center
-        gutterWidth="var(--s1)"
-        css={css`
-          padding-top: 100px;
-          font-family: Wotfard;
-          font-style: normal;
-        `}
-      >
+      <Center css={headerRoom} gutterWidth="var(--s1)">
         <div>
           <h1>This is an h1</h1>
           <h2>This is an h2</h2>

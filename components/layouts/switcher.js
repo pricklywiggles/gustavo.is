@@ -8,21 +8,21 @@ import PropTypes from "prop-types";
  */
 export const Switcher = styled.div`
   display: block;
-  > * {
+  & > * {
     display: flex;
     flex-wrap: wrap;
     margin: calc(${(props) => props.space} / 2) * -1);
   }
 
-  > * > * {
+  & > * > * {
     flex-grow: 1;
     ${(props) =>
       `flex-basis: calc((${props.threshold} - (100% - ${props.space})) * 999);
       margin: calc(${props.space} / 2);`}
   }
 
-  > * > :nth-last-child(n+${(props) => props.limit + 1}),
-  > * > :nth-last-child(n+${(props) => props.limit + 1}) ~ * {
+  & > * > :nth-last-child(n+${(props) => props.limit + 1}),
+  & > * > :nth-last-child(n+${(props) => props.limit + 1}) ~ * {
     flex-basis: 100%;
   }
 `;

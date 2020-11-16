@@ -81,3 +81,10 @@ export function useWindowWidth() {
 
   return width;
 }
+
+export function useToggle(initialState) {
+  const [isOn, setIsOn] = React.useState(initialState);
+  const toggle = React.useCallback(() => setIsOn((prev) => !prev), []);
+
+  return [isOn, toggle, setIsOn];
+}

@@ -136,6 +136,17 @@ html {
   --font-size-biggest: var(--s3);
 
   --border-thin: var(--s-6);
+
+  --colors-white-rgb: 255, 255, 255;
+  --colors-offwhite-rgb: 231, 231, 231;
+  --colors-darkpurple-rgb: 26, 26, 46;
+  --colors-black-rgb: 0, 0, 0;
+  --colors-ponder-rgb: 246, 241, 237;
+
+  --colors-primary-light-rgb: var(--colors-black-rgb);
+  --colors-primary-dark-rgb: var(--colors-offwhite-rgb);
+  --colors-background-light-rgb: var(--colors-ponder-rgb);
+  --colors-background-dark-rgb: var(--colors-darkpurple-rgb);
 }
 
 /* exception-based limit for width is a measure (60ch) */
@@ -174,22 +185,20 @@ h3 {
 
 /* theme based colors and values. -transitional vars are for the header fade transition */
 body[data-theme="light"] {
-  --colors-primary: black;
-  --colors-background: white;
-  --colors-background-gradient: rgba(255, 255, 255, 0);
-  --colors-background-transitional: rgba(26, 26, 46);
-  --colors-background-gradient-transitional: rgba(26, 26, 46, 0);
+  --colors-primary-rgb: var(--colors-primary-light-rgb);
+  --colors-background-rgb: var(--colors-background-light-rgb);
+  --colors-primary: rgb(var(--colors-primary-rgb));
+  --colors-background: rgb(var(--colors-background-rgb));
   --colors-fun: purple;
   --light-header-opacity: 1;
-  --theme-switch-icon: "🌜";
+  --theme-switch-icon: "🌗";
   --highlight-icon: url("/cloud.png");
 }
 body[data-theme="dark"] {
-  --colors-primary: rgb(231, 231, 231);
-  --colors-background: rgba(26, 26, 46);
-  --colors-background-gradient: rgba(26, 26, 46, 0);
-  --colors-background-transitional: white;
-  --colors-background-gradient-transitional: rgba(255, 255, 255, 0);
+  --colors-primary-rgb: var(--colors-primary-dark-rgb);
+  --colors-background-rgb: var(--colors-background-dark-rgb);
+  --colors-primary: rgb(var(--colors-primary-rgb));
+  --colors-background: rgb(var(--colors-background-rgb));
   --colors-fun: yellow;
   --light-header-opacity: 0;
   --theme-switch-icon: "☀️";
@@ -238,6 +247,18 @@ body {
   }
   100% {
     font-size: var(--font-size-base);
+  }
+}
+
+@keyframes font-bounce-small {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(0.7);
+  }
+  50% {
+    transform: scale(1);
   }
 }
 
