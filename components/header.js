@@ -3,7 +3,7 @@ import React from "react";
 import styled from "@emotion/styled";
 import { useRouter } from "next/router";
 import Link from "../components/link";
-import { Center, Box, Stack } from "./layouts";
+import { Center, Box } from "./layouts";
 import { useLocalStorageState, useCounter, useToggle } from "../utils/hooks";
 
 export default function Header() {
@@ -12,7 +12,7 @@ export default function Header() {
   const router = useRouter();
   // This counter simulates the irregular frencuency of a human typing.
   const [count, resetCount] = useCounter(0, Math.random() * 300 + 90);
-  const [isDark, setIsDark] = useLocalStorageState("theme", false);
+  const [isDark, setIsDark] = useLocalStorageState("theme", true);
   const [isMenuOpen, toggleMenuOpen, setIsMenuOpen] = useToggle(false);
   const toggleTheme = () => setIsDark((prev) => !prev);
 
@@ -21,6 +21,12 @@ export default function Header() {
     setIsMenuOpen(false);
   }, [router.pathname, setIsMenuOpen]);
 
+  // Fixes flash bug due to css transition.
+  React.useEffect(() => {
+    document.body.dataset.bgtransition = "loaded";
+  }, []);
+
+  // sets css variables for a given theme.
   React.useEffect(() => {
     document.body.dataset.theme = isDark ? "dark" : "light";
   }, [isDark]);
@@ -54,12 +60,12 @@ export default function Header() {
             </Legend>
             <Nav isMenuOpen={isMenuOpen} className="hidden">
               <Box>
-                <Link href="/">
+                <Link href="/" passHref>
                   <a>Portfolio</a>
                 </Link>
               </Box>
               <Box>
-                <Link href="/fonts">
+                <Link href="/fonts" passHref>
                   <a>Blog</a>
                 </Link>
               </Box>
@@ -67,7 +73,11 @@ export default function Header() {
                 <a>About</a>
               </Box>
               <Box>
-                <IconButton aria-pressed={isDark} onClick={toggleTheme} />
+                <IconButton
+                  aria-pressed={isDark}
+                  aria-label="dark theme"
+                  onClick={toggleTheme}
+                />
               </Box>
               <Box>
                 <div>Made with </div>
@@ -82,7 +92,7 @@ export default function Header() {
         </Center>
       </HeaderContainer>
 
-      <MenuButton onClick={toggleMenuOpen}>
+      <MenuButton aria-label="menu" onClick={toggleMenuOpen}>
         <Box padding="var(--s0)">
           <Hamburger isMenuOpen={isMenuOpen}>
             {isMenuOpen ? (
@@ -252,6 +262,9 @@ const Legend = styled(Box)`
 const Nav = styled.nav`
   display: flex;
   transition: 0.3s cubic-bezier(0.77, 0, 0.175, 1);
+  * {
+    font-size: var(--font-size-base);
+  }
   @media (max-width: 767px) {
     ${(props) => (props.isMenuOpen ? "left: 0;" : "left: 100vw;")}
     position: fixed;
@@ -259,6 +272,7 @@ const Nav = styled.nav`
     background-color: rgba(var(--colors-background-rgb), 0.5);
     backdrop-filter: blur(20px);
     flex-flow: column;
+    z-index: 1;
 
     height: 100vh;
     width: 100vw;
@@ -286,16 +300,20 @@ const Nav = styled.nav`
     }
 
     & > :nth-last-child(2) {
-      font-size: var(--font-size-smallish);
+      & > * {
+        font-size: var(--font-size-smallish);
+      }
       align-self: center;
-      display: float;
+      div:first-of-type {
+        float: left;
+      }
       div {
-        padding-left: 1.8em;
-        padding-right: 0.5em;
+        float: left;
       }
       span {
-        position: absolute;
-        padding-right: 1em;
+        float: left;
+        padding-left: var(--s-2);
+        padding-right: var(--s-3);
         animation: font-bounce-small 1s 0s cubic-bezier(0.18, 1.06, 0.6, 0.95)
           infinite;
       }
@@ -350,6 +368,7 @@ const IconButton = styled.button`
 `;
 
 const MenuButton = styled.button`
+  z-index: 1;
   @media (min-width: 768px) {
     display: none;
   }

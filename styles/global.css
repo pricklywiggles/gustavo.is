@@ -121,19 +121,22 @@ html {
   --s-3: calc(var(--s-2) / var(--ratio));
   --s-2: calc(var(--s-1) / var(--ratio));
   --s-1: calc(var(--s0) / var(--ratio));
-  --s0: 1.1rem;
+  --s0: 1rem;
   --s1: calc(var(--s0) * var(--ratio));
   --s2: calc(var(--s1) * var(--ratio));
   --s3: calc(var(--s2) * var(--ratio));
   --s4: calc(var(--s3) * var(--ratio));
   --s5: calc(var(--s4) * var(--ratio));
 
-  --font-size-small: var(--s-2);
-  --font-size-smallish: var(--s-1);
+  --font-size-smaller: var(--s-2);
+  --font-size-small: var(--s-1);
   --font-size-base: var(--s0);
-  --font-size-biggish: var(--s1);
-  --font-size-big: var(--s2);
+  --font-size-big: var(--s1);
+  --font-size-bigger: var(--s2);
   --font-size-biggest: var(--s3);
+
+  --font-size-biggish: calc(var(--font-size-base) * 1.25);
+  --font-size-smallish: calc(var(--font-size-base) / 1.25);
 
   --border-thin: var(--s-6);
 
@@ -205,6 +208,10 @@ body[data-theme="dark"] {
   --highlight-icon: url("/stars.png");
 }
 
+body[data-bgtransition="loaded"] {
+  transition: background-color 0.5s;
+}
+
 /* utility classes */
 .font-size\:small {
   font-size: var(--font-size-small) !important;
@@ -233,7 +240,6 @@ body[data-theme="dark"] {
 body {
   color: var(--colors-primary);
   background-color: var(--colors-background);
-  transition: background-color 0.5s;
 }
 
 /* animations */
