@@ -19,17 +19,17 @@ export const Stack = styled.div`
     height: 100%;
   }
 
-  & > :nth-child(${(props) => props.splitAt}) {
+  & > :nth-of-type(${(props) => props.splitAt}) {
     margin-bottom: auto;
   }
 `;
 
 Stack.propTypes = {
-  margin: PropTypes.string,
+  space: PropTypes.string,
   splitAt: PropTypes.number
 };
 
 Stack.defaultProps = {
-  margin: "var(--s1)",
+  space: "var(--s1)",
   splitAt: 4
 };

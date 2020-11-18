@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 /**
  * Implementation of Every Layout's Box component.
- *
+ * props: padding and borderWidth
  * @visibleName A Layout Box Primitive.
  */
 export const Box = styled.div`

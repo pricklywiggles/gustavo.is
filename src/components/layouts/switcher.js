@@ -6,38 +6,46 @@ import PropTypes from "prop-types";
  *
  * @visibleName A Switcher Primitive.
  */
-export const Switcher = styled.div`
+export const Switcher = ({ children, ...props }) => (
+  <SwitcherContainer {...props}>
+    <div>{children}</div>
+  </SwitcherContainer>
+);
+
+const SwitcherContainer = styled.div`
   display: block;
   & > * {
     display: flex;
     flex-wrap: wrap;
-    margin: calc(${(props) => props.space} / 2) * -1);
+    overflow: hidden;
+    ${"" /* margin: calc(${(props) => props.space} / 2) * -1); */}
   }
 
   & > * > * {
     flex-grow: 1;
     ${(props) =>
-      `flex-basis: calc((${props.threshold} - (100% - ${props.space})) * 999);
+      `flex-basis: calc((${props.threshold} - 100%) * 999);
       margin: calc(${props.space} / 2);`}
   }
 
-  & > * > :nth-last-child(n+${(props) => props.limit + 1}),
-  & > * > :nth-last-child(n+${(props) => props.limit + 1}) ~ * {
-    flex-basis: 100%;
-  }
+  ${(props) => `
+  & > * > :nth-last-child(n+${props.limit + 1}),
+  & > * > :nth-last-child(n+${props.limit + 1}) ~ * {
+    flex-basis: 99.23%;
+  `}
 `;
 
-Switcher.propTypes = {
+SwitcherContainer.propTypes = {
   threshold: PropTypes.string,
   space: PropTypes.string,
   limit: PropTypes.number
 };
 
-Switcher.defaultProps = {
+SwitcherContainer.defaultProps = {
   /** CSS width value representing the container breakpoint */
   threshold: "var(--measure)",
   /** CSS margin value */
   space: "var(--s1)",
   /** Maximum number of items permitted horizontally */
-  limit: 4
+  limit: 3
 };

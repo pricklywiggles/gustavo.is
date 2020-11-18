@@ -23,6 +23,14 @@ module.exports = {
   rules: {
     "prettier/prettier": "error",
     "react/react-in-jsx-scope": 0,
-    "react/prop-types": 0
+    "react/prop-types": 0,
+    "jsx-a11y/anchor-is-valid": [
+      "error",
+      {
+        components: ["Link"],
+        specialLink: ["hrefLeft", "hrefRight"],
+        aspects: ["invalidHref", "preferButton"]
+      }
+    ]
   }
 };

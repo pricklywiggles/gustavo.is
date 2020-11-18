@@ -2,9 +2,10 @@
 import React from "react";
 import styled from "@emotion/styled";
 import { useRouter } from "next/router";
-import Link from "../components/link";
+import Link from "./link";
 import { Center, Box } from "./layouts";
 import { useLocalStorageState, useCounter, useToggle } from "../utils/hooks";
+import { WithLove } from "./sprinkles";
 
 export default function Header() {
   const [actionIndex, setActionIndex] = React.useState(0);
@@ -58,17 +59,17 @@ export default function Header() {
                 <div>⎽</div>
               </div>
             </Legend>
-            <Nav isMenuOpen={isMenuOpen} className="hidden">
+            <Nav isMenuOpen={isMenuOpen}>
               <Box>
                 <Link href="/" passHref>
                   <a>Portfolio</a>
                 </Link>
               </Box>
-              <Box>
+              <div>
                 <Link href="/fonts" passHref>
                   <a>Blog</a>
                 </Link>
-              </Box>
+              </div>
               <Box>
                 <a>About</a>
               </Box>
@@ -79,13 +80,14 @@ export default function Header() {
                   onClick={toggleTheme}
                 />
               </Box>
-              <Box>
+              <WithLove />
+              {/* <Box>
                 <div>Made with </div>
                 <span role="img" aria-label="love">
                   🤎
                 </span>
                 <div>in Los Angeles</div>
-              </Box>
+              </Box> */}
               <Box padding="var(--s3)"></Box>
             </Nav>
           </HeaderBar>
@@ -295,28 +297,12 @@ const Nav = styled.nav`
       height: 100%;
     }
 
-    & > :nth-child(3) {
+    & > :nth-of-type(3) {
       margin-bottom: auto;
     }
 
     & > :nth-last-child(2) {
-      & > * {
-        font-size: var(--font-size-smallish);
-      }
       align-self: center;
-      div:first-of-type {
-        float: left;
-      }
-      div {
-        float: left;
-      }
-      span {
-        float: left;
-        padding-left: var(--s-2);
-        padding-right: var(--s-3);
-        animation: font-bounce-small 1s 0s cubic-bezier(0.18, 1.06, 0.6, 0.95)
-          infinite;
-      }
     }
   }
 
