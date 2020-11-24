@@ -42,6 +42,7 @@ export default function Header() {
 
   return (
     <div>
+      <HeaderPad />
       <HeaderContainer>
         <Center maxWidth="1100px">
           <HeaderBar>
@@ -65,13 +66,15 @@ export default function Header() {
                   <a>Portfolio</a>
                 </Link>
               </Box>
-              <div>
+              <Box>
                 <Link href="/fonts" passHref>
                   <a>Blog</a>
                 </Link>
-              </div>
+              </Box>
               <Box>
-                <a>About</a>
+                <Link href="/layouts" passHref>
+                  <a>About</a>
+                </Link>
               </Box>
               <Box>
                 <IconButton
@@ -81,13 +84,6 @@ export default function Header() {
                 />
               </Box>
               <WithLove />
-              {/* <Box>
-                <div>Made with </div>
-                <span role="img" aria-label="love">
-                  🤎
-                </span>
-                <div>in Los Angeles</div>
-              </Box> */}
               <Box padding="var(--s3)"></Box>
             </Nav>
           </HeaderBar>
@@ -120,9 +116,20 @@ export default function Header() {
 //
 export { Header };
 
+// Adds a block element the size of the header that helps better lay out pages
+const HeaderPad = styled.div`
+  display: none;
+  height: calc(var(--s1) + var(--s3));
+  @media (min-width: 768px) {
+    display: block;
+    height: calc(var(--s1) + var(--s3));
+  }
+`;
+
 // Creates the container fixed to the top of the screen with the fade image
 const HeaderContainer = styled.div`
   --border-debug: none;
+  z-index: 1;
 
   @media (min-width: 768px) {
     position: fixed;
@@ -130,7 +137,7 @@ const HeaderContainer = styled.div`
     width: 100vw;
 
     * {
-      z-index: 3;
+      z-index: 1;
     }
 
     /* In order to transition the gradients nicely when the theme changes we must do 
@@ -144,7 +151,6 @@ const HeaderContainer = styled.div`
       right: 0;
       bottom: 0;
       left: 0;
-      z-index: 1;
       background: linear-gradient(
         to bottom,
         rgb(var(--colors-background-light-rgb)),
@@ -163,7 +169,6 @@ const HeaderContainer = styled.div`
       right: 0;
       bottom: 0;
       left: 0;
-      z-index: 2;
 
       background: linear-gradient(
         to bottom,
@@ -366,8 +371,8 @@ const MenuButton = styled.button`
 `;
 
 const Hamburger = styled.div`
-  width: var(--s3);
-  height: var(--s3);
+  width: calc(var(--s3) + var(--s-1));
+  height: calc(var(--s3) + var(--s-1));
   color: white;
 
   ${(props) =>
@@ -378,7 +383,7 @@ const Hamburger = styled.div`
   `
       : ``}
 
-  padding-top: var(--s-1);
+  padding-top: var(--s0);
   font-size: var(--font-size-big);
 `;
 

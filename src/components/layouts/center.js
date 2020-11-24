@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 
 /**
  * Implementation of Every Layout's Center component.
+ * Props: maxWidth, alignText, gutterWidth, intrinsic.
  *
  * @visibleName A Layout Center Primitive.
  */

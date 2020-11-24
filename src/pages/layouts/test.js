@@ -20,7 +20,6 @@ export default function Home() {
     <Container>
       <div>
         <Stack>
-          <Box></Box>
           <Cluster justify="space-between">
             <Box>Logo</Box>
             <Cluster>
@@ -31,13 +30,24 @@ export default function Home() {
             </Cluster>
           </Cluster>
           <Center maxWidth="80%">
+            <Cover minHeight="50%">
+              <div>Some cover header text</div>
+              <h1>This text is the main text of the cover</h1>
+              <div>Some cover footer text</div>
+            </Cover>
+            <Imposter fixed>
+              <Box css={{ backgroundColor: "black" }}>This is an imposter!</Box>
+            </Imposter>
+          </Center>
+          <Center maxWidth="80%">
             <Frame ratio="4:4">
               <img
                 alt="vista"
                 src="https://images.unsplash.com/photo-1605441065768-a2798213ac26?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1300&q=80"
               />
             </Frame>
-            <Box>This is the Biographical section which is mostly text</Box>{" "}
+
+            <Box>This is the Biographical section which is mostly text</Box>
           </Center>
           <div>
             <div>Projects</div>
@@ -74,6 +84,34 @@ export default function Home() {
               Contact Form with some nice controls and a superior textarea
             </Box>
           </Center>
+          <Grid>
+            <Box>Grid Item 1</Box>
+            <Box>Grid Item 2</Box>
+            <Box>Grid Item 3</Box>
+            <Box>Grid Item 4</Box>
+            <Box>Grid Item 5</Box>
+            <Box>Grid Item 6</Box>
+            <Box>Grid Item 7</Box>
+            <Box>Grid Item 8</Box>
+            <Box>Grid Item 9</Box>
+            <Box>Grid Item 10</Box>
+            <Box>Grid Item 11</Box>
+            <Box>Grid Item 12</Box>
+          </Grid>
+          <Reel>
+            <Box>Reel Item 1</Box>
+            <Box>Reel Item 2</Box>
+            <Box>Reel Item 3</Box>
+            <Box>Reel Item 4</Box>
+            <Box>Reel Item 5</Box>
+            <Box>Reel Item 6</Box>
+            <Box>Reel Item 7</Box>
+            <Box>Reel Item 8</Box>
+            <Box>Reel Item 9</Box>
+            <Box>Reel Item 10</Box>
+            <Box>Reel Item 11</Box>
+            <Box>Reel Item 12</Box>
+          </Reel>
           <div>Footer</div>
         </Stack>
       </div>

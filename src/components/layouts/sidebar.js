@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 /**
  * Implementation of Every Layout's Switcher component.
  * Two elements are displayed either side by side (if space permits) or on top of each other
- * Props:
+ * Props: side, sideWidth, contentMin, space, noStretch
  *
  * @visibleName A Sidebar Primitive.
  */

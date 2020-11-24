@@ -8,20 +8,20 @@ import PropTypes from "prop-types";
  */
 export const Switcher = ({ children, ...props }) => (
   <SwitcherContainer {...props}>
-    <div>{children}</div>
+    <div className="container">{children}</div>
   </SwitcherContainer>
 );
 
 const SwitcherContainer = styled.div`
   display: block;
-  & > * {
+  & > div {
     display: flex;
     flex-wrap: wrap;
     overflow: hidden;
-    ${"" /* margin: calc(${(props) => props.space} / 2) * -1); */}
+    margin: calc(${(props) => props.space} / 2) * -1); 
   }
 
-  & > * > * {
+  & > div > * {
     flex-grow: 1;
     ${(props) =>
       `flex-basis: calc((${props.threshold} - 100%) * 999);
@@ -47,5 +47,5 @@ SwitcherContainer.defaultProps = {
   /** CSS margin value */
   space: "var(--s1)",
   /** Maximum number of items permitted horizontally */
-  limit: 3
+  limit: 4
 };

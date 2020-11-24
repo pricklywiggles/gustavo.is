@@ -192,6 +192,7 @@ body[data-theme="light"] {
   --colors-background-rgb: var(--colors-background-light-rgb);
   --colors-primary: rgb(var(--colors-primary-rgb));
   --colors-background: rgb(var(--colors-background-rgb));
+  --colors-background-secondary: #ffffff;
   --colors-fun: purple;
   --light-header-opacity: 1;
   --theme-switch-icon: "🌗";
@@ -202,6 +203,7 @@ body[data-theme="dark"] {
   --colors-background-rgb: var(--colors-background-dark-rgb);
   --colors-primary: rgb(var(--colors-primary-rgb));
   --colors-background: rgb(var(--colors-background-rgb));
+  --colors-background-secondary: #0f3460;
   --colors-fun: yellow;
   --light-header-opacity: 0;
   --theme-switch-icon: "☀️";
