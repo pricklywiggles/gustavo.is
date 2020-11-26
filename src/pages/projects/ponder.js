@@ -6,10 +6,9 @@ import {
   Switcher,
   Cluster,
   Sidebar,
-  Frame,
-  Stack
+  Frame
 } from "components/layouts";
-import { css } from "@emotion/core";
+import { Logo } from "components/logo";
 import styled from "@emotion/styled";
 
 const technologies = {
@@ -17,28 +16,79 @@ const technologies = {
     name: "React",
     logoUrl: "/react-logo.svg",
     highlights: [
-      "React single page app.",
-      "Bundled with Parcel.",
-      "Modern hook based architecture."
+      "📄 React single page app",
+      "📦 Bundled with Parcel",
+      "🪝 Modern hook based architecture"
     ]
   },
-  urql: { name: "Urql GraphQL Client", logoUrl: "/urql-logo.svg" },
-  neo4j: { name: "Neo4J Aura Graph Database", logoUrl: "/neo4j-logo.svg" },
-  vercel: { name: "Vercel", logoUrl: "/vercel-logo.svg" },
-  digitalOcean: { name: "DigitalOcean", logoUrl: "/digitalocean-logo.svg" },
-  apollo: { name: "Apollo GraphQL Server", logoUrl: "/apollo-logo.svg" },
+  urql: {
+    name: "Urql",
+    logoUrl: "/urql-logo.svg",
+    highlights: [
+      "🕊 Lightweight GraphQL client",
+      "🏪 Normalized cache",
+      "🔒 Custom auth exchange",
+      "⚡️ Subscriptions for real time notifications"
+    ]
+  },
+  neo4j: {
+    name: "Neo4J Graph DB",
+    logoUrl: "/neo4j-logo.svg",
+    highlights: [
+      "🔌 Our own model and js driver code",
+      "💾 Simple analytics scripts"
+    ]
+  },
+  vercel: {
+    name: "Vercel",
+    logoUrl: "/vercel-logo.svg",
+    invertable: true,
+    highlights: [
+      "📡 SPA Client deployment",
+      "🔧 Utility lambda functions (JS)",
+      "🌎 Domain management"
+    ]
+  },
+  digitalOcean: {
+    name: "DigitalOcean",
+    logoUrl: "/digitalocean-logo.svg",
+    highlights: [
+      "🏚 GraphQL server hosting",
+      "👯‍♂️ Deployed production, development and staging environments",
+      "📦 AWS S3 compatible storage"
+    ]
+  },
+  apollo: {
+    name: "Apollo GraphQL Server",
+    logoUrl: "/apollo-logo.svg",
+    invertable: true,
+    highlights: [
+      "🔑 JWT expiration/refresh auth",
+      "💫 Leveraged directives for authentication and simple DB queries",
+      "🗞 PubSub based subscriptions for real time notifications"
+    ]
+  },
   styledComponents: {
     name: "Styled-Components",
-    icon: "💅"
+    icon: "💅",
+    highlights: ["📄 CSS-in-JS to power Dave Gorum's beautiful design"]
+  },
+  integrations: {
+    name: "Integrations",
+    icon: "🤝",
+    highlights: [
+      "📧 Postmark (email notifications)",
+      "📈 Segment (analytics)",
+      "🌄 Unsplash (photos)",
+      "💾 DigitalOcean (storage)"
+    ]
   }
 };
 
-export default function Project(props) {
-  const [activeTech, setActiveTech] = React.useState("react");
-
+export default function Project() {
   return (
     <Container>
-      <Center alignText="center">
+      <Center alignText={true}>
         <Cover minHeight="90vh">
           <h1>
             <img
@@ -49,92 +99,97 @@ export default function Project(props) {
             />
             , a group blogging platform.
           </h1>
-          <div>Explore the project 👇</div>
+          <div>
+            Explore the project{" "}
+            <span role="img" aria-label="">
+              👇
+            </span>
+          </div>
         </Cover>
       </Center>
       <Section alternate>
-        <Center alignText>
-          <h2>Inception and Purpose</h2>
-        </Center>
-        <Sidebar>
-          <Box>
-            <Center>
-              <Frame css={{ minWidth: "400px" }} ratio="1:1">
-                <img
-                  alt="ponder homepage screenshot"
-                  css={{ borderRadius: "20px" }}
-                  src="/ponder-screen1.jpg"
-                ></img>
-              </Frame>
-            </Center>
-          </Box>
+        <Center maxWidth="calc(var(--measure) * 2)">
+          <Center alignText>
+            <h2>Inception and Purpose</h2>
+          </Center>
+          <Sidebar contentMin="45%">
+            <Box>
+              <Center>
+                <Frame css={{ minWidth: "350px" }} ratio="1:1">
+                  <img
+                    alt="ponder homepage screenshot"
+                    css={{ borderRadius: "20px" }}
+                    src="/ponder-screen1.jpg"
+                  ></img>
+                </Frame>
+              </Center>
+            </Box>
 
-          <Box>
-            <Center>
-              <h3>
-                Founded in mid-2019 by Kristen Pavle, Dave Gorum and myself,
-                Ponder was a blogging platform focused on simplicity aimed at
-                people that wanted to publish a blog collaboratively.
-              </h3>
-              <p>
-                We built a product where small groups of people collaborated on
-                creating content, had private discussions and published their
-                content to the web.
-              </p>
-              <p>
-                Following the Slack team model, each group blog collaborated
-                privately and users could be members of a number of different
-                blogs. The group would then choose which content to publish on
-                the Ponder Blogs site.
-              </p>
-              <p>
-                We worked hard to design a product that would promote meaningful
-                content and meaningful discussions as a small counterbalance to
-                pervailing social media trends.
-              </p>
-              <p>
-                My responsibility was engineering, I was the sole developer
-                (frontend/backend/db and ops), it was the most challenging yet
-                rewarding experience in my professional life. Never have I
-                learned so much in such a short amount of time.
-              </p>
-            </Center>
-          </Box>
-        </Sidebar>
+            <Box>
+              <Center>
+                <h3>
+                  Founded in mid-2019 by Kristen Pavle, Dave Gorum and myself,
+                  Ponder was a blogging platform focused on simplicity aimed at
+                  people that wanted to publish a blog collaboratively.
+                </h3>
+                <p>
+                  We built a product where small groups of people collaborated
+                  on creating content, had private discussions and published
+                  their content to the web.
+                </p>
+                <p>
+                  Following the Slack team model, each group blog collaborated
+                  privately and users could be members of a number of different
+                  blogs. The group would then choose which content to publish on
+                  the Ponder Blogs site.
+                </p>
+                <p>
+                  We worked hard to design a product that would promote
+                  meaningful content and meaningful discussions as a small
+                  counterbalance to pervailing social media trends.
+                </p>
+                <p>
+                  My responsibility was engineering, I was the sole developer
+                  (frontend/backend/db and ops), it was the most challenging yet
+                  rewarding experience in my professional life. Never have I
+                  learned so much in such a short amount of time.
+                </p>
+              </Center>
+            </Box>
+          </Sidebar>
+        </Center>
       </Section>
-      <Center alignText>
-        <h2>Technologies</h2>
-      </Center>
-      <Center alignText="center" maxWidth="100%">
-        <Box>
-          <Cluster css={{ overflow: "visible" }} justify="space-around">
-            {Object.keys(technologies).map((name) => (
-              <Logo
-                key={name}
-                onClick={() => setActiveTech(name)}
-                src={technologies[name].logoUrl}
-                isActive={activeTech === name}
-                icon={technologies[name].icon}
-              />
-            ))}
-          </Cluster>
-        </Box>
-        <Box css={{ borderTop: "1px solid yellow" }}>
-          <Stack>
-            {technologies[activeTech].highlights?.map((highlight) => (
-              <div>{highlight}</div>
-            ))}
-          </Stack>
-        </Box>
-      </Center>
-      <Section alternate>
+      <Section>
         <Center alignText>
+          <h2>Technologies</h2>
+        </Center>
+        <Center alignText maxWidth="90%">
+          <Cluster align="flex-start" justify="space-around" space="var(--s3)">
+            {Object.entries(technologies).map(
+              ([key, { name, logoUrl, icon, invertable, highlights = [] }]) => (
+                <Card key={key}>
+                  <div>
+                    <Logo src={logoUrl} icon={icon} invertable={invertable} />
+                    <div className="title">{name}</div>
+                    {highlights.map((highlight) => (
+                      <div className="highlight" key={highlight}>
+                        {highlight}
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              )
+            )}
+          </Cluster>
+        </Center>
+      </Section>
+      <Section alternate>
+        <Center alignText={true}>
           <h2>Highlights</h2>
         </Center>
-
         <Switcher threshold="90ch" space="0">
           <Box className="video">
-            <Center>
+            <Center gutterWidth="5.5px">
               <Embed>
                 <iframe
                   title="Post editor"
@@ -219,7 +274,10 @@ export default function Project(props) {
           <Box>
             <Center>
               <ul>
-                <li>Organize your post by adding it to a collection.</li>
+                <li>
+                  Organize your content by adding posts to collections shared
+                  with all members of the blog.
+                </li>
                 <li>View collection feeds.</li>
                 <li>
                   Personalize your collection with cover image and metadata.
@@ -287,21 +345,22 @@ export default function Project(props) {
           </Box>
           <Box>
             <Center>
-              <p>
-                Once a blog has been made public, all published content is
-                available to anyone at ponder.to/[Blog Name] using NextJS and
-                SSR.
-              </p>
-              <p>
-                Public blogs can be personalized by adding moods (color themes
-                with styling rules) through different font families and some
-                minor layout options, making each blog unique, all possible
-                thanks to styled-components.
-              </p>
-              <p>
-                For an in depth look, see the Ponder Blogs project exploration
-                page.
-              </p>
+              <ul>
+                <li>
+                  Once a blog is made public, all published content is available
+                  at a personalized ponder.to/[blog] url.
+                </li>
+                <li>
+                  Public blogs can be personalized by admins by adding moods
+                  (color themes, layout, font and styling presets) from the
+                  app.ponder.to site at any time making each blog unique.
+                </li>
+                <li>
+                  The public-facing blog site is a separate SSR NextJS
+                  application, you can read more about it in the Ponder Blogs
+                  project exploration page.
+                </li>
+              </ul>
             </Center>
           </Box>
         </Switcher>
@@ -338,7 +397,8 @@ const Container = styled.div`
     padding: 0;
   }
   li {
-    line-height: 2;
+    line-height: 1.5;
+    padding-top: 1em;
     ::before {
       content: "⚡︎ ";
       color: yellow;
@@ -353,7 +413,9 @@ const Container = styled.div`
 
 const Section = ({ alternate, children }) => (
   <SectionWrapper alternate={alternate}>
-    <Center maxWidth="calc(var(--measure) * 2)">{children}</Center>
+    {/* <Center maxWidth="calc(var(--measure) * 2)"> */}
+    {children}
+    {/* </Center> */}
   </SectionWrapper>
 );
 
@@ -365,48 +427,27 @@ const SectionWrapper = styled.div`
       : "var(--colors-background)"};
 `;
 
-// const Logo = ({ onClick, legend, bg, src, activeTech }) => (
-//   <TechButton
-//     onClick={onClick}
-//     src={src}
-//     bg={bg}
-//     active={activeTech === legend}
-//   ></TechButton>
-// );
+const Card = styled(Box)`
+  width: 280px;
+  line-height: var(--s2);
 
-const Logo = styled.button`
-  ${(props) =>
-    props.isActive
-      ? `
-      box-shadow: 
-        0 0 5px 2px var(--colors-primary),
-        inset 0 0 10px 5px var(--colors-primary);
-      `
-      : ""}
-  border: none;
-  border-radius: 999px;
-  padding: 0;
-  width: 5ch;
-  height: 5ch;
-  background: ${(props) =>
-    props.src ? `black url(${props.src}) no-repeat center` : "black"};
-  background-size: 3ch 3ch;
+  & > div {
+    display: flex;
+    flex-flow: column;
+  }
 
-  ${(props) =>
-    props.icon
-      ? `
-    &::before {
-      content: "💅";
-      font-size: var(--font-size-big);
-    }`
-      : ""}
+  .title {
+    font-size: var(--font-size-big);
+    text-transform: lowercase;
+    font-variant: small-caps;
 
-  @media (min-width: 700px) {
-    width: 7ch;
-    height: 7ch;
-    background-size: 5ch 5ch;
-    &::before {
-      font-size: var(--font-size-bigger);
+    &::after {
+      display: block;
+      content: "";
+      width: 100%;
+      padding-bottom: var(--s0);
+      border-bottom: 2px dotted var(--colors-fun);
+      margin-bottom: 10px;
     }
   }
 `;

@@ -21,13 +21,14 @@ export const Center = styled.div`
     padding-right: ${props.gutterWidth};`
       : ""};
 
-  ${(props) =>
-    props.intrinsic
+  ${(props) => {
+    return props.intrinsic
       ? `
     display: flex;
     flex-direction: column;
     align-items: center;`
-      : ""};
+      : "";
+  }};
 `;
 
 Center.propTypes = {

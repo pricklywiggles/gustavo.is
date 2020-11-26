@@ -2,7 +2,7 @@
 import React from "react";
 import styled from "@emotion/styled";
 import { useRouter } from "next/router";
-import Link from "./link";
+import NavLink from "./navlink";
 import { Center, Box } from "./layouts";
 import { useLocalStorageState, useCounter, useToggle } from "../utils/hooks";
 import { WithLove } from "./sprinkles";
@@ -12,7 +12,10 @@ export default function Header() {
   const [spin, setSpin] = React.useState(false);
   const router = useRouter();
   // This counter simulates the irregular frencuency of a human typing.
-  const [count, resetCount] = useCounter(0, Math.random() * 300 + 90);
+  const [count, resetCount, toggleCounter] = useCounter(
+    0,
+    Math.random() * 300 + 90
+  );
   const [isDark, setIsDark] = useLocalStorageState("theme", true);
   const [isMenuOpen, toggleMenuOpen, setIsMenuOpen] = useToggle(false);
   const toggleTheme = () => setIsDark((prev) => !prev);
@@ -49,7 +52,7 @@ export default function Header() {
             <Logo
               spin={spin}
               aria-pressed={spin}
-              onClick={() => setSpin(!spin)}
+              onClick={() => toggleCounter()}
             >
               <img src="/worldblot.png" alt="ink blot" />
             </Logo>
@@ -62,19 +65,19 @@ export default function Header() {
             </Legend>
             <Nav isMenuOpen={isMenuOpen}>
               <Box>
-                <Link href="/" passHref>
+                <NavLink href="/" passHref>
                   <a>Portfolio</a>
-                </Link>
+                </NavLink>
               </Box>
               <Box>
-                <Link href="/fonts" passHref>
+                <NavLink href="/fonts" passHref>
                   <a>Blog</a>
-                </Link>
+                </NavLink>
               </Box>
               <Box>
-                <Link href="/layouts" passHref>
+                <NavLink href="/layouts" passHref>
                   <a>About</a>
-                </Link>
+                </NavLink>
               </Box>
               <Box>
                 <IconButton

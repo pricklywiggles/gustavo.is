@@ -50,17 +50,20 @@ export function useLocalStorageState(
 
 export function useCounter(initialValue = 0, tick = 1000) {
   const [counter, setCounter] = React.useState(initialValue);
+  const [running, toggle] = useToggle(true);
   const tickRef = React.useRef(tick);
   const reset = React.useCallback(() => setCounter(0), []);
 
   React.useEffect(() => {
-    let timer = setTimeout(() => {
-      setCounter((prev) => prev + 1);
-    }, tickRef.current);
-    return () => clearTimeout(timer);
-  }, [counter]);
+    if (running) {
+      let timer = setTimeout(() => {
+        setCounter((prev) => prev + 1);
+      }, tickRef.current);
+      return () => clearTimeout(timer);
+    }
+  }, [counter, running]);
 
-  return [counter, reset];
+  return [counter, reset, toggle];
 }
 
 export function useWindowWidth() {

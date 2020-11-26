@@ -25,8 +25,8 @@ export default function Home() {
         <Link href="/layouts/home">
           <Box>Home Layout</Box>
         </Link>
-        <Link href="/layouts/project">
-          <Box>Project Detail Layout</Box>
+        <Link href="/layouts/card">
+          <Box>Card</Box>
         </Link>
         <Link href="/layouts/test">
           <Box>All Layout Components</Box>
