@@ -10,7 +10,7 @@ import PropTypes from "prop-types";
  */
 export const Sidebar = ({ children, ...props }) => (
   <SidebarContainer {...props}>
-    <div>{children}</div>
+    <div className="sidebar">{children}</div>
   </SidebarContainer>
 );
 
@@ -39,7 +39,7 @@ const SidebarContainer = styled.div`
 SidebarContainer.propTypes = {
   side: PropTypes.string,
   sideWidth: PropTypes.string,
-  contentMin: PropTypes.number,
+  contentMin: PropTypes.string,
   space: PropTypes.string,
   noStretch: PropTypes.bool
 };

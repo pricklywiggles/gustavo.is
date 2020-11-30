@@ -142,15 +142,23 @@ html {
 
   --colors-white-rgb: 255, 255, 255;
   --colors-offwhite-rgb: 231, 231, 231;
-  --colors-darkpurple-rgb: 26, 26, 46;
-  --colors-gunmetal-rgb: 25, 44, 56;
+  --colors-xiketic-rgb: 26, 26, 46; /* 240, 28, 14 */
+  --colors-gunmetal-rgb: 25, 44, 56; /* 203, 38, 16 */
   --colors-black-rgb: 0, 0, 0;
   --colors-ponder-rgb: 246, 241, 237;
+  --colors-palespringbud-rgb: 244, 247, 190; /* 63 78 86 */
+  --colors-aero-rgb: 135 188 222; /* 203 57 70 */
+  --colors-midnightgreeneagle-rgb: 11, 58, 70; /* 192, 73, 16 */
+
+  --colors-palespringbud: rgb(var(--colors-palespringbud-rgb));
+  --colors-aero: rgb(var(--colors-aero-rgb));
+  --colors-midnightgreeneagle: rgb(var(--colors-midnightgreeneagle-rgb));
+  --colors-gunmetal: rgb(var(--colors-gunmetal-rgb));
 
   --colors-primary-light-rgb: var(--colors-black-rgb);
   --colors-primary-dark-rgb: var(--colors-offwhite-rgb);
   --colors-background-light-rgb: var(--colors-ponder-rgb);
-  --colors-background-dark-rgb: var(--colors-darkpurple-rgb);
+  --colors-background-dark-rgb: var(--colors-xiketic-rgb);
 }
 
 /* exception-based limit for width is a measure (60ch) */
@@ -193,25 +201,30 @@ body[data-theme="light"] {
   --colors-background-rgb: var(--colors-background-light-rgb);
   --colors-primary: rgb(var(--colors-primary-rgb));
   --colors-background: rgb(var(--colors-background-rgb));
-  --colors-background-secondary: #ffffff;
+  --colors-background-lighter: #ffffff;
   --colors-fun: purple;
   --light-header-opacity: 1;
   --theme-switch-icon: "🌗";
   --highlight-icon: url("/cloud.png");
-  --icon-inversion: 100%;
+  --icon-inversion: 0%;
 }
 body[data-theme="dark"] {
   --colors-primary-rgb: var(--colors-primary-dark-rgb);
   --colors-background-rgb: var(--colors-background-dark-rgb);
   --colors-primary: rgb(var(--colors-primary-rgb));
   --colors-background: rgb(var(--colors-background-rgb));
-  --colors-background-secondary: rgb(var(--colors-gunmetal-rgb));
-  --colors-background-tertiary: rgb(var(--colors-gunmetal-rgb));
+  --colors-background-darkest: rgb(14, 17, 19);
+  --colors-background-darker: rgb(8, 18, 41);
+  --colors-background-lighter: var(--colors-gunmetal);
+  --colors-background-lightest: var(--colors-midnightgreeneagle);
+  --colors-highlight: var(--colors-palespringbud);
+  --colors-accent: var(--colors-aero);
   --colors-fun: yellow;
+  --colors-error: red;
   --light-header-opacity: 0;
   --theme-switch-icon: "☀️";
   --highlight-icon: url("/stars.png");
-  --icon-inversion: 0%;
+  --icon-inversion: 100%;
 }
 
 body[data-bgtransition="loaded"] {

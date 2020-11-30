@@ -10,82 +10,9 @@ import {
 } from "components/layouts";
 import { Logo } from "components/logo";
 import styled from "@emotion/styled";
+import { stackIcons } from "utils/data";
 
-const technologies = {
-  react: {
-    name: "React",
-    logoUrl: "/react-logo.svg",
-    highlights: [
-      "📄 React single page app",
-      "📦 Bundled with Parcel",
-      "🪝 Modern hook based architecture"
-    ]
-  },
-  urql: {
-    name: "Urql",
-    logoUrl: "/urql-logo.svg",
-    highlights: [
-      "🕊 Lightweight GraphQL client",
-      "🏪 Normalized cache",
-      "🔒 Custom auth exchange",
-      "⚡️ Subscriptions for real time notifications"
-    ]
-  },
-  neo4j: {
-    name: "Neo4J Graph DB",
-    logoUrl: "/neo4j-logo.svg",
-    highlights: [
-      "🔌 Our own model and js driver code",
-      "💾 Simple analytics scripts"
-    ]
-  },
-  vercel: {
-    name: "Vercel",
-    logoUrl: "/vercel-logo.svg",
-    invertable: true,
-    highlights: [
-      "📡 SPA Client deployment",
-      "🔧 Utility lambda functions (JS)",
-      "🌎 Domain management"
-    ]
-  },
-  digitalOcean: {
-    name: "DigitalOcean",
-    logoUrl: "/digitalocean-logo.svg",
-    highlights: [
-      "🏚 GraphQL server hosting",
-      "👯‍♂️ Deployed production, development and staging environments",
-      "📦 AWS S3 compatible storage"
-    ]
-  },
-  apollo: {
-    name: "Apollo GraphQL Server",
-    logoUrl: "/apollo-logo.svg",
-    invertable: true,
-    highlights: [
-      "🔑 JWT expiration/refresh auth",
-      "💫 Leveraged directives for authentication and simple DB queries",
-      "🗞 PubSub based subscriptions for real time notifications"
-    ]
-  },
-  styledComponents: {
-    name: "Styled-Components",
-    icon: "💅",
-    highlights: ["📄 CSS-in-JS to power Dave Gorum's beautiful design"]
-  },
-  integrations: {
-    name: "Integrations",
-    icon: "🤝",
-    highlights: [
-      "📧 Postmark (email notifications)",
-      "📈 Segment (analytics)",
-      "🌄 Unsplash (photos)",
-      "💾 DigitalOcean (storage)"
-    ]
-  }
-};
-
-export default function Project() {
+export default function PonderProject() {
   return (
     <Container>
       <Center alignText={true}>
@@ -93,7 +20,7 @@ export default function Project() {
           <h1>
             <img
               css={{ width: "6ch" }}
-              src="/logomark.svg"
+              src="/logos/ponder-blogs-logo.svg"
               alt="Vercel Logo"
               className="logo"
             />
@@ -423,7 +350,7 @@ const SectionWrapper = styled.div`
   padding: var(--s1);
   background-color: ${(props) =>
     props.alternate
-      ? "var(--colors-background-secondary)"
+      ? "var(--colors-background-lighter)"
       : "var(--colors-background)"};
 `;
 
@@ -451,3 +378,78 @@ const Card = styled(Box)`
     }
   }
 `;
+
+const technologies = {
+  react: {
+    name: "React",
+    logoUrl: stackIcons.react,
+    highlights: [
+      "📄 React single page app",
+      "📦 Bundled with Parcel",
+      "🪝 Modern hook based architecture"
+    ]
+  },
+  urql: {
+    name: "Urql",
+    logoUrl: stackIcons.urql,
+    highlights: [
+      "🕊 Lightweight GraphQL client",
+      "🏪 Normalized cache",
+      "🔒 Custom auth exchange",
+      "⚡️ Subscriptions for real time notifications"
+    ]
+  },
+  neo4j: {
+    name: "Neo4J Graph DB",
+    logoUrl: stackIcons.neo4j,
+    highlights: [
+      "🔌 Our own model and js driver code",
+      "💾 Simple analytics scripts",
+      "💫 Cypher graphql directives"
+    ]
+  },
+  vercel: {
+    name: "Vercel",
+    logoUrl: stackIcons.vercel,
+    invertable: true,
+    highlights: [
+      "📡 SPA Client deployment",
+      "🔧 Utility lambda functions (JS)",
+      "🌎 Domain management"
+    ]
+  },
+  digitalOcean: {
+    name: "DigitalOcean",
+    logoUrl: stackIcons.digitalOcean,
+    highlights: [
+      "🏚 GraphQL server hosting",
+      "👯‍♂️ Deployed production, development and staging environments",
+      "📦 AWS S3 compatible storage"
+    ]
+  },
+  apollo: {
+    name: "Apollo GraphQL Server",
+    logoUrl: stackIcons.apollo,
+    invertable: true,
+    highlights: [
+      "🔑 JWT expiration/refresh auth",
+      "💫 authentication directives",
+      "🗞 PubSub based subscriptions for real time notifications"
+    ]
+  },
+  styledComponents: {
+    name: "Styled-Components",
+    icon: "💅",
+    highlights: ["📄 CSS-in-JS to power Dave Gorum's beautiful design"]
+  },
+  integrations: {
+    name: "Integrations",
+    icon: "🤝",
+    highlights: [
+      "📧 Postmark (email notifications)",
+      "📈 Segment (analytics)",
+      "🌄 Unsplash (photos)",
+      "💾 DigitalOcean (storage)"
+    ]
+  }
+};

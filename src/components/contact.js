@@ -1,27 +1,15 @@
-import {
-  Stack,
-  Center,
-  Box,
-  Switcher,
-  Sidebar,
-  Cover,
-  Cluster,
-  Frame,
-  Imposter,
-  Grid,
-  Reel
-} from "components/layouts";
+import { Stack, Center, Sidebar, Imposter, Box } from "components/layouts";
 import * as React from "react";
-import { Logo } from "components/logo";
-import { css } from "@emotion/core";
 import { useForm } from "react-hook-form";
 import styled from "@emotion/styled";
 
-// eslint-disable-next-line react/display-name
-export default function Home() {
+export function ContactForm() {
   const [count, setCount] = React.useState(0);
   const { register, handleSubmit, errors } = useForm();
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = (data) => {
+    console.log("Submitting", data);
+    fetch("/api/contact", { method: "POST", body: JSON.stringify(data) });
+  };
 
   const handleChange = (event) => setCount(event.target.value.length);
 
@@ -62,58 +50,41 @@ export default function Home() {
             <Error message={errors.email?.message} />
           </div>
           <label htmlFor="message">What&apos;s on your mind?</label>
-          <textarea
-            className={errors.message ? "error" : ""}
-            onChange={handleChange}
-            rows="20"
-            name="message"
-            ref={register({ required: true, maxLength: 2000 })}
-          />
+          <div>
+            <textarea
+              className={errors.message ? "error" : ""}
+              onChange={handleChange}
+              rows="10"
+              name="message"
+              ref={register({
+                required: "You forgot to write something",
+                maxLength: 2000
+              })}
+            />
+            <Error message={errors.message?.message} />
+          </div>
           <Sidebar side="right">
             <Count count={2000 - count} />
-            <input type="submit" />
+            <button type="submit">Send</button>
           </Sidebar>
         </Stack>
+        {/* <Imposter>
+          <Stack className="confirmation">
+            <p>It’s decision time, sunshine!</p>
+            <button type="button">Ok</button>
+          </Stack>
+        </Imposter> */}
       </Form>
     </Center>
   );
 }
 
-const Stuff = styled.div`
-  label {
-    background-color: blue;
-    line-height: 2em;
-    height: 2em;
-  }
-`;
-
-const Container = styled.div`
-  height: 100vh;
-  width: 100vw;
-  display: flex;
-  & > * {
-    width: 100vw;
-    margin: auto;
-    border: 1px solid darkblue;
-  }
-
-  ${Box} {
-    border: 0.5px solid red;
-    border-radius: 20px;
-  }
-
-  ${Stack} {
-    border: 1px dashed gray;
-    & > * {
-      border: 1px dotted yellow;
-    }
-  }
-`;
-
 const Form = styled.form`
+  position: relative;
   display: flex;
   flex-flow: column;
   font-weight: bold;
+  padding: var(--s1);
 
   input,
   textarea {
@@ -124,14 +95,15 @@ const Form = styled.form`
 
   textarea {
     border-radius: var(--s-1);
+    width: calc(100% - var(--s0));
   }
 
   .sidebar label {
     border-radius: var(--s1) 0 0 var(--s-1);
     background-color: var(--colors-background-lighter);
-    line-height: 3em;
+    line-height: 2.5em;
     padding: 0 var(--s1) 0 var(--s1);
-    height: 3em;
+    height: 2.5em;
   }
 
   .sidebar input {
@@ -148,19 +120,47 @@ const Form = styled.form`
     height: 1em;
   }
 
-  input[type="submit"] {
+  button[type="submit"] {
     border: none;
-    width: 100px;
     font-weight: bold;
     align-self: flex-end;
-    line-height: 2em;
-    border-radius: var(--s-1) var(--s-1) var(--s1) var(--s1);
+    line-height: 1.5em;
+    border-radius: var(--s-1);
+    padding: var(--s-3) var(--s0) var(--s-3) var(--s0);
     color: var(--colors-background);
     background-color: var(--colors-accent);
+    opacity: 80%;
     &:hover {
       transform: scale(1.05);
+      opacity: 100%;
+    }
+    &:active {
+      transform: scale(0.95);
+      opacity: 100%;
     }
     transition: all 0.65s cubic-bezier(0.18, 0.9, 0.58, 1);
+  }
+
+  &::after {
+    width: 100%;
+    height: 100%;
+    background-color: white;
+  }
+
+  .confirmation {
+    background-color: rgba(var(--colors-background-rgb), 0.5);
+    backdrop-filter: blur(10px);
+    ${"" /* display: flex;
+    flex-flow: column;
+    width: 655px;
+    height: 450px;
+    justify-content: center;
+
+    z-index: 1;
+    button {
+      align-self: center;
+      justify-self: flex-end;
+    } */}
   }
 `;
 

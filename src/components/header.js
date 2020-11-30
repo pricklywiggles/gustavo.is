@@ -309,7 +309,7 @@ const Nav = styled.nav`
       margin-bottom: auto;
     }
 
-    & > :nth-last-child(2) {
+    & > :nth-last-of-type(2) {
       align-self: center;
     }
   }
