@@ -38,6 +38,20 @@ class MyDocument extends Document {
           />
           <link
             rel="preload"
+            href="/fonts/Wotfard/wotfard-semibold-webfont.ttf"
+            as="font"
+            type="font/ttf"
+            crossOrigin="anonymous"
+          />
+          <link
+            rel="preload"
+            href="/fonts/Wotfard/wotfard-bold-webfont.ttf"
+            as="font"
+            type="font/ttf"
+            crossOrigin="anonymous"
+          />
+          <link
+            rel="preload"
             href="/fonts/Archia/archia-regular-webfont.ttf"
             as="font"
             type="font/ttf"

@@ -1,303 +1,157 @@
-html {
-  box-sizing: border-box;
-}
-*,
-*:before,
-*:after {
-  box-sizing: inherit;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: "Wotfard";
+    src: url("/fonts/Wotfard/wotfard-regular-webfont.eot");
+    src: url("/fonts/Wotfard/wotfard-regular-webfont.eot?#iefix")
+        format("embedded-opentype"),
+      url("/fonts/Wotfard/wotfard-regular-webfont.ttf") format("truetype");
+    font-weight: 400;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Wotfard";
+    src: url("/fonts/Wotfard/wotfard-semibold-webfont.eot");
+    src: url("/fonts/Wotfard/wotfard-semibold-webfont.eot?#iefix")
+        format("embedded-opentype"),
+      url("/fonts/Wotfard/wotfard-semibold-webfont.ttf") format("truetype");
+    font-weight: 600;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Wotfard";
+    src: url("/fonts/Wotfard/wotfard-bold-webfont.eot");
+    src: url("/fonts/Wotfard/wotfard-bold-webfont.eot?#iefix")
+        format("embedded-opentype"),
+      url("/fonts/Wotfard/wotfard-bold-webfont.ttf") format("truetype");
+    font-weight: 700;
+    font-display: swap;
+  }
 }
 
-@font-face {
-  font-family: "Wotfard";
-  src: url("/fonts/Wotfard/wotfard-thin-webfont.ttf");
-  src: url("/fonts/Wotfard/wotfard-extralight-webfont.ttf");
-  src: url("/fonts/Wotfard/wotfard-light-webfont.ttf");
-  src: url("/fonts/Wotfard/wotfard-regular-webfont.ttf");
-  src: url("/fonts/Wotfard/wotfard-semibold-webfont.ttf");
-  src: url("/fonts/Wotfard/wotfard-bold-webfont.ttf");
-}
-
-@font-face {
-  font-family: "Wotfard";
-  src: url("/fonts/Wotfard/wotfard-thin-webfont.eot");
-  src: url("/fonts/Wotfard/wotfard-thin-webfont.ttf");
-  font-weight: 100;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Wotfard";
-  src: url("/fonts/Wotfard/wotfard-extralight-webfont.eot");
-  src: url("/fonts/Wotfard/wotfard-extralight-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("/fonts/Wotfard/wotfard-extralight-webfont.ttf") format("truetype");
-  font-weight: 200;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Wotfard";
-  src: url("/fonts/Wotfard/wotfard-light-webfont.eot");
-  src: url("/fonts/Wotfard/wotfard-light-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("/fonts/Wotfard/wotfard-light-webfont.ttf") format("truetype");
-  font-weight: 300;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Wotfard";
-  src: url("/fonts/Wotfard/wotfard-regular-webfont.eot");
-  src: url("/fonts/Wotfard/wotfard-regular-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("/fonts/Wotfard/wotfard-regular-webfont.ttf") format("truetype");
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Wotfard";
-  src: url("/fonts/Wotfard/wotfard-semibold-webfont.eot");
-  src: url("/fonts/Wotfard/wotfard-semibold-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("/fonts/Wotfard/wotfard-semibold-webfont.ttf") format("truetype");
-  font-weight: 600;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Wotfard";
-  src: url("/fonts/Wotfard/wotfard-bold-webfont.eot");
-  src: url("/fonts/Wotfard/wotfard-bold-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("/fonts/Wotfard/wotfard-bold-webfont.ttf") format("truetype");
-  font-weight: 800;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Archia";
-  src: url("/fonts/Archia/archia-regular-webfont.eot");
-  src: url("/fonts/Archia/archia-regular-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("/fonts/Archia/archia-regular-webfont.ttf") format("truetype");
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Basier";
-  src: url("/fonts/BasierMono/basiercirclemono-regular-webfont.eot");
-  src: url("/fonts/BasierMono/basiercirclemono-regular-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("/fonts/BasierMono/basiercirclemono-regular-webfont.ttf")
-      format("truetype");
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Parking";
-  src: url("/fonts/Parking/parking-regular-webfont.eot");
-  src: url("/fonts/Parking/parking-regular-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("/fonts/Parking/parking-regular-webfont.ttf") format("truetype");
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Silka";
-  src: url("/fonts/Silka/silka-regular-webfont.eot");
-  src: url("/fonts/Silka/silka-regular-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("/fonts/Silka/silka-regular-webfont.ttf") format("truetype");
-  font-weight: 400;
-  font-display: swap;
+@layer utilities {
+  @variants hover, focus {
+    .invert {
+      filter: invert(50%);
+    }
+    .emphasis {
+      filter: brightness(200%);
+    }
+  }
 }
 
 :root {
-  --measure: 60ch;
+  --colors-coolgray-50: #f9fafb;
+  --colors-coolgray-100: #f3f4f6;
+  --colors-coolgray-200: #e5e7eb;
+  --colors-coolgray-300: #d1d5db;
+  --colors-coolgray-400: #9ca3af;
+  --colors-coolgray-500: #6b7280;
+  --colors-coolgray-600: #4b5563;
+  --colors-coolgray-700: #374151;
+  --colors-coolgray-800: #1f2937;
+  --colors-coolgray-900: #111827;
 
-  /* Modular scale points */
-  --ratio: 1.5;
-  --s-6: calc(var(--s-5) / var(--ratio));
-  --s-5: calc(var(--s-4) / var(--ratio));
-  --s-4: calc(var(--s-3) / var(--ratio));
-  --s-3: calc(var(--s-2) / var(--ratio));
-  --s-2: calc(var(--s-1) / var(--ratio));
-  --s-1: calc(var(--s0) / var(--ratio));
-  --s0: 1rem;
-  --s1: calc(var(--s0) * var(--ratio));
-  --s2: calc(var(--s1) * var(--ratio));
-  --s3: calc(var(--s2) * var(--ratio));
-  --s4: calc(var(--s3) * var(--ratio));
-  --s5: calc(var(--s4) * var(--ratio));
+  --colors-purple-50: #faf5ff;
+  --colors-purple-100: #f3e8ff;
+  --colors-purple-200: #e9d5ff;
+  --colors-purple-300: #d8b4fe;
+  --colors-purple-400: #c084fc;
+  --colors-purple-500: #a855f7;
+  --colors-purple-600: #9333ea;
+  --colors-purple-700: #7e22ce;
+  --colors-purple-800: #6b21a8;
+  --colors-purple-900: #581c87;
 
-  --font-size-smaller: var(--s-2);
-  --font-size-small: var(--s-1);
-  --font-size-base: var(--s0);
-  --font-size-big: var(--s1);
-  --font-size-bigger: var(--s2);
-  --font-size-biggest: var(--s3);
+  --colors-bluegray-50: #f8fafc;
+  --colors-bluegray-100: #f1f5f9;
+  --colors-bluegray-200: #e2e8f0;
+  --colors-bluegray-300: #cbd5e1;
+  --colors-bluegray-400: #94a3b8;
+  --colors-bluegray-500: #64748b;
+  --colors-bluegray-600: #475569;
+  --colors-bluegray-700: #334155;
+  --colors-bluegray-800: #1e293b;
+  --colors-bluegray-900: #0f172a;
+  --colors-bluegray-1000: #080d1b;
 
-  --font-size-biggish: calc(var(--font-size-base) * 1.25);
-  --font-size-smallish: calc(var(--font-size-base) / 1.25);
+  --colors-cyan-50: #ecfeff;
+  --colors-cyan-100: #cffafe;
+  --colors-cyan-200: #a5f3fc;
+  --colors-cyan-300: #67e8f9;
+  --colors-cyan-400: #22d3ee;
+  --colors-cyan-500: #06b6d4;
+  --colors-cyan-600: #0891b2;
+  --colors-cyan-700: #0e7490;
+  --colors-cyan-800: #155e75;
+  --colors-cyan-900: #164e63;
 
-  --border-thin: var(--s-6);
-
-  --colors-white-rgb: 255, 255, 255;
-  --colors-offwhite-rgb: 231, 231, 231;
-  --colors-xiketic-rgb: 26, 26, 46; /* 240, 28, 14 */
-  --colors-gunmetal-rgb: 25, 44, 56; /* 203, 38, 16 */
-  --colors-black-rgb: 0, 0, 0;
-  --colors-ponder-rgb: 246, 241, 237;
-  --colors-palespringbud-rgb: 244, 247, 190; /* 63 78 86 */
-  --colors-aero-rgb: 135 188 222; /* 203 57 70 */
-  --colors-midnightgreeneagle-rgb: 11, 58, 70; /* 192, 73, 16 */
-
-  --colors-palespringbud: rgb(var(--colors-palespringbud-rgb));
-  --colors-aero: rgb(var(--colors-aero-rgb));
-  --colors-midnightgreeneagle: rgb(var(--colors-midnightgreeneagle-rgb));
-  --colors-gunmetal: rgb(var(--colors-gunmetal-rgb));
-
-  --colors-primary-light-rgb: var(--colors-black-rgb);
-  --colors-primary-dark-rgb: var(--colors-offwhite-rgb);
-  --colors-background-light-rgb: var(--colors-ponder-rgb);
-  --colors-background-dark-rgb: var(--colors-xiketic-rgb);
+  --colors-yellow-50: #fefce8;
+  --colors-yellow-100: #fef9c3;
+  --colors-yellow-200: #fef08a;
+  --colors-yellow-300: #fde047;
+  --colors-yellow-400: #facc15;
+  --colors-yellow-500: #eab308;
+  --colors-yellow-600: #ca8a04;
+  --colors-yellow-700: #a16207;
+  --colors-yellow-800: #854d0e;
+  --colors-yellow-900: #713f12;
 }
 
-/* exception-based limit for width is a measure (60ch) */
-* {
-  max-width: var(--measure);
-}
-
-html,
-body,
-div,
-header,
-nav,
-main,
-footer {
-  max-width: none;
-}
-
-body {
-  font-family: Wotfard, Silka, Futura, --apple-system, sans-serif;
-}
-
-p {
-  font-size: var(--font-size-base);
-  line-height: 140%;
-}
-
-h1 {
-  font-size: var(--font-size-biggest);
-}
-h2 {
-  font-size: var(--font-size-big);
-}
-h3 {
-  font-size: var(--font-size-biggish);
-}
-
-/* theme based colors and values. -transitional vars are for the header fade transition */
+/* Keep these */
 body[data-theme="light"] {
-  --colors-primary-rgb: var(--colors-primary-light-rgb);
-  --colors-background-rgb: var(--colors-background-light-rgb);
-  --colors-primary: rgb(var(--colors-primary-rgb));
-  --colors-background: rgb(var(--colors-background-rgb));
-  --colors-background-lighter: #ffffff;
-  --colors-fun: purple;
-  --light-header-opacity: 1;
-  --theme-switch-icon: "🌗";
-  --highlight-icon: url("/cloud.png");
-  --icon-inversion: 0%;
+  /* --colors-primary-50: var(--colors-bluegray-50);
+  --colors-primary-100: var(--colors-bluegray-100);
+  --colors-primary-200: var(--colors-bluegray-200);
+  --colors-primary-300: var(--colors-bluegray-300);
+  --colors-primary-400: var(--colors-bluegray-400);
+  --colors-primary-500: var(--colors-bluegray-500);
+  --colors-primary-600: var(--colors-bluegray-600);
+  --colors-primary-700: var(--colors-bluegray-700);
+  --colors-primary-800: var(--colors-bluegray-800);
+  --colors-primary-900: var(--colors-bluegray-900);
+  --colors-background-50: var(--colors-cyan-50);
+  --colors-background-100: var(--colors-cyan-100);
+  --colors-background-200: var(--colors-cyan-200);
+  --colors-background-300: var(--colors-cyan-300);
+  --colors-background-400: var(--colors-cyan-400);
+  --colors-background-500: var(--colors-cyan-500);
+  --colors-background-600: var(--colors-cyan-600);
+  --colors-background-700: var(--colors-cyan-700);
+  --colors-background-800: var(--colors-cyan-800);
+  --colors-background-900: var(--colors-cyan-900); */
+  --colors-primary-lightest: var(--colors-coolgray-500);
+  --colors-primary-lighter: var(--colors-coolgray-600);
+  --colors-primary-regular: var(--colors-coolgray-700);
+  --colors-primary-darker: var(--colors-coolgray-800);
+  --colors-primary-darkest: var(--colors-coolgray-900);
+  --colors-background-lightest: var(--colors-cyan-100);
+  --colors-background-lighter: var(--colors-cyan-200);
+  --colors-background-regular: var(--colors-cyan-300);
+  --colors-background-darker: var(--colors-cyan-400);
+  --colors-background-darkest: var(--colors-cyan-500);
+  background-color: var(--colors-background-regular);
+  color: var(--colors-primary-regular);
 }
 body[data-theme="dark"] {
-  --colors-primary-rgb: var(--colors-primary-dark-rgb);
-  --colors-background-rgb: var(--colors-background-dark-rgb);
-  --colors-primary: rgb(var(--colors-primary-rgb));
-  --colors-background: rgb(var(--colors-background-rgb));
-  --colors-background-darkest: rgb(14, 17, 19);
-  --colors-background-darker: rgb(8, 18, 41);
-  --colors-background-lighter: var(--colors-gunmetal);
-  --colors-background-lightest: var(--colors-midnightgreeneagle);
-  --colors-highlight: var(--colors-palespringbud);
-  --colors-accent: var(--colors-aero);
-  --colors-fun: yellow;
-  --colors-error: red;
-  --light-header-opacity: 0;
-  --theme-switch-icon: "☀️";
-  --highlight-icon: url("/stars.png");
-  --icon-inversion: 100%;
-}
-
-body[data-bgtransition="loaded"] {
-  transition: background-color 0.5s;
-}
-
-/* utility classes */
-.font-size\:small {
-  font-size: var(--font-size-small) !important;
-}
-
-.font-size\:smallish {
-  font-size: var(--font-size-smallish) !important;
-}
-
-.font-size\:base {
-  font-size: var(--font-size-base) !important;
-}
-
-.font-size\:biggish {
-  font-size: var(--font-size-biggish) !important;
-}
-
-.font-size\:big {
-  font-size: var(--font-size-big) !important;
-}
-
-.font-size\:biggest {
-  font-size: var(--font-size-biggest) !important;
+  --colors-primary-lightest: var(--colors-coolgray-100);
+  --colors-primary-lighter: var(--colors-coolgray-200);
+  --colors-primary-regular: var(--colors-coolgray-300);
+  --colors-primary-darker: var(--colors-coolgray-400);
+  --colors-primary-darkest: var(--colors-coolgray-500);
+  --colors-background-lightest: var(--colors-bluegray-700);
+  --colors-background-lighter: var(--colors-bluegray-800);
+  --colors-background-regular: var(--colors-bluegray-900);
+  --colors-background-darker: var(--colors-bluegray-1000);
+  --colors-background-darkest: black;
+  background-color: var(--colors-background-regular);
+  color: var(--colors-primary-regular);
 }
 
 body {
-  color: var(--colors-primary);
-  background-color: var(--colors-background);
-}
-
-/* animations */
-
-@keyframes font-bounce {
-  0% {
-    font-size: var(--font-size-base);
-  }
-  50% {
-    font-size: var(--font-size-big);
-  }
-  100% {
-    font-size: var(--font-size-base);
-  }
-}
-
-@keyframes font-bounce-small {
-  0% {
-    transform: scale(1);
-  }
-  25% {
-    transform: scale(0.7);
-  }
-  50% {
-    transform: scale(1);
-  }
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes blinker {
-  50% {
-    opacity: 0;
-  }
+  color: var(--colors-primary-regular);
+  background-color: var(--colors-background-regular);
 }
