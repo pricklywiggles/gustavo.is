@@ -125,15 +125,21 @@ export default function PonderBlogsProject() {
           <Box>
             <Center>
               <ul>
-                <li>Chatlog-style blog post authoring</li>
-                <li>Optimistic updates</li>
-                <li>Continuous auto-save</li>
-                <li>Independent inputs can be reordered, edited or deleted</li>
                 <li>
-                  Images can be uploaded via file upload or drag and drop{" "}
+                  Simple and elegant design by Dave Gorum to showcase content
+                  from Ponder communities
                 </li>
-                <li>Unlimited image uploads</li>
-                <li>Images stored in DigitalOcean Spaces via AWS S3 driver</li>
+                <li>Blazing fast load times thanks to SSR/SSG</li>
+                <li>
+                  Chronological, collection-based and member-based content
+                  streams per blog.
+                </li>
+                <li>Personalized Blog profile</li>
+                <li>Personalized Member profiles</li>
+                <li>
+                  Built-in high-fidelity OpenGraph metadata for beautiful social
+                  media unfurls
+                </li>
               </ul>
             </Center>
           </Box>
@@ -144,19 +150,13 @@ export default function PonderBlogsProject() {
           <Box>
             <Center>
               <ul>
+                <li>Customize your blog&apos;s color palette with Moods.</li>
+                <li>Personalize your typeface with font family presets.</li>
+                <li>Preset layout options</li>
                 <li>
-                  One-on-one conversations for more meaningful discussions
+                  Show the world what your group blog is all about through
+                  taglines, description, logos and special link.
                 </li>
-                <li>
-                  Private to the group, conversations are not published to the
-                  blog.
-                </li>
-                <li>Message inbox</li>
-                <li>
-                  Real-time in-app notifications powered by GraphQL
-                  subscriptions (urql client, apollo server).
-                </li>
-                <li>Email notifications via PostMark</li>
               </ul>
             </Center>
           </Box>
@@ -280,30 +280,30 @@ const technologies = {
     logoUrl: stackIcons.apollo,
     invertable: true,
     highlights: [
-      "💫  Fully directive-based model for cypher queries, no resolvers"
+      "💫  Fully directive-based model for cypher queries, no explicit resolvers",
+      "🔐 Shared codebase from Ponder client but separate schema ensures privacy of non-published data"
     ]
   },
   neo4j: {
     name: "Neo4J Graph DB",
     logoUrl: stackIcons.neo4j,
     highlights: [
-      "🔌 
+      "⚡️ Optimized indexes for data retrieval speed for blogs data"
     ]
+  },
+  styledComponents: {
+    name: "Styled-Components",
+    icon: "💅",
+    highlights: ["📄 CSS-in-JS powers customized author-side 'moods' or themes"]
   },
   vercel: {
     name: "Vercel",
     logoUrl: stackIcons.vercel,
     invertable: true,
     highlights: [
-      "📡 SPA Client deployment",
-      "🔧 Utility lambda functions (JS)",
+      "📡 Native NextJS deployment solution (from CLI)",
+      "🔧 Lambda function for waitlist signup",
       "🌎 Domain management"
     ]
-  },
-
-  styledComponents: {
-    name: "Styled-Components",
-    icon: "💅",
-    highlights: ["📄 CSS-in-JS powers powerful author-side 'moods' or themes"]
   }
 };
