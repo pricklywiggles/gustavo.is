@@ -1,6 +1,17 @@
+import React from "react";
 import { Box } from "./layouts";
 import styled from "@emotion/styled";
 
+export const BeatingHeart = () => (
+  <>
+    <div className="relative inline">
+      <span className="absolute animate-beat" role="img" aria-label="love">
+        🤎
+      </span>
+    </div>
+    <div className="px-3 sm:px-2 inline"></div>
+  </>
+);
 export const WithLove = () => (
   <BoxWrapper>
     <div>Made with </div>

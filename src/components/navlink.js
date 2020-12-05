@@ -7,7 +7,7 @@ export default function NavLink({ href, children }) {
   let className = children.props.className ?? "";
 
   if (router.pathname === href) {
-    className = `${className} current`;
+    className = `${className} text-accentlight-900 dark:text-accentdark-600  `;
   }
   return <Link href={href}>{React.cloneElement(children, { className })}</Link>;
 }

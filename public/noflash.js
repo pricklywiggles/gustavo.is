@@ -1,12 +1,12 @@
 (function () {
   // Change these if you use something different in your hook.
   var storageKey = "theme";
-  var classNameDark = "dark-mode";
-  var classNameLight = "light-mode";
 
   function setClassOnDocumentBody(isDark) {
-    document.body.dataset.theme = isDark ? "dark" : "light";
-    console.log("set to", document.body.dataset.theme);
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+      console.log("set to dark");
+    }
   }
 
   var preferDarkQuery = "(prefers-color-scheme: dark)";

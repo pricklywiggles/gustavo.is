@@ -1,33 +1,82 @@
 import { Logo } from "components/logo";
+import React from "react";
 import Link from "next/link";
 import { stackIcons } from "utils/data";
 import styled from "@emotion/styled";
+import * as Logos from "components/svg/logos";
 
 export function ProjectCard({ title, href, logo, stack, description }) {
+  const [hovering, setHovering] = React.useState(false);
   return (
     <Link href={href}>
-      <Card>
-        <div>
-          <img src={logo} alt={`${title} logo`} className="logo" />
-          <div className="highlight" />
+      <div
+        className={`flex flex-nowrap mx-auto sm:mx-0 sm:flex-col mb-6 sm:mb-0 overflow-hidden shadow-md hover:shadow-lg transition-all transform hover:scale-101 bg-bglight-lightest dark:bg-bglight dark:text-gray-700 rounded-xl sm:p-4 ${
+          hovering ? "cursor-pointer" : ""
+        }`}
+        onMouseEnter={() => setHovering(true)}
+        onMouseLeave={() => setHovering(false)}
+      >
+        <div
+          className={`card-logo ${
+            hovering ? "card-logo-hover" : ""
+          } relative  w-48 h-48`}
+        >
+          {React.createElement(logo, {
+            className:
+              "absolute p-2 bg-bgdark border-8 border-double border-primary-800 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-3/4 w-3/4 rounded-full"
+          })}
         </div>
-        <div>
-          <div className="title">{title}</div>
-          <div>
-            {stack.map((technology) => (
-              <Logo
-                key={technology}
-                src={stackIcons[technology]}
-                size="2.5ch"
-              />
-            ))}
+        <div className="flex p-2 flex-col justify-around border-l sm:border-l-0 sm:border-t border-bgdark-400 px-2 text-center w-48 h-48">
+          <div className="self-center">
+            <div className=" text-md font-semibold border-2 border-bglight-darker bg-bglight-lighter px-2 uppercase mt-0 sm:-mt-10 rounded-full shadow-sm">
+              {title}
+            </div>
+          </div>
+          <div className="flex justify-around">
+            {stack.map((technology) =>
+              React.createElement(stackIcons[technology], {
+                className: "h-6 w-6"
+              })
+            )}
           </div>
           <div className="description">{description}</div>
+          {/* <div
+            className={`${
+              hovering ? "opacity-100" : "opacity-0"
+            } text-3xl mb-5`}
+          >
+            ↣
+          </div> */}
         </div>
-      </Card>
+      </div>
     </Link>
   );
 }
+
+//   return (
+//     <Link href={href}>
+//       <Card>
+//         <div>
+//           <img src={logo} alt={`${title} logo`} className="logo" />
+//           <div className="highlight" />
+//         </div>
+//         <div>
+//           <div className="title">{title}</div>
+//           <div>
+//             {stack.map((technology) => (
+//               <Logo
+//                 key={technology}
+//                 src={stackIcons[technology]}
+//                 size="2.5ch"
+//               />
+//             ))}
+//           </div>
+//           <div className="description">{description}</div>
+//         </div>
+//       </Card>
+//     </Link>
+//   );
+// }
 
 const Card = styled.div`
   --flow: row nowrap;

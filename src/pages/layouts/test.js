@@ -1,143 +1,77 @@
-import {
-  Stack,
-  Center,
-  Box,
-  Switcher,
-  Sidebar,
-  Cover,
-  Cluster,
-  Frame,
-  Imposter,
-  Grid,
-  Reel
-} from "components/layouts";
-import { css } from "@emotion/core";
-import styled from "@emotion/styled";
+import Head from "next/head";
+import React from "react";
+import Link from "next/link";
+import { headerRoom } from "styles/util";
+import { WithLove } from "components/sprinkles";
+import { ContactForm } from "components/contact";
+import { ProjectCard } from "components/project-card";
+import { projects } from "utils/data";
+import { Stack } from "components/layouts/stack";
 
-// eslint-disable-next-line react/display-name
 export default function Home() {
   return (
-    <Container>
-      <div>
-        <Stack>
-          <Cluster justify="space-between">
-            <Box>Logo</Box>
-            <Cluster>
-              <Box>Link 1</Box>
-              <Box>Link 2</Box>
-              <Box>Link 3</Box>
-              <Box>Link 4</Box>
-            </Cluster>
-          </Cluster>
-          <Center maxWidth="80%">
-            <Cover minHeight="50%">
-              <div>Some cover header text</div>
-              <h1>This text is the main text of the cover</h1>
-              <div>Some cover footer text</div>
-            </Cover>
-            <Imposter fixed>
-              <Box css={{ backgroundColor: "black" }}>This is an imposter!</Box>
-            </Imposter>
-          </Center>
-          <Center maxWidth="80%">
-            <Frame ratio="4:4">
-              <img
-                alt="vista"
-                src="https://images.unsplash.com/photo-1605441065768-a2798213ac26?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1300&q=80"
-              />
-            </Frame>
-
-            <Box>This is the Biographical section which is mostly text</Box>
-          </Center>
-          <div>
-            <div>Projects</div>
-            <Switcher threshold="875px">
-              <Box>
-                <Sidebar sideWidth="50px" noStretch>
-                  <Box>Project Image</Box>
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  </p>
-                </Sidebar>
-              </Box>
-              <Box>
-                <Sidebar sideWidth="50px" noStretch>
-                  <Box>Project Image</Box>
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  </p>
-                </Sidebar>
-              </Box>
-              <Box>
-                <Sidebar sideWidth="50px" noStretch>
-                  <Box>Project Image</Box>
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  </p>
-                </Sidebar>
-              </Box>
-            </Switcher>
-          </div>
-          <Center maxWidth="80%">
-            <div>Contact Me</div>
-            <Box>
-              Contact Form with some nice controls and a superior textarea
-            </Box>
-          </Center>
-          <Grid>
-            <Box>Grid Item 1</Box>
-            <Box>Grid Item 2</Box>
-            <Box>Grid Item 3</Box>
-            <Box>Grid Item 4</Box>
-            <Box>Grid Item 5</Box>
-            <Box>Grid Item 6</Box>
-            <Box>Grid Item 7</Box>
-            <Box>Grid Item 8</Box>
-            <Box>Grid Item 9</Box>
-            <Box>Grid Item 10</Box>
-            <Box>Grid Item 11</Box>
-            <Box>Grid Item 12</Box>
-          </Grid>
-          <Reel>
-            <Box>Reel Item 1</Box>
-            <Box>Reel Item 2</Box>
-            <Box>Reel Item 3</Box>
-            <Box>Reel Item 4</Box>
-            <Box>Reel Item 5</Box>
-            <Box>Reel Item 6</Box>
-            <Box>Reel Item 7</Box>
-            <Box>Reel Item 8</Box>
-            <Box>Reel Item 9</Box>
-            <Box>Reel Item 10</Box>
-            <Box>Reel Item 11</Box>
-            <Box>Reel Item 12</Box>
-          </Reel>
-          <div>Footer</div>
-        </Stack>
+    <main>
+      <Head>
+        <title>Hello World</title>
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <div className="mx-auto max-w-measure">
+        <div className="px-10 md:px-0 text-left">
+          <h1 className="text-4xl tracking-tight font-extrabold text-gray-200 sm:text-5xl md:text-6xl">
+            <span className="inline xl:inline">Hi there! </span>
+            <span className="inline pl-1 text-indigo-600">
+              I&apos;m Gustavo
+            </span>
+            <span className="inline relative top-2 pl-1 -ml-28 font-archia text-tiny text-gray-400">
+              ..but you can call me goose
+            </span>
+          </h1>
+          <p className="mt-3 mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl">
+            I'm a frontend developer living in Los Angeles with my wonderful dog
+            Luna. When I was a 15 year kid in Guadalajara I somehow convinced my
+            dad to buy me an IBM PS/2 so I could try doing some Basic and C++
+            programming. I remember excitedly looking over the technician's
+            shoulder as he began setting it up "FORMAT C:" he typed, before
+            inserting and removing various floppy disks, gave me some manuals,
+            and left. I felt the future was in my grasp as I ran up the stairs,
+            sat down and drew a smile across my face as I typed my first
+            command... "FORMAT C:" ...and thus began a long sequence of learning
+            opportunities that continue to this day. After leaving for the US to
+            get a CS degree, I began my career as a developer at Microsoft
+            before moving to the Bay Area to work at Slide and later Jawbone as
+            a Technical Program Manager. Two years ago I decided to jump back
+            into development by co-founding the company behind ponder.to, a
+            group blogging platform that we recently had to shutter. As
+            difficult as it was to get back to speed after not coding for a long
+            time, I loved every minute of it, using code to bring an experience
+            to life is a joy, no matter how many &quot;format c:&quot; moments
+            you have along the way. I love working on my own things but I am
+            eager to find my tribe, people with whom I can make something
+            meaningful and from whom I can continue this learning journey. Does
+            that sound like you? drop me a line below!
+          </p>
+        </div>
       </div>
-    </Container>
+      <div className="bg-bgdark-800">
+        <h2 className="text-xl py-10 font-bold text-center">
+          Examples of my work
+        </h2>
+
+        <div justify="center" space="4em">
+          {projects.map((project) => (
+            <ProjectCard key={project.title} {...project} />
+          ))}
+        </div>
+      </div>
+      <div>
+        <h2>Get in touch!</h2>
+      </div>
+      <ContactForm />
+      <div>
+        <footer>
+          <WithLove />
+        </footer>
+      </div>
+    </main>
   );
 }
-
-const Container = styled.div`
-  height: 100vh;
-  width: 100vw;
-  display: flex;
-  & > * {
-    width: 80vw;
-    margin: auto;
-    border: 1px solid darkblue;
-  }
-
-  ${Box} {
-    border: 0.5px solid red;
-    border-radius: 20px;
-  }
-
-  ${Stack} {
-    border: 1px dashed gray;
-    & > * {
-      border: 1px dotted yellow;
-    }
-  }
-`;
