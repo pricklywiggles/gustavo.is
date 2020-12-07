@@ -58,7 +58,7 @@ class MyDocument extends Document {
             crossOrigin="anonymous"
           />
         </Head>
-        <body className="text-gray-800 bg-bglight dark:text-gray-300 dark:bg-bgdark">
+        <body className="text-gray-800 bg-lt-bg dark:text-gray-300 dark:bg-dk-bg">
           <script src="/noflash.js" />
           <Main />
           <NextScript />

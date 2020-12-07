@@ -1,14 +1,14 @@
 import * as Logos from "components/svg/logos";
 
-export const stackIcons = {
-  graphql: Logos.GraphQLLogo,
-  react: Logos.ReactLogo,
-  neo4j: Logos.Neo4jLogo,
-  nextjs: Logos.NextLogo,
-  urql: Logos.UrqlLogo,
-  vercel: Logos.VercelLogo,
-  digitalOcean: Logos.DigitalOceanLogo,
-  apollo: Logos.ApolloLogo
+export const logos = {
+  graphql: { themed: false, component: Logos.GraphQLLogo },
+  react: { themed: false, component: Logos.ReactLogo },
+  neo4j: { themed: false, component: Logos.Neo4jLogo },
+  nextjs: { themed: true, component: Logos.NextLogo },
+  urql: { themed: false, component: Logos.UrqlLogo },
+  vercel: { themed: true, component: Logos.VercelLogo },
+  digitalOcean: { themed: true, component: Logos.DigitalOceanLogo },
+  apollo: { themed: true, component: Logos.ApolloLogo }
 };
 
 export const projects = [

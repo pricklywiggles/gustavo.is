@@ -2,6 +2,7 @@ import { Stack, Center, Sidebar, Imposter, Box } from "components/layouts";
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import styled from "@emotion/styled";
+import Link from "next/link";
 import { TwitterLogo, GitHubLogo, LinkedInLogo } from "components/svg/logos";
 
 export function ContactForm() {
@@ -49,7 +50,7 @@ export function ContactForm() {
                   type="text"
                   name="name"
                   autoComplete="name"
-                  className={`block w-full py-3 px-4 mb-4 bg-bglight-lightest rounded-md ${fieldClasses(
+                  className={`block w-full py-3 px-4 mb-4 bg-lt-bg-lightest rounded-md ${fieldClasses(
                     "name"
                   )}`}
                   placeholder={`${
@@ -72,7 +73,7 @@ export function ContactForm() {
                   name="email"
                   type="email"
                   autoComplete="email"
-                  className={`block w-full py-3 px-4 mb-4 bg-bglight-lightest rounded-md  ${fieldClasses(
+                  className={`block w-full py-3 px-4 mb-4 bg-lt-bg-lightest rounded-md  ${fieldClasses(
                     "email"
                   )}`}
                   placeholder={
@@ -92,7 +93,7 @@ export function ContactForm() {
                     name="message"
                     rows="4"
                     onChange={handleChange}
-                    className={`block w-full py-3 px-4 mb-4 bg-bglight-lightest rounded-md ${fieldClasses(
+                    className={`block w-full py-3 px-4 mb-4 bg-lt-bg-lightest rounded-md ${fieldClasses(
                       "message"
                     )}`}
                     placeholder={
@@ -144,16 +145,22 @@ export function ContactForm() {
 const SocialSection = ({ className }) => (
   <div className={className}>
     <p className="pt-4 font-semibold">Or find me on the web...</p>
-    <div className="flex mt-5 justify-around text-bglight dark:text-bgdark">
-      <div className="flex rounded-full w-12 h-12 bg-blueGray-400 overflow-hidden well-shadow ">
-        <GitHubLogo className="m-auto  fill-current w-10 h-10 " />
-      </div>
-      <div className="flex bg-blueGray-400 w-12 h-12 rounded-full well-shadow">
-        <TwitterLogo className="m-auto pt-1 fill-current w-8 h-8" />
-      </div>
-      <div className="flex bg-blueGray-400 w-12 h-12  rounded-full well-shadow">
-        <LinkedInLogo className="m-auto pb-1 fill-current w-7 h-7" />
-      </div>
+    <div className="flex mt-5 justify-around text-lt-bg dark:text-dk-bg">
+      <Link href="https://github.com/pricklywiggles">
+        <div className="hover:cursor-pointer flex rounded-full w-12 h-12 bg-blueGray-400 overflow-hidden well-shadow ">
+          <GitHubLogo className="m-auto  fill-current w-10 h-10 " />
+        </div>
+      </Link>
+      <Link href="https://twitter.com/pricklywiggles">
+        <div className="hover:cursor-pointer flex bg-blueGray-400 w-12 h-12 rounded-full well-shadow">
+          <TwitterLogo className="m-auto pt-1 fill-current w-8 h-8" />
+        </div>
+      </Link>
+      <Link href="https://www.linkedin.com/in/gustavogallegos/">
+        <div className="hover:cursor-pointer flex bg-blueGray-400 w-12 h-12  rounded-full well-shadow">
+          <LinkedInLogo className="m-auto pb-1 fill-current w-7 h-7" />
+        </div>
+      </Link>
     </div>
   </div>
 );

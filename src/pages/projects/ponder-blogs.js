@@ -1,274 +1,241 @@
 import React from "react";
+import { logos } from "utils/data";
+import { PonderBlogsLogo } from "components/svg/logos";
 import {
-  Cover,
-  Center,
-  Box,
-  Switcher,
-  Cluster,
-  Sidebar,
-  Frame
-} from "components/layouts";
-import { Logo } from "components/logo";
-import styled from "@emotion/styled";
-import { stackIcons } from "utils/data";
+  SparkleIcon,
+  GradCapIcon,
+  ChipIcon,
+  FilmIcon,
+  BoltIcon,
+  BoltIconSmall
+} from "components/svg/icons";
 
-export default function PonderBlogsProject() {
+export default function PonderProject() {
   return (
-    <Container>
-      <Center alignText={true}>
-        <Cover minHeight="90vh">
-          <h1>
-            <img
-              css={{ width: "6ch" }}
-              src="/logos/ponder-blogs-logo.svg"
-              alt="Vercel Logo"
-              className="logo"
-            />{" "}
-            blogs, a collection of creative group blogs from the Ponder
-            community.
-          </h1>
-          <div>
-            Explore the project{" "}
-            <span role="img" aria-label="">
-              👇
-            </span>
-          </div>
-        </Cover>
-      </Center>
-      <Section alternate>
-        <Center maxWidth="calc(var(--measure) * 2)">
-          <Center alignText>
-            <h2>Purpose</h2>
-          </Center>
-          <Sidebar contentMin="45%">
-            <Box>
-              <Center>
-                <Frame css={{ minWidth: "350px" }} ratio="1:1">
-                  <img
-                    alt="ponder homepage screenshot"
-                    css={{ borderRadius: "20px" }}
-                    src="/ponderblogs-screen1.jpg"
-                  ></img>
-                </Frame>
-              </Center>
-            </Box>
+    <div className="dark:text-gray-300 text-gray-800">
+      <div className="relative transition-all mt-10 mb-10 bg-lt-bg dark:bg-dk-bg sm:border-l-2 sm:border-dashed md:border-solid sm:border-yellow-300 lg:border-0 overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div
+            className="relative z-10 pb-8 md:py-10 bg-lt-bg dark:bg-dk-bg md:max-w-lg lg:max-w-2xl "
+            stuff="sm:pb-16 md:pb-20 lg:w-full lg:pb-28 xl:pb-32"
+          >
+            <svg
+              className="hidden md:block transition-fill absolute right-0 inset-y-0 h-full w-48 dark:text-dk-bg text-lt-bg fill-current transform translate-x-1/2"
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              <polygon points="50,0 100,0 50,100" />
+            </svg>
 
-            <Box>
-              <Center>
-                <h3>
-                  Ponder Blogs was a destination site where anyone could read
-                  the public content authored with Ponder.
-                </h3>
-                <p>
-                  Powered by NextJS, the Ponder Blogs was a mixture of SSR
-                  (servier side rendered) and SSG (statically generated)
-                  content, making it blazingly fast while still allowing for
-                  having dynamic elements and instant publishing as well as
-                  advanced features like allowing authors to choose theme and
-                  layout variations.
+            <main className="max-w-7xl px-4 sm:px-6 md:py-10 lg:px-8">
+              <div className="text-center md:text-left">
+                <h1 className="text-4xl tracking-tight font-extrabold text-lt-bg-100 sm:text-5xl md:text-4xl lg:text-6xl">
+                  <PonderBlogsLogo className="inline-flex align-baseline h-10 md:h-12 mx-auto md:mx-0" />{" "}
+                  blogs,
+                  <span className="block text-gray-800 dark:text-gray-200 xl:inline">
+                    a collection of creative group blogs from the Ponder
+                    community.
+                  </span>
+                </h1>
+                <p className="mt-3 text-base text-gray-500 dark:text-gray-400 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl md:mx-0">
+                  Contributions: client development, server development and
+                  devOps.
                 </p>
-                <p>
-                  My contributions included the graphql server code, as well as
-                  all the client code except for styling (css and styled
-                  components), which was the beautiful work of my co-founder
-                  Dave Gorum.
-                </p>
-              </Center>
-            </Box>
-          </Sidebar>
-        </Center>
+              </div>
+            </main>
+          </div>
+        </div>
+        <div className="md:absolute md:inset-y-0 md:right-0 md:w-1/2">
+          <img
+            className="h-56 w-full object-cover sm:h-72 md:w-full md:h-full"
+            src="/ponder-screen1.jpg"
+            alt=""
+          />
+        </div>
+      </div>
+
+      <Section
+        className="pb-4"
+        icon={SparkleIcon}
+        title="Inception and Purpose"
+      >
+        <div className="max-w-measure text-lg sm:text-xl leading-snug font-medium">
+          <p className="pb-2 sm:pb-4">
+            Ponder Blogs was a destination site where anyone could read the
+            public content authored with Ponder.
+          </p>
+          <p className="pb-2 sm:pb-4">
+            Powered by NextJS, the Ponder Blogs was a mixture of SSR (servier
+            side rendered) and SSG (statically generated) content, making it
+            blazingly fast while still allowing for having dynamic elements and
+            instant publishing as well as advanced features like allowing
+            authors to choose theme and layout variations.
+          </p>
+          <p>
+            I was in charge of development, while the beautiful design was the
+            work of my co-founder Dave Gorum
+          </p>
+        </div>
       </Section>
-      <Section>
-        <Center alignText>
-          <h2>Technologies</h2>
-        </Center>
-        <Center alignText maxWidth="90%">
-          <Cluster align="flex-start" justify="space-around" space="var(--s3)">
-            {Object.entries(technologies).map(
-              ([key, { name, logoUrl, icon, invertable, highlights = [] }]) => (
-                <Card key={key}>
-                  <div>
-                    <Logo src={logoUrl} icon={icon} invertable={invertable} />
-                    <div className="title">{name}</div>
-                    {highlights.map((highlight) => (
-                      <div className="highlight" key={highlight}>
-                        {highlight}
+
+      <Section icon={GradCapIcon} title="Lessons learned">
+        <TabbedContent>
+          {lessons.map(({ title, content }) => (
+            <div
+              key={title}
+              className="lg:flex lg:justify-between ml-4 sm:ml-8 md:ml-16"
+            >
+              <div className="text-lg pb-2 sm:text-2xl leading-snug font-semibold">
+                {title}
+              </div>
+              <div className="max-w-measure lg:ml-20 text-sm sm:text-lg sm:leading-snug">
+                {content}
+              </div>
+            </div>
+          ))}
+        </TabbedContent>
+      </Section>
+
+      <Section
+        className="pt-10"
+        icon={ChipIcon}
+        title="Technologies and Integrations"
+      >
+        <div className="mt-8 sm:grid sm:grid-cols-2 ">
+          {Object.entries(technologies).map(
+            ([key, { name, highlights, icon }]) => (
+              <div key={name} className="mb-10">
+                <div className="">
+                  {logos[key] ? (
+                    React.createElement(logos[key].component, {
+                      className: `w-28 h-28 mx-auto ${
+                        logos[key].themed
+                          ? "fill-current dark:text-indigo-400"
+                          : ""
+                      }`
+                    })
+                  ) : (
+                    <div className="flex justify-center text-8xl text-center mx-auto pb-4 min-h-full">
+                      <div className="rounded-full overflow-hidden bg-white">
+                        {icon}
                       </div>
+                    </div>
+                  )}
+                </div>
+                <div
+                  key={name}
+                  className="flex flex-col -mt-14 mx-10 lg:mx-20 p-4 pt-16 text-center bg-white dark:bg-dk-bg-200 rounded-xl border border-lt-bg dark:border-2 dark:border-dk-bg-400 shadow-md"
+                >
+                  <div className="mb-2 pt-2 pb-2 font-semibold uppercase border-t  border-b text-gray-800 border-gray-300 dark:border-dk-bg-400">
+                    {name}
+                  </div>
+                  <div className="text-gray-500 self-center md:w-4/5 ">
+                    {highlights.map((highlight) => (
+                      <div key={highlight}>{highlight}</div>
                     ))}
                   </div>
-                </Card>
-              )
-            )}
-          </Cluster>
-        </Center>
+                </div>
+              </div>
+            )
+          )}
+        </div>
       </Section>
-      <Section alternate>
-        <Center alignText={true}>
-          <h2>Highlights</h2>
-        </Center>
-        <Switcher threshold="90ch" space="0">
-          <Box className="video">
-            <Center gutterWidth="5.5px">
-              <Embed>
-                <iframe
-                  title="Ponder blogs video"
-                  src="https://player.vimeo.com/video/484970796"
-                  width="640"
-                  height="564"
-                  frameBorder="0"
-                  allow="autoplay; fullscreen"
-                  allowFullScreen
-                ></iframe>
-              </Embed>
-            </Center>
-          </Box>
-          <Box>
-            <Center>
-              <ul>
-                <li>
-                  Simple and elegant design by Dave Gorum to showcase content
-                  from Ponder communities
-                </li>
-                <li>Blazing fast load times thanks to SSR/SSG</li>
-                <li>
-                  Chronological, collection-based and member-based content
-                  streams per blog.
-                </li>
-                <li>Personalized Blog profile</li>
-                <li>Personalized Member profiles</li>
-                <li>
-                  Built-in high-fidelity OpenGraph metadata for beautiful social
-                  media unfurls
-                </li>
-              </ul>
-            </Center>
-          </Box>
-        </Switcher>
+
+      <Section icon={FilmIcon} title="Feature Showcase">
+        <TabbedContent labels={walkthroughs.map((feature) => feature.title)}>
+          {walkthroughs.map(({ title, src, highlights }) => (
+            <div className="flex flex-col mx-4 lg:flex-row" key={title}>
+              <div className="w-full lg:pr-8 lg:w-8/12">
+                <div className="relative block h-0 p-0 overflow-hidden aspect-ratio-16/9">
+                  <iframe
+                    className="absolute inset-0 w-full h-full"
+                    title={title}
+                    src={src}
+                    frameBorder="0"
+                    allow="autoplay; fullscreen"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+              </div>
+              <div className="mt-6 lg:mt-0">
+                {highlights.map((highlight) => (
+                  <div key={highlight} className="flex">
+                    <div className="mb-3 leading-tight">
+                      <span role="img" aria-label="hand pointing right">
+                        👉🏼
+                      </span>{" "}
+                      {highlight}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </TabbedContent>
       </Section>
-      <Section>
-        <Switcher threshold="90ch" space="0">
-          <Box>
-            <Center>
-              <ul>
-                <li>Customize your blog&apos;s color palette with Moods.</li>
-                <li>Personalize your typeface with font family presets.</li>
-                <li>Preset layout options</li>
-                <li>
-                  Show the world what your group blog is all about through
-                  taglines, description, logos and special link.
-                </li>
-              </ul>
-            </Center>
-          </Box>
-          <Box className="video">
-            <Center>
-              <Embed>
-                <iframe
-                  title="Ponder Blogs customization video"
-                  src="https://player.vimeo.com/video/484967092"
-                  width="640"
-                  height="564"
-                  frameBorder="0"
-                  allow="autoplay; fullscreen"
-                  allowFullScreen
-                ></iframe>
-              </Embed>
-            </Center>
-          </Box>
-        </Switcher>
-      </Section>
-    </Container>
+    </div>
   );
 }
 
-const Embed = styled.div`
-  & > :first-child {
-    width: 100%;
-  }
-  @supports (--custom: property) {
-    position: relative;
+function Section({ className, icon, title, children }) {
+  return (
+    <div className={className}>
+      <section className="mb-10 overflow-hidden">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative">
+            <div className="flex rounded-xl h-10 w-10 sm:h-14 sm:w-14 md:h-10 md:w-10 mb-2 bg-blue-800 text-coolGray-200 fill-current shadow-md border dark:border-dk-bg-600 border-gray-400">
+              {React.createElement(icon, {
+                className: "h-6 sm:h-8 md:h-6 m-auto text-white fill-blue"
+              })}
+            </div>
+            <div className="text-3xl sm:text-4xl md:text-3xl mb-3 sm:mb-4 dark:text-gray-200 font-semibold tracking-tight">
+              {title}
+            </div>
+            {children}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
 
-    &::before {
-      content: "";
-      display: block;
-      padding-bottom: calc(100% / (16 / 9));
-    }
-    & > :first-child {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-    }
-  }
-`;
+function TabbedContent({ className, labels, children }) {
+  const [currentTab, setCurrentTab] = React.useState(0);
 
-const Container = styled.div`
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  li {
-    line-height: 1.5;
-    padding-top: 1em;
-    ::before {
-      content: "⚡︎ ";
-      color: yellow;
-    }
-  }
-  @media (max-width: 990px) {
-    .video {
-      order: -1;
-    }
-  }
-`;
+  const handleTabChange = (tab) => setCurrentTab(tab);
 
-const Section = ({ alternate, children }) => (
-  <SectionWrapper alternate={alternate}>
-    {/* <Center maxWidth="calc(var(--measure) * 2)"> */}
-    {children}
-    {/* </Center> */}
-  </SectionWrapper>
-);
+  const childrenCount = React.Children.count(children);
 
-const SectionWrapper = styled.div`
-  padding: var(--s1);
-  background-color: ${(props) =>
-    props.alternate
-      ? "var(--colors-background-lighter)"
-      : "var(--colors-background)"};
-`;
-
-const Card = styled(Box)`
-  width: 280px;
-  line-height: var(--s2);
-
-  & > div {
-    display: flex;
-    flex-flow: column;
-  }
-
-  .title {
-    font-size: var(--font-size-big);
-    text-transform: lowercase;
-    font-variant: small-caps;
-
-    &::after {
-      display: block;
-      content: "";
-      width: 100%;
-      padding-bottom: var(--s0);
-      border-bottom: 2px dotted var(--colors-fun);
-      margin-bottom: 10px;
-    }
-  }
-`;
+  return (
+    <>
+      <div className="flex flex-wrap pb-3 pt-3 justify-around mt-2 mb-4">
+        {Array(childrenCount)
+          .fill()
+          .map((c, childIndex) => (
+            <button
+              className={`flex items-center rounded-full m-2 h-8 py-1 px-2 text-xs md:text-md bg-lt-primary-400 text-gray-50 shadow-md dark:text-dk-bg-900  dark:bg-dk-primary-200  dark:hover:bg-dk-primary-lightest outline-none focus:ring-1 focus:ring-offset-1 focus:ring-white ${
+                childIndex === currentTab
+                  ? "border border-lt-bg-800 dark:border-lt-bg-50 "
+                  : "border border-lt-bg-300 dark:border-dk-bg-600"
+              }`}
+              key={childIndex}
+              onClick={() => handleTabChange(childIndex)}
+            >
+              {labels ? labels[childIndex] : childIndex + 1}
+            </button>
+          ))}
+      </div>
+      <div className={`${className} border-lt-accent-400 md:border-l-8`}>
+        {React.Children.toArray(children)[currentTab]}
+      </div>
+    </>
+  );
+}
 
 const technologies = {
   nextjs: {
     name: "NextJS",
-    logoUrl: stackIcons.nextjs,
-    invertable: true,
     highlights: [
       "⚛️ Server side rendering for speedy yet up to date member content",
       "⚡️ Static site generation for non-dynamic content",
@@ -277,8 +244,6 @@ const technologies = {
   },
   apollo: {
     name: "Apollo GraphQL Server",
-    logoUrl: stackIcons.apollo,
-    invertable: true,
     highlights: [
       "💫  Fully directive-based model for cypher queries, no explicit resolvers",
       "🔐 Shared codebase from Ponder client but separate schema ensures privacy of non-published data"
@@ -286,7 +251,6 @@ const technologies = {
   },
   neo4j: {
     name: "Neo4J Graph DB",
-    logoUrl: stackIcons.neo4j,
     highlights: [
       "⚡️ Optimized indexes for data retrieval speed for blogs data"
     ]
@@ -298,8 +262,6 @@ const technologies = {
   },
   vercel: {
     name: "Vercel",
-    logoUrl: stackIcons.vercel,
-    invertable: true,
     highlights: [
       "📡 Native NextJS deployment solution (from CLI)",
       "🔧 Lambda function for waitlist signup",
@@ -307,3 +269,137 @@ const technologies = {
     ]
   }
 };
+
+const lessons = [
+  {
+    title: (
+      <div>
+        Cutting edge technologies are{" "}
+        <span className="text-indigo-400">not always</span> the best solution
+      </div>
+    ),
+    content: (
+      <>
+        Perhaps this is better explained through example: NextJS is an amazing
+        framework. After writing the Ponder client in standalone react, writing
+        the blogs site with Next was a revelation. It allowed me to build fast
+        and focus on the important aspects of the product. As we were beginning
+        to build, Next released a new feature called Incremental
+        Static Regeneration (ISR), which did on-the-fly static site generation
+        at request time instead of compile time. It was way faster than SSR,
+        worked like magic and had minimal setup. Unfortunately our feature-set
+        included the ability for authors to change the theme of their site, and
+        there was no way of making that feature &quot;feel&quot; right with ISR,
+        since one couldn&apos;t invalidate the existing cache across all the
+        blog&apos;s pages at once. It was a painful but right decision to use
+        SSR instead no matter how much I wanted to use ISR. (someday I&apos;m
+        sure they will introduce partial cache invalidation).
+      </>
+    )
+  },
+  {
+    title: (
+      <>
+        Don&apos;t let the <span className="text-indigo-400">ideal</span> be the
+        enemy of the <span className="text-indigo-400">good</span>.
+      </>
+    ),
+    content: (
+      <>
+        In a way I think both me and Dave (co-founder) really like polished
+        experiences (in design and code respectively). This being our company
+        and it being a startup we learned that good and working is better than
+        perfect and under development. This also led me to develop better
+        practices of incremental refactoring.
+      </>
+    )
+  },
+  {
+    title: (
+      <>
+        Incremental refactoring is almost always{" "}
+        <span className="text-indigo-400">better than rewrites</span>.
+      </>
+    ),
+    content: (
+      <>
+        The drive to rewrite something is especially strong when you are new at
+        something. You&apos;re learning so much so fast that pretty soon you
+        realize you could&apos;ve done things so much better. This feeling felt
+        like trap, what is paramount is results in the form of having a working
+        product. However, I got much better at achieving the same result by
+        instead doing incremental refactoring which helped me keep the speed of
+        development while also increasing stability.
+      </>
+    )
+  },
+  {
+    title: (
+      <>
+        Code <span className="text-indigo-400">clarity</span> through
+        consistency is
+        <span className="text-indigo-400"> better than perfection</span>.
+      </>
+    ),
+    content: (
+      <>
+        Another example: Even in a development team of one I sometimes faced the
+        issue of wanting to change the way I did something, either stylistically
+        or syntactically, because I learned new things or people showed me
+        better ways of expressing things. When you&apos;re iterating fast
+        though, I found 99% of the time it&apos;s better to stick to a correct
+        (if not perfect) set of rules, have a linter enforce them and just
+        forget about it.
+      </>
+    )
+  },
+  {
+    title: (
+      <>
+        When time spent <span className="text-indigo-400">working</span> grows,
+        so should my{" "}
+        <span className="text-indigo-400">mindfulness practice</span>
+      </>
+    ),
+    content: (
+      <>
+        Last but probably the most valuable lesson for me was that it is not
+        enough for me to maintain my mindfulness practice as my work volume
+        fluctuates, it is imperative that my practice grows proportional to it.
+        There&apos;s a certain momentum (what I&apos;ve heard being referred to
+        as &apos;codebrain&apos;) that my mind builds when programming that if
+        left unchecked will continue on and bleed into the rest of my day, which
+        results in a too active mind, less clarity and less sleep, which in turn
+        can hurt the work. Ironically, I&apos;ve found it&apos;s especially
+        necessary for me to do this when the work is fun (and it almost always
+        does). I learned to stop every so often and take some time to meditate,
+        then go back to work or go back about my day.
+      </>
+    )
+  }
+];
+
+const walkthroughs = [
+  {
+    title: "walkthrough",
+    src: "https://player.vimeo.com/video/484970796",
+    highlights: [
+      "Simple and elegant design by Dave Gorum to showcase content from Ponder communities",
+      "Blazing fast load times thanks to SSR/SSG",
+      "Chronological, collection-based and member-based content streams per blog.",
+      "Personalized Blog profile",
+      "Personalized Member profiles",
+      "Built-in high-fidelity OpenGraph metadata for beautiful social media unfurls"
+    ]
+  },
+  {
+    title: "customization",
+    src: "https://player.vimeo.com/video/482506771",
+    highlights: [
+      "Customize your blog&apos;s color palette with Moods.",
+      "Personalize your typeface with font family presets.",
+      "Preset layout options",
+      "Show the world what your group blog is all about through taglines, description, logos and special link."
+    ]
+  }
+];

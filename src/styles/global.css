@@ -69,6 +69,10 @@
       backdrop-filter: blur(20px);
     }
 
+    .bg-blur-50 {
+      backdrop-filter: blur(50px);
+    }
+
     .bg-blur-0 {
       backdrop-filter: none;
     }
@@ -93,6 +97,22 @@
       box-shadow: inset 0 2px 2px rgb(0, 0, 0, 0.4),
         0 2px 0 rgb(255, 255, 255, 0.4);
     }
+  }
+
+  .aspect-ratio-none {
+    padding-bottom: 0;
+  }
+  .aspect-ratio-square {
+    padding-bottom: 100%;
+  }
+  .aspect-ratio-16\/9 {
+    padding-bottom: 56.25%;
+  }
+  .aspect-ratio-4\/3 {
+    padding-bottom: 75%;
+  }
+  .aspect-ratio-21\/9 {
+    padding-bottom: 42.86%;
   }
 
   .light-gradient {
@@ -129,6 +149,13 @@
     margin-top: var(--space);
   }
 
+  /* decoration for current navlink */
+  .current-link::before {
+    content: "\2022";
+    position: absolute;
+    margin-left: -0.6em;
+  }
+
   .hero {
     position: absolute;
     height: 400%;
@@ -160,8 +187,14 @@
   .card-logo-hover::after {
     transform: translate(-50%, -40%);
   }
+
+  .transition-fill {
+    polygon {
+      transition: fill 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  }
 }
 
-body {
+* {
   transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }

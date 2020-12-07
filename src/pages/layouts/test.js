@@ -3,7 +3,7 @@ import React from "react";
 import Link from "next/link";
 import { headerRoom } from "styles/util";
 import { WithLove } from "components/sprinkles";
-import { ContactForm } from "components/contact";
+import { ContactForm } from "components/contact-form";
 import { ProjectCard } from "components/project-card";
 import { projects } from "utils/data";
 import { Stack } from "components/layouts/stack";
@@ -52,7 +52,7 @@ export default function Home() {
           </p>
         </div>
       </div>
-      <div className="bg-bgdark-800">
+      <div className="bg-dk-bg-800">
         <h2 className="text-xl py-10 font-bold text-center">
           Examples of my work
         </h2>

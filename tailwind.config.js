@@ -21,7 +21,14 @@ module.exports = {
       scale: {
         101: "1.01"
       },
+      fill: {
+        blue: colors.blue["800"]
+      },
       colors: {
+        cyan: colors.cyan,
+        yellow: colors.yellow,
+        coolGray: colors.coolGray,
+        blueGray: colors.blueGray,
         lt: {
           primary: {
             ...colors.indigo,
@@ -37,11 +44,16 @@ module.exports = {
             // 0: "rgba(228,228,231,0)", // gray.200
             // 8: "rgba(228,228,231,0.8)",
             ...colors.gray,
+            8: "rgba(228,228,231, 0.8)",
             lightest: colors.gray["50"],
             lighter: colors.gray["100"],
             DEFAULT: colors.gray["200"],
             darker: colors.gray["300"],
             darkest: colors.gray["400"]
+          },
+          accent: {
+            DEFAULT: colors.cyan[800],
+            ...colors.indigo
           }
         },
         error: { ...colors.red, DEFAULT: colors.red[500] },
@@ -59,45 +71,19 @@ module.exports = {
             // 8: "rgba(17, 24, 39, 0.8)", // used for menu button background (blueGray)
             // 1000: "rgb(11, 16, 25)", // blueGray
             ...colors.gray,
-            0: "rgba(250,250,250, 0)",
-            8: "rgba(250,250,250, 0.8)",
+            0: "rgba(24,25,28, 0)",
+            8: "rgba(24,25,28, 0.8)",
             1000: "rgb(18,18,18)",
             lightest: colors.gray["700"],
             ligher: colors.gray["800"],
             DEFAULT: colors.gray["900"],
             darker: "rgb(18,18,18)",
             darkest: "rgb(0, 0, 0)"
+          },
+          accent: {
+            DEFAULT: colors.yellow[200],
+            ...colors.yellow
           }
-        },
-        cyan: colors.cyan,
-        yellow: colors.yellow,
-        coolGray: colors.coolGray,
-        blueGray: colors.blueGray,
-        bgdark: {
-          // 0: "rgba(17, 24, 39, 0)", // used for header gradient (blueGray-900)
-          // 8: "rgba(17, 24, 39, 0.8)", // used for menu button background (blueGray)
-          // 1000: "rgb(11, 16, 25)", // blueGray
-          ...colors.gray,
-          0: "rgba(250,250,250, 0)",
-          8: "rgba(250,250,250, 0.8)",
-          1000: "rgb(18,18,18)",
-          lightest: colors.gray["700"],
-          ligher: colors.gray["800"],
-          DEFAULT: colors.gray["900"],
-          darker: "rgb(18,18,18)",
-          darkest: "rgb(0, 0, 0)"
-        },
-        bglight: {
-          // 0: "rgba(165, 243, 252, 0)", // cyan-200
-          // 8: "rgba(165, 243, 252, 0.8)",
-          // 0: "rgba(228,228,231,0)", // gray.200
-          // 8: "rgba(228,228,231,0.8)",
-          lightest: colors.gray["50"],
-          lighter: colors.gray["100"],
-          DEFAULT: colors.gray["200"],
-          darker: colors.gray["300"],
-          darkest: colors.gray["400"],
-          ...colors.gray
         },
         primary: "#f6f1ed",
         accentdark: {
@@ -128,6 +114,10 @@ module.exports = {
           to: { borderRight: "2px solid transparent" }
         },
         "font-bounce": {
+          "0%, 100%": { fontSize: defaultTheme.fontSize.sm },
+          "50%": { fontSize: defaultTheme.fontSize["3xl"] }
+        },
+        "font-accent": {
           "0%, 100%": { fontSize: defaultTheme.fontSize.sm },
           "50%": { fontSize: defaultTheme.fontSize["3xl"] }
         },

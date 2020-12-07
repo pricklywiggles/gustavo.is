@@ -15,16 +15,16 @@ export default function Home() {
         <title>Hello World</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="mx-auto max-w-measure">
+      <div className="mx-auto mt-8 sm:mt-20 max-w-measure">
         <div className="px-10 md:px-0 text-left text-gray-600 dark:text-gray-400">
-          <h1 className="text-4xl tracking-tight font-extrabold   sm:text-5xl md:text-6xl">
+          <h1 className="relative text-4xl tracking-tight font-extrabold   sm:text-5xl md:text-6xl">
             <span className="inline xl:inline text-gray-800 dark:text-gray-200">
               Hi there!{" "}
             </span>
             <span className="inline pl-1 text-indigo-600">
               I&apos;m Gustavo
             </span>
-            <span className="relative block -top-3 text-right tracking-tighter sm:-left-20 font-archia text-tiny text-">
+            <span className="relative block -top-3 text-right tracking-tighter sm:-left-20 font-archia text-tiny">
               ..but you can call me goose
             </span>
           </h1>
