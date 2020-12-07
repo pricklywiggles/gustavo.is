@@ -1,12 +1,9 @@
 import Head from "next/head";
 import React from "react";
-import Link from "next/link";
-import { headerRoom } from "styles/util";
-import { WithLove, BeatingHeart } from "components/sprinkles";
+import { BeatingHeart } from "components/sprinkles";
 import { ContactForm } from "components/contact-form";
 import { ProjectCard } from "components/project-card";
 import { projects } from "utils/data";
-import { Stack } from "components/layouts/stack";
 
 export default function Home() {
   return (
@@ -29,28 +26,29 @@ export default function Home() {
             </span>
           </h1>
           <p className="mt-3 mx-auto text-base sm:text-lg md:mt-5 md:text-xl">
-            I'm a frontend developer living in Los Angeles with my wonderful dog
-            Luna. When I was a 15 year kid in Guadalajara I somehow convinced my
-            dad to buy me an IBM PS/2 so I could try doing some Basic and C++
-            programming. I remember excitedly looking over the technician's
-            shoulder as he began setting it up "FORMAT C:" he typed, before
-            inserting and removing various floppy disks, gave me some manuals,
-            and left. I felt the future was in my grasp as I ran up the stairs,
-            sat down and drew a smile across my face as I typed my first
-            command... "FORMAT C:" ...and thus began a long sequence of learning
-            opportunities that continue to this day. After leaving for the US to
-            get a CS degree, I began my career as a developer at Microsoft
-            before moving to the Bay Area to work at Slide and later Jawbone as
-            a Technical Program Manager. Two years ago I decided to jump back
-            into development by co-founding the company behind ponder.to, a
-            group blogging platform that we recently had to shutter. As
-            difficult as it was to get back to speed after not coding for a long
-            time, I loved every minute of it, using code to bring an experience
-            to life is a joy, no matter how many &quot;format c:&quot; moments
-            you have along the way. I love working on my own things but I am
-            eager to find my tribe, people with whom I can make something
-            meaningful continue this learning journey. Does that sound like you?
-            drop me a line and check out some of my work below!
+            I&quot;m a frontend developer living in Los Angeles with my
+            wonderful dog Luna. When I was a 15 year kid in Guadalajara I
+            somehow convinced my dad to buy me an IBM PS/2 so I could try doing
+            some Basic and C++ programming. I remember excitedly looking over
+            the technician&apos;s shoulder as he began setting it up
+            &quot;FORMAT C:&quot; he typed, before inserting and removing
+            various floppy disks, gave me some manuals, and left. I felt the
+            future was in my grasp as I ran up the stairs, sat down and drew a
+            smile across my face as I typed my first command... &quot;FORMAT
+            C:&quot; ...and thus began a long sequence of learning opportunities
+            that continue to this day. After leaving for the US to get a CS
+            degree, I began my career as a developer at Microsoft before moving
+            to the Bay Area to work at Slide and later Jawbone as a Technical
+            Program Manager. Two years ago I decided to jump back into
+            development by co-founding the company behind ponder.to, a group
+            blogging platform that we recently had to shutter. As difficult as
+            it was to get back to speed after not coding for a long time, I
+            loved every minute of it, using code to bring an experience to life
+            is a joy, no matter how many &quot;format c:&quot; moments you have
+            along the way. I love working on my own things but I am eager to
+            find my tribe, people with whom I can make something meaningful
+            continue this learning journey. Does that sound like you? drop me a
+            line and check out some of my work below!
           </p>
         </div>
       </div>

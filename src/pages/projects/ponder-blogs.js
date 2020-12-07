@@ -5,9 +5,7 @@ import {
   SparkleIcon,
   GradCapIcon,
   ChipIcon,
-  FilmIcon,
-  BoltIcon,
-  BoltIconSmall
+  FilmIcon
 } from "components/svg/icons";
 
 export default function PonderProject() {
@@ -284,16 +282,16 @@ const lessons = [
         framework. After writing the Ponder client in standalone react, writing
         the blogs site with Next was a revelation. It allowed me to build fast
         and focus on the important aspects of the product. As we were beginning
-        to build, Next released a new feature called Incremental
-        Static Regeneration (ISR), which did on-the-fly static site generation
-        at request time instead of compile time. It was way faster than SSR,
-        worked like magic and had minimal setup. Unfortunately our feature-set
-        included the ability for authors to change the theme of their site, and
-        there was no way of making that feature &quot;feel&quot; right with ISR,
-        since one couldn&apos;t invalidate the existing cache across all the
-        blog&apos;s pages at once. It was a painful but right decision to use
-        SSR instead no matter how much I wanted to use ISR. (someday I&apos;m
-        sure they will introduce partial cache invalidation).
+        to build, Next released a new feature called Incremental Static
+        Regeneration (ISR), which did on-the-fly static site generation at
+        request time instead of compile time. It was way faster than SSR, worked
+        like magic and had minimal setup. Unfortunately our feature-set included
+        the ability for authors to change the theme of their site, and there was
+        no way of making that feature &quot;feel&quot; right with ISR, since one
+        couldn&apos;t invalidate the existing cache across all the blog&apos;s
+        pages at once. It was a painful but right decision to use SSR instead no
+        matter how much I wanted to use ISR. (someday I&apos;m sure they will
+        introduce partial cache invalidation).
       </>
     )
   },

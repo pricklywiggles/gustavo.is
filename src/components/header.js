@@ -1,9 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from "react";
-import styled from "@emotion/styled";
 import { useRouter } from "next/router";
 import NavLink from "components/navlink";
-import { Center, Box } from "components/layouts";
 import { useLocalStorageState, useCounter, useToggle } from "utils/hooks";
 import { BeatingHeart } from "components/sprinkles";
 

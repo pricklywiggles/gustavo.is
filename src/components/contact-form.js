@@ -1,4 +1,3 @@
-import { Stack, Center, Sidebar, Imposter, Box } from "components/layouts";
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import styled from "@emotion/styled";
@@ -164,24 +163,3 @@ const SocialSection = ({ className }) => (
     </div>
   </div>
 );
-
-const Error = styled.div`
-  width: 100%;
-  position: relative;
-  ${(props) =>
-    props.message
-      ? `
-    &::before {
-      content: "${props.message}";
-      position: absolute;
-      width: 100%;
-      font-weight: 400;
-      color: red;
-      text-align: right;
-      text-transform: lowercase;
-      font-variant: small-caps;
-      opacity: 80%;
-    }
-  `
-      : "display: none;"}
-`;
