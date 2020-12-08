@@ -9,6 +9,7 @@ if (isProduction)
   client = new postmark.ServerClient(process.env.POSTMARK_API_TOKEN);
 
 export default async (req, res) => {
+  res.status(200).json({ message: "SUCCESS" });
   const data = JSON.parse(req.body);
   console.log("REQ DATA", data);
   const { name, email, message } = data;

@@ -1,5 +1,4 @@
 import Document, { Html, Head, Main, NextScript } from "next/document";
-import { css, Global } from "@emotion/core";
 
 class MyDocument extends Document {
   static async getInitialProps(ctx) {
@@ -38,13 +37,27 @@ class MyDocument extends Document {
           />
           <link
             rel="preload"
+            href="/fonts/Wotfard/wotfard-semibold-webfont.ttf"
+            as="font"
+            type="font/ttf"
+            crossOrigin="anonymous"
+          />
+          <link
+            rel="preload"
+            href="/fonts/Wotfard/wotfard-bold-webfont.ttf"
+            as="font"
+            type="font/ttf"
+            crossOrigin="anonymous"
+          />
+          <link
+            rel="preload"
             href="/fonts/Archia/archia-regular-webfont.ttf"
             as="font"
             type="font/ttf"
             crossOrigin="anonymous"
           />
         </Head>
-        <body>
+        <body className="text-gray-800 bg-lt-bg dark:text-gray-300 dark:bg-dk-bg">
           <script src="/noflash.js" />
           <Main />
           <NextScript />
