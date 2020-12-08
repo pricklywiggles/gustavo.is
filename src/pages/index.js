@@ -18,11 +18,16 @@ export default function Home() {
             <span className="inline xl:inline text-gray-800 dark:text-gray-200">
               Hi there!{" "}
             </span>
-            <span className="inline pl-1 text-indigo-600">
-              I&apos;m Gustavo
-            </span>
-            <span className="relative block -top-3 text-right tracking-tighter sm:-left-20 font-archia text-tiny">
-              ..but you can call me goose
+            <span className="block sm:inline">
+              <span className="relative text-indigo-600 " stuff="inline pl-1 ">
+                I&apos;m Gustavo
+                <span
+                  className="absolute -right-8 -bottom-1 sm:bottom-1 tracking-tighter font-archia text-tiny text-gray-600 dark:text-gray-400"
+                  stuff="relative block -top-3 text-right tracking-tighter sm:-left-20 font-archia text-tiny text-gray-200"
+                >
+                  ..but you can call me goose
+                </span>
+              </span>
             </span>
           </h1>
           <p className="mt-3 mx-auto text-base sm:text-lg md:mt-5 md:text-xl">
@@ -52,11 +57,10 @@ export default function Home() {
           </p>
         </div>
       </div>
-      <div className="">
-        <h2 className="font-bold text-2xl py-10 px-10 sm:text-center">
+      <div className="px-6">
+        <h2 className="font-bold text-2xl py-10  sm:text-center">
           Projects and products
         </h2>
-
         <div className="flex flex-col sm:flex-row justify-around mx-auto max-w-measure">
           {projects.map((project) => (
             <ProjectCard key={project.title} {...project} />

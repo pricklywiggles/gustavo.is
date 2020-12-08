@@ -1,6 +1,8 @@
-import React from "react";
+import * as React from "react";
 import { logos } from "utils/data";
 import { PonderBlogsLogo } from "components/svg/logos";
+import { TabbedContent } from "components/tabbed-content";
+import { Section } from "components/section";
 import {
   SparkleIcon,
   GradCapIcon,
@@ -11,7 +13,7 @@ import {
 export default function PonderProject() {
   return (
     <div className="dark:text-gray-300 text-gray-800">
-      <div className="relative transition-all mt-10 mb-10 bg-lt-bg dark:bg-dk-bg sm:border-l-2 sm:border-dashed md:border-solid sm:border-yellow-300 lg:border-0 overflow-hidden">
+      <div className="relative transition-all mt-10 mb-10 bg-lt-bg dark:bg-dk-bg overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div
             className="relative z-10 pb-8 md:py-10 bg-lt-bg dark:bg-dk-bg md:max-w-lg lg:max-w-2xl "
@@ -43,11 +45,17 @@ export default function PonderProject() {
             </main>
           </div>
         </div>
-        <div className="md:absolute md:inset-y-0 md:right-0 md:w-1/2">
-          <img
-            className="h-56 w-full object-cover sm:h-72 md:w-full md:h-full"
-            src="/ponder-screen1.jpg"
-            alt=""
+        <div
+          className="md:absolute  md:inset-y-0 h-72 md:right-0 md:w-1/2"
+          stuff=""
+        >
+          <div
+            className="absolute bg-repeat bg-white -top-1/2 -left-1/3  bg-ponder-hero animate-hero-scroll"
+            style={{
+              height: "800%",
+              width: "400%",
+              backgroundSize: "800px auto"
+            }}
           />
         </div>
       </div>
@@ -59,9 +67,9 @@ export default function PonderProject() {
       >
         <div className="max-w-measure text-lg sm:text-xl leading-snug font-medium">
           <p className="pb-2 sm:pb-4">
-            Founded in early 2019 by Kristen Pavle, Dave Gorum and me, Ponder
-            was a blogging platform focused on simplicity aimed at people that
-            wanted to publish a blog collaboratively.
+            Founded in early 2019 by Kristen Pavle, Dave Gorum and me (Gustavo
+            Gallegos), Ponder was a blogging platform focused on simplicity
+            aimed at people that wanted to publish a blog collaboratively.
           </p>
           <p className="pb-2 sm:pb-4">
             We built a product where small groups of people collaborated on
@@ -114,7 +122,7 @@ export default function PonderProject() {
                     })
                   ) : (
                     <div className="flex justify-center text-8xl text-center mx-auto pb-4 min-h-full">
-                      <div className="rounded-full overflow-hidden bg-white">
+                      <div className="rounded-full overflow-hidden bg-lt-bg">
                         {icon}
                       </div>
                     </div>
@@ -140,7 +148,10 @@ export default function PonderProject() {
       </Section>
 
       <Section icon={FilmIcon} title="Feature Showcase">
-        <TabbedContent labels={walkthroughs.map((feature) => feature.title)}>
+        <TabbedContent
+          showSideline={false}
+          labels={walkthroughs.map((feature) => feature.title)}
+        >
           {walkthroughs.map(({ title, src, highlights }) => (
             <div className="flex flex-col mx-4 lg:flex-row" key={title}>
               <div className="w-full lg:pr-8 lg:w-8/12">
@@ -155,7 +166,7 @@ export default function PonderProject() {
                   ></iframe>
                 </div>
               </div>
-              <div className="mt-6 lg:mt-0">
+              <div className="mt-6 lg:mt-0 lg:w-4/12">
                 {highlights.map((highlight) => (
                   <div key={highlight} className="flex">
                     <div className="mb-2 leading-tight">
@@ -172,61 +183,6 @@ export default function PonderProject() {
         </TabbedContent>
       </Section>
     </div>
-  );
-}
-
-function Section({ className, icon, title, children }) {
-  return (
-    <div className={className}>
-      <section className="mb-10 overflow-hidden">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative">
-            <div className="flex rounded-xl h-10 w-10 sm:h-14 sm:w-14 md:h-10 md:w-10 mb-2 bg-blue-800 text-coolGray-200 fill-current shadow-md border dark:border-dk-bg-600 border-gray-400">
-              {React.createElement(icon, {
-                className: "h-6 sm:h-8 md:h-6 m-auto text-white fill-blue"
-              })}
-            </div>
-            <div className="text-3xl sm:text-4xl md:text-3xl mb-3 sm:mb-4 dark:text-gray-200 font-semibold tracking-tight">
-              {title}
-            </div>
-            {children}
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-}
-
-function TabbedContent({ className, labels, children }) {
-  const [currentTab, setCurrentTab] = React.useState(0);
-
-  const handleTabChange = (tab) => setCurrentTab(tab);
-
-  const childrenCount = React.Children.count(children);
-
-  return (
-    <>
-      <div className="flex flex-wrap pb-3 pt-3 justify-around mt-2 mb-4">
-        {Array(childrenCount)
-          .fill()
-          .map((c, childIndex) => (
-            <button
-              className={`flex items-center rounded-full m-2 h-8 py-1 px-2 text-xs md:text-md bg-lt-primary-400 text-gray-50 shadow-md dark:text-dk-bg-900  dark:bg-dk-primary-200  dark:hover:bg-dk-primary-lightest outline-none focus:ring-1 focus:ring-offset-1 focus:ring-white ${
-                childIndex === currentTab
-                  ? "border border-lt-bg-800 dark:border-lt-bg-50 "
-                  : "border border-lt-bg-300 dark:border-dk-bg-600"
-              }`}
-              key={childIndex}
-              onClick={() => handleTabChange(childIndex)}
-            >
-              {labels ? labels[childIndex] : childIndex + 1}
-            </button>
-          ))}
-      </div>
-      <div className={`${className} border-lt-accent-400 md:border-l-8`}>
-        {React.Children.toArray(children)[currentTab]}
-      </div>
-    </>
   );
 }
 

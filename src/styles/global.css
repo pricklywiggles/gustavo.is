@@ -156,15 +156,6 @@
     margin-left: -0.6em;
   }
 
-  .hero {
-    position: absolute;
-    height: 400%;
-    width: 200%;
-    top: -25%;
-    left: -100%;
-    background-size: 800px auto;
-  }
-
   .card-logo::after {
     display: block;
     content: "";

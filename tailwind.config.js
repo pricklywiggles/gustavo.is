@@ -1,5 +1,6 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
 const colors = require("tailwindcss/colors");
+const { urlObjectKeys } = require("next/dist/next-server/lib/utils");
 
 module.exports = {
   purge: ["./src/pages/**/*.js", "./src/components/**/*.js"],
@@ -132,6 +133,10 @@ module.exports = {
         beat: {
           "0%": { transform: "scale(1.2)" },
           "100%": { transform: "scale(0.8)" }
+        },
+        "hero-scroll": {
+          "0%": { transform: "rotate(-13deg) translateY(0);" },
+          "100%": { transform: "rotate(-13deg) translateY(-1278px);" }
         }
       },
       animation: {
@@ -143,13 +148,18 @@ module.exports = {
         "font-beat":
           "font-bounce-small 1s 0s cubic-bezier(0.18, 1.06, 0.6, 0.95) infinite",
         "scroll-lg": "scroll-lg 35s linear infinite",
-        beat: "beat 1s 0s cubic-bezier(0.18, 1.06, 0.6, 0.95) infinite"
+        beat: "beat 1s 0s cubic-bezier(0.18, 1.06, 0.6, 0.95) infinite",
+        "hero-scroll": "hero-scroll 35s linear infinite"
       },
       maxWidth: {
         measure: "var(--measure)"
       },
       backgroundImage: {
-        "hero-pattern": "url('/hero-pattern-lg.png')"
+        "ponder-hero": "url('/ponder-hero.png')",
+        "ponder-blogs-hero": "url('/ponder-blogs-hero.png')"
+      },
+      backgroundSize: {
+        hero: "800px auto"
       }
     }
   },
