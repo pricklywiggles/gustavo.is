@@ -40,9 +40,9 @@ export default function Header() {
   }, [count, resetCount]);
 
   // Fixes flash bug due to css transition.
-  // React.useEffect(() => {
-  //   document.body.dataset.bgtransition = "loaded";
-  // }, []);
+  React.useEffect(() => {
+    document.body.dataset.bgtransition = "loaded";
+  }, []);
 
   // sets css variables for a given theme.
   React.useEffect(() => {

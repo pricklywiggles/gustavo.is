@@ -13,12 +13,12 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="mx-auto mt-8 sm:mt-20 max-w-measure">
-        <div className="px-10 md:px-0 text-left text-gray-600 dark:text-gray-400">
+        <div className="px-6 sm:px-10 md:px-0 text-left text-gray-600 dark:text-gray-400">
           <h1 className="relative text-4xl tracking-tight font-extrabold   sm:text-5xl md:text-6xl">
             <span className="inline xl:inline text-gray-800 dark:text-gray-200">
               Hi there!{" "}
             </span>
-            <span className="block sm:inline">
+            <span className="inline-block">
               <span className="relative text-indigo-600 " stuff="inline pl-1 ">
                 I&apos;m Gustavo
                 <span
@@ -30,7 +30,7 @@ export default function Home() {
               </span>
             </span>
           </h1>
-          <p className="mt-3 mx-auto text-base sm:text-lg md:mt-5 md:text-xl">
+          <p className="mt-3 text-base sm:text-lg md:mt-5 md:text-xl">
             I&quot;m a frontend developer living in Los Angeles with my
             wonderful dog Luna. When I was a 15 year kid in Guadalajara I
             somehow convinced my dad to buy me an IBM PS/2 so I could try doing
