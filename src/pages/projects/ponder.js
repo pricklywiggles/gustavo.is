@@ -9,6 +9,7 @@ import {
   ChipIcon,
   FilmIcon
 } from "components/svg/icons";
+import { TechnologyCard } from "components/technology-card";
 
 export default function PonderProject() {
   return (
@@ -108,42 +109,11 @@ export default function PonderProject() {
         title="Technologies and Integrations"
       >
         <div className="mt-8 sm:grid sm:grid-cols-2 ">
-          {Object.entries(technologies).map(
-            ([key, { name, highlights, icon }]) => (
-              <div key={name} className="mb-10">
-                <div className="">
-                  {logos[key] ? (
-                    React.createElement(logos[key].component, {
-                      className: `w-28 h-28 mx-auto ${
-                        logos[key].themed
-                          ? "fill-current dark:text-indigo-400"
-                          : ""
-                      }`
-                    })
-                  ) : (
-                    <div className="flex justify-center text-8xl text-center mx-auto pb-4 min-h-full">
-                      <div className="rounded-full overflow-hidden bg-lt-bg">
-                        {icon}
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div
-                  key={name}
-                  className="flex flex-col -mt-14 mx-10 lg:mx-20 p-4 pt-16 text-center bg-white dark:bg-dk-bg-200 rounded-xl border border-lt-bg dark:border-2 dark:border-dk-bg-400 shadow-md"
-                >
-                  <div className="mb-2 pt-2 pb-2 font-semibold uppercase border-t  border-b text-gray-800 border-gray-300 dark:border-dk-bg-400">
-                    {name}
-                  </div>
-                  <div className="text-gray-500 self-center md:w-4/5 ">
-                    {highlights.map((highlight) => (
-                      <div key={highlight}>{highlight}</div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )
-          )}
+          {Object.entries(technologies).map(([key, technology]) => (
+            <div key={key} className="mx-auto mb-10">
+              <TechnologyCard id={key} {...technology} />
+            </div>
+          ))}
         </div>
       </Section>
 
@@ -189,6 +159,7 @@ export default function PonderProject() {
 const technologies = {
   react: {
     name: "React",
+    type: "Client Framework",
     highlights: [
       "📄 React single page app",
       "📦 Bundled with Parcel",
@@ -197,6 +168,7 @@ const technologies = {
   },
   urql: {
     name: "Urql",
+    type: "Graphql Client",
     highlights: [
       "🕊 Lightweight GraphQL client",
       "🏪 Normalized cache",
@@ -205,7 +177,8 @@ const technologies = {
     ]
   },
   neo4j: {
-    name: "Neo4J Graph DB",
+    name: "Neo4J Aura",
+    type: "Graph Database",
     highlights: [
       "🔌 Our own model and js driver code",
       "💾 Simple analytics scripts",
@@ -214,6 +187,7 @@ const technologies = {
   },
   vercel: {
     name: "Vercel",
+    type: "Client Hosting/Deployment",
     invertable: true,
     highlights: [
       "📡 SPA Client deployment",
@@ -223,6 +197,7 @@ const technologies = {
   },
   digitalOcean: {
     name: "DigitalOcean",
+    type: "Server & Media Hosting",
     highlights: [
       "🏚 GraphQL server hosting",
       "👯‍♂️ Deployed production, development and staging environments",
@@ -231,6 +206,7 @@ const technologies = {
   },
   apollo: {
     name: "Apollo GraphQL Server",
+    type: "GraphQL Server",
     invertable: true,
     highlights: [
       "🔑 JWT expiration/refresh auth",
@@ -240,11 +216,13 @@ const technologies = {
   },
   styledComponents: {
     name: "Styled-Components",
+    type: "CSS in JS Library",
     icon: "💅",
     highlights: ["📄 CSS-in-JS to power Dave Gorum's beautiful design"]
   },
   integrations: {
     name: "Integrations",
+    type: "Services used",
     icon: "🤝",
     highlights: [
       "📧 Postmark (email notifications)",

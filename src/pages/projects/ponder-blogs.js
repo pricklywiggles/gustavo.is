@@ -9,6 +9,7 @@ import {
   ChipIcon,
   FilmIcon
 } from "components/svg/icons";
+import { TechnologyCard } from "components/technology-card";
 
 export default function PonderProject() {
   return (
@@ -29,11 +30,11 @@ export default function PonderProject() {
             </svg>
 
             <main className="max-w-7xl px-4 sm:px-6 md:py-10 lg:px-8">
-              <div className="text-center md:text-left">
-                <h1 className="text-4xl tracking-tight font-extrabold text-lt-bg-100 sm:text-5xl md:text-4xl lg:text-6xl">
+              <div className="text-center md:text-left text-gray-800 dark:text-gray-200 ">
+                <h1 className="text-4xl tracking-tight font-extrabold  sm:text-5xl md:text-4xl lg:text-6xl">
                   <PonderBlogsLogo className="inline-flex align-baseline h-10 md:h-12 mx-auto md:mx-0" />{" "}
                   blogs,
-                  <span className="block text-gray-800 dark:text-gray-200 xl:inline">
+                  <span className="block xl:inline">
                     a collection of creative group blogs from the Ponder
                     community.
                   </span>
@@ -111,43 +112,12 @@ export default function PonderProject() {
         icon={ChipIcon}
         title="Technologies and Integrations"
       >
-        <div className="mt-8 sm:grid sm:grid-cols-2 ">
-          {Object.entries(technologies).map(
-            ([key, { name, highlights, icon }]) => (
-              <div key={name} className="mb-10">
-                <div className="">
-                  {logos[key] ? (
-                    React.createElement(logos[key].component, {
-                      className: `w-28 h-28 mx-auto ${
-                        logos[key].themed
-                          ? "fill-current dark:text-indigo-400"
-                          : ""
-                      }`
-                    })
-                  ) : (
-                    <div className="flex justify-center text-8xl text-center mx-auto pb-4 min-h-full">
-                      <div className="rounded-full overflow-hidden bg-white">
-                        {icon}
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div
-                  key={name}
-                  className="flex flex-col -mt-14 mx-10 lg:mx-20 p-4 pt-16 text-center bg-white dark:bg-dk-bg-200 rounded-xl border border-lt-bg dark:border-2 dark:border-dk-bg-400 shadow-md"
-                >
-                  <div className="mb-2 pt-2 pb-2 font-semibold uppercase border-t  border-b text-gray-800 border-gray-300 dark:border-dk-bg-400">
-                    {name}
-                  </div>
-                  <div className="text-gray-500 self-center md:w-4/5 ">
-                    {highlights.map((highlight) => (
-                      <div key={highlight}>{highlight}</div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )
-          )}
+        <div className="mt-8 mx-auto justify-items-center md:gap-10 grid grid-cols-1 md:grid-cols-2 ">
+          {Object.entries(technologies).map(([key, technology]) => (
+            <div key={key} className="mb-10 w-min">
+              <TechnologyCard id={key} {...technology} />
+            </div>
+          ))}
         </div>
       </Section>
 
@@ -193,6 +163,7 @@ export default function PonderProject() {
 const technologies = {
   nextjs: {
     name: "NextJS",
+    type: "Client Framework",
     highlights: [
       "⚛️ Server side rendering for speedy yet up to date member content",
       "⚡️ Static site generation for non-dynamic content",
@@ -201,24 +172,28 @@ const technologies = {
   },
   apollo: {
     name: "Apollo GraphQL Server",
+    type: "GraphQL Server",
     highlights: [
       "💫  Fully directive-based model for cypher queries, no explicit resolvers",
       "🔐 Shared codebase from Ponder client but separate schema ensures privacy of non-published data"
     ]
   },
   neo4j: {
-    name: "Neo4J Graph DB",
+    name: "Neo4J Aura",
+    type: "Graph Database",
     highlights: [
       "⚡️ Optimized indexes for data retrieval speed for blogs data"
     ]
   },
   styledComponents: {
     name: "Styled-Components",
+    type: "CSS in JS library",
     icon: "💅",
     highlights: ["📄 CSS-in-JS powers customized author-side 'moods' or themes"]
   },
   vercel: {
     name: "Vercel",
+    type: "Client Hosting/Deployment",
     highlights: [
       "📡 Native NextJS deployment solution (from CLI)",
       "🔧 Lambda function for waitlist signup",

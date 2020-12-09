@@ -61,7 +61,7 @@ export default function Header() {
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <img
-                  className="h-14"
+                  className="h-14 rounded-full shadow-xl"
                   alt="ink blot logo"
                   src="/worldblot.png"
                 />
@@ -120,7 +120,7 @@ export default function Header() {
               </NavLink>
               <NavLink href="/blog" passHref>
                 <a className="box font-semibold hover:cursor-pointer hover:text-lt-primary sm:mt-0 sm:pl-4">
-                  Blog
+                  Resume
                 </a>
               </NavLink>
               <NavLink href="/layouts" passHref>

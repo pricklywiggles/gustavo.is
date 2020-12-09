@@ -3,13 +3,24 @@ import { useForm } from "react-hook-form";
 import styled from "@emotion/styled";
 import Link from "next/link";
 import { TwitterLogo, GitHubLogo, LinkedInLogo } from "components/svg/logos";
+import { CheckmarkIcon, EnvelopeIcon } from "./svg/icons";
 
 export function ContactForm() {
   const [count, setCount] = React.useState(0);
+  const [sent, setSent] = React.useState(false);
   const { register, handleSubmit, errors } = useForm();
   const onSubmit = (data) => {
     console.log("Submitting", data);
-    fetch("/api/contact", { method: "POST", body: JSON.stringify(data) });
+    fetch("/api/contact", {
+      method: "POST",
+      body: JSON.stringify(data)
+    })
+      .then((res) => res.json())
+      .then(({ message }) => {
+        console.log(message);
+        if (message === "SUCCESS") setSent(true);
+      })
+      .catch((error) => console.log(error));
   };
   console.log(errors);
 
@@ -38,9 +49,22 @@ export function ContactForm() {
           </div>
           <div className="sm:w-3/5 -mt-6 sm:mt-0 p-6 w-9/10">
             <form
-              className="well-shadow p-6 bg-blueGray-400 text-blueGray-700 shadow-inner rounded-3xl"
+              className="relative well-shadow h-full p-6 bg-blueGray-400 text-blueGray-700 shadow-inner rounded-3xl"
               onSubmit={handleSubmit(onSubmit)}
             >
+              {sent ? (
+                <div className="absolute flex flex-col p-6 justify-center rounded-3xl items-center text-blueGray-500 bg-blur-50 inset-1">
+                  <div>
+                    <EnvelopeIcon className="inline h-28" />
+                    <CheckmarkIcon className="inline h-28" />
+                  </div>
+                  <div className="text-4xl text-center py-10">
+                    All done!{" "}
+                    <span className="block">Thanks for reaching out.</span>
+                  </div>
+                </div>
+              ) : null}
+
               <div>
                 <label htmlFor="full_name" className="sr-only">
                   Full name
