@@ -4,6 +4,7 @@ import { BeatingHeart } from "components/sprinkles";
 import { ContactForm } from "components/contact-form";
 import { ProjectCard } from "components/project-card";
 import { projects } from "utils/data";
+import { ProfilePhoto } from "components/profile-photo";
 
 export default function Home() {
   return (
@@ -14,22 +15,30 @@ export default function Home() {
       </Head>
       <div className="mx-auto mt-8 sm:mt-20 max-w-measure">
         <div className="px-6 sm:px-10 md:px-0 text-left text-gray-600 dark:text-gray-400">
-          <h1 className="relative text-4xl tracking-tight font-extrabold   sm:text-5xl md:text-6xl">
-            <span className="inline xl:inline text-gray-800 dark:text-gray-200">
-              Hi there!{" "}
-            </span>
-            <span className="inline-block">
-              <span className="relative text-indigo-600 " stuff="inline pl-1 ">
-                I&apos;m Gustavo
+          <div className="flex justify-between">
+            <h1 className="relative text-4xl tracking-tight font-extrabold   sm:text-5xl md:text-6xl lg:text-7xl">
+              <span className="text-gray-800 dark:text-gray-200">
+                Hi there!{" "}
+              </span>
+              <span className="block">
                 <span
-                  className="absolute -right-8 -bottom-1 sm:bottom-1 tracking-tighter font-archia text-tiny text-gray-600 dark:text-gray-400"
-                  stuff="relative block -top-3 text-right tracking-tighter sm:-left-20 font-archia text-tiny text-gray-200"
+                  className="relative text-indigo-600 "
+                  stuff="inline pl-1 "
                 >
-                  ..but you can call me goose
+                  I&apos;m Gustavo
+                  <span
+                    className="absolute -right-4 sm:-right-8 -bottom-1 sm:bottom-1 tracking-tighter font-archia text-tiny text-gray-600 dark:text-gray-400"
+                    stuff="relative block -top-3 text-right tracking-tighter sm:-left-20 font-archia text-tiny text-gray-200"
+                  >
+                    ..but you can call me goose
+                  </span>
                 </span>
               </span>
-            </span>
-          </h1>
+            </h1>
+            <div className="w-32 md:w-40 lg:w-52">
+              <ProfilePhoto />
+            </div>
+          </div>
           <p className="mt-3 text-base sm:text-lg md:mt-5 md:text-xl">
             I&quot;m a frontend developer living in Los Angeles with my
             wonderful dog Luna. When I was a 15 year kid in Guadalajara I
@@ -57,8 +66,8 @@ export default function Home() {
           </p>
         </div>
       </div>
-      <div className="px-6">
-        <h2 className="font-bold text-2xl py-10  sm:text-center">
+      <div>
+        <h2 className="font-bold px-6 text-2xl py-10  sm:text-center">
           Projects and products
         </h2>
         <div className="flex flex-col sm:flex-row justify-around mx-auto max-w-measure">

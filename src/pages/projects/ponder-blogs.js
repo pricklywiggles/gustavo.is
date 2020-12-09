@@ -13,14 +13,14 @@ import {
 export default function PonderProject() {
   return (
     <div className="dark:text-gray-300 text-gray-800">
-      <div className="relative transition-all mt-10 mb-10 bg-lt-bg dark:bg-dk-bg overflow-hidden">
+      <div className="relative  mt-10 mb-10 bg-lt-bg dark:bg-dk-bg overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div
             className="relative z-10 pb-8 md:py-10 bg-lt-bg dark:bg-dk-bg md:max-w-lg lg:max-w-2xl "
             stuff="sm:pb-16 md:pb-20 lg:w-full lg:pb-28 xl:pb-32"
           >
             <svg
-              className="hidden md:block transition-fill absolute right-0 inset-y-0 h-full w-48 dark:text-dk-bg text-lt-bg fill-current transform translate-x-1/2"
+              className="hidden md:block transition-all  absolute right-0 inset-y-0 h-full w-48 dark:text-dk-bg text-lt-bg fill-current transform translate-x-1/2"
               viewBox="0 0 100 100"
               preserveAspectRatio="none"
               aria-hidden="true"

@@ -12,6 +12,9 @@
 
   --bgcolor-dark-rgb: var(--gray-900-rgb);
   --bgcolor-light-rgb: var(--gray-200-rgb);
+
+  --invert: invert(0);
+  --blur: blur(0px);
 }
 
 @layer base {
@@ -93,6 +96,26 @@
       filter: invert(0%);
     }
 
+    .invert-80 {
+      --invert: invert(80%);
+    }
+
+    .blur-10 {
+      --blur: blur(10px);
+    }
+
+    .blur-1 {
+      --blur: blur(1px);
+    }
+
+    .blur-5 {
+      --blur: blur(5px);
+    }
+
+    .filter {
+      filter: var(--invert) var(--blur);
+    }
+
     .well-shadow {
       box-shadow: inset 0 2px 2px rgb(0, 0, 0, 0.4),
         0 2px 0 rgb(255, 255, 255, 0.4);
@@ -127,10 +150,6 @@
 
   .box {
     @apply block p-5;
-  }
-
-  .invert-80 {
-    filter: invert(80%);
   }
 
   /* Some css var trickery to make every-layout stacks */
@@ -180,9 +199,7 @@
   }
 
   .transition-fill {
-    polygon {
-      transition: fill 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+    transition: fill 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 

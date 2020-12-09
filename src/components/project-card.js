@@ -7,7 +7,7 @@ export function ProjectCard({ title, href, logo, stack, description }) {
   return (
     <Link href={href}>
       <div
-        className={`flex flex-nowrap mx-auto sm:mx-0 sm:flex-col mb-6 sm:mb-0 overflow-hidden shadow-md hover:shadow-lg transition-all transform hover:scale-101 bg-lt-bg-lightest dark:bg-lt-bg dark:text-gray-700 rounded-xl sm:p-4 ${
+        className={`flex flex-nowrap mx-auto max-w-min sm:flex-col mb-6 sm:mb-0 overflow-hidden shadow-md hover:shadow-lg transition-all transform scale-90 hover:scale-100 sm:scale-100 sm:hover:scale-101 bg-lt-bg-lightest dark:bg-lt-bg dark:text-gray-700 rounded-xl sm:p-4 ${
           hovering ? "cursor-pointer" : ""
         }`}
         onMouseEnter={() => setHovering(true)}

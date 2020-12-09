@@ -20,7 +20,8 @@ module.exports = {
         mono: ["Basier", ...defaultTheme.fontFamily.mono]
       },
       scale: {
-        101: "1.01"
+        101: "1.01",
+        90: "0.9"
       },
       fill: {
         blue: colors.blue["800"]
@@ -135,8 +136,12 @@ module.exports = {
           "100%": { transform: "scale(0.8)" }
         },
         "hero-scroll": {
-          "0%": { transform: "rotate(-13deg) translateY(0);" },
-          "100%": { transform: "rotate(-13deg) translateY(-1278px);" }
+          "0%": { transform: "rotate(-13deg) translateY(0)" },
+          "100%": { transform: "rotate(-13deg) translateY(-1278px)" }
+        },
+        "concept-scroll": {
+          "0%": { transform: "translateY(0)" },
+          "100%": { transform: "translateY(-3853px)" }
         }
       },
       animation: {
@@ -149,14 +154,19 @@ module.exports = {
           "font-bounce-small 1s 0s cubic-bezier(0.18, 1.06, 0.6, 0.95) infinite",
         "scroll-lg": "scroll-lg 35s linear infinite",
         beat: "beat 1s 0s cubic-bezier(0.18, 1.06, 0.6, 0.95) infinite",
-        "hero-scroll": "hero-scroll 35s linear infinite"
+        "hero-scroll": "hero-scroll 35s linear infinite",
+        "concept-scroll": "concept-scroll 240s linear infinite"
       },
       maxWidth: {
         measure: "var(--measure)"
       },
       backgroundImage: {
+        "concept-doodle": "url('/hero-pattern-lg.png')",
         "ponder-hero": "url('/ponder-hero.png')",
-        "ponder-blogs-hero": "url('/ponder-blogs-hero.png')"
+        "ponder-blogs-hero": "url('/ponder-blogs-hero.png')",
+        "concept-positive": "url('/concept-positive.png')",
+        "concept-negative": "url('/concept-negative.png')",
+        "concept-positive-bw": "url('/concept-positive-bw.png')"
       },
       backgroundSize: {
         hero: "800px auto"
