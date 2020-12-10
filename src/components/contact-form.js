@@ -40,9 +40,9 @@ export function ContactForm() {
             <div className="mt-4">
               <p>
                 I love hearing from people all over the world. Whether you want
-                to just chat, collaborate or already have a team of great folks
-                having fun building great experiences, I would love to hear from
-                you.
+                to just chat, collaborate or are already building great
+                experiences and think I&apos;d be a great addition to your team,
+                I would love to hear from you.
               </p>
               <SocialSection className="hidden sm:block" />
             </div>

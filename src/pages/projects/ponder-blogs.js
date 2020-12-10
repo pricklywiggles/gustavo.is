@@ -35,8 +35,7 @@ export default function PonderProject() {
                   <PonderBlogsLogo className="inline-flex align-baseline h-10 md:h-12 mx-auto md:mx-0" />{" "}
                   blogs,
                   <span className="block xl:inline">
-                    a collection of creative group blogs from the Ponder
-                    community.
+                    a collection of creative blogs from the Ponder community.
                   </span>
                 </h1>
                 <p className="mt-3 text-base text-gray-500 dark:text-gray-400 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl md:mx-0">
@@ -56,13 +55,6 @@ export default function PonderProject() {
             ></div>
           </div>
         </div>
-        {/* <div className="md:absolute md:inset-y-0 md:right-0 md:w-1/2">
-          <img
-            className="h-56 w-full object-cover sm:h-72 md:w-full md:h-full"
-            src="/ponder-screen1.jpg"
-            alt=""
-          />
-        </div> */}
       </div>
 
       <Section
@@ -70,21 +62,24 @@ export default function PonderProject() {
         icon={SparkleIcon}
         title="Inception and Purpose"
       >
-        <div className="max-w-measure text-lg sm:text-xl leading-snug font-medium">
+        <div className="pb-2 max-w-measure text-lg sm:text-xl leading-snug font-medium">
           <p className="pb-2 sm:pb-4">
             Ponder Blogs was a destination site where anyone could read the
             public content authored with Ponder.
           </p>
           <p className="pb-2 sm:pb-4">
-            Powered by NextJS, the Ponder Blogs was a mixture of SSR (servier
-            side rendered) and SSG (statically generated) content, making it
-            blazingly fast while still allowing for having dynamic elements and
-            instant publishing as well as advanced features like allowing
-            authors to choose theme and layout variations.
+            Powered by NextJS, Ponder Blogs was a mixture of SSR (server side
+            rendered) and SSG (statically generated) content, making it
+            blazingly fast while still allowing for dynamic elements and instant
+            publishing as well as advanced features like allowing authors to
+            choose theme and layout variations.
           </p>
           <p>
             I was in charge of development, while the beautiful design was the
-            work of my co-founder Dave Gorum
+            work of my co-founder{" "}
+            <a className="link" href="https://twitter.com/davegorum">
+              Dave Gorum
+            </a>
           </p>
         </div>
       </Section>
@@ -181,9 +176,7 @@ const technologies = {
   neo4j: {
     name: "Neo4J Aura",
     type: "Graph Database",
-    highlights: [
-      "⚡️ Optimized indexes for data retrieval speed for blogs data"
-    ]
+    highlights: ["⚡️ Optimized indexes for speedy blogs data retrieval"]
   },
   styledComponents: {
     name: "Styled-Components",
@@ -214,7 +207,7 @@ const lessons = [
       <>
         Perhaps this is better explained through example: NextJS is an amazing
         framework. After writing the Ponder client in standalone react, writing
-        the blogs site with Next was a revelation. It allowed me to build fast
+        the blogs site with NextJS was a revelation. It allowed me to build fast
         and focus on the important aspects of the product. As we were beginning
         to build, Next released a new feature called Incremental Static
         Regeneration (ISR), which did on-the-fly static site generation at
@@ -224,8 +217,8 @@ const lessons = [
         no way of making that feature &quot;feel&quot; right with ISR, since one
         couldn&apos;t invalidate the existing cache across all the blog&apos;s
         pages at once. It was a painful but right decision to use SSR instead no
-        matter how much I wanted to use ISR. (someday I&apos;m sure they will
-        introduce partial cache invalidation).
+        matter how much better ISR was in every other respect. (someday I&apos;m
+        sure they will introduce partial cache invalidation).
       </>
     )
   },
@@ -242,7 +235,7 @@ const lessons = [
         experiences (in design and code respectively). This being our company
         and it being a startup we learned that good and working is better than
         perfect and under development. This also led me to develop better
-        practices of incremental refactoring.
+        practices for incremental refactoring.
       </>
     )
   },
@@ -288,9 +281,8 @@ const lessons = [
   {
     title: (
       <>
-        When time spent <span className="text-indigo-400">working</span> grows,
-        so should my{" "}
-        <span className="text-indigo-400">mindfulness practice</span>
+        As time spent <span className="text-indigo-400">working</span> grows, so
+        should my <span className="text-indigo-400">mindfulness practice</span>
       </>
     ),
     content: (
@@ -300,11 +292,11 @@ const lessons = [
         fluctuates, it is imperative that my practice grows proportional to it.
         There&apos;s a certain momentum (what I&apos;ve heard being referred to
         as &apos;codebrain&apos;) that my mind builds when programming that if
-        left unchecked will continue on and bleed into the rest of my day, which
-        results in a too active mind, less clarity and less sleep, which in turn
-        can hurt the work. Ironically, I&apos;ve found it&apos;s especially
-        necessary for me to do this when the work is fun (and it almost always
-        does). I learned to stop every so often and take some time to meditate,
+        left unchecked will continue on and bleed into the rest of my day (or
+        most often, night), resulting in a too active mind, less clarity and
+        less sleep, in turn affecting the work. Ironically, I&apos;ve found
+        it&apos;s especially necessary for me to do this when the work is the
+        most fun. I learned to stop frequently and take some time to meditate,
         then go back to work or go back about my day.
       </>
     )
@@ -319,7 +311,7 @@ const walkthroughs = [
       "Simple and elegant design by Dave Gorum to showcase content from Ponder communities",
       "Blazing fast load times thanks to SSR/SSG",
       "Chronological, collection-based and member-based content streams per blog.",
-      "Personalized Blog profile",
+      "Personalized Blog info page",
       "Personalized Member profiles",
       "Built-in high-fidelity OpenGraph metadata for beautiful social media unfurls"
     ]
@@ -328,7 +320,7 @@ const walkthroughs = [
     title: "customization",
     src: "https://player.vimeo.com/video/482506771",
     highlights: [
-      "Customize your blog&apos;s color palette with Moods.",
+      "Customize your blog's color palette with Moods.",
       "Personalize your typeface with font family presets.",
       "Preset layout options",
       "Show the world what your group blog is all about through taglines, description, logos and special link."

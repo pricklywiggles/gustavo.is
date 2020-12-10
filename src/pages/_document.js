@@ -9,7 +9,6 @@ class MyDocument extends Document {
   render() {
     return (
       <Html lang="en">
-        {/* <Global styles={globalStyles} /> */}
         <Head>
           <meta
             name="description"

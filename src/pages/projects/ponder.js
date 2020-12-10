@@ -1,5 +1,4 @@
 import * as React from "react";
-import { logos } from "utils/data";
 import { PonderBlogsLogo } from "components/svg/logos";
 import { TabbedContent } from "components/tabbed-content";
 import { Section } from "components/section";
@@ -84,16 +83,23 @@ export default function PonderProject() {
         icon={SparkleIcon}
         title="Inception and Purpose"
       >
-        <div className="max-w-measure text-lg sm:text-xl leading-snug font-medium">
+        <div className="max-w-measure pb-2 text-lg sm:text-xl leading-snug font-medium">
           <p className="pb-2 sm:pb-4">
-            Founded in early 2019 by Kristen Pavle, Dave Gorum and me (Gustavo
-            Gallegos), Ponder was a blogging platform focused on simplicity
-            aimed at people that wanted to publish a blog collaboratively.
+            Founded in early 2019 by{" "}
+            <a className="link" href="http://twitter.com/khpavle">
+              Kristen Pavle
+            </a>
+            ,{" "}
+            <a className="link" href="https://twitter.com/davegorum">
+              Dave Gorum
+            </a>{" "}
+            and me (Gustavo Gallegos), Ponder was a blogging platform focused on
+            simplicity aimed at people that wanted to publish a blog
+            collaboratively.
           </p>
           <p className="pb-2 sm:pb-4">
-            We built a product where small groups of people collaborated on
-            creating content, had private discussions and published their
-            content to the web.
+            We built a product where friends could create content together, have
+            private discussions and publish their work to the web.
           </p>
           <p>
             We worked hard to design a product that would promote meaningful
@@ -181,9 +187,9 @@ const technologies = {
     name: "React",
     type: "Client Framework",
     highlights: [
-      "📄 React single page app",
+      "📄 React SPA",
       "📦 Bundled with Parcel",
-      "🪝 Modern hook based architecture"
+      "🪝 Modern hook-based architecture"
     ]
   },
   urql: {
@@ -192,7 +198,7 @@ const technologies = {
     highlights: [
       "🕊 Lightweight GraphQL client",
       "🏪 Normalized cache",
-      "🔒 Custom auth exchange",
+      "🔒 Homegrown auth exchange",
       "⚡️ Subscriptions for real time notifications"
     ]
   },
@@ -200,9 +206,9 @@ const technologies = {
     name: "Neo4J Aura",
     type: "Graph Database",
     highlights: [
-      "🔌 Our own model and js driver code",
+      "🔌 Cypher resolvers for complex queries",
       "💾 Simple analytics scripts",
-      "💫 Cypher graphql directives"
+      "💫 Cypher graphql directive for simple queries"
     ]
   },
   vercel: {
@@ -220,7 +226,7 @@ const technologies = {
     type: "Server & Media Hosting",
     highlights: [
       "🏚 GraphQL server hosting",
-      "👯‍♂️ Deployed production, development and staging environments",
+      "👯‍♂️ Production, development and staging environments",
       "📦 AWS S3 compatible storage"
     ]
   },
@@ -248,7 +254,8 @@ const technologies = {
       "📧 Postmark (email notifications)",
       "📈 Segment (analytics)",
       "🌄 Unsplash (photos)",
-      "💾 DigitalOcean (storage)"
+      "💾 DigitalOcean (storage)",
+      "🪳 Sentry (exception reporting)"
     ]
   }
 };
@@ -260,36 +267,35 @@ const lessons = [
       <>
         Although finding my co-founders was not only unexpected but also quick,
         the process of distilling our purpose and ideas into a cohesive product
-        idea took some time. Refining the need and the solution that fulfills it
-        must happen as soon as humanly possible to begin testing the market. The
-        details of establishing a company and its principles can be a small side
-        project or left for later in favor of small, incremental rounds of
-        development to test utility in order to validate the product idea.
+        plan took some time. Refining the market need and its proposed solution
+        must happen as soon as humanly possible to begin testing your
+        assumptions. The details of establishing a company and its principles
+        can be a small side project or postponed in favor of small, incremental
+        rounds of development to test utility in order to validate the product
+        idea.
       </>
     )
   },
   {
     title: (
       <>
-        Asking for <span className="text-indigo-400">help</span> and honoring
-        the need of being part of a{" "}
-        <span className="text-indigo-400">community</span>.
+        Ask for <span className="text-indigo-400">help</span> and honor the need
+        of being part of a <span className="text-indigo-400">community</span>.
       </>
     ),
     content: (
       <>
-        Being the only technical founder could feel like a lonely affair. This
-        was accentuated by the fact that this my first time back as a developer
-        after several years of working as a Technical Program Manager. Even the
-        technologies I already knew, have changed a lot in just a few years
-        (just look at javascript), not to mention all the ones that were new to
-        me like GraphQL and graph databases. The longer I went the more excited
-        I became about what I was learning, but sometimes I felt there
-        wasn&apos;t someone to effectively share that excitement with.
-        Thankfully this led to me reaching out not only to ask for help in
-        learning but also to share the way I felt online, mostly in Discord
-        groups (shout out to @kentcdodds), this helped me stay in touch with
-        like-minded people I could learn from.
+        Being the only technical founder sometimes felt like a lonely affair,
+        especially being the first time back as a developer after several years
+        of working as a Technical Program Manager. Even the technologies I knew
+        had changed drastically in just a few years (just look at javascript),
+        not to mention the new ones like GraphQL and graph databases. As time
+        passed I became more excited about what I was learning, but sometimes I
+        felt there wasn&apos;t someone to effectively share that excitement
+        with. Thankfully this led me to search out communities where I could not
+        only to ask for learning help but also to share the way I felt in
+        general, mostly in Discord groups (shout out to @kentcdodds). This
+        helped me stay in touch with like-minded people I could learn from.
       </>
     )
   },
@@ -303,33 +309,34 @@ const lessons = [
     content: (
       <>
         The good news about being the technology officer is that you get to call
-        the shots about what tech to use, the bad news is that you&apos;re at
-        faced with the tyranny of choice. I learned that you should time-box
-        doing due diligence and research, get feedback from people you trust,
-        make a decision and stick with it. It is very unlikely that the benefits
-        of switching to a new framework, language, or tech once you&apos;ve made
+        the shots about what tech to use, the bad news is having to face the
+        tyranny of choice. I learned that you should time-box doing due
+        diligence and research, get feedback from people you trust, make a
+        decision and stick with it. It is very unlikely that the benefits of
+        switching to a new framework, language, or tech once you&apos;ve made
         significant progress will outweigh the compound gains of having learned
-        your original choice. Consistency and mastery trump perfection.
+        your original choice.{" "}
+        <span className="text-indigo-500">
+          Consistency and mastery trump perfection.
+        </span>
       </>
     )
   },
   {
     title: (
       <>
-        The importance of{" "}
-        <span className="text-indigo-400">being open to change</span>
+        Be open to <span className="text-indigo-400">change</span>
       </>
     ),
     content: (
       <>
-        Situations change. Your understanding of situations also change, new
-        evidence is found every day and I must always be open to changing my
-        assumptions of what the product should be based on the available
-        evidence. At times it was difficult to change course when it involved
-        the loss of work that was already done, especially because development
-        time was our most needed resource. I learned to analyze the data at hand
-        and course correct to the reality that it presents, no matter the sunk
-        costs.
+        Situations change. My understanding of situations also changes, I must
+        always be open to change my assumptions of what the product should be
+        based on the available evidence. At times it was difficult to change
+        course when it involved the loss of work that was already done,
+        especially because development time was our most needed resource. I
+        learned to analyze the data at hand and course correct to the reality
+        that it presents, no matter the sunk costs.
       </>
     )
   },
@@ -343,15 +350,15 @@ const lessons = [
       <>
         2019-2020 in hindsight was not the best time to start a company
         (understatement of the year). Even though remote collaboration has come
-        a long way, before the pandemic it was easy to get together with my
+        a long way, prior to the pandemic it was easy to get together with my
         partners and hash out big ideas and lay out a direction and plan of
         action, course correcting as we went. Even small amounts of face to face
         interaction quickly became impossible come 2020. I learned for a team to
         charge ahead in the same direction at such an early stage, everyone must
-        be be frank about not only their technical challenges but their personal
-        relationship with work. When building a company with others, it&apos;s
-        important to help people understand how you feel about the work and how
-        they can help you make it better.
+        be be frank about not only their technical challenges but their
+        emotional state and personal relationship with work. When building a
+        company with others, it&apos;s important to help people understand how
+        you feel about the work and how they can help you make things better.
       </>
     )
   },
@@ -372,8 +379,8 @@ const lessons = [
         first step. I learned that learning itself is addictive so it must be
         done with focus and direction towards a goal or it can become an
         obstacle to producing results. Finally, I learned that I must factor in
-        excitement as a compass to help guide me on the areas of focus, as it
-        helps the work feel like{" "}
+        excitement as a compass to help guide me on what areas to focus, making
+        the work feel more like{" "}
         <span className="inline-block animate-bounce font-semibold text-indigo-400">
           play
         </span>
