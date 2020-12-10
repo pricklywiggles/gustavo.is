@@ -1,6 +1,5 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
 const colors = require("tailwindcss/colors");
-const { urlObjectKeys } = require("next/dist/next-server/lib/utils");
 
 module.exports = {
   purge: ["./src/pages/**/*.js", "./src/components/**/*.js"],
@@ -17,7 +16,8 @@ module.exports = {
         sans: ["Wotfard", ...defaultTheme.fontFamily.sans],
         archia: ["Archia"],
         quirky: ["Indie Flower"],
-        mono: ["Basier", ...defaultTheme.fontFamily.mono]
+        mono: ["Basier", ...defaultTheme.fontFamily.mono],
+        code: ["Basier"]
       },
       scale: {
         101: "1.01",
@@ -131,6 +131,10 @@ module.exports = {
           "0%": { transform: "translateY(0)" },
           "100%": { transform: "translateY(-1278px)" }
         },
+        "fade-in": {
+          "0%": { opacity: 0, transform: "translateX(100%)" },
+          "100%": { opacity: 1, transform: "translateX(0)" }
+        },
         beat: {
           "0%": { transform: "scale(1.2)" },
           "100%": { transform: "scale(0.8)" }
@@ -155,7 +159,8 @@ module.exports = {
         "scroll-lg": "scroll-lg 35s linear infinite",
         beat: "beat 1s 0s cubic-bezier(0.18, 1.06, 0.6, 0.95) infinite",
         "hero-scroll": "hero-scroll 35s linear infinite",
-        "concept-scroll": "concept-scroll 240s linear infinite"
+        "concept-scroll": "concept-scroll 240s linear infinite",
+        "fade-in": "fade-in 0.5s ease-in forwards"
       },
       maxWidth: {
         measure: "var(--measure)"

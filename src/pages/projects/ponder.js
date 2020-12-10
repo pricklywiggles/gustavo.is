@@ -12,6 +12,24 @@ import {
 import { TechnologyCard } from "components/technology-card";
 
 export default function PonderProject() {
+  const nodeRef = React.useRef();
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        console.log("entry", entry);
+
+        if (entry.intersectionRatio === 1) {
+          console.log("boo!");
+          entry.target.classList.add("animate-fade-in");
+        }
+      },
+      { root: null, rootMargin: "0px", threshold: 1 }
+    );
+    if (nodeRef.current) observer.observe(nodeRef.current);
+    return () => {};
+  }, []);
+
   return (
     <div className="dark:text-gray-300 text-gray-800">
       <div className="relative transition-all mt-10 mb-10 bg-lt-bg dark:bg-dk-bg overflow-hidden">
@@ -85,32 +103,34 @@ export default function PonderProject() {
         </div>
       </Section>
 
-      <Section icon={GradCapIcon} title="Lessons learned">
-        <TabbedContent>
-          {lessons.map(({ title, content }) => (
-            <div
-              key={title}
-              className="lg:flex lg:justify-between ml-4 sm:ml-8 md:ml-16"
-            >
-              <div className="text-lg pb-2 sm:text-2xl leading-snug font-semibold">
-                {title}
+      <div className="opacity-0" ref={nodeRef}>
+        <Section icon={GradCapIcon} title="Lessons learned">
+          <TabbedContent>
+            {lessons.map(({ title, content }) => (
+              <div
+                key={title}
+                className="lg:flex lg:justify-between ml-4 sm:ml-8 md:ml-16"
+              >
+                <div className="text-lg pb-2 sm:text-2xl leading-snug font-semibold">
+                  {title}
+                </div>
+                <div className="max-w-measure lg:ml-20 text-sm sm:text-lg sm:leading-snug">
+                  {content}
+                </div>
               </div>
-              <div className="max-w-measure lg:ml-20 text-sm sm:text-lg sm:leading-snug">
-                {content}
-              </div>
-            </div>
-          ))}
-        </TabbedContent>
-      </Section>
+            ))}
+          </TabbedContent>
+        </Section>
+      </div>
 
       <Section
         className="pt-10"
         icon={ChipIcon}
         title="Technologies and Integrations"
       >
-        <div className="mt-8 sm:grid sm:grid-cols-2 ">
+        <div className="mt-8 mx-auto justify-items-center md:gap-10 grid grid-cols-1 md:grid-cols-2">
           {Object.entries(technologies).map(([key, technology]) => (
-            <div key={key} className="mx-auto mb-10">
+            <div key={key} className="w-min mb-10">
               <TechnologyCard id={key} {...technology} />
             </div>
           ))}

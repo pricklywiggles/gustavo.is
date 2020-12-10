@@ -56,6 +56,13 @@ class MyDocument extends Document {
             type="font/ttf"
             crossOrigin="anonymous"
           />
+          <link
+            rel="preload"
+            href="/fonts/BasierMono/basiercirclemono-regular-webfont.ttf"
+            as="font"
+            type="font/ttf"
+            crossOrigin="anonymous"
+          />
         </Head>
         <body className="text-gray-800 bg-lt-bg dark:text-gray-300 dark:bg-dk-bg">
           <script src="/noflash.js" />

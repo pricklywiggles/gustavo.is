@@ -91,3 +91,15 @@ export function useToggle(initialState) {
 
   return [isOn, toggle, setIsOn];
 }
+
+const handleIntersection = (entries) => {
+  if (entries[0].intersectionRatio <= 0) return;
+  console.log("Triggered");
+};
+
+export function useObserver() {
+  const nodeRef = React.useRef();
+  const observer = new IntersectionObserver(handleIntersection);
+
+  return { nodeRef, observer };
+}
