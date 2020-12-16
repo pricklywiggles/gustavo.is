@@ -19,24 +19,20 @@ export default function PonderProject() {
         console.log("entry", entry);
 
         if (entry.intersectionRatio === 1) {
-          console.log("boo!");
           entry.target.classList.add("animate-fade-in");
         }
       },
       { root: null, rootMargin: "0px", threshold: 1 }
     );
     if (nodeRef.current) observer.observe(nodeRef.current);
-    return () => {};
+    return () => observer.disconnect();
   }, []);
 
   return (
     <div className="dark:text-gray-300 text-gray-800">
       <div className="relative transition-all mt-10 mb-10 bg-lt-bg dark:bg-dk-bg overflow-hidden">
         <div className="max-w-7xl mx-auto">
-          <div
-            className="relative z-10 pb-8 md:py-10 bg-lt-bg dark:bg-dk-bg md:max-w-lg lg:max-w-2xl "
-            stuff="sm:pb-16 md:pb-20 lg:w-full lg:pb-28 xl:pb-32"
-          >
+          <div className="relative z-10 pb-8 md:py-10 bg-lt-bg dark:bg-dk-bg md:max-w-lg lg:max-w-2xl ">
             <svg
               className="hidden md:block transition-fill absolute right-0 inset-y-0 h-full w-48 dark:text-dk-bg text-lt-bg fill-current transform translate-x-1/2"
               viewBox="0 0 100 100"
@@ -181,6 +177,8 @@ export default function PonderProject() {
     </div>
   );
 }
+
+PonderProject.displayName = "Ponder";
 
 const technologies = {
   react: {

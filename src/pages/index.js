@@ -1,18 +1,17 @@
 import Head from "next/head";
 import React from "react";
 import { BeatingHeart } from "components/sprinkles";
-import { ContactForm } from "components/contact-form";
+import { ContactForm, SocialSection } from "components/contact";
 import { ProjectCard } from "components/project-card";
 import { projects } from "utils/data";
 import { ProfilePhoto } from "components/profile-photo";
+import { CheckmarkIcon } from "components/svg/icons";
 
 export default function Home() {
+  const [result, setResult] = React.useState(null);
+
   return (
     <main>
-      <Head>
-        <title>Hello World</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
       <div className="mx-auto mt-8 sm:mt-20 max-w-measure">
         <div className="px-6 sm:px-10 md:px-0 text-left text-gray-600 dark:text-gray-400">
           <div className="flex justify-between">
@@ -21,15 +20,9 @@ export default function Home() {
                 Hi there!{" "}
               </span>
               <span className="block">
-                <span
-                  className="relative text-indigo-600 "
-                  stuff="inline pl-1 "
-                >
+                <span className="relative text-indigo-600">
                   I&apos;m Gustavo
-                  <span
-                    className="absolute -right-4 sm:-right-8 -bottom-1 sm:bottom-1 tracking-tighter font-archia text-tiny text-gray-600 dark:text-gray-400"
-                    stuff="relative block -top-3 text-right tracking-tighter sm:-left-20 font-archia text-tiny text-gray-200"
-                  >
+                  <span className="absolute -right-4 sm:-right-8 -bottom-1 sm:bottom-1 tracking-tighter font-archia text-tiny text-gray-600 dark:text-gray-400">
                     ..but you can call me goose
                   </span>
                 </span>
@@ -51,8 +44,8 @@ export default function Home() {
               commands he typed into the DOS prompt. By the time he left I
               thought to myself &quot;That didn&lsquo;t look so hard&quot;, so I
               sat down and typed my very first computer command...
-              <code className="block mx-auto text-sm my-4  font-code w-max px-4 py-1 rounded-md p- bg-gray-800 text-gray-200 uppercase">
-                C> format c:
+              <code className="block mx-auto text-sm my-4  font-code w-max px-4 py-1 rounded-md p- bg-gray-800 text-gray-300 uppercase">
+                C&gt; format c:
                 <span className="r animate-pulse">_</span>
               </code>
             </p>
@@ -96,7 +89,63 @@ export default function Home() {
           ))}
         </div>
       </div>
-      <ContactForm />
+      <div className="max-w-4xl mx-auto sm:mt-16">
+        <div className="">
+          <div className="flex flex-col sm:flex-row">
+            <div className="p-6 pt-6 sm:w-2/5">
+              <h2 className="font-bold text-3xl">Get in touch!</h2>
+              <div className="mt-4">
+                <p>
+                  I love hearing from people all over the world. Whether you
+                  want to just chat, collaborate or are already building great
+                  experiences and think I&apos;d be a great addition to your
+                  team, I would love to hear from you.
+                </p>
+                <SocialSection className="hidden sm:block" />
+              </div>
+            </div>
+            <div className="sm:w-3/5 -mt-6 sm:mt-0 p-6 w-9/10">
+              {result === "success" ? (
+                <div className="flex  items-center bg-blueGray-400 min-h-full p-6 well-shadow shadow-inner rounded-3xl">
+                  <div>
+                    <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+                      <CheckmarkIcon className="h-6 w-6 text-green-600" />
+                    </div>
+                    <div className="mt-3 text-center sm:mt-5">
+                      <h3
+                        className="text-lg leading-6 font-medium text-gray-100"
+                        id="modal-headline"
+                      >
+                        Your message was sent!
+                      </h3>
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-600">
+                          I will get back to you as soon as possible, feel free
+                          to also reach out to me on LinkedIn, Twitter or GitHub
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <ContactForm
+                    className="bg-blueGray-400 p-6 well-shadow shadow-inner rounded-3xl"
+                    onFinished={setResult}
+                  />
+                  <div className="text-right font-quirky ml-auto mr-3 mt-1 text-xs text-gray-500 dark:text-gray-200">
+                    *Don&apos;t forget to be nice{" "}
+                    <span role="img" aria-label="winky face">
+                      😉
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          <SocialSection className="sm:hidden -mt-6 px-6 pb-6" />
+        </div>
+      </div>
 
       <div>
         <footer className="text-center">
@@ -108,3 +157,5 @@ export default function Home() {
     </main>
   );
 }
+
+Home.displayName = "Home";

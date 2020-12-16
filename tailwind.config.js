@@ -77,7 +77,7 @@ module.exports = {
             8: "rgba(24,25,28, 0.8)",
             1000: "rgb(18,18,18)",
             lightest: colors.gray["700"],
-            ligher: colors.gray["800"],
+            lighter: colors.gray["800"],
             DEFAULT: colors.gray["900"],
             darker: "rgb(18,18,18)",
             darkest: "rgb(0, 0, 0)"

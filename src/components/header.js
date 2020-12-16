@@ -4,6 +4,8 @@ import { useRouter } from "next/router";
 import NavLink from "components/navlink";
 import { useLocalStorageState, useCounter, useToggle } from "utils/hooks";
 import { BeatingHeart } from "components/sprinkles";
+import { LogoLink } from "./contact";
+import { accounts } from "utils/data";
 
 const actions = [
   "ready for new ideas.",
@@ -118,45 +120,21 @@ export default function Header() {
                   Portfolio
                 </a>
               </NavLink>
-              <NavLink href="/blog" passHref>
+              <NavLink href="/resume" passHref>
                 <a className="box font-semibold hover:cursor-pointer hover:text-lt-primary sm:mt-0 sm:pl-4">
                   Resume
                 </a>
               </NavLink>
-              <NavLink href="/layouts" passHref>
-                <a className="box font-semibold hover:cursor-pointer hover:text-lt-primary sm:mt-0 sm:pl-4">
-                  About
-                </a>
-              </NavLink>
+              <LogoLink
+                className="text-dk-bg mt-auto sm:mt-0 ml-1 sm:ml-0 mb-4 sm:mb-0 transform scale-50"
+                {...accounts.github}
+              />
               <button
                 onClick={() => toggleTheme()}
-                className="mt-auto sm:mt-0 ml-3 h-8 w-8 border  border-transparent shadow-sm text-sm active:animate-font-bounce rounded-full hover:ring-1 hover:ring-offset-2 hover:ring-accentlight dark:hover:ring-accentdark hover:border-dotted focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-accentlight dark:focus:ring-accentdark"
+                className="ml-3 mb-10 sm:mb-0 h-8 w-8 border  border-transparent shadow-sm text-md sm:text-sm active:animate-font-bounce rounded-full hover:ring-1 hover:ring-offset-2 hover:ring-accentlight dark:hover:ring-accentdark hover:border-dotted focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-accentlight dark:focus:ring-accentdark"
                 type="button"
               >
                 <div className="">{isDark ? "☀️" : "🌓"}</div>
-                {/* <svg
-                className="block dark:hover:text-accentdark m-auto h-5 w-5"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                {isDark ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                  />
-                )}
-              </svg> */}
               </button>
               {isMenuOpen ? (
                 <div className="block sm:hidden text-base self-center">

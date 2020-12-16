@@ -11,6 +11,6 @@ export const BeatingHeart = () => (
         🤎
       </span>
     </div>
-    <div className="px-3 inline"></div>
+    <div className="relative pl-7 inline-block"></div>
   </>
 );

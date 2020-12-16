@@ -3,10 +3,11 @@
   "version": "0.8.0",
   "private": true,
   "license": "MIT",
-  "author": { 
-    "name" : "Gustavo Gallegos", 
-    "email" : "goose@fractal.ly", 
-    "url" : "https://gustavo.is"},
+  "author": {
+    "name": "Gustavo Gallegos",
+    "email": "goose@fractal.ly",
+    "url": "https://gustavo.is"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -15,6 +16,7 @@
   "dependencies": {
     "@emotion/core": "^10.1.1",
     "@emotion/styled": "^10.0.27",
+    "dayjs": "^1.9.7",
     "email-validator": "^2.0.4",
     "next": "10.0.1",
     "postmark": "^2.6.0",
