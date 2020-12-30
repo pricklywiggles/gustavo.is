@@ -13,20 +13,17 @@ import { TechnologyCard } from "components/technology-card";
 export default function PonderProject() {
   const nodeRef = React.useRef();
 
-  React.useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        console.log("entry", entry);
-
-        if (entry.intersectionRatio === 1) {
-          entry.target.classList.add("animate-fade-in");
-        }
-      },
-      { root: null, rootMargin: "0px", threshold: 1 }
-    );
-    if (nodeRef.current) observer.observe(nodeRef.current);
-    return () => observer.disconnect();
-  }, []);
+  // React.useEffect(() => {
+  //   const observer = new IntersectionObserver(
+  //     ([entry]) => {
+  //       if (entry.intersectionRatio === 1) {
+  //       }
+  //     },
+  //     { root: null, rootMargin: "0px", threshold: 1 }
+  //   );
+  //   if (nodeRef.current) observer.observe(nodeRef.current);
+  //   return () => observer.disconnect();
+  // }, []);
 
   return (
     <div className="dark:text-gray-300 text-gray-800">
@@ -105,7 +102,7 @@ export default function PonderProject() {
         </div>
       </Section>
 
-      <div className="opacity-0" ref={nodeRef}>
+      <div ref={nodeRef}>
         <Section icon={GradCapIcon} title="Lessons learned">
           <TabbedContent>
             {lessons.map(({ title, content }) => (

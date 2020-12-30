@@ -16,14 +16,14 @@ export const logos = {
 export const projects = [
   {
     title: "Ponder",
-    href: "/projects/ponder",
+    href: "/remembering/ponder",
     logo: Logos.PonderLogo,
     stack: ["react", "graphql", "neo4j"],
     description: "A fun and simple tool for creating collaborative blogs."
   },
   {
     title: "Ponder Blogs",
-    href: "/projects/ponder-blogs",
+    href: "/remembering/ponder-blogs",
     logo: Logos.PonderBlogsLogo,
     stack: ["nextjs", "graphql", "neo4j"],
     description:
@@ -94,16 +94,16 @@ export const resume = {
       endDate: null,
       results: [
         <>
-          Developed <Link href="/projects/ponder">Ponder</Link>, a React client
-          web application for authoring group blogs that leveraged refreshable
-          JWT authentication and real-time in-app messaging notifications,
-          optimistic updates, Slack-inspired private communities, unlimited
-          image uploads and messaging system.
+          Developed <Link href="/remembering/ponder">Ponder</Link>, a React
+          client web application for authoring group blogs that leveraged
+          refreshable JWT authentication and real-time in-app messaging
+          notifications, optimistic updates, Slack-inspired private communities,
+          unlimited image uploads and messaging system.
         </>,
         "Implemented a fully featured Apollo GraphQL server for Ponder and Ponder Blogs clients including resolvers and directives for JWT authentication, Neo4j graph DB Cypher queries, unlimited image uploads to DigitalOcean Spaces (via AWS S3 SDK) as well as Integrations with Sentry for exception reporting, Segment for analytics and PostMark for email notifications.",
         <>
-          Developed <Link href="/projects/ponder-blogs">Ponder Blogs</Link>, a
-          NextJS-based SSR/SSG destination site for group blogs published
+          Developed <Link href="/remembering/ponder-blogs">Ponder Blogs</Link>,
+          a NextJS-based SSR/SSG destination site for group blogs published
           through the ponder client. Features included author-customizable
           layouts and color themes and instant availability of new content
           thanks to SSR and useSWR.
@@ -187,42 +187,64 @@ const TwitterCardSize = {
   large: "summary_large_image"
 };
 
-export const openGraphData = {
+export const metadata = {
   Home: {
-    "og:title": "Hi, I'm Gustavo Gallegos and this is my dev portfolio",
-    "og:description":
-      "I'm a web developer in Los Angeles. See a collection of previous projects, lessons learned and my contact information. Cheers!",
-    "og:image": "https://gustavo.is/og_home.png",
-    "og:site_name": "Gustavo Gallegos' Dev Portfolio",
-    "og:url": "https://gustavo.is",
-    "twitter:card": TwitterCardSize.large
+    title: "Hi, I'm Gustavo Gallegos. A web developer in Los Angeles.",
+    description:
+      "I'm a web developer (React, NextJS, Javascript, GraphQL, HTML and CSS) living in in Los Angeles. See my portfolio and contact information",
+    openGraph: {
+      "og:title": "Hi, I'm Gustavo Gallegos and this is my dev portfolio",
+      "og:description":
+        "I'm a web developer in Los Angeles. See a collection of previous projects, lessons learned and my contact information. Cheers!",
+      "og:image": "https://gustavo.is/og_home.png",
+      "og:site_name": "Gustavo Gallegos' Dev Portfolio",
+      "og:url": "https://gustavo.is",
+      "og:type": "website",
+      "twitter:card": TwitterCardSize.large
+    }
   },
   Ponder: {
-    "og:title": "Looking back at Ponder, a group blogging platform",
-    "og:description":
+    title: "A look back at building Ponder, a group blogging platform.",
+    description:
       "We recently had to sunset Ponder, Check out what it was, the technologies used, and the lessons I learned building it.",
-    "og:image": "https://gustavo.is/og_ponder.png",
-    "og:site_name": "Gustavo Gallegos' Dev Portfolio",
-    "og:url": "https://gustavo.is/projects/ponder",
-    "twitter:card": TwitterCardSize.large
+    openGraph: {
+      "og:title": "Looking back at Ponder, a group blogging platform",
+      "og:description":
+        "We recently had to sunset Ponder, Check out what it was, the technologies used, and the lessons I learned building it.",
+      "og:image": "https://gustavo.is/og_ponder.png",
+      "og:site_name": "Gustavo Gallegos' Dev Portfolio",
+      "og:url": "https://gustavo.is/remembering/ponder",
+      "og:type": "website",
+      "twitter:card": TwitterCardSize.large
+    }
   },
   PonderBlogs: {
-    "og:title":
-      "Looking back at Ponder Blogs, a destination site for Ponder content",
-    "og:description":
-      "Now that Ponder Blogs is no more, I spent some time reflecting on the lessons I learned building it.",
-    "og:image": "https://gustavo.is/og_ponder_blogs.png",
-    "og:site_name": "Gustavo Gallegos' Dev Portfolio",
-    "og:url": "https://gustavo.is/projects/ponder-blogs",
-    "twitter:card": TwitterCardSize.large
+    title: "A retrospective of things I learned building Ponder Blogs",
+    openGraph: {
+      "og:title":
+        "Now that we've sunset the Ponder Blogs site, I spent some time reflecting on the lessons I learned building it.",
+      "og:description":
+        "Now that we've sunset the Ponder Blogs site, I spent some time reflecting on the lessons I learned building it.",
+      "og:image": "https://gustavo.is/og_ponder_blogs.png",
+      "og:site_name": "Gustavo Gallegos' Dev Portfolio",
+      "og:url": "https://gustavo.is/remembering/ponder-blogs",
+      "og:type": "website",
+      "twitter:card": TwitterCardSize.large
+    }
   },
   Resume: {
-    "og:title": "Hi there! I'm Gustavo Gallegos.",
-    "og:description":
-      "I'm a web developer in Los Angeles, CA. This is my resume, you should hire me.",
-    "og:image": "https://gustavo.is/og_resume.png",
-    "og:site_name": "Gustavo Gallegos' Dev Portfolio",
-    "og:url": "https://gustavo.is",
-    "twitter:card": TwitterCardSize.small
+    title: "Hi there! I'm Gustavo Gallegos. This is my resume.",
+    description:
+      "I'm a web developer in Los Angeles, CA and I'm looking for my tribe. This is my resume.",
+    openGraph: {
+      "og:title": "Hi there! I'm Gustavo Gallegos. This is my resume.",
+      "og:description":
+        "I'm a web developer in Los Angeles, CA and I'm looking for my tribe. This is my resume",
+      "og:image": "https://gustavo.is/og_resume.png",
+      "og:site_name": "Gustavo Gallegos' Dev Portfolio",
+      "og:url": "https://gustavo.is",
+      "og:type": "website",
+      "twitter:card": TwitterCardSize.small
+    }
   }
 };

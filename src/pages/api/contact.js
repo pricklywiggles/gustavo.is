@@ -11,14 +11,8 @@ if (isProduction)
 export default async (req, res) => {
   if (isProduction) {
     const data = JSON.parse(req.body);
-    console.log("REQ DATA", data);
     const { name, email, message } = data;
-    console.log("REQ", {
-      name,
-      email,
-      message,
-      tok: process.env.POSTMARK_API_TOKEN
-    });
+
     if (!isProduction) return res.status(200).json({ message: "Sent" });
 
     if (!validator.validate(email)) {
@@ -26,17 +20,17 @@ export default async (req, res) => {
     } else {
       try {
         const result = await client.sendEmail({
-          From: "howdy@ponder.to",
-          To: "sky100010@gmail.com",
+          From: process.env.POSTMARK_SENDER,
+          To: process.env.POSTMARK_RECIPIENT,
           Subject: "Gustavo.is CONTACT FORM",
           TextBody: `${name} (${email}): ${message}`,
           MessageStream: "outbound"
         });
 
-        console.log("Successfully sent email", result);
-        res.status(200).json({ message: "Sent" });
+        // console.log("Successfully sent email", result);
+        res.status(200).json({ message: "SUCCESS" });
       } catch (error) {
-        console.log("Could not send mail", error);
+        // console.log("Could not send mail", error);
         res.status(400).json({ message: error });
       }
     }

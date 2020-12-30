@@ -8,14 +8,14 @@ export function ContactForm({ className, dialog, onFinished }) {
   const [count, setCount] = React.useState(0);
   const { register, handleSubmit, errors } = useForm();
   const onSubmit = (data) => {
-    console.log("Submitting", data);
+    // console.log("Submitting", data);
     fetch("/api/contact", {
       method: "POST",
       body: JSON.stringify(data)
     })
       .then((res) => res.json())
       .then(({ message }) => {
-        console.log(message);
+        // console.log(message);
         if (message === "SUCCESS") {
           if (onFinished) onFinished("success");
           else console.warn("ContactForm has no onFinished callback");
@@ -26,7 +26,7 @@ export function ContactForm({ className, dialog, onFinished }) {
         onFinished("failure");
       });
   };
-  console.log(errors);
+  // console.log(errors);
 
   const handleChange = (event) => setCount(event.target.value.length);
 

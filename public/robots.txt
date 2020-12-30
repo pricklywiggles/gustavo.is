@@ -1,0 +1,6 @@
+Sitemap: https://gustavo.is/sitemap.xml
+
+User-agent: *
+Allow: /*
+
+Disallow: /api/*

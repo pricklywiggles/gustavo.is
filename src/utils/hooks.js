@@ -74,7 +74,6 @@ export function useWindowWidth() {
   React.useEffect(() => {
     if (typeof window !== "undefined") {
       const handleResize = () => {
-        console.log("width resized to", window.innerWidth);
         setWidth(window.innerWidth);
       };
       window.addEventListener("resize", handleResize);
@@ -90,16 +89,4 @@ export function useToggle(initialState) {
   const toggle = React.useCallback(() => setIsOn((prev) => !prev), []);
 
   return [isOn, toggle, setIsOn];
-}
-
-const handleIntersection = (entries) => {
-  if (entries[0].intersectionRatio <= 0) return;
-  console.log("Triggered");
-};
-
-export function useObserver() {
-  const nodeRef = React.useRef();
-  const observer = new IntersectionObserver(handleIntersection);
-
-  return { nodeRef, observer };
 }

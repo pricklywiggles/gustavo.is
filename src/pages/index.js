@@ -34,11 +34,11 @@ export default function Home() {
           </div>
           <div className="mt-3 text-base sm:text-lg md:mt-5 md:text-xl">
             <p>
-              I&lsquo;m a developer living in Los Angeles with my wonderful dog
-              Luna, specializing in Javascript, React and GraphQL. I&lsquo;ve
-              loved technology since I was very young. I remember when I was a
-              15 year kid in Guadalajara I somehow convinced my parents to buy
-              me an IBM PS/2 desktop so I could try some Basic and C++
+              I&lsquo;m a developer specializing in Javascript, React and
+              GraphQL and currently living in Los Angeles. I&lsquo;ve loved
+              technology since I was very young. I remember when I was a 15 year
+              old kid living in Guadalajara I somehow convinced my parents to
+              buy me an IBM PS/2 desktop so I could try some Basic and C++
               programming. A technician came to your house to install it, as was
               common back then, and I stood right next to him memorizing the
               commands he typed into the DOS prompt. By the time he left I

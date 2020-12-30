@@ -2,13 +2,23 @@ import React from "react";
 import "../styles/global.css";
 import Head from "next/head";
 import { Header } from "../components/header";
-import { openGraphData } from "utils/data";
+import { metadata } from "utils/data";
 
 function MyApp({ Component, pageProps }) {
   return (
     <>
       <Head>
-        <title>Gustavo Gallegos Dev Portfolio</title>
+        <title>
+          {metadata[Component.displayName]?.title ??
+            "Hi, I'm Gustavo Gallegos, a web developer living in Los Angeles."}
+        </title>
+        <meta
+          name="description"
+          content={
+            metadata[Component.displayName]?.description ??
+            "Gustavo Gallegos Developer Portfolio Site. Web developer specializing in React, NextJS, Javascript, GraphQL, HTML and CSS"
+          }
+        ></meta>
         <link
           rel="apple-touch-icon"
           sizes="152x152"
@@ -34,7 +44,7 @@ function MyApp({ Component, pageProps }) {
           name="viewport"
           content="width=device-width, initial-scale=1.0"
         ></meta>
-        {Object.entries(openGraphData[Component.displayName] || {}).map(
+        {Object.entries(metadata[Component.displayName]?.openGraph ?? {}).map(
           ([property, content]) => (
             <meta property={property} content={content} key={property} />
           )

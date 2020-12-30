@@ -5,7 +5,7 @@
   function setClassOnDocumentBody(isDark) {
     if (isDark) {
       document.documentElement.classList.add("dark");
-      console.log("set to dark");
+      // console.log("set to dark");
     }
   }
 
@@ -18,9 +18,9 @@
   } catch (err) {}
   var localStorageExists = localStorageTheme !== null;
   if (localStorageExists) {
-    console.log("localStorage exists");
+    // console.log("localStorage exists");
     localStorageTheme = JSON.parse(localStorageTheme);
-    console.log("retrieved from ls: ", localStorageTheme);
+    // console.log("retrieved from ls: ", localStorageTheme);
   }
 
   // Determine the source of truth
@@ -29,12 +29,12 @@
     setClassOnDocumentBody(localStorageTheme);
   } else if (supportsColorSchemeQuery) {
     // source of truth from system
-    console.log("No ls, but supports color scheme", mql.matches);
+    // console.log("No ls, but supports color scheme", mql.matches);
     setClassOnDocumentBody(mql.matches);
     localStorage.setItem(storageKey, mql.matches);
   } else {
     // source of truth from document.body
-    console.log("last resort", document.body.dataset.theme);
+    // console.log("last resort", document.body.dataset.theme);
     var isDarkMode = document.body.dataset.theme;
     localStorage.setItem(storageKey, JSON.stringify(isDarkMode));
   }

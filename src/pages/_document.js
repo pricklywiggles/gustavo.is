@@ -10,10 +10,6 @@ class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
-          <meta
-            name="description"
-            content="Gustavo Gallegos Developer Portfolio Site. Web developer specializing in React, NextJS, Javascript, GraphQL, HTML and CSS"
-          ></meta>
           <link
             rel="preconnect"
             href="https://fonts.gstatic.com/"
