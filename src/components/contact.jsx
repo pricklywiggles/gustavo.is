@@ -1,29 +1,29 @@
-import * as React from "react";
-import { useForm } from "react-hook-form";
-import Link from "next/link";
-import { EnvelopeIcon } from "./svg/icons";
-import { accounts } from "utils/data";
+import * as React from 'react';
+import { useForm } from 'react-hook-form';
+import Link from 'next/link';
+import { EnvelopeIcon } from './svg/icons';
+import { accounts } from 'utils/data';
 
 export function ContactForm({ className, dialog, onFinished }) {
   const [count, setCount] = React.useState(0);
   const { register, handleSubmit, errors } = useForm();
   const onSubmit = (data) => {
     // console.log("Submitting", data);
-    fetch("/api/contact", {
-      method: "POST",
+    fetch('/api/contact', {
+      method: 'POST',
       body: JSON.stringify(data)
     })
       .then((res) => res.json())
       .then(({ message }) => {
         // console.log(message);
-        if (message === "SUCCESS") {
-          if (onFinished) onFinished("success");
-          else console.warn("ContactForm has no onFinished callback");
+        if (message === 'SUCCESS') {
+          if (onFinished) onFinished('success');
+          else console.warn('ContactForm has no onFinished callback');
         }
       })
       .catch((error) => {
         console.log(error);
-        onFinished("failure");
+        onFinished('failure');
       });
   };
   // console.log(errors);
@@ -34,7 +34,7 @@ export function ContactForm({ className, dialog, onFinished }) {
     errors[fieldName]
       ? `placeholder-red-500 focus:ring-red-500 border-red-500 border`
       : `placeholder-gray-500 focus:ring-lt-primary-lighter  ${
-          dialog ? "border-coolGray-200 border-2" : "border-transparent border"
+          dialog ? 'border-coolGray-200 border-2' : 'border-transparent border'
         }`;
 
   return (
@@ -63,13 +63,13 @@ export function ContactForm({ className, dialog, onFinished }) {
           name="name"
           autoComplete="name"
           className={`block w-full py-3 px-4 mb-4 bg-lt-bg-lightest rounded-md ${fieldClasses(
-            "name"
+            'name'
           )}`}
           placeholder={`${
-            errors.name ? "⚠️ You forgot your name" : "What's your name?"
+            errors.name ? '⚠️ You forgot your name' : "What's your name?"
           }`}
           ref={register({
-            required: "Please enter your name",
+            required: 'Please enter your name',
             maxLength: 100
           })}
         />
@@ -84,11 +84,11 @@ export function ContactForm({ className, dialog, onFinished }) {
           type="email"
           autoComplete="email"
           className={`block w-full py-3 px-4 mb-4 bg-lt-bg-lightest rounded-md  ${fieldClasses(
-            "email"
+            'email'
           )}`}
-          placeholder={errors.email ? "⚠️ Don't forget your email" : "Email"}
+          placeholder={errors.email ? "⚠️ Don't forget your email" : 'Email'}
           ref={register({
-            required: "Please enter your email",
+            required: 'Please enter your email',
             maxLength: 320
           })}
         />
@@ -102,24 +102,24 @@ export function ContactForm({ className, dialog, onFinished }) {
             rows="4"
             onChange={handleChange}
             className={`block w-full py-3 px-4 mb-4 bg-lt-bg-lightest rounded-md ${fieldClasses(
-              "message"
+              'message'
             )}`}
             placeholder={
               errors.message
                 ? "⚠️ Don't be shy, tell me something"
-                : "Tell me everything!*"
+                : 'Tell me everything!*'
             }
             ref={register({
-              required: "You forgot to write something",
+              required: 'You forgot to write something',
               maxLength: 2000
             })}
           ></textarea>
         </div>
-        <div className={`${dialog ? "" : "flex justify-between"}`}>
+        <div className={`${dialog ? '' : 'flex justify-between'}`}>
           <div
             className={`text-sm ${
-              count >= 2000 ? "text-error-600" : "text-blueGray-600"
-            } ${dialog ? "text-left -mt-2" : ""}`}
+              count >= 2000 ? 'text-error-600' : 'text-blueGray-600'
+            } ${dialog ? 'text-left -mt-2' : ''}`}
           >
             {count >= 2000
               ? `You typed ${-2000 + count} characters too many`
@@ -129,7 +129,7 @@ export function ContactForm({ className, dialog, onFinished }) {
             <button
               type="submit"
               className={`flex items-center justify-center ${
-                dialog ? "w-full py-2 mt-4" : "py-3 ml-auto px-6 -mb-2"
+                dialog ? 'w-full py-2 mt-4' : 'py-3 ml-auto px-6 -mb-2'
               } border border-transparent text-base shadow-md font-medium rounded-md text-white bg-lt-primary active:shadow-sm hover:bg-lt-primary-darker focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lt-primary-lighter`}
             >
               <EnvelopeIcon className="h-5 mr-1" />
@@ -162,7 +162,7 @@ export function LogoLink({ className, url, logo }) {
         className={`hover:cursor-pointer flex rounded-full w-12 h-12 bg-blueGray-400 overflow-hidden well-shadow ${className}`}
       >
         {React.createElement(logo, {
-          className: "m-auto  fill-current w-10 h-10"
+          className: 'm-auto  fill-current w-10 h-10'
         })}
       </div>
     </Link>

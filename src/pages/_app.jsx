@@ -1,8 +1,8 @@
-import React from "react";
-import "../styles/global.css";
-import Head from "next/head";
-import { Header } from "../components/header";
-import { metadata } from "utils/data";
+import React from 'react';
+import '../styles/global.css';
+import Head from 'next/head';
+import { Header } from '../components/header';
+import { metadata } from 'utils/data';
 
 function MyApp({ Component, pageProps }) {
   return (
@@ -16,7 +16,7 @@ function MyApp({ Component, pageProps }) {
           name="description"
           content={
             metadata[Component.displayName]?.description ??
-            "Gustavo Gallegos Developer Portfolio Site. Web developer specializing in React, NextJS, Javascript, GraphQL, HTML and CSS"
+            'Gustavo Gallegos Developer Portfolio Site. Web developer specializing in React, NextJS, Javascript, GraphQL, HTML and CSS'
           }
         ></meta>
         <link

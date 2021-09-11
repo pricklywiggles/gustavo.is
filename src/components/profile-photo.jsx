@@ -1,6 +1,6 @@
 export function ProfilePhoto({
-  photoUrl = "/gustavo.png",
-  bgClass = "bg-concept-positive"
+  photoUrl = '/gustavo.png',
+  bgClass = 'bg-concept-positive'
 }) {
   return (
     <div>
@@ -8,9 +8,9 @@ export function ProfilePhoto({
         <div
           className={`absolute bg-repeat ${bgClass} filter dark:invert-80  transform animate-concept-scroll`}
           style={{
-            width: "92%",
-            height: "11559px",
-            backgroundSize: "200% auto"
+            width: '92%',
+            height: '11559px',
+            backgroundSize: '200% auto'
           }}
         />
         <div className="absolute flex items-center w-full h-full">
@@ -22,7 +22,7 @@ export function ProfilePhoto({
         </div>
         <svg
           className="relative transition-all fill-current text-lt-bg dark:text-dk-bg"
-          style={{ width: "100%", height: "100%" }}
+          style={{ width: '100%', height: '100%' }}
           viewBox="0 0 200 200"
         >
           <defs>

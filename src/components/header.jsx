@@ -1,27 +1,27 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from "react";
-import { useRouter } from "next/router";
-import NavLink from "components/navlink";
-import { useLocalStorageState, useCounter, useToggle } from "utils/hooks";
-import { BeatingHeart } from "components/sprinkles";
-import { LogoLink } from "./contact";
-import { accounts } from "utils/data";
+import React from 'react';
+import { useRouter } from 'next/router';
+import NavLink from 'components/navlink';
+import { useLocalStorageState, useCounter, useToggle } from 'utils/hooks';
+import { BeatingHeart } from 'components/sprinkles';
+import { LogoLink } from './contact';
+import { accounts } from 'utils/data';
 
 const actions = [
-  "ready for new ideas.",
-  "glad you are here.",
-  "coding.",
-  "typing furiously.",
-  "a big fan of React.",
-  "working on something.",
-  "from Guadalajara.",
-  "drinking tea.",
-  "in Los Angeles."
+  'ready for new ideas.',
+  'glad you are here.',
+  'coding.',
+  'typing furiously.',
+  'a big fan of React.',
+  'working on something.',
+  'from Guadalajara.',
+  'drinking tea.',
+  'in Los Angeles.'
 ];
 
 export default function Header() {
   const router = useRouter();
-  const [isDark, setIsDark] = useLocalStorageState("theme", true);
+  const [isDark, setIsDark] = useLocalStorageState('theme', true);
   const [isMenuOpen, toggleMenuOpen, setIsMenuOpen] = useToggle(false);
   const [count, resetCount, toggleCounter] = useCounter(0, 10000);
   const [currentAction, setCurrentAction] = React.useState(actions[0]);
@@ -43,14 +43,14 @@ export default function Header() {
 
   // Fixes flash bug due to css transition.
   React.useEffect(() => {
-    document.body.dataset.bgtransition = "loaded";
+    document.body.dataset.bgtransition = 'loaded';
   }, []);
 
   // sets css variables for a given theme.
   React.useEffect(() => {
     let root = document.documentElement;
-    if (isDark) root.classList.add("dark");
-    else root.classList.remove("dark");
+    if (isDark) root.classList.add('dark');
+    else root.classList.remove('dark');
   }, [isDark]);
 
   return (
@@ -112,17 +112,12 @@ export default function Header() {
             </div>
             <div
               className={`${
-                isMenuOpen ? "" : "left-full"
+                isMenuOpen ? '' : 'left-full'
               } fixed sm:static flex flex-col sm:flex-row sm:items-center w-screen sm:w-auto inset-0 text-2xl text-dk-bg dark:text-lt-bg-200 sm:text-lg bg-blur-50 sm:bg-blur-0  bg-opacity-40 p-6 sm:p-0 transition-all duration-500 boing`}
             >
               <NavLink href="/" passHref>
                 <a className="box marker font-semibold hover:cursor-pointer  sm:mt-0 sm:pl-4">
                   Portfolio
-                </a>
-              </NavLink>
-              <NavLink href="/resume" passHref>
-                <a className="box font-semibold hover:cursor-pointer hover:text-lt-primary sm:mt-0 sm:pl-4">
-                  Resume
                 </a>
               </NavLink>
               <LogoLink
@@ -134,7 +129,7 @@ export default function Header() {
                 className="ml-3 mb-10 sm:mb-0 h-8 w-8 border  border-transparent shadow-sm text-md sm:text-sm active:animate-font-bounce rounded-full hover:ring-1 hover:ring-offset-2 hover:ring-accentlight dark:hover:ring-accentdark hover:border-dotted focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-accentlight dark:focus:ring-accentdark"
                 type="button"
               >
-                <div className="">{isDark ? "☀️" : "🌓"}</div>
+                <div className="">{isDark ? '☀️' : '🌓'}</div>
               </button>
               {isMenuOpen ? (
                 <div className="block sm:hidden text-base self-center">

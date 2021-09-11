@@ -1,11 +1,11 @@
-import Head from "next/head";
-import React from "react";
-import { BeatingHeart } from "components/sprinkles";
-import { ContactForm, SocialSection } from "components/contact";
-import { ProjectCard } from "components/project-card";
-import { projects } from "utils/data";
-import { ProfilePhoto } from "components/profile-photo";
-import { CheckmarkIcon } from "components/svg/icons";
+import Head from 'next/head';
+import React from 'react';
+import { BeatingHeart } from 'components/sprinkles';
+import { ContactForm, SocialSection } from 'components/contact';
+import { ProjectCard } from 'components/project-card';
+import { projects } from 'utils/data';
+import { ProfilePhoto } from 'components/profile-photo';
+import { CheckmarkIcon } from 'components/svg/icons';
 
 export default function Home() {
   const [result, setResult] = React.useState(null);
@@ -17,7 +17,7 @@ export default function Home() {
           <div className="flex justify-between">
             <h1 className="relative text-4xl tracking-tight font-extrabold   sm:text-5xl md:text-6xl lg:text-7xl">
               <span className="text-gray-800 dark:text-gray-200">
-                Hi there!{" "}
+                Hi there!{' '}
               </span>
               <span className="block">
                 <span className="relative text-indigo-600">
@@ -67,7 +67,7 @@ export default function Home() {
               platform we recently had to shutter. As difficult as it was to get
               back to speed after not coding for a long time, I loved every
               minute of it. Using code to bring an experience to life is a joy,
-              no matter how many{" "}
+              no matter how many{' '}
               <span className="pl-2 text-sm pr-2 font-semibold font-code uppercase">
                 format c:
               </span>
@@ -105,7 +105,7 @@ export default function Home() {
               </div>
             </div>
             <div className="sm:w-3/5 -mt-6 sm:mt-0 p-6 w-9/10">
-              {result === "success" ? (
+              {result === 'success' ? (
                 <div className="flex  items-center bg-blueGray-400 min-h-full p-6 well-shadow shadow-inner rounded-3xl">
                   <div>
                     <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
@@ -134,7 +134,7 @@ export default function Home() {
                     onFinished={setResult}
                   />
                   <div className="text-right font-quirky ml-auto mr-3 mt-1 text-xs text-gray-500 dark:text-gray-200">
-                    *Don&apos;t forget to be nice{" "}
+                    *Don&apos;t forget to be nice{' '}
                     <span role="img" aria-label="winky face">
                       😉
                     </span>
@@ -158,4 +158,4 @@ export default function Home() {
   );
 }
 
-Home.displayName = "Home";
+Home.displayName = 'Home';

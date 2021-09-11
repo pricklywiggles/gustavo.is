@@ -1,15 +1,15 @@
-import React from "react";
-import { logos } from "utils/data";
-import { PonderBlogsLogo } from "components/svg/logos";
-import { TabbedContent } from "components/tabbed-content";
-import { Section } from "components/section";
+import React from 'react';
+import { logos } from 'utils/data';
+import { PonderBlogsLogo } from 'components/svg/logos';
+import { TabbedContent } from 'components/tabbed-content';
+import { Section } from 'components/section';
 import {
   SparkleIcon,
   GradCapIcon,
   ChipIcon,
   FilmIcon
-} from "components/svg/icons";
-import { TechnologyCard } from "components/technology-card";
+} from 'components/svg/icons';
+import { TechnologyCard } from 'components/technology-card';
 
 export default function PonderBlogsProject() {
   return (
@@ -29,7 +29,7 @@ export default function PonderBlogsProject() {
             <main className="max-w-7xl px-4 sm:px-6 md:py-10 lg:px-8">
               <div className="text-center md:text-left text-gray-800 dark:text-gray-200 ">
                 <h1 className="text-4xl tracking-tight font-extrabold  sm:text-5xl md:text-4xl lg:text-6xl">
-                  <PonderBlogsLogo className="inline-flex align-baseline h-10 md:h-12 mx-auto md:mx-0" />{" "}
+                  <PonderBlogsLogo className="inline-flex align-baseline h-10 md:h-12 mx-auto md:mx-0" />{' '}
                   blogs,
                   <span className="block xl:inline">
                     a collection of creative blogs from the Ponder community.
@@ -45,9 +45,9 @@ export default function PonderBlogsProject() {
             <div
               className="absolute bg-repeat -top-2/3 -left-1/3 bg-ponder-blogs-hero animate-hero-scroll "
               style={{
-                backgroundSize: "800px auto",
-                width: "400%",
-                height: "800%"
+                backgroundSize: '800px auto',
+                width: '400%',
+                height: '800%'
               }}
             ></div>
           </div>
@@ -73,7 +73,7 @@ export default function PonderBlogsProject() {
           </p>
           <p>
             I was in charge of development, while the beautiful design was the
-            work of my co-founder{" "}
+            work of my co-founder{' '}
             <a className="link" href="https://twitter.com/davegorum">
               Dave Gorum
             </a>
@@ -138,7 +138,7 @@ export default function PonderBlogsProject() {
                     <div className="mb-3 leading-tight">
                       <span role="img" aria-label="hand pointing right">
                         👉🏼
-                      </span>{" "}
+                      </span>{' '}
                       {highlight}
                     </div>
                   </div>
@@ -152,44 +152,44 @@ export default function PonderBlogsProject() {
   );
 }
 
-PonderBlogsProject.displayName = "PonderBlogs";
+PonderBlogsProject.displayName = 'PonderBlogs';
 
 const technologies = {
   nextjs: {
-    name: "NextJS",
-    type: "Client Framework",
+    name: 'NextJS',
+    type: 'Client Framework',
     highlights: [
-      "⚛️ Server side rendering for speedy yet up to date member content",
-      "⚡️ Static site generation for non-dynamic content",
-      "📰 OpenGraph metadata in all pages for social site unfurling"
+      '⚛️ Server side rendering for speedy yet up to date member content',
+      '⚡️ Static site generation for non-dynamic content',
+      '📰 OpenGraph metadata in all pages for social site unfurling'
     ]
   },
   apollo: {
-    name: "Apollo GraphQL Server",
-    type: "GraphQL Server",
+    name: 'Apollo GraphQL Server',
+    type: 'GraphQL Server',
     highlights: [
-      "💫  Fully directive-based model for cypher queries, no explicit resolvers",
-      "🔐 Shared codebase from Ponder client but separate schema ensures privacy of non-published data"
+      '💫  Fully directive-based model for cypher queries, no explicit resolvers',
+      '🔐 Shared codebase from Ponder client but separate schema ensures privacy of non-published data'
     ]
   },
   neo4j: {
-    name: "Neo4J Aura",
-    type: "Graph Database",
-    highlights: ["⚡️ Optimized indexes for speedy blogs data retrieval"]
+    name: 'Neo4J Aura',
+    type: 'Graph Database',
+    highlights: ['⚡️ Optimized indexes for speedy blogs data retrieval']
   },
   styledComponents: {
-    name: "Styled-Components",
-    type: "CSS in JS library",
-    icon: "💅",
+    name: 'Styled-Components',
+    type: 'CSS in JS library',
+    icon: '💅',
     highlights: ["📄 CSS-in-JS powers customized author-side 'moods' or themes"]
   },
   vercel: {
-    name: "Vercel",
-    type: "Client Hosting/Deployment",
+    name: 'Vercel',
+    type: 'Client Hosting/Deployment',
     highlights: [
-      "📡 Native NextJS deployment solution (from CLI)",
-      "🔧 Lambda function for waitlist signup",
-      "🌎 Domain management"
+      '📡 Native NextJS deployment solution (from CLI)',
+      '🔧 Lambda function for waitlist signup',
+      '🌎 Domain management'
     ]
   }
 };
@@ -198,7 +198,7 @@ const lessons = [
   {
     title: (
       <div>
-        Cutting edge technologies are{" "}
+        Cutting edge technologies are{' '}
         <span className="text-indigo-400">not always</span> the best solution
       </div>
     ),
@@ -241,7 +241,7 @@ const lessons = [
   {
     title: (
       <>
-        Incremental refactoring is almost always{" "}
+        Incremental refactoring is almost always{' '}
         <span className="text-indigo-400">better than rewrites</span>.
       </>
     ),
@@ -304,25 +304,25 @@ const lessons = [
 
 const walkthroughs = [
   {
-    title: "walkthrough",
-    src: "https://player.vimeo.com/video/484970796",
+    title: 'walkthrough',
+    src: 'https://player.vimeo.com/video/484970796',
     highlights: [
-      "Simple and elegant design by Dave Gorum to showcase content from Ponder communities",
-      "Blazing fast load times thanks to SSR/SSG",
-      "Chronological, collection-based and member-based content streams per blog.",
-      "Personalized Blog info page",
-      "Personalized Member profiles",
-      "Built-in high-fidelity OpenGraph metadata for beautiful social media unfurls"
+      'Simple and elegant design by Dave Gorum to showcase content from Ponder communities',
+      'Blazing fast load times thanks to SSR/SSG',
+      'Chronological, collection-based and member-based content streams per blog.',
+      'Personalized Blog info page',
+      'Personalized Member profiles',
+      'Built-in high-fidelity OpenGraph metadata for beautiful social media unfurls'
     ]
   },
   {
-    title: "customization",
-    src: "https://player.vimeo.com/video/482506771",
+    title: 'customization',
+    src: 'https://player.vimeo.com/video/482506771',
     highlights: [
       "Customize your blog's color palette with Moods.",
-      "Personalize your typeface with font family presets.",
-      "Preset layout options",
-      "Show the world what your group blog is all about through taglines, description, logos and special link."
+      'Personalize your typeface with font family presets.',
+      'Preset layout options',
+      'Show the world what your group blog is all about through taglines, description, logos and special link.'
     ]
   }
 ];

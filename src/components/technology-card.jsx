@@ -1,5 +1,5 @@
-import * as React from "react";
-import { logos } from "utils/data";
+import * as React from 'react';
+import { logos } from 'utils/data';
 
 export function TechnologyCard({ id, name, type, highlights, icon }) {
   return (
@@ -8,7 +8,7 @@ export function TechnologyCard({ id, name, type, highlights, icon }) {
         {logos[id] ? (
           React.createElement(logos[id].component, {
             className: `w-14 h-14 ${
-              logos[id].themed ? "fill-current dark:text-indigo-400" : ""
+              logos[id].themed ? 'fill-current dark:text-indigo-400' : ''
             }`
           })
         ) : (

@@ -1,14 +1,14 @@
-import * as React from "react";
-import { PonderBlogsLogo } from "components/svg/logos";
-import { TabbedContent } from "components/tabbed-content";
-import { Section } from "components/section";
+import * as React from 'react';
+import { PonderBlogsLogo } from 'components/svg/logos';
+import { TabbedContent } from 'components/tabbed-content';
+import { Section } from 'components/section';
 import {
   SparkleIcon,
   GradCapIcon,
   ChipIcon,
   FilmIcon
-} from "components/svg/icons";
-import { TechnologyCard } from "components/technology-card";
+} from 'components/svg/icons';
+import { TechnologyCard } from 'components/technology-card';
 
 export default function PonderProject() {
   const nodeRef = React.useRef();
@@ -63,9 +63,9 @@ export default function PonderProject() {
           <div
             className="absolute bg-repeat bg-white -top-1/2 -left-1/3  bg-ponder-hero animate-hero-scroll"
             style={{
-              height: "800%",
-              width: "400%",
-              backgroundSize: "800px auto"
+              height: '800%',
+              width: '400%',
+              backgroundSize: '800px auto'
             }}
           />
         </div>
@@ -78,14 +78,14 @@ export default function PonderProject() {
       >
         <div className="max-w-measure pb-2 text-lg sm:text-xl leading-snug font-medium">
           <p className="pb-2 sm:pb-4">
-            Founded in early 2019 by{" "}
+            Founded in early 2019 by{' '}
             <a className="link" href="http://twitter.com/khpavle">
               Kristen Pavle
             </a>
-            ,{" "}
+            ,{' '}
             <a className="link" href="https://twitter.com/davegorum">
               Dave Gorum
-            </a>{" "}
+            </a>{' '}
             and me (Gustavo Gallegos), Ponder was a blogging platform focused on
             simplicity aimed at people that wanted to publish a blog
             collaboratively.
@@ -161,7 +161,7 @@ export default function PonderProject() {
                     <div className="mb-2 leading-tight">
                       <span role="img" aria-label="hand pointing right">
                         👉🏼
-                      </span>{" "}
+                      </span>{' '}
                       {highlight}
                     </div>
                   </div>
@@ -175,82 +175,82 @@ export default function PonderProject() {
   );
 }
 
-PonderProject.displayName = "Ponder";
+PonderProject.displayName = 'Ponder';
 
 const technologies = {
   react: {
-    name: "React",
-    type: "Client Framework",
+    name: 'React',
+    type: 'Client Framework',
     highlights: [
-      "📄 React SPA",
-      "📦 Bundled with Parcel",
-      "🪝 Modern hook-based architecture"
+      '📄 React SPA',
+      '📦 Bundled with Parcel',
+      '🪝 Modern hook-based architecture'
     ]
   },
   urql: {
-    name: "Urql",
-    type: "Graphql Client",
+    name: 'Urql',
+    type: 'Graphql Client',
     highlights: [
-      "🕊 Lightweight GraphQL client",
-      "🏪 Normalized cache",
-      "🔒 Homegrown auth exchange",
-      "⚡️ Subscriptions for real time notifications"
+      '🕊 Lightweight GraphQL client',
+      '🏪 Normalized cache',
+      '🔒 Homegrown auth exchange',
+      '⚡️ Subscriptions for real time notifications'
     ]
   },
   neo4j: {
-    name: "Neo4J Aura",
-    type: "Graph Database",
+    name: 'Neo4J Aura',
+    type: 'Graph Database',
     highlights: [
-      "🔌 Cypher resolvers for complex queries",
-      "💾 Simple analytics scripts",
-      "💫 Cypher graphql directive for simple queries"
+      '🔌 Cypher resolvers for complex queries',
+      '💾 Simple analytics scripts',
+      '💫 Cypher graphql directive for simple queries'
     ]
   },
   vercel: {
-    name: "Vercel",
-    type: "Client Hosting/Deployment",
+    name: 'Vercel',
+    type: 'Client Hosting/Deployment',
     invertable: true,
     highlights: [
-      "📡 SPA Client deployment",
-      "🔧 Utility lambda functions (JS)",
-      "🌎 Domain management"
+      '📡 SPA Client deployment',
+      '🔧 Utility lambda functions (JS)',
+      '🌎 Domain management'
     ]
   },
   digitalOcean: {
-    name: "DigitalOcean",
-    type: "Server & Media Hosting",
+    name: 'DigitalOcean',
+    type: 'Server & Media Hosting',
     highlights: [
-      "🏚 GraphQL server hosting",
-      "👯‍♂️ Production, development and staging environments",
-      "📦 AWS S3 compatible storage"
+      '🏚 GraphQL server hosting',
+      '👯‍♂️ Production, development and staging environments',
+      '📦 AWS S3 compatible storage'
     ]
   },
   apollo: {
-    name: "Apollo GraphQL Server",
-    type: "GraphQL Server",
+    name: 'Apollo GraphQL Server',
+    type: 'GraphQL Server',
     invertable: true,
     highlights: [
-      "🔑 JWT expiration/refresh auth",
-      "💫 authentication directives",
-      "🗞 PubSub based subscriptions for real time notifications"
+      '🔑 JWT expiration/refresh auth',
+      '💫 authentication directives',
+      '🗞 PubSub based subscriptions for real time notifications'
     ]
   },
   styledComponents: {
-    name: "Styled-Components",
-    type: "CSS in JS Library",
-    icon: "💅",
+    name: 'Styled-Components',
+    type: 'CSS in JS Library',
+    icon: '💅',
     highlights: ["📄 CSS-in-JS to power Dave Gorum's beautiful design"]
   },
   integrations: {
-    name: "Integrations",
-    type: "Services used",
-    icon: "🤝",
+    name: 'Integrations',
+    type: 'Services used',
+    icon: '🤝',
     highlights: [
-      "📧 Postmark (email notifications)",
-      "📈 Segment (analytics)",
-      "🌄 Unsplash (photos)",
-      "💾 DigitalOcean (storage)",
-      "🪳 Sentry (exception reporting)"
+      '📧 Postmark (email notifications)',
+      '📈 Segment (analytics)',
+      '🌄 Unsplash (photos)',
+      '💾 DigitalOcean (storage)',
+      '🪳 Sentry (exception reporting)'
     ]
   }
 };
@@ -310,7 +310,7 @@ const lessons = [
         decision and stick with it. It is very unlikely that the benefits of
         switching to a new framework, language, or tech once you&apos;ve made
         significant progress will outweigh the compound gains of having learned
-        your original choice.{" "}
+        your original choice.{' '}
         <span className="text-indigo-500">
           Consistency and mastery trump perfection.
         </span>
@@ -361,7 +361,7 @@ const lessons = [
     title: (
       <>
         <span className="text-indigo-400">Continuously learn</span> with clear
-        direction informed by{" "}
+        direction informed by{' '}
         <span className="text-indigo-400">excitement</span>.
       </>
     ),
@@ -375,7 +375,7 @@ const lessons = [
         done with focus and direction towards a goal or it can become an
         obstacle to producing results. Finally, I learned that I must factor in
         excitement as a compass to help guide me on what areas to focus, making
-        the work feel more like{" "}
+        the work feel more like{' '}
         <span className="inline-block animate-bounce font-semibold text-indigo-400">
           play
         </span>
@@ -387,58 +387,58 @@ const lessons = [
 
 const walkthroughs = [
   {
-    title: "editor",
-    src: "https://player.vimeo.com/video/482506828",
+    title: 'editor',
+    src: 'https://player.vimeo.com/video/482506828',
     highlights: [
-      "Chatlog-style blog post authoring",
-      "Optimistic updates",
-      "Continuous auto-save",
-      "Independent inputs can be reordered, edited or deleted",
-      "Images can be uploaded via file upload or drag and drop ",
-      "Unlimited image uploads",
-      "Images stored in DigitalOcean Spaces via AWS S3 driver"
+      'Chatlog-style blog post authoring',
+      'Optimistic updates',
+      'Continuous auto-save',
+      'Independent inputs can be reordered, edited or deleted',
+      'Images can be uploaded via file upload or drag and drop ',
+      'Unlimited image uploads',
+      'Images stored in DigitalOcean Spaces via AWS S3 driver'
     ]
   },
   {
-    title: "conversations",
-    src: "https://player.vimeo.com/video/482506771",
+    title: 'conversations',
+    src: 'https://player.vimeo.com/video/482506771',
     highlights: [
-      "One-on-one conversations for more meaningful discussions",
-      "Private to the group, conversations are not published to the blog.",
-      "Message inbox",
-      "Real-time in-app notifications powered by GraphQL subscriptions (urql client, apollo server).",
-      "Email notifications via PostMark"
+      'One-on-one conversations for more meaningful discussions',
+      'Private to the group, conversations are not published to the blog.',
+      'Message inbox',
+      'Real-time in-app notifications powered by GraphQL subscriptions (urql client, apollo server).',
+      'Email notifications via PostMark'
     ]
   },
   {
-    title: "collections",
-    src: "https://player.vimeo.com/video/482505654",
+    title: 'collections',
+    src: 'https://player.vimeo.com/video/482505654',
     highlights: [
-      "Organize your content by adding posts to collections shared with all members of the blog.",
-      "View collection feeds.",
-      "Personalize your collection with cover image and metadata.",
-      "Assign a unique url to a collection feed to share with anyone."
+      'Organize your content by adding posts to collections shared with all members of the blog.',
+      'View collection feeds.',
+      'Personalize your collection with cover image and metadata.',
+      'Assign a unique url to a collection feed to share with anyone.'
     ]
   },
   {
-    title: "groups",
-    src: "https://player.vimeo.com/video/482507258",
+    title: 'groups',
+    src: 'https://player.vimeo.com/video/482507258',
     highlights: [
-      "Create up to 10 different blogs",
-      "Invite any number of members",
-      "Each blog is private and isolated from the rest, with its own set of members.",
-      "A privacy-first model gives you a different identity for each blog while still being able to context switch between them from any screen.",
-      "Owner can assign (and revoke) admin privileges to any member.",
-      "Pinnable announcements for members feeds."
+      'Create up to 10 different blogs',
+      'Invite any number of members',
+      'Each blog is private and isolated from the rest, with its own set of members.',
+      'A privacy-first model gives you a different identity for each blog while still being able to context switch between them from any screen.',
+      'Owner can assign (and revoke) admin privileges to any member.',
+      'Pinnable announcements for members feeds.'
     ]
   },
   {
-    title: "publishing",
-    src: "https://player.vimeo.com/video/482507338",
+    title: 'publishing',
+    src: 'https://player.vimeo.com/video/482507338',
     highlights: [
-      "Once a blog is made public, all published content is available at a personalized ponder.to/[blog] url.",
-      "Public blogs can be personalized by admins by adding moods (color themes, layout, font and styling presets) from the app.ponder.to site at any time making each blog unique.",
-      "The public-facing blog site is a separate SSR NextJS application, you can read more about it in the Ponder Blogs project exploration page."
+      'Once a blog is made public, all published content is available at a personalized ponder.to/[blog] url.',
+      'Public blogs can be personalized by admins by adding moods (color themes, layout, font and styling presets) from the app.ponder.to site at any time making each blog unique.',
+      'The public-facing blog site is a separate SSR NextJS application, you can read more about it in the Ponder Blogs project exploration page.'
     ]
   }
 ];

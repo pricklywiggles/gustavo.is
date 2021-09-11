@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react';
 
 export function Section({ className, icon, title, children }) {
   return (
@@ -8,7 +8,7 @@ export function Section({ className, icon, title, children }) {
           <div className="relative">
             <div className="flex rounded-xl h-10 w-10 sm:h-14 sm:w-14 md:h-10 md:w-10 mb-2 bg-blue-800 text-coolGray-200 fill-current shadow-md border dark:border-dk-bg-600 border-gray-400">
               {React.createElement(icon, {
-                className: "h-6 sm:h-8 md:h-6 m-auto text-white fill-blue"
+                className: 'h-6 sm:h-8 md:h-6 m-auto text-white fill-blue'
               })}
             </div>
             <div className="text-3xl sm:text-4xl md:text-3xl mb-3 sm:mb-4 dark:text-gray-200 font-semibold tracking-tight">
