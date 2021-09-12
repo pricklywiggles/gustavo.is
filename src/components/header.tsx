@@ -25,7 +25,7 @@ export default function Header() {
   const [isMenuOpen, toggleMenuOpen, setIsMenuOpen] = useToggle(false);
   const [count, resetCount, toggleCounter] = useCounter(0, 10000);
   const [currentAction, setCurrentAction] = React.useState(actions[0]);
-  const toggleTheme = () => setIsDark((prev) => !prev);
+  const toggleTheme = () => setIsDark((prev: boolean) => !prev);
 
   // closes the menu when user picks a route on mobile
   React.useEffect(() => {
@@ -53,13 +53,18 @@ export default function Header() {
     else root.classList.remove('dark');
   }, [isDark]);
 
+  let cn = 'relative mx-auto sm:flex sm:justify-between sm:items-center max-w-7xl p-4';
+  if (router.pathname.indexOf('remembering') !== -1) {
+    cn = 'relative mx-auto sm:flex sm:justify-between sm:items-center max-w-7xl p-4';
+  }
+
   return (
     <header>
       <div>
         <div className="relative z-20 sm:fixed w-screen">
           <div className="absolute inset-0 dark-gradient opacity-0 dark:opacity-100 transition-opacity duration-500"></div>
           <div className="absolute inset-0 light-gradient dark:opacity-0 transition-opacity duration-500"></div>
-          <div className="relative mx-auto sm:flex sm:justify-between sm:items-center max-w-screen-lg p-4">
+          <div className={cn}>
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <img
@@ -72,8 +77,7 @@ export default function Header() {
                   <button
                     key={currentAction}
                     onClick={toggleCounter}
-                    className="hidden whitespace-nowrap overflow-hidden border-black animate-typewrite sm:block pl-1 text-xs tracking-tighter font-mono text-accentlight dark:text-accentdark "
-                  >
+                    className="hidden whitespace-nowrap overflow-hidden border-black animate-typewrite sm:block pl-1 text-xs tracking-tighter font-mono text-accentlight dark:text-accentdark ">
                     {currentAction}
                   </button>
                 </div>
@@ -82,14 +86,9 @@ export default function Header() {
                 <button
                   className="block bg-lt-bg-8 dark:bg-dk-bg-8 rounded-full dark:focus:text-dk-primary dark:hover:text-dk-primary focus:outline-none"
                   onClick={toggleMenuOpen}
-                  type="button"
-                >
+                  type="button">
                   <div className="flex h-10 w-10">
-                    <svg
-                      className="m-auto w-100 h-6"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
+                    <svg className="m-auto w-100 h-6" viewBox="0 0 24 24" stroke="currentColor">
                       {isMenuOpen ? (
                         <path
                           strokeLinecap="round"
@@ -113,9 +112,8 @@ export default function Header() {
             <div
               className={`${
                 isMenuOpen ? '' : 'left-full'
-              } fixed sm:static flex flex-col sm:flex-row sm:items-center w-screen sm:w-auto inset-0 text-2xl text-dk-bg dark:text-lt-bg-200 sm:text-lg bg-blur-50 sm:bg-blur-0  bg-opacity-40 p-6 sm:p-0 transition-all duration-500 boing`}
-            >
-              <NavLink href="/" passHref>
+              } fixed sm:static flex flex-col sm:flex-row sm:items-center w-screen sm:w-auto inset-0 text-2xl text-dk-bg dark:text-lt-bg-200 sm:text-lg bg-blur-50 sm:bg-blur-0  bg-opacity-40 p-6 sm:p-0 transition-all duration-500 boing`}>
+              <NavLink href="/">
                 <a className="box marker font-semibold hover:cursor-pointer  sm:mt-0 sm:pl-4">
                   Portfolio
                 </a>
@@ -127,8 +125,7 @@ export default function Header() {
               <button
                 onClick={() => toggleTheme()}
                 className="ml-3 mb-10 sm:mb-0 h-8 w-8 border  border-transparent shadow-sm text-md sm:text-sm active:animate-font-bounce rounded-full hover:ring-1 hover:ring-offset-2 hover:ring-accentlight dark:hover:ring-accentdark hover:border-dotted focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-accentlight dark:focus:ring-accentdark"
-                type="button"
-              >
+                type="button">
                 <div className="">{isDark ? '☀️' : '🌓'}</div>
               </button>
               {isMenuOpen ? (

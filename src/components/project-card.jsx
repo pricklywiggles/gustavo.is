@@ -11,13 +11,8 @@ export function ProjectCard({ title, href, logo, stack, description }) {
           hovering ? 'cursor-pointer' : ''
         }`}
         onMouseEnter={() => setHovering(true)}
-        onMouseLeave={() => setHovering(false)}
-      >
-        <div
-          className={`card-logo ${
-            hovering ? 'card-logo-hover' : ''
-          } relative  w-48 h-48`}
-        >
+        onMouseLeave={() => setHovering(false)}>
+        <div className={`card-logo ${hovering ? 'card-logo-hover' : ''} relative  w-48 h-48`}>
           {React.createElement(logo, {
             className:
               'absolute p-2 bg-dk-bg border-8 border-double border-primary-800 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-3/4 w-3/4 rounded-full'

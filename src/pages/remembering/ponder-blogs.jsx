@@ -3,12 +3,7 @@ import { logos } from 'utils/data';
 import { PonderBlogsLogo } from 'components/svg/logos';
 import { TabbedContent } from 'components/tabbed-content';
 import { Section } from 'components/section';
-import {
-  SparkleIcon,
-  GradCapIcon,
-  ChipIcon,
-  FilmIcon
-} from 'components/svg/icons';
+import { SparkleIcon, GradCapIcon, ChipIcon, FilmIcon } from 'components/svg/icons';
 import { TechnologyCard } from 'components/technology-card';
 
 export default function PonderBlogsProject() {
@@ -21,8 +16,7 @@ export default function PonderBlogsProject() {
               className="hidden md:block transition-all  absolute right-0 inset-y-0 h-full w-48 dark:text-dk-bg text-lt-bg fill-current transform translate-x-1/2"
               viewBox="0 0 100 100"
               preserveAspectRatio="none"
-              aria-hidden="true"
-            >
+              aria-hidden="true">
               <polygon points="50,0 100,0 50,100" />
             </svg>
 
@@ -48,32 +42,25 @@ export default function PonderBlogsProject() {
                 backgroundSize: '800px auto',
                 width: '400%',
                 height: '800%'
-              }}
-            ></div>
+              }}></div>
           </div>
         </div>
       </div>
 
-      <Section
-        className="pb-4"
-        icon={SparkleIcon}
-        title="Inception and Purpose"
-      >
+      <Section className="pb-4" icon={SparkleIcon} title="Inception and Purpose">
         <div className="pb-2 max-w-measure text-lg sm:text-xl leading-snug font-medium">
           <p className="pb-2 sm:pb-4">
-            Ponder Blogs was a destination site where anyone could read the
-            public content authored with Ponder.
+            Ponder Blogs was a destination site where anyone could read the public content authored
+            with Ponder.
           </p>
           <p className="pb-2 sm:pb-4">
-            Powered by NextJS, Ponder Blogs was a mixture of SSR (server side
-            rendered) and SSG (statically generated) content, making it
-            blazingly fast while still allowing for dynamic elements and instant
-            publishing as well as advanced features like allowing authors to
-            choose theme and layout variations.
+            Powered by NextJS, Ponder Blogs was a mixture of SSR (server side rendered) and SSG
+            (statically generated) content, making it blazingly fast while still allowing for
+            dynamic elements and instant publishing as well as advanced features like allowing
+            authors to choose theme and layout variations.
           </p>
           <p>
-            I was in charge of development, while the beautiful design was the
-            work of my co-founder{' '}
+            I was in charge of development, while the beautiful design was the work of my co-founder{' '}
             <a className="link" href="https://twitter.com/davegorum">
               Dave Gorum
             </a>
@@ -84,13 +71,8 @@ export default function PonderBlogsProject() {
       <Section icon={GradCapIcon} title="Lessons learned">
         <TabbedContent>
           {lessons.map(({ title, content }) => (
-            <div
-              key={title}
-              className="lg:flex lg:justify-between ml-4 sm:ml-8 md:ml-16"
-            >
-              <div className="text-lg pb-2 sm:text-2xl leading-snug font-semibold">
-                {title}
-              </div>
+            <div key={title} className="lg:flex lg:justify-between ml-4 sm:ml-8 md:ml-16">
+              <div className="text-lg pb-2 sm:text-2xl leading-snug font-semibold">{title}</div>
               <div className="max-w-measure lg:ml-20 text-sm sm:text-lg sm:leading-snug">
                 {content}
               </div>
@@ -99,11 +81,7 @@ export default function PonderBlogsProject() {
         </TabbedContent>
       </Section>
 
-      <Section
-        className="pt-10"
-        icon={ChipIcon}
-        title="Technologies and Integrations"
-      >
+      <Section className="pt-10" icon={ChipIcon} title="Technologies and Integrations">
         <div className="mt-8 mx-auto justify-items-center md:gap-10 grid grid-cols-1 md:grid-cols-2 ">
           {Object.entries(technologies).map(([key, technology]) => (
             <div key={key} className="mb-10 w-min">
@@ -114,10 +92,7 @@ export default function PonderBlogsProject() {
       </Section>
 
       <Section icon={FilmIcon} title="Feature Showcase">
-        <TabbedContent
-          showSideline={false}
-          labels={walkthroughs.map((feature) => feature.title)}
-        >
+        <TabbedContent showSideline={false} labels={walkthroughs.map((feature) => feature.title)}>
           {walkthroughs.map(({ title, src, highlights }) => (
             <div className="flex flex-col mx-4 lg:flex-row" key={title}>
               <div className="w-full lg:pr-8 lg:w-8/12">
@@ -128,8 +103,7 @@ export default function PonderBlogsProject() {
                     src={src}
                     frameBorder="0"
                     allow="autoplay; fullscreen"
-                    allowFullScreen
-                  ></iframe>
+                    allowFullScreen></iframe>
                 </div>
               </div>
               <div className="mt-6 lg:mt-0">
@@ -198,42 +172,38 @@ const lessons = [
   {
     title: (
       <div>
-        Cutting edge technologies are{' '}
-        <span className="text-indigo-400">not always</span> the best solution
+        Cutting edge technologies are <span className="text-indigo-400">not always</span> the best
+        solution
       </div>
     ),
     content: (
       <>
-        Perhaps this is better explained through example: NextJS is an amazing
-        framework. After writing the Ponder client in standalone react, writing
-        the blogs site with NextJS was a revelation. It allowed me to build fast
-        and focus on the important aspects of the product. As we were beginning
-        to build, Next released a new feature called Incremental Static
-        Regeneration (ISR), which did on-the-fly static site generation at
-        request time instead of compile time. It was way faster than SSR, worked
-        like magic and had minimal setup. Unfortunately our feature-set included
-        the ability for authors to change the theme of their site, and there was
-        no way of making that feature &quot;feel&quot; right with ISR, since one
-        couldn&apos;t invalidate the existing cache across all the blog&apos;s
-        pages at once. It was a painful but right decision to use SSR instead no
-        matter how much better ISR was in every other respect. (someday I&apos;m
-        sure they will introduce partial cache invalidation).
+        Perhaps this is better explained through example: NextJS is an amazing framework. After
+        writing the Ponder client in standalone react, writing the blogs site with NextJS was a
+        revelation. It allowed me to build fast and focus on the important aspects of the product.
+        As we were beginning to build, Next released a new feature called Incremental Static
+        Regeneration (ISR), which did on-the-fly static site generation at request time instead of
+        compile time. It was way faster than SSR, worked like magic and had minimal setup.
+        Unfortunately our feature-set included the ability for authors to change the theme of their
+        site, and there was no way of making that feature &quot;feel&quot; right with ISR, since one
+        couldn&apos;t invalidate the existing cache across all the blog&apos;s pages at once. It was
+        a painful but right decision to use SSR instead no matter how much better ISR was in every
+        other respect. (someday I&apos;m sure they will introduce partial cache invalidation).
       </>
     )
   },
   {
     title: (
       <>
-        Don&apos;t let the <span className="text-indigo-400">ideal</span> be the
-        enemy of the <span className="text-indigo-400">good</span>.
+        Don&apos;t let the <span className="text-indigo-400">ideal</span> be the enemy of the{' '}
+        <span className="text-indigo-400">good</span>.
       </>
     ),
     content: (
       <>
-        In a way I think both me and Dave (co-founder) really like polished
-        experiences (in design and code respectively). This being our company
-        and it being a startup we learned that good and working is better than
-        perfect and under development. This also led me to develop better
+        In a way I think both me and Dave (co-founder) really like polished experiences (in design
+        and code respectively). This being our company and it being a startup we learned that good
+        and working is better than perfect and under development. This also led me to develop better
         practices for incremental refactoring.
       </>
     )
@@ -247,56 +217,50 @@ const lessons = [
     ),
     content: (
       <>
-        The drive to rewrite something is especially strong when you are new at
-        something. You&apos;re learning so much so fast that pretty soon you
-        realize you could&apos;ve done things so much better. This feeling felt
-        like trap, what is paramount is results in the form of having a working
-        product. However, I got much better at achieving the same result by
-        instead doing incremental refactoring which helped me keep the speed of
-        development while also increasing stability.
+        The drive to rewrite something is especially strong when you are new at something.
+        You&apos;re learning so much so fast that pretty soon you realize you could&apos;ve done
+        things so much better. This feeling felt like trap, what is paramount is results in the form
+        of having a working product. However, I got much better at achieving the same result by
+        instead doing incremental refactoring which helped me keep the speed of development while
+        also increasing stability.
       </>
     )
   },
   {
     title: (
       <>
-        Code <span className="text-indigo-400">clarity</span> through
-        consistency is
+        Code <span className="text-indigo-400">clarity</span> through consistency is
         <span className="text-indigo-400"> better than perfection</span>.
       </>
     ),
     content: (
       <>
-        Another example: Even in a development team of one I sometimes faced the
-        issue of wanting to change the way I did something, either stylistically
-        or syntactically, because I learned new things or people showed me
-        better ways of expressing things. When you&apos;re iterating fast
-        though, I found 99% of the time it&apos;s better to stick to a correct
-        (if not perfect) set of rules, have a linter enforce them and just
-        forget about it.
+        Another example: Even in a development team of one I sometimes faced the issue of wanting to
+        change the way I did something, either stylistically or syntactically, because I learned new
+        things or people showed me better ways of expressing things. When you&apos;re iterating fast
+        though, I found 99% of the time it&apos;s better to stick to a correct (if not perfect) set
+        of rules, have a linter enforce them and just forget about it.
       </>
     )
   },
   {
     title: (
       <>
-        As time spent <span className="text-indigo-400">working</span> grows, so
-        should my <span className="text-indigo-400">mindfulness practice</span>
+        As time spent <span className="text-indigo-400">working</span> grows, so should my{' '}
+        <span className="text-indigo-400">mindfulness practice</span>
       </>
     ),
     content: (
       <>
-        Last but probably the most valuable lesson for me was that it is not
-        enough for me to maintain my mindfulness practice as my work volume
-        fluctuates, it is imperative that my practice grows proportional to it.
-        There&apos;s a certain momentum (what I&apos;ve heard being referred to
-        as &apos;codebrain&apos;) that my mind builds when programming that if
-        left unchecked will continue on and bleed into the rest of my day (or
-        most often, night), resulting in a too active mind, less clarity and
-        less sleep, in turn affecting the work. Ironically, I&apos;ve found
-        it&apos;s especially necessary for me to do this when the work is the
-        most fun. I learned to stop frequently and take some time to meditate,
-        then go back to work or go back about my day.
+        Last but probably the most valuable lesson for me was that it is not enough for me to
+        maintain my mindfulness practice as my work volume fluctuates, it is imperative that my
+        practice grows proportional to it. There&apos;s a certain momentum (what I&apos;ve heard
+        being referred to as &apos;codebrain&apos;) that my mind builds when programming that if
+        left unchecked will continue on and bleed into the rest of my day (or most often, night),
+        resulting in a too active mind, less clarity and less sleep, in turn affecting the work.
+        Ironically, I&apos;ve found it&apos;s especially necessary for me to do this when the work
+        is the most fun. I learned to stop frequently and take some time to meditate, then go back
+        to work or go back about my day.
       </>
     )
   }

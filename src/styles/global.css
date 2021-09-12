@@ -11,6 +11,7 @@
   --gray-200-rgb: 228, 228, 231;
 
   --bgcolor-dark-rgb: var(--gray-900-rgb);
+  --bgcolor-light-hsl: 223, 74%, 92%;
   --bgcolor-light-rgb: var(--gray-200-rgb);
 
   --invert: invert(0);
@@ -19,48 +20,43 @@
 
 @layer base {
   @font-face {
-    font-family: "Wotfard";
-    src: url("/fonts/Wotfard/wotfard-regular-webfont.eot");
-    src: url("/fonts/Wotfard/wotfard-regular-webfont.eot?#iefix")
-        format("embedded-opentype"),
-      url("/fonts/Wotfard/wotfard-regular-webfont.ttf") format("truetype");
+    font-family: 'Wotfard';
+    src: url('/fonts/Wotfard/wotfard-regular-webfont.eot');
+    src: url('/fonts/Wotfard/wotfard-regular-webfont.eot?#iefix') format('embedded-opentype'),
+      url('/fonts/Wotfard/wotfard-regular-webfont.ttf') format('truetype');
     font-weight: 400;
     font-display: swap;
   }
   @font-face {
-    font-family: "Wotfard";
-    src: url("/fonts/Wotfard/wotfard-semibold-webfont.eot");
-    src: url("/fonts/Wotfard/wotfard-semibold-webfont.eot?#iefix")
-        format("embedded-opentype"),
-      url("/fonts/Wotfard/wotfard-semibold-webfont.ttf") format("truetype");
+    font-family: 'Wotfard';
+    src: url('/fonts/Wotfard/wotfard-semibold-webfont.eot');
+    src: url('/fonts/Wotfard/wotfard-semibold-webfont.eot?#iefix') format('embedded-opentype'),
+      url('/fonts/Wotfard/wotfard-semibold-webfont.ttf') format('truetype');
     font-weight: 600;
     font-display: swap;
   }
   @font-face {
-    font-family: "Wotfard";
-    src: url("/fonts/Wotfard/wotfard-bold-webfont.eot");
-    src: url("/fonts/Wotfard/wotfard-bold-webfont.eot?#iefix")
-        format("embedded-opentype"),
-      url("/fonts/Wotfard/wotfard-bold-webfont.ttf") format("truetype");
+    font-family: 'Wotfard';
+    src: url('/fonts/Wotfard/wotfard-bold-webfont.eot');
+    src: url('/fonts/Wotfard/wotfard-bold-webfont.eot?#iefix') format('embedded-opentype'),
+      url('/fonts/Wotfard/wotfard-bold-webfont.ttf') format('truetype');
     font-weight: 700;
     font-display: swap;
   }
   @font-face {
-    font-family: "Basier";
-    src: url("/fonts/BasierMono/basiercirclemono-regular-webfont.eot");
-    src: url("/fonts/BasierMono/basiercirclemono-regular-webfont.eot?#iefix")
-        format("embedded-opentype"),
-      url("/fonts/BasierMono/basiercirclemono-regular-webfont.ttf")
-        format("truetype");
+    font-family: 'Basier';
+    src: url('/fonts/BasierMono/basiercirclemono-regular-webfont.eot');
+    src: url('/fonts/BasierMono/basiercirclemono-regular-webfont.eot?#iefix')
+        format('embedded-opentype'),
+      url('/fonts/BasierMono/basiercirclemono-regular-webfont.ttf') format('truetype');
     font-weight: 400;
     font-display: swap;
   }
   @font-face {
-    font-family: "Archia";
-    src: url("/fonts/Archia/archia-regular-webfont.eot");
-    src: url("/fonts/Archia/archia-regular-webfont.eot?#iefix")
-        format("embedded-opentype"),
-      url("/fonts/Archia/archia-regular-webfont.ttf") format("truetype");
+    font-family: 'Archia';
+    src: url('/fonts/Archia/archia-regular-webfont.eot');
+    src: url('/fonts/Archia/archia-regular-webfont.eot?#iefix') format('embedded-opentype'),
+      url('/fonts/Archia/archia-regular-webfont.ttf') format('truetype');
     font-weight: 400;
     font-display: swap;
   }
@@ -121,8 +117,7 @@
     }
 
     .well-shadow {
-      box-shadow: inset 0 2px 2px rgb(0, 0, 0, 0.4),
-        0 2px 0 rgb(255, 255, 255, 0.4);
+      box-shadow: inset 0 2px 2px rgb(0, 0, 0, 0.4), 0 2px 0 rgb(255, 255, 255, 0.4);
     }
   }
 
@@ -145,10 +140,10 @@
   .light-gradient {
     background: linear-gradient(
       to bottom,
-      rgb(var(--bgcolor-light-rgb)),
-      rgb(var(--bgcolor-light-rgb)),
-      rgb(var(--bgcolor-light-rgb)),
-      rgba(var(--bgcolor-light-rgb), 0)
+      hsl(var(--bgcolor-light-hsl)),
+      hsl(var(--bgcolor-light-hsl)),
+      hsl(var(--bgcolor-light-hsl)),
+      hsla(var(--bgcolor-light-hsl), 0)
     );
   }
 
@@ -158,7 +153,7 @@
 
   /* Some css var trickery to make every-layout stacks */
   .sts-10 {
-    --space: theme("spacing.10");
+    --space: theme('spacing.10');
   }
 
   .stack {
@@ -174,14 +169,14 @@
 
   /* decoration for current navlink */
   .current-link::before {
-    content: "\2022";
+    content: '\2022';
     position: absolute;
     margin-left: -0.6em;
   }
 
   .card-logo::after {
     display: block;
-    content: "";
+    content: '';
     position: absolute;
     top: 50%;
     left: 50%;
@@ -189,11 +184,7 @@
     width: 65%;
     height: 65%;
     border-radius: 100%;
-    background: linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 1) 0%,
-      rgba(255, 255, 255, 0) 100%
-    );
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
     opacity: 0.52;
     transition: transform 0.65s cubic-bezier(0.18, 0.9, 0.58, 1);
   }
@@ -207,6 +198,6 @@
   }
 }
 
-body[data-bgtransition="loaded"] {
+body[data-bgtransition='loaded'] {
   transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }

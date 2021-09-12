@@ -4,8 +4,7 @@ import * as postmark from 'postmark';
 const isProduction = process.env.NODE_ENV === 'production';
 
 let client;
-if (isProduction)
-  client = new postmark.ServerClient(process.env.POSTMARK_API_TOKEN);
+if (isProduction) client = new postmark.ServerClient(process.env.POSTMARK_API_TOKEN);
 
 export default async (req, res) => {
   if (isProduction) {

@@ -24,8 +24,7 @@ export const projects = [
     href: '/remembering/ponder-blogs',
     logo: Logos.PonderBlogsLogo,
     stack: ['nextjs', 'graphql', 'neo4j'],
-    description:
-      'A collection of creative group blogs from the Ponder community.'
+    description: 'A collection of creative group blogs from the Ponder community.'
   }
 ];
 

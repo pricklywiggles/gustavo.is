@@ -50,7 +50,7 @@ module.exports = {
             8: 'rgba(228,228,231, 0.8)',
             lightest: colors.gray['50'],
             lighter: colors.gray['100'],
-            DEFAULT: colors.gray['200'],
+            DEFAULT: 'hsla( 219, 83%, 92%, 100%)',
             darker: colors.gray['300'],
             darkest: colors.gray['400']
           },
@@ -150,13 +150,10 @@ module.exports = {
         }
       },
       animation: {
-        typewrite:
-          'typewrite 4s steps(29) 1s 1 normal both, blink 600ms steps(29) infinite',
+        typewrite: 'typewrite 4s steps(29) 1s 1 normal both, blink 600ms steps(29) infinite',
         blinky: 'blink 600ms steps(29) infinite',
-        'font-bounce':
-          'font-bounce 0.5s 0s cubic-bezier(0.18, 1.06, 0.6, 0.95) none',
-        'font-beat':
-          'font-bounce-small 1s 0s cubic-bezier(0.18, 1.06, 0.6, 0.95) infinite',
+        'font-bounce': 'font-bounce 0.5s 0s cubic-bezier(0.18, 1.06, 0.6, 0.95) none',
+        'font-beat': 'font-bounce-small 1s 0s cubic-bezier(0.18, 1.06, 0.6, 0.95) infinite',
         'scroll-lg': 'scroll-lg 35s linear infinite',
         beat: 'beat 1s 0s cubic-bezier(0.18, 1.06, 0.6, 0.95) infinite',
         'hero-scroll': 'hero-scroll 35s linear infinite',
