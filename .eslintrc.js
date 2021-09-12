@@ -1,37 +1,64 @@
-// eslint-disable-next-line no-undef
 module.exports = {
   env: {
     browser: true,
     es2020: true,
     node: true
   },
-  extends: [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:jsx-a11y/recommended",
-    "plugin:react-hooks/recommended",
-    "prettier",
-    "prettier/react"
-  ],
   parserOptions: {
     ecmaFeatures: {
       jsx: true
     },
     ecmaVersion: 11,
-    sourceType: "module"
+    sourceType: 'module'
   },
-  plugins: ["react", "jsx-a11y", "react-hooks", "prettier"],
-  rules: {
-    "prettier/prettier": "error",
-    "react/react-in-jsx-scope": 0,
-    "react/prop-types": 0,
-    "jsx-a11y/anchor-is-valid": [
-      "error",
-      {
-        components: ["Link"],
-        specialLink: ["hrefLeft", "hrefRight"],
-        aspects: ["invalidHref", "preferButton"]
+  overrides: [
+    {
+      files: ['*.ts', '*.tsx'],
+      excludedFiles: ['*.js', '*.jsx'],
+      parser: '@typescript-eslint/parser',
+      plugins: [
+        'react',
+        'react-hooks',
+        'jsx-a11y',
+        '@typescript-eslint',
+        'prettier'
+      ],
+      extends: [
+        'eslint:recommended',
+        'plugin:react/recommended',
+        'plugin:react-hooks/recommended',
+        'plugin:jsx-a11y/recommended',
+        'plugin:@typescript-eslint/recommended',
+        'prettier'
+      ],
+      rules: {
+        'prettier/prettier': 'error',
+        'no-console': 'warn',
+        'react/prop-types': 'off'
       }
-    ]
-  }
+    },
+    {
+      files: ['*.js', '*.jsx'],
+      plugins: ['react', 'jsx-a11y', 'react-hooks', 'prettier'],
+      extends: [
+        'eslint:recommended',
+        'plugin:react/recommended',
+        'plugin:jsx-a11y/recommended',
+        'plugin:react-hooks/recommended',
+        'prettier'
+      ],
+      rules: {
+        'prettier/prettier': 'error',
+        'react/prop-types': 'off',
+        'jsx-a11y/anchor-is-valid': [
+          'error',
+          {
+            components: ['Link'],
+            specialLink: ['hrefLeft', 'hrefRight'],
+            aspects: ['invalidHref', 'preferButton']
+          }
+        ]
+      }
+    }
+  ]
 };

@@ -1,4 +1,4 @@
-import Document, { Html, Head, Main, NextScript } from "next/document";
+import Document, { Html, Head, Main, NextScript } from 'next/document';
 
 class MyDocument extends Document {
   static async getInitialProps(ctx) {
@@ -10,19 +10,14 @@ class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
-          <link
-            rel="preconnect"
-            href="https://fonts.gstatic.com/"
-            crossOrigin="anonymous"
-          ></link>
+          <link rel="preconnect" href="https://fonts.gstatic.com/" crossOrigin="anonymous"></link>
           <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
           />
           <link
             href="https://fonts.googleapis.com/css2?family=Reenie+Beanie&family=Indie+Flower&family=Aleo:ital,wght@0,300;0,400;1,300&family=Roboto:wght@300&display=swap"
-            rel="stylesheet"
-          ></link>
+            rel="stylesheet"></link>
           <link
             rel="preload"
             href="/fonts/Wotfard/wotfard-bold-webfont.ttf"

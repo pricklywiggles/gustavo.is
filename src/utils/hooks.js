@@ -1,19 +1,19 @@
-import React from "react";
+import React from 'react';
 
 // Here's where we can change storage place and where we deal with SSR
 const store = {
   getItem: (key) => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       return window.localStorage.getItem(key);
     }
-    console.error("Attempted to get localStorage while on server");
+    console.error('Attempted to get localStorage while on server');
     return null;
   },
   setItem: (key, value) => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       return window.localStorage.setItem(key, value);
     }
-    console.error("Attempted to set localStorage while on server");
+    console.error('Attempted to set localStorage while on server');
     return null;
   }
 };
@@ -27,7 +27,7 @@ const store = {
  */
 export function useLocalStorageState(
   key,
-  defaultValue = "",
+  defaultValue = '',
   { serialize = JSON.stringify, deserialize = JSON.parse } = {}
 ) {
   const [state, setState] = React.useState(() => {
@@ -36,7 +36,7 @@ export function useLocalStorageState(
     if (value) {
       return deserialize(value);
     }
-    return typeof defaultValue === "function" ? defaultValue() : defaultValue;
+    return typeof defaultValue === 'function' ? defaultValue() : defaultValue;
   });
 
   React.useDebugValue(`${key}: ${serialize(state)}`);
@@ -68,16 +68,16 @@ export function useCounter(initialValue = 0, tick = 1000) {
 
 export function useWindowWidth() {
   const [width, setWidth] = React.useState(() =>
-    typeof window !== "undefined" ? window.innerWidth : 800
+    typeof window !== 'undefined' ? window.innerWidth : 800
   );
 
   React.useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       const handleResize = () => {
         setWidth(window.innerWidth);
       };
-      window.addEventListener("resize", handleResize);
-      return () => window.removeEventListener("resize", handleResize);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
     }
   }, []);
 
