@@ -20,6 +20,6 @@
     "baseUrl": "./src",
     "incremental": false
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/components/sparkles.jsx"],
   "exclude": ["node_modules"]
 }

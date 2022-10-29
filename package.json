@@ -16,9 +16,9 @@
     "autoformat": "prettier --write src/**/*.js src/**/*.ts src/**/*.tsx src/**/*.jsx"
   },
   "dependencies": {
-    "@emotion/core": "^10.1.1",
-    "@emotion/styled": "^10.0.27",
-    "dayjs": "^1.9.7",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "dayjs": "^1.11.6",
     "email-validator": "^2.0.4",
     "next": "^13.0.0",
     "postmark": "^2.6.0",
@@ -28,7 +28,6 @@
     "react-hook-form": "^6.12.0"
   },
   "devDependencies": {
-    "@emotion/babel-preset-css-prop": "^10.1.0",
     "@types/node": "^18.11.7",
     "@types/react": "^17.0.20",
     "autoprefixer": "^10.3.4",
