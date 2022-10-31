@@ -6,7 +6,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 let client;
 if (isProduction) client = new postmark.ServerClient(process.env.POSTMARK_API_TOKEN);
 
-export default async (req, res) => {
+const contact = async (req, res) => {
   if (isProduction) {
     const data = JSON.parse(req.body);
     const { name, email, message } = data;
@@ -32,3 +32,5 @@ export default async (req, res) => {
     }
   } else res.status(200).json({ message: 'SUCCESS' });
 };
+
+export default contact;

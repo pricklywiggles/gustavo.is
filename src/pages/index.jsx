@@ -62,7 +62,7 @@ export default function Home() {
               was to get back to speed after not coding for a long time, I loved every minute of it.
               Using code to bring an experience to life is a joy, no matter how many{' '}
               <span className="pl-2 text-sm pr-2 font-semibold font-code uppercase">format c:</span>
-              moments you have along the way. I'm currently working at{' '}
+              moments you have along the way. I&apos;m currently working at{' '}
               <Sparkles>
                 <Link href="https://tartle.co" className="text-green-600">
                   TARTLE
@@ -73,8 +73,8 @@ export default function Home() {
               directly by the companies that want to use it.{' '}
             </p>
             <p className="mt-4">
-              If you've read all this, why don't you drop me a line below? I'd love to hear from
-              you.
+              If you&apos;ve read all this, why don&apos;t you drop me a line below? I&apos;d love
+              to hear from you.
             </p>
           </div>
         </div>
