@@ -6,6 +6,7 @@ import { useLocalStorageState, useCounter, useToggle } from 'utils/hooks';
 import { BeatingHeart } from 'components/sprinkles';
 import { LogoLink } from './contact';
 import { accounts } from 'utils/data';
+import Image from 'next/image';
 
 const actions = [
   'ready for new ideas.',
@@ -67,10 +68,12 @@ export default function Header() {
           <div className={cn}>
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <img
+                <Image
                   className="h-14 rounded-full shadow-xl"
                   alt="ink blot logo"
                   src="/worldblot.png"
+                  width={56}
+                  height={56}
                 />
                 <div className="flex items-baseline">
                   <div className="pl-3 font-quirky text-2xl">gustavo.is</div>

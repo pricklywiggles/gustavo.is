@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 export function ProfilePhoto({ photoUrl = '/gustavo.png', bgClass = 'bg-concept-positive' }) {
   return (
     <div>
@@ -11,7 +13,13 @@ export function ProfilePhoto({ photoUrl = '/gustavo.png', bgClass = 'bg-concept-
           }}
         />
         <div className="absolute flex items-center w-full h-full">
-          <img alt="Headshot" className="transform scale-75 object-cover" src={photoUrl} />
+          <Image
+            alt="Headshot"
+            className="transform scale-75 object-cover"
+            src={photoUrl}
+            height={250}
+            width={250}
+          />
         </div>
         <svg
           className="relative transition-all fill-current text-lt-bg dark:text-dk-bg"

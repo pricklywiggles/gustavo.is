@@ -16,20 +16,16 @@ module.exports = {
       files: ['*.ts', '*.tsx'],
       excludedFiles: ['*.js', '*.jsx'],
       parser: '@typescript-eslint/parser',
-      plugins: [
-        'react',
-        'react-hooks',
-        'jsx-a11y',
-        '@typescript-eslint',
-        'prettier'
-      ],
+      plugins: ['react', 'react-hooks', 'jsx-a11y', '@typescript-eslint', 'prettier'],
       extends: [
         'eslint:recommended',
         'plugin:react/recommended',
         'plugin:react-hooks/recommended',
         'plugin:jsx-a11y/recommended',
         'plugin:@typescript-eslint/recommended',
-        'prettier'
+        'plugin:@next/next/recommended',
+        'prettier',
+        'next'
       ],
       rules: {
         'prettier/prettier': 'error',
@@ -45,7 +41,9 @@ module.exports = {
         'plugin:react/recommended',
         'plugin:jsx-a11y/recommended',
         'plugin:react-hooks/recommended',
-        'prettier'
+        'plugin:@next/next/recommended',
+        'prettier',
+        'next'
       ],
       rules: {
         'prettier/prettier': 'error',

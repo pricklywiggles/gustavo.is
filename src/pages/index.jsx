@@ -6,6 +6,8 @@ import { ProjectCard } from 'components/project-card';
 import { projects } from 'utils/data';
 import { ProfilePhoto } from 'components/profile-photo';
 import { CheckmarkIcon } from 'components/svg/icons';
+import Sparkles from '../components/sparkles';
+import Link from 'next/link';
 
 export default function Home() {
   const [result, setResult] = React.useState(null);
@@ -55,14 +57,24 @@ export default function Home() {
               but I missed the feeling of finding elegant solutions to problems through code.
             </p>
             <p className="mt-4">
-              So two years ago I decided to jump back into development by co-founding the company
-              behind ponder.to, a group blogging platform we recently had to shutter. As difficult
-              as it was to get back to speed after not coding for a long time, I loved every minute
-              of it. Using code to bring an experience to life is a joy, no matter how many{' '}
+              In 2018 I decided to jump back into development by co-founding the company behind
+              ponder.to, a group blogging platform we recently had to shutter. As difficult as it
+              was to get back to speed after not coding for a long time, I loved every minute of it.
+              Using code to bring an experience to life is a joy, no matter how many{' '}
               <span className="pl-2 text-sm pr-2 font-semibold font-code uppercase">format c:</span>
-              moments you have along the way. I love working on my own things but I am eager to find
-              my tribe, people I can learn from and with whom I can make something meaningful and
-              continue this learning journey. Does that sound like you? drop me a line below!
+              moments you have along the way. I&apos;m currently working at{' '}
+              <Sparkles>
+                <Link href="https://tartle.co" className="text-green-600">
+                  TARTLE
+                </Link>
+              </Sparkles>{' '}
+              (yes, in all caps), a B-Corporation dedicated to providing an ethical alternative to
+              data brokers, where people are in control of their personal information and get paid
+              directly by the companies that want to use it.{' '}
+            </p>
+            <p className="mt-4">
+              If you&apos;ve read all this, why don&apos;t you drop me a line below? I&apos;d love
+              to hear from you.
             </p>
           </div>
         </div>
@@ -132,7 +144,7 @@ export default function Home() {
       </div>
 
       <div>
-        <footer className="text-center">
+        <footer className="text-center mb-2">
           Made with
           <BeatingHeart />
           in Los Angeles
