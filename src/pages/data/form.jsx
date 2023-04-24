@@ -5,7 +5,7 @@ export default function DataForm() {
     <>
       <Script
         id="tartle-iframe"
-        data-env="development"
+        data-env="staging"
         src="https://demo.tartle.co/scripts/tartle-widget.js"
       />
       <div className="mt-28 w-screen">
@@ -15,16 +15,8 @@ export default function DataForm() {
               id="tartle-container"
               className="rounded-md overflow-hidden"
               data-packet-id="oNpQVoKWjzXJN"
-              data-referral-code="2d454d17021543451c2747d2b9fdcd7f"
+              data-referral-code="a4fc47faffd3cce77ea6df565fcbeaf6"
             />
-            {/* <iframe
-              className="rounded-md"
-              // src="https://staging.tartle.co/frictionless/embedded_packet?packet_id=R1vaQ7Bebmx8N&referral_code=a4fc47faffd3cce77ea6df565fcbeaf6"
-              src="http://localhost:3000/frictionless/embedded_packet?packet_id=oNpQVoKWjzXJN&referral_code=2d454d17021543451c2747d2b9fdcd7f"
-              // src="http://localhost:3000/frictionless/widget?packet_id=jVYa25pL4v1r3&referral_code=2d454d17021543451c2747d2b9fdcd7f"
-              width="500px"
-              id="tartle-iframe"
-            /> */}
           </div>
         </div>
       </div>
