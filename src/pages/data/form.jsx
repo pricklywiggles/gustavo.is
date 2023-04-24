@@ -2,8 +2,8 @@ import Script from 'next/script';
 
 const jsUrl =
   process.env.NODE_ENV === 'development'
-    ? 'http://localhost:3000/scripts/tartle-iframe.js'
-    : 'https://staging.tartle.co/scripts/tartle-iframe.js';
+    ? 'http://localhost:3000/scripts/tartle-widget.js'
+    : 'https://staging.tartle.co/scripts/tartle-widget.js';
 
 console.log('env', process.env.NODE_ENV);
 
@@ -13,7 +13,7 @@ export default function DataForm() {
       <Script
         id="tartle-iframe"
         data-env="development"
-        src="https://staging.tartle.co/scripts/tartle-iframe.js"
+        src="https://staging.tartle.co/scripts/tartle-widget.js"
       />
       <div className="mt-28 w-screen">
         <div className="w-min mx-auto">
