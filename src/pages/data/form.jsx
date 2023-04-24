@@ -3,11 +3,7 @@ import Script from 'next/script';
 export default function DataForm() {
   return (
     <>
-      <Script
-        id="tartle-iframe"
-        data-env="staging"
-        src="https://demo.tartle.co/scripts/tartle-widget.js"
-      />
+      <Script data-env="staging" src="https://demo.tartle.co/scripts/tartle-widget.js" />
       <div className="mt-28 w-screen">
         <div className="w-min mx-auto">
           <div className="">
