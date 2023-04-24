@@ -5,10 +5,16 @@ const jsUrl =
     ? 'http://localhost:3000/scripts/tartle-iframe.js'
     : 'https://staging.tartle.co/scripts/tartle-iframe.js';
 
+console.log('env', process.env.NODE_ENV);
+
 export default function DataForm() {
   return (
     <>
-      <Script id="tartle-iframe" data-env="development" src={jsUrl} />
+      <Script
+        id="tartle-iframe"
+        data-env="development"
+        src="https://staging.tartle.co/scripts/tartle-iframe.js"
+      />
       <div className="mt-28 w-screen">
         <div className="w-min mx-auto">
           <div className="">
