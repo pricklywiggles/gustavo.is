@@ -3,7 +3,7 @@ import Script from 'next/script';
 export default function DataForm() {
   return (
     <>
-      <Script src="https://demo.tartle.co/scripts/tartle-widget.js" />
+      <Script data-env="staging" src="https://demo.tartle.co/scripts/tartle-widget.js" />
       <Script id="tartle-pubkey">
         {`
           console.log("Setting up event listener")
