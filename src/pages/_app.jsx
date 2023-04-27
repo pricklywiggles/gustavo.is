@@ -3,6 +3,7 @@ import '../styles/global.css';
 import Head from 'next/head';
 import { Header } from '../components/header';
 import { metadata } from 'utils/data';
+import { Analytics } from '@vercel/analytics/react';
 
 function MyApp({ Component, pageProps }) {
   return (
@@ -34,6 +35,7 @@ function MyApp({ Component, pageProps }) {
       </Head>
       <Header />
       <Component {...pageProps} />
+      <Analytics />
     </>
   );
 }
