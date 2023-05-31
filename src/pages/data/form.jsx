@@ -5,7 +5,7 @@ export default function DataForm() {
     <>
       <Script
         id="tartle-script"
-        data-env="staging"
+        data-env="https://staging.tartle.co"
         src="https://demo.tartle.co/scripts/tartle-widget.js"
       />
       {/* <Script
