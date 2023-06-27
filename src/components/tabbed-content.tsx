@@ -23,8 +23,8 @@ export const TabbedContent: FComp<TabbedContentProps> = ({
     <>
       <div className="flex flex-wrap pb-3 pt-3 justify-around mt-2 mb-4">
         {Array(childrenCount)
-          .fill()
-          .map((c, childIndex) => (
+          .fill(undefined)
+          .map((_, childIndex) => (
             <div key={childIndex}>
               <button
                 className={`flex items-center m-2 h-8 py-1 px-2 text-xl font-semibold rounded-full md:text-md transition-none hover:text-gray-800 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-white ${
