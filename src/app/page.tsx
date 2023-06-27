@@ -37,7 +37,7 @@ export default function Home() {
           </div>
           <div className="mt-3 text-base sm:text-lg md:mt-5 md:text-xl">
             <p>
-              I&lsquo;m a developer specializing in Javascript, React and
+              I&lsquo;m a developer specializing in Typescript, React and
               GraphQL and currently living in Los Angeles. I&lsquo;ve loved
               technology since I was very young. I remember when I was a 15 year
               old kid living in Guadalajara I somehow convinced my parents to
