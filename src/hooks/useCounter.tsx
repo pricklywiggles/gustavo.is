@@ -15,7 +15,9 @@ export function useCounter(
       let timer = setTimeout(() => {
         setCounter((prev) => prev + 1);
       }, tickRef.current);
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+      };
     }
   }, [counter, running]);
 
