@@ -33,8 +33,8 @@ module.exports = {
       colors: {
         cyan: colors.cyan,
         yellow: colors.yellow,
-        coolGray: colors.coolGray,
-        blueGray: colors.blueGray,
+        coolGray: colors.gray,
+        blueGray: colors.slate,
         lt: {
           primary: {
             ...colors.indigo,
