@@ -103,6 +103,7 @@ export default function Header() {
                   className="block bg-lt-bg-8 dark:bg-dk-bg-8 rounded-full dark:focus:text-dk-primary dark:hover:text-dk-primary focus:outline-none"
                   onClick={toggleMenuOpen}
                   type="button"
+                  aria-label="open menu"
                 >
                   <div className="flex h-10 w-10">
                     <svg

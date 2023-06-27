@@ -222,7 +222,12 @@ export const SocialSection: FComp<SocialSectionProps> = ({
     )}
     <div className="flex mt-5 justify-around text-lt-bg dark:text-dk-bg">
       {Object.entries(accounts).map(([key, account]) => (
-        <LogoLink key={key} url={account.url} logo={account.logo} />
+        <LogoLink
+          key={key}
+          url={account.url}
+          logo={account.logo}
+          alt={`${key} url`}
+        />
       ))}
     </div>
   </div>
@@ -231,11 +236,17 @@ export const SocialSection: FComp<SocialSectionProps> = ({
 type LogoLinkProps = {
   url: string;
   logo: FComp;
+  alt: string;
 };
 
-export const LogoLink: FComp<LogoLinkProps> = ({ className, url, logo }) => {
+export const LogoLink: FComp<LogoLinkProps> = ({
+  className,
+  url,
+  logo,
+  alt
+}) => {
   return (
-    <Link href={url}>
+    <Link href={url} aria-label={alt}>
       <div
         className={`hover:cursor-pointer flex rounded-full w-12 h-12 bg-blueGray-400 overflow-hidden well-shadow ${className}`}
       >
