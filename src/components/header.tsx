@@ -145,6 +145,7 @@ export default function Header() {
               <LogoLink
                 className="text-dk-bg mt-auto sm:mt-0 ml-1 sm:ml-0 mb-4 sm:mb-0 transform scale-50"
                 {...accounts.github}
+                alt="github url"
               />
               <button
                 onClick={toggleTheme}
