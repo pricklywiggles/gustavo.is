@@ -1,10 +1,13 @@
+/** @type {import('tailwindcss').Config} */
 const defaultTheme = require('tailwindcss/defaultTheme');
 const colors = require('tailwindcss/colors');
 
 module.exports = {
-  purge: ['./src/**/*.{jsx,tsx}'],
-  mode: 'jit',
-  darkMode: 'class', // or 'media' or 'class'
+  content: [
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}'
+  ],
+  darkMode: 'class',
   theme: {
     extend: {
       boxShadow: {
@@ -14,11 +17,11 @@ module.exports = {
         tiny: ['0.6rem', { letterSpacing: '0em', lineHeight: '1rem' }]
       },
       fontFamily: {
-        sans: ['Wotfard', ...defaultTheme.fontFamily.sans],
-        archia: ['Archia'],
-        quirky: ['Indie Flower'],
-        mono: ['Basier', ...defaultTheme.fontFamily.mono],
-        code: ['Basier']
+        sans: ['var(--font-wotfard)'],
+        archia: ['var(--font-archia)'],
+        quirky: ['var(--font-indie-flower)'],
+        mono: ['var(--font-basier-mono)', ...defaultTheme.fontFamily.mono],
+        code: ['var(--font-basier-mono)']
       },
       scale: {
         101: '1.01',
@@ -150,10 +153,13 @@ module.exports = {
         }
       },
       animation: {
-        typewrite: 'typewrite 4s steps(29) 1s 1 normal both, blink 600ms steps(29) infinite',
+        typewrite:
+          'typewrite 4s steps(29) 1s 1 normal both, blink 600ms steps(29) infinite',
         blinky: 'blink 600ms steps(29) infinite',
-        'font-bounce': 'font-bounce 0.5s 0s cubic-bezier(0.18, 1.06, 0.6, 0.95) none',
-        'font-beat': 'font-bounce-small 1s 0s cubic-bezier(0.18, 1.06, 0.6, 0.95) infinite',
+        'font-bounce':
+          'font-bounce 0.5s 0s cubic-bezier(0.18, 1.06, 0.6, 0.95) none',
+        'font-beat':
+          'font-bounce-small 1s 0s cubic-bezier(0.18, 1.06, 0.6, 0.95) infinite',
         'scroll-lg': 'scroll-lg 35s linear infinite',
         beat: 'beat 1s 0s cubic-bezier(0.18, 1.06, 0.6, 0.95) infinite',
         'hero-scroll': 'hero-scroll 35s linear infinite',
@@ -176,17 +182,17 @@ module.exports = {
       }
     }
   },
-  variants: {
-    extend: {
-      cursor: ['hover'],
-      borderStyle: ['hover', 'focus'],
-      ringWidth: ['hover'],
-      ringColor: ['hover'],
-      opacity: ['dark'],
-      animation: ['active'],
-      scale: ['hover'],
-      boxShadow: ['active']
-    }
-  },
+  // variants: {
+  //   extend: {
+  //     cursor: ['hover'],
+  //     borderStyle: ['hover', 'focus'],
+  //     ringWidth: ['hover'],
+  //     ringColor: ['hover'],
+  //     opacity: ['dark'],
+  //     animation: ['active'],
+  //     scale: ['hover'],
+  //     boxShadow: ['active']
+  //   }
+  // },
   plugins: []
 };
