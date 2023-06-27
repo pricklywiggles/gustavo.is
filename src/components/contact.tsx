@@ -156,8 +156,7 @@ export const ContactForm: FComp<ContactFormProps> = ({
           placeholder={errors.email ? "⚠️ Don't forget your email" : 'Email'}
           {...register('email', {
             required: 'Please enter your email',
-            maxLength: 320,
-            onChange: handleChange
+            maxLength: 320
           })}
         />
         <div>
@@ -177,7 +176,8 @@ export const ContactForm: FComp<ContactFormProps> = ({
             }
             {...register('message', {
               required: 'You forgot to write something',
-              maxLength: 2000
+              maxLength: 2000,
+              onChange: handleChange
             })}
           ></textarea>
         </div>

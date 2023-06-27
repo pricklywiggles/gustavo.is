@@ -31,9 +31,6 @@
     .bg-blur-0 {
       backdrop-filter: none;
     }
-  }
-
-  @variants dark {
     .dark-gradient {
       background: linear-gradient(
         to bottom,
