@@ -66,7 +66,6 @@ export default function Header() {
     cn =
       'relative mx-auto sm:flex sm:justify-between sm:items-center max-w-7xl p-4';
   }
-  console.log({ isDark });
 
   return (
     <header>

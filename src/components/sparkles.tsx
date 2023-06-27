@@ -40,6 +40,12 @@ const Sparkles: FComp<SparklesProps> = ({
   const [sparkles, setSparkles] = React.useState(() => {
     return range(3).map(() => generateSparkle(color));
   });
+  const [isLoaded, setIsLoaded] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsLoaded(true);
+  }, []);
+
   useRandomInterval(
     () => {
       const sparkle = generateSparkle(color);
@@ -56,14 +62,16 @@ const Sparkles: FComp<SparklesProps> = ({
   );
   return (
     <Wrapper>
-      {sparkles.map((sparkle) => (
-        <Sparkle
-          key={sparkle.id}
-          color={sparkle.color}
-          size={sparkle.size}
-          style={sparkle.style}
-        />
-      ))}
+      {isLoaded
+        ? sparkles.map((sparkle) => (
+            <Sparkle
+              key={sparkle.id}
+              color={sparkle.color}
+              size={sparkle.size}
+              style={sparkle.style}
+            />
+          ))
+        : null}
       <ChildWrapper>{children}</ChildWrapper>
     </Wrapper>
   );

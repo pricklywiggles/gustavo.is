@@ -8,7 +8,7 @@ const staticMetadata = {
     title: "Hi, I'm Gustavo Gallegos. A web developer in Los Angeles.",
     description:
       "I'm a web developer (React, NextJS, Javascript, GraphQL, HTML and CSS) living in in Los Angeles. See my portfolio and contact information",
-    url: 'https://gustavo.is',
+    url: '/',
     openGraph: {
       title: "Hi, I'm Gustavo Gallegos and this is my dev portfolio",
       description:
@@ -20,7 +20,7 @@ const staticMetadata = {
     title: 'A look back at building Ponder, a group blogging platform.',
     description:
       'We recently had to sunset Ponder, Check out what it was, the technologies used, and the lessons I learned building it.',
-    url: 'https://gustavo.is/remembering/ponder',
+    url: '/remembering/ponder',
     openGraph: {
       title: 'Looking back at Ponder, a group blogging platform',
       siteName: "Gustavo Gallegos' Dev Portfolio"
@@ -30,7 +30,7 @@ const staticMetadata = {
     title: 'A retrospective of things I learned building Ponder Blogs',
     description:
       'After sunsetting Ponder Blogs, I spent some time reflecting on the lessons I learned building it.',
-    url: 'https://gustavo.is/remembering/ponder-blogs',
+    url: '/remembering/ponder-blogs',
     openGraph: {
       title: 'A look back at Ponder Blogs',
       siteName: "Gustavo Gallegos' Dev Portfolio"
@@ -38,6 +38,7 @@ const staticMetadata = {
   },
   resume: {
     title: "Hi there! I'm Gustavo Gallegos. This is my resume.",
+    url: '/resume',
     description:
       "I'm a web developer in Los Angeles, CA and I'm looking for my tribe. This is my resume.",
     twitter: {
@@ -50,6 +51,7 @@ export const buildStaticMetadata = (pageName) => ({
   title: staticMetadata[pageName].title,
   description: staticMetadata[pageName].description,
   url: staticMetadata[pageName].url,
+  metadataBase: new URL('https://gustavo.is'),
   openGraph: {
     title:
       staticMetadata[pageName].openGraph.title ||

@@ -14,7 +14,6 @@ if (isProduction)
   client = new postmark.ServerClient(process.env.POSTMARK_API_TOKEN || '');
 
 export async function POST(req: NextRequest) {
-  console.log({ isProduction });
   if (isProduction) {
     const data = req.json() as unknown as ContactData;
     const { name, email, message } = data;
