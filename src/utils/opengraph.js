@@ -51,6 +51,7 @@ export const buildStaticMetadata = (pageName) => ({
   title: staticMetadata[pageName].title,
   description: staticMetadata[pageName].description,
   url: staticMetadata[pageName].url,
+  metadataBase: new URL('https://gustavo.is'),
   openGraph: {
     title:
       staticMetadata[pageName].openGraph.title ||
