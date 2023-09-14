@@ -47,6 +47,9 @@
   .invert-0 {
     filter: invert(0%);
   }
+  .invert-50 {
+    filter: invert(50%);
+  }
 
   .invert-80 {
     --invert: invert(80%);
