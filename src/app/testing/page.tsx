@@ -14,7 +14,7 @@ export default function DataForm() {
           const sellerId = urlParams.get('seller_id');
           const token = urlParams.get('token');
           console.log('Found data: ', {sellerId, token});
-          const endpointUrl = "https://demo.tartle.co//api/v3/endlinks/complete.html?token=" + token;
+          const endpointUrl = "https://demo.tartle.co/api/v3/endlinks/complete.html?token=" + token;
           fetch(endpointUrl).then((response) => console.log("Response: ", response)).catch((error) => console.error("Error: ", error));
         `}
       </Script>
