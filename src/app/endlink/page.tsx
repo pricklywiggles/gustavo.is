@@ -16,7 +16,7 @@ export default function DataForm() {
           const token = urlParams.get('token');
           console.log('Found data: ', {sellerId, token});
           localStorage.setItem('ENDLINK_TOKEN', token);
-      `}
+       `}
       </Script>
       <div className='mt-28 w-screen'>
         <div className='w-min mx-auto'>

@@ -1,21 +1,33 @@
 import Script from 'next/script';
 
-export default function DataForm() {
+export default function Completed() {
   return (
     <>
       {/* <Script
         id='tartle-script'
         src='http://localhost:3000/scripts/endlink-landing.js'
       /> */}
-      <Script id='tartle-endpoint'>
+      <Script id='tartle-complete'>
         {`
-          const token = localStorage.getItem('ENDLINK_TOKEN');
-          if (!token) {
-            console.error("No token found");
-          } else {
-            const endpointUrl = "https://source.tartle.co/api/v3/endlinks/complete?token=" + token;
-            fetch(endpointUrl).then((response) => console.log("Response: ", response)).catch((error) => console.error("Error: ", error));
-          }
+          console.log("Running completion script")
+          const ready = callback => {
+            if (document.readyState !== 'loading') {
+              callback();
+            } else {
+              document.addEventListener('DOMContentLoaded', callback);
+            }
+          };
+
+          ready(function() {
+            const token = localStorage.getItem('ENDLINK_TOKEN');
+            if (!token) {
+              console.error("No token found");
+            } else {
+              const endpointUrl = "https://demo.tartle.co/api/v3/endlinks/complete?token=" + token;
+              console.log("Endpoint: ", endpointUrl);
+              fetch(endpointUrl).then((response) => console.log("Response: ", response)).catch((error) => console.error("Error: ", error));
+            }
+          })
         `}
       </Script>
       <div className='mt-28 w-screen'>
