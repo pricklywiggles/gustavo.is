@@ -23,7 +23,7 @@ export default function Completed() {
             if (!token) {
               console.error("No token found");
             } else {
-              const endpointUrl = "https://source.tartle.co/api/v3/endlinks/complete?token=" + token;
+              const endpointUrl = "https://demo.tartle.co/api/v3/endlinks/complete?token=" + token;
               console.log("Endpoint: ", endpointUrl);
               fetch(endpointUrl).then((response) => console.log("Response: ", response)).catch((error) => console.error("Error: ", error));
             }
