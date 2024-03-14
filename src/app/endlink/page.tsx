@@ -6,7 +6,6 @@ export default function DataForm() {
   return (
     <>
       <Script
-        id='tartle-script'
         data-kind='landing'
         src='https://demo.tartle.co/scripts/endlink.js'
       />

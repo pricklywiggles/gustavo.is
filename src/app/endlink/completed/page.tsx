@@ -4,7 +4,6 @@ export default function Completed() {
   return (
     <>
       <Script
-        id='tartle-script'
         data-kind='completion'
         src='https://demo.tartle.co/scripts/endlink.js'
       />
