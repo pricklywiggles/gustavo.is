@@ -3,11 +3,12 @@ import Script from 'next/script';
 export default function Completed() {
   return (
     <>
-      {/* <Script
+      <Script
         id='tartle-script'
-        src='http://localhost:3000/scripts/endlink-landing.js'
-      /> */}
-      <Script id='tartle-complete'>
+        data-kind='completion'
+        src='https://demo.tartle.co/scripts/endlink.js'
+      />
+      {/* <Script id='tartle-complete'>
         {`
           console.log("Running completion script")
           const ready = callback => {
@@ -29,7 +30,7 @@ export default function Completed() {
             }
           })
         `}
-      </Script>
+      </Script> */}
       <div className='mt-28 w-screen'>
         <div className='w-min mx-auto'>
           <div className='text-4xl tracking-tight font-extrabold   sm:text-5xl md:text-6xl lg:text-7xl'>

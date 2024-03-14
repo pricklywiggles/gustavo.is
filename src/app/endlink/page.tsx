@@ -5,11 +5,12 @@ import Script from 'next/script';
 export default function DataForm() {
   return (
     <>
-      {/* <Script
+      <Script
         id='tartle-script'
-        src='http://localhost:3000/scripts/endlink-landing.js'
-      /> */}
-      <Script id='tartle-endpoint'>
+        data-kind='landing'
+        src='https://demo.tartle.co/scripts/endlink.js'
+      />
+      {/* <Script id='tartle-endpoint'>
         {`
           const urlParams = new URLSearchParams(window.location.search);
           const sellerId = urlParams.get('seller_id');
@@ -17,7 +18,7 @@ export default function DataForm() {
           console.log('Found data: ', {sellerId, token});
           localStorage.setItem('ENDLINK_TOKEN', token);
        `}
-      </Script>
+      </Script> */}
       <div className='mt-28 w-screen'>
         <div className='w-min mx-auto'>
           <div className='text-4xl tracking-tight font-extrabold   sm:text-5xl md:text-6xl lg:text-7xl'>
