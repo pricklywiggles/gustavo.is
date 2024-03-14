@@ -1,3 +1,5 @@
+/* eslint-disable @next/next/no-sync-scripts */
+import Head from 'next/head';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import Script from 'next/script';
@@ -5,11 +7,13 @@ import Script from 'next/script';
 export default function DataForm() {
   return (
     <>
-      <Script
-        id='tt-landing'
-        data-kind='landing'
-        src='https://demo.tartle.co/scripts/endlink.js'
-      />
+      <Head>
+        <script
+          data-kind='landing'
+          src='https://demo.tartle.co/scripts/endlink.js'
+        />
+      </Head>
+
       {/* <Script id='tartle-endpoint'>
         {`
           const urlParams = new URLSearchParams(window.location.search);

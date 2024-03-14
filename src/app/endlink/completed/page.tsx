@@ -1,13 +1,16 @@
+/* eslint-disable @next/next/no-sync-scripts */
+import Head from 'next/head';
 import Script from 'next/script';
 
 export default function Completed() {
   return (
     <>
-      <Script
-        id='tt-completion'
-        data-kind='completion'
-        src='https://demo.tartle.co/scripts/endlink.js'
-      />
+      <Head>
+        <script
+          data-kind='completion'
+          src='https://demo.tartle.co/scripts/endlink.js'
+        />
+      </Head>
       {/* <Script id='tartle-complete'>
         {`
           console.log("Running completion script")
