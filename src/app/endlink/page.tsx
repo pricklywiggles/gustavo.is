@@ -6,7 +6,7 @@ import Script from 'next/script';
 export default function DataForm() {
   return (
     <>
-      <Script src='https://demo.tartle.co/scripts/endlink-landing.js' />
+      <Script src='https://source.tartle.co/scripts/endlink-landing.js' />
 
       {/* <Script id='tartle-endpoint'>
         {`

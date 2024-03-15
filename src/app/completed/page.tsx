@@ -5,7 +5,7 @@ import Script from 'next/script';
 export default function Completed() {
   return (
     <>
-      <Script src='https://demo.tartle.co/scripts/endlink-completion.js' />
+      <Script src='https://source.tartle.co/scripts/endlink-completion.js' />
       {/* <Script id='tartle-complete'>
         {`
           console.log("Running completion script")
