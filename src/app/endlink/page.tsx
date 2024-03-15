@@ -25,18 +25,18 @@ export default function DataForm() {
             </div>
           </div>
           <div className='flex gap-6'>
-            <Link
-              href='/endlink/completed'
+            <a
+              href='/completed'
               className='flex items-center  whitespace-nowrap text- justify-center py-3 ml-auto px-6 -mb-2 border border-transparent text-base shadow-md font-medium rounded-md text-white bg-lt-primary active:shadow-sm hover:bg-lt-primary-darker focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lt-primary-lighter'
             >
               THE MUFFIN MAN!!??
-            </Link>
-            <Link
+            </a>
+            <a
               href='/endlink/rejected'
               className='flex items-center justify-center py-3 ml-auto px-6 -mb-2 border border-transparent text-base shadow-md font-medium rounded-md text-white bg-lt-primary active:shadow-sm hover:bg-lt-primary-darker focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lt-primary-lighter'
             >
               No
-            </Link>
+            </a>
           </div>
         </div>
       </div>
