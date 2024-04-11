@@ -5,7 +5,7 @@ import Script from 'next/script';
 
 const origins = {
   production: 'https://source.tartle.co',
-  development: 'http://localhost:3000',
+  development: 'http://localhost:3001',
   staging: 'https://staging.tartle.co'
 };
 
