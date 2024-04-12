@@ -18,7 +18,11 @@ export default function Completed({
 }) {
   const envParam = searchParams['env'];
   let env: Origin = 'production';
-  if (envParam === 'staging' || envParam === 'development') {
+  if (
+    envParam === 'staging' ||
+    envParam === 'development' ||
+    envParam === 'demo'
+  ) {
     env = envParam;
   }
 
