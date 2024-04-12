@@ -6,17 +6,24 @@ import Script from 'next/script';
 const origins = {
   production: 'https://source.tartle.co',
   development: 'http://localhost:3000',
-  staging: 'https://staging.tartle.co'
+  staging: 'https://staging.tartle.co',
+  demo: 'https://demo.tartle.co'
 };
+
+type Origin = keyof typeof origins;
 
 export default function DataForm({
   searchParams
 }: {
-  searchParams: { env: 'production' | 'staging' | 'development' };
+  searchParams: { env: Origin };
 }) {
   const envParam = searchParams['env'];
-  let env: 'production' | 'staging' | 'development' = 'production';
-  if (envParam === 'staging' || envParam === 'development') {
+  let env: Origin = 'production';
+  if (
+    envParam === 'staging' ||
+    envParam === 'development' ||
+    envParam === 'demo'
+  ) {
     env = envParam;
   }
 
