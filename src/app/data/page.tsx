@@ -3,16 +3,16 @@ import Script from 'next/script';
 export default function DataForm() {
   return (
     <>
-      <Script
+      {/* <Script
         id='tartle-script'
         data-env='https://demo.tartle.co'
         src='https://demo.tartle.co/scripts/tartle-widget.js'
-      />
-      {/* <Script
-        id="tartle-script"
-        data-env="http://localhost:3000"
-        src="http://localhost:3000/scripts/tartle-widget.js"
       /> */}
+      <Script
+        id='tartle-script'
+        data-env='http://localhost:3000'
+        src='http://localhost:3000/scripts/tartle-widget.js'
+      />
       {/* <Script
         id="tartle-script"
         // data-env="http://localhost:3000"
@@ -32,18 +32,18 @@ export default function DataForm() {
       <div className='mt-28 w-screen'>
         <div className='w-min mx-auto'>
           <div className=''>
-            <div
+            {/* <div
               id='tartle-container'
               className='rounded-md overflow-hidden'
               data-packet-id='R1vaQ7Bebmx8N'
               data-referral-code='a4fc47faffd3cce77ea6df565fcbeaf6'
-            />
-            {/* <div
-              id="tartle-container"
-              className="rounded-md overflow-hidden"
-              data-packet-id="oNpQVoKWjzXJN"
-              data-referral-code="2d454d17021543451c2747d2b9fdcd7f"
             /> */}
+            <div
+              id='tartle-container'
+              className='rounded-md overflow-hidden'
+              data-packet-id='oNpQVoKWjzXJN'
+              data-referral-code='2d454d17021543451c2747d2b9fdcd7f'
+            />
             {/* <div
               id="tartle-container"
               className="rounded-md overflow-hidden"
