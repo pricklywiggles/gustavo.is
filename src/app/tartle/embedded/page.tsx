@@ -18,11 +18,11 @@ const tartleData = {
     referralCode: '2d454d17021543451c2747d2b9fdcd7f'
   },
   staging: {
-    packetId: 'WY7aQd95N6xvd',
+    packetId: 'zWlQNPBXd6JG6',
     referralCode: '60c188d139d8555039bae931f49a0b59'
   },
   demo: {
-    packetId: 'WY7aQd95N6xvd',
+    packetId: 'zWlQNPBXd6JG6',
     referralCode: '60c188d139d8555039bae931f49a0b59'
   }
 };
