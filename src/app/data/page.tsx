@@ -1,23 +1,52 @@
 import Script from 'next/script';
+import React from 'react';
 
-export default function DataForm() {
+const origins = {
+  production: 'https://source.tartle.co',
+  development: 'http://localhost:3000',
+  staging: 'https://staging.tartle.co',
+  demo: 'https://demo.tartle.co'
+};
+
+const tartleData = {
+  production: {
+    packetId: 'R1vaQ7Bebmx8N',
+    referralCode: 'a4fc47faffd3cce77ea6df565fcbeaf6'
+  },
+  development: {
+    packetId: 'oNpQVoKWjzXJN',
+    referralCode: '2d454d17021543451c2747d2b9fdcd7f'
+  },
+  staging: {
+    packetId: 'WY7aQd95N6xvd',
+    referralCode: '60c188d139d8555039bae931f49a0b59'
+  },
+  demo: {
+    packetId: 'WY7aQd95N6xvd',
+    referralCode: '60c188d139d8555039bae931f49a0b59'
+  }
+};
+
+type Origin = keyof typeof origins;
+
+export default function DataForm({
+  searchParams
+}: {
+  searchParams: { env: Origin };
+}) {
+  const envParam = searchParams['env'];
+  let env: Origin = Object.keys(origins).includes(envParam)
+    ? envParam
+    : 'production';
+  console.log('envParam:', envParam, tartleData[env]);
+
   return (
     <>
-      {/* <Script
-        id='tartle-script'
-        data-env='https://demo.tartle.co'
-        src='https://demo.tartle.co/scripts/tartle-widget.js'
-      /> */}
       <Script
         id='tartle-script'
-        data-env='http://localhost:3000'
-        src='http://localhost:3000/scripts/tartle-widget.js'
+        data-env={origins[env]}
+        src={`${origins[env]}/scripts/tartle-widget.js`}
       />
-      {/* <Script
-        id="tartle-script"
-        // data-env="http://localhost:3000"
-        src="http://source.tartle.co/scripts/tartle-widget.js"
-      /> */}
       <Script id='tartle-pubkey'>
         {`
           console.log("Setting up event listener")
@@ -32,24 +61,12 @@ export default function DataForm() {
       <div className='mt-28 w-screen'>
         <div className='w-min mx-auto'>
           <div className=''>
-            {/* <div
-              id='tartle-container'
-              className='rounded-md overflow-hidden'
-              data-packet-id='R1vaQ7Bebmx8N'
-              data-referral-code='a4fc47faffd3cce77ea6df565fcbeaf6'
-            /> */}
             <div
               id='tartle-container'
               className='rounded-md overflow-hidden'
-              data-packet-id='oNpQVoKWjzXJN'
-              data-referral-code='2d454d17021543451c2747d2b9fdcd7f'
+              data-packet-id={tartleData[env].packetId}
+              data-referral-code={tartleData[env].referralCode}
             />
-            {/* <div
-              id="tartle-container"
-              className="rounded-md overflow-hidden"
-              data-packet-id="WY7aQd95N6xvd"
-              data-referral-code="60c188d139d8555039bae931f49a0b59"
-            /> */}
           </div>
         </div>
       </div>
