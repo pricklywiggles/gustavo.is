@@ -19,11 +19,11 @@ const tartleData = {
   },
   staging: {
     packetId: 'zWlQNPBXd6JG6',
-    referralCode: '60c188d139d8555039bae931f49a0b59'
+    referralCode: '3a8ec2aab8d5fb6105f5b1f88cd4eb7b'
   },
   demo: {
     packetId: 'zWlQNPBXd6JG6',
-    referralCode: '60c188d139d8555039bae931f49a0b59'
+    referralCode: '3a8ec2aab8d5fb6105f5b1f88cd4eb7b'
   }
 };
 
