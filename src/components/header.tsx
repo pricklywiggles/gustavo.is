@@ -26,6 +26,7 @@ const actions = [
 
 export default function Header() {
   const pathname = usePathname();
+  const [isHidden, setIsHidden] = React.useState(false);
   const [isDark, setIsDark] = useLocalStorageState('theme', true);
   const [isLoaded, setIsLoaded] = React.useState(false);
   const [isMenuOpen, toggleMenuOpen, setIsMenuOpen] = useToggle(false);
@@ -36,6 +37,9 @@ export default function Header() {
   //closes the menu when user picks a route on mobile
   React.useEffect(() => {
     setIsMenuOpen(false);
+    if (pathname === '/tartle/endlink') {
+      setIsHidden(true);
+    }
   }, [pathname, setIsMenuOpen]);
 
   // cycle through sentences for header.
@@ -67,7 +71,7 @@ export default function Header() {
       'relative mx-auto sm:flex sm:justify-between sm:items-center max-w-7xl p-4';
   }
 
-  return (
+  return isHidden ? null : (
     <header>
       <div>
         <div className='relative z-20 sm:fixed w-screen'>
