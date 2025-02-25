@@ -5,7 +5,7 @@ export async function GET(request: Request) {
   const authorizationCode = searchParams.get('code');
   console.log({ authorizationCode });
 
-  const endpointUri = process.env.TARTLE_API_URI + '/oauth/token';
+  const endpointUri = process.env.NEXT_PUBLIC_TARTLE_API_URI + '/oauth/token';
   const params = {
     code: authorizationCode,
     grant_type: 'authorization_code',
