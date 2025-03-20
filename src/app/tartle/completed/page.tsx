@@ -7,7 +7,8 @@ export default async function Completed({
 }: {
   searchParams: { env: string };
 }) {
-  const envParam = searchParams['env'];
+  const envParam = await searchParams['env'];
+
   let src = 'https://source.tartle.co/scripts/endlink-completion.js';
   if (envParam) {
     src = 'https://demo.tartle.co/scripts/endlink-completion-demo.js';

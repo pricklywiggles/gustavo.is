@@ -29,12 +29,12 @@ const tartleData = {
 
 type Origin = keyof typeof origins;
 
-export default function DataForm({
+export default async function DataForm({
   searchParams
 }: {
   searchParams: { env: Origin };
 }) {
-  const envParam = searchParams['env'];
+  const envParam = await searchParams['env'];
   let env: Origin = Object.keys(origins).includes(envParam)
     ? envParam
     : 'production';

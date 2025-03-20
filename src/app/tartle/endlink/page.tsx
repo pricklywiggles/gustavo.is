@@ -3,12 +3,12 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import Script from 'next/script';
 
-export default function DataForm({
+export default async function DataForm({
   searchParams
 }: {
   searchParams: { env: string };
 }) {
-  const envParam = searchParams['env'];
+  const envParam = await searchParams['env'];
   let src = 'https://source.tartle.co/scripts/endlink-landing.js';
   let completeUrl = '/tartle/completed';
   if (envParam) {
