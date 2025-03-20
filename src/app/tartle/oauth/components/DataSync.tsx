@@ -2,23 +2,31 @@
 
 import { useState } from 'react';
 
-type SellersPacketResponse = {
-  message: string;
-  sellers_packet: {
-    account_id: number;
-    status: string;
-    updated_at: string;
-    id: number;
-    packet_id: number;
-    created_at: string;
-    beneficiary_account_id: null;
-    autosell_setting: string;
-    first_published_at: string;
-  };
+type ApiError = {
+  errors: Record<string, string[]>;
 };
 
+type SellersPacketResponse =
+  | {
+      message: string;
+      sellers_packet: {
+        account_id: number;
+        status: string;
+        updated_at: string;
+        id: number;
+        packet_id: number;
+        created_at: string;
+        beneficiary_account_id: null;
+        autosell_setting: string;
+        first_published_at: string;
+      };
+    }
+  | ApiError;
+
 const DataSync = ({ token }: { token: string }) => {
-  const [result, setResult] = useState<SellersPacketResponse | string>('');
+  const [result, setResult] = useState<[number, SellersPacketResponse] | null>(
+    null
+  );
   const data = {
     name: 'John Doe',
     email: 'john.doe@example.com',
@@ -40,23 +48,38 @@ const DataSync = ({ token }: { token: string }) => {
       body: JSON.stringify({ token, data })
     });
 
-    if (response.ok) {
-      const responseData = await response.json();
-      setResult(responseData);
-    } else {
-      setResult('An error occurred');
+    let responseData: SellersPacketResponse;
+
+    try {
+      responseData = await response.json();
+      setResult([response.status, responseData]);
+    } catch {
+      setResult([
+        response.status,
+        { errors: { base: ['Error parsing response'] } }
+      ]);
     }
   };
 
+  const isFailure = !result || result[0] >= 400;
+  const isIdle = result === null;
+
   return (
-    <div className='mt-5 border-2 font-normal border-gray-300 rounded-xl p-4 max-w-md break-words'>
-      Ready!, click the button to sync this data:
-      <div className='mt-5 border-2 border-gray-500 bg-black rounded-xl p-4 max-w-md break-words'>
+    <div className='mt-5 border-2 font-normal border-gray-300 rounded-xl p-4 max-w-xl break-words'>
+      {isIdle
+        ? 'Ready!, click the button to sync this data'
+        : isFailure
+        ? '🚨 Sync Failed'
+        : '🎉 Success! Sync result:'}
+      <div className='mt-5 border-2 border-gray-500 bg-black rounded-xl p-4 max-w-xl break-words'>
         <pre className='font-mono text-sm whitespace-pre-wrap'>
-          {JSON.stringify(data, null, 2)}
+          {JSON.stringify(isIdle ? data : result, null, 2)}
         </pre>
       </div>
-      <button onClick={handleSync} className='dvc-button !mt-5 !px-2'>
+      <button
+        onClick={handleSync}
+        className='bg-blue-500 mt-4 text-white p-2 rounded-md w-full'
+      >
         Sync Data
       </button>
     </div>

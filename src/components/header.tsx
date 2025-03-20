@@ -24,6 +24,8 @@ const actions = [
   'in Los Angeles.'
 ];
 
+const blockedPaths = ['/tartle/oauth', '/tartle/oauth/settings'];
+
 export default function Header() {
   const pathname = usePathname();
   const [isDark, setIsDark] = useLocalStorageState('theme', true);
@@ -33,7 +35,7 @@ export default function Header() {
   const [currentAction, setCurrentAction] = React.useState(actions[0]);
   const toggleTheme = () => setIsDark((prev: boolean) => !prev);
 
-  const isShowing = pathname !== '/tartle/oauth';
+  const isShowing = !blockedPaths.includes(pathname);
 
   //closes the menu when user picks a route on mobile
   React.useEffect(() => {

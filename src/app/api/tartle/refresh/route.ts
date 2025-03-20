@@ -1,23 +1,27 @@
 import { NextResponse } from 'next/server';
 import { get } from '@vercel/edge-config';
+
 export const POST = async (request: Request) => {
-  const { token, data } = await request.json();
+  const { refresh_token } = await request.json();
 
   const config = (await get(process.env.EDGE_CONFIG_OBJECT_KEY as string)) as {
-    packet_id: string;
+    client_id: string;
+    client_secret: string;
   };
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_TARTLE_API_URI}/api/v5/packets/${config.packet_id}/sellers_packets/push`,
+    `${process.env.NEXT_PUBLIC_TARTLE_API_URI}/oauth/token`,
     {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        id: config.packet_id,
-        payload: data
+        client_id: config.client_id,
+        client_secret: config.client_secret,
+        redirect_uri: process.env.NEXT_PUBLIC_TARTLE_REDIRECT_URI,
+        refresh_token,
+        grant_type: 'refresh_token'
       })
     }
   );

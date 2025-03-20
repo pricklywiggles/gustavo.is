@@ -11,22 +11,22 @@ export const ContactSection: FComp = () => {
   const [result, setResult] = React.useState<string>('');
 
   return (
-    <div className="sm:w-3/5 -mt-6 sm:mt-0 p-6 w-9/10">
+    <div className='sm:w-3/5 -mt-6 sm:mt-0 p-6 w-9/10'>
       {result === 'success' ? (
-        <div className="flex  items-center bg-blueGray-400 min-h-full p-6 well-shadow shadow-inner rounded-3xl">
+        <div className='flex  items-center bg-blueGray-400 min-h-full p-6 well-shadow shadow-inner rounded-3xl'>
           <div>
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-              <CheckmarkIcon className="h-6 w-6 text-green-600" />
+            <div className='mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100'>
+              <CheckmarkIcon className='h-6 w-6 text-green-600' />
             </div>
-            <div className="mt-3 text-center sm:mt-5">
+            <div className='mt-3 text-center sm:mt-5'>
               <h3
-                className="text-lg leading-6 font-medium text-gray-100"
-                id="modal-headline"
+                className='text-lg leading-6 font-medium text-gray-100'
+                id='modal-headline'
               >
                 Your message was sent!
               </h3>
-              <div className="mt-2">
-                <p className="text-sm text-gray-600">
+              <div className='mt-2'>
+                <p className='text-sm text-gray-600'>
                   I will get back to you as soon as possible, feel free to also
                   reach out to me on LinkedIn, Twitter or GitHub
                 </p>
@@ -37,14 +37,14 @@ export const ContactSection: FComp = () => {
       ) : (
         <div>
           <ContactForm
-            className="bg-blueGray-400 p-6 well-shadow shadow-inner rounded-3xl"
+            className='bg-blueGray-400 p-6 well-shadow shadow-inner rounded-3xl'
             onFinished={setResult}
           />
           <div
             className={`${indieFlower.variable} text-right font-quirky ml-auto mr-3 mt-1 text-xs text-gray-500 dark:text-gray-200`}
           >
             *Don&apos;t forget to be nice{' '}
-            <span role="img" aria-label="winky face">
+            <span role='img' aria-label='winky face'>
               😉
             </span>
           </div>
@@ -89,7 +89,6 @@ export const ContactForm: FComp<ContactFormProps> = ({
         }
       })
       .catch((error) => {
-        console.log(error);
         if (onFinished) onFinished('failure');
       });
   };
@@ -124,15 +123,15 @@ export const ContactForm: FComp<ContactFormProps> = ({
       ) : null} */}
 
       <div>
-        <label htmlFor="full_name" className="sr-only">
+        <label htmlFor='full_name' className='sr-only'>
           Full name
         </label>
         <input
-          type="text"
+          type='text'
           className={`block w-full py-3 px-4 mb-4 bg-lt-bg-lightest rounded-md ${fieldClasses(
             'name'
           )}`}
-          autoComplete="name"
+          autoComplete='name'
           placeholder={`${
             errors.name ? '⚠️ You forgot your name' : "What's your name?"
           }`}
@@ -143,13 +142,13 @@ export const ContactForm: FComp<ContactFormProps> = ({
         />
       </div>
       <div>
-        <label htmlFor="email" className="sr-only">
+        <label htmlFor='email' className='sr-only'>
           Email
         </label>
         <input
-          id="email"
-          type="email"
-          autoComplete="email"
+          id='email'
+          type='email'
+          autoComplete='email'
           className={`block w-full py-3 px-4 mb-4 bg-lt-bg-lightest rounded-md  ${fieldClasses(
             'email'
           )}`}
@@ -160,11 +159,11 @@ export const ContactForm: FComp<ContactFormProps> = ({
           })}
         />
         <div>
-          <label htmlFor="message" className="sr-only">
+          <label htmlFor='message' className='sr-only'>
             Message
           </label>
           <textarea
-            id="message"
+            id='message'
             rows={4}
             className={`block w-full py-3 px-4 mb-4 bg-lt-bg-lightest rounded-md ${fieldClasses(
               'message'
@@ -193,12 +192,12 @@ export const ContactForm: FComp<ContactFormProps> = ({
           </div>
           <div>
             <button
-              type="submit"
+              type='submit'
               className={`flex items-center justify-center ${
                 isDialog ? 'w-full py-2 mt-4' : 'py-3 ml-auto px-6 -mb-2'
               } border border-transparent text-base shadow-md font-medium rounded-md text-white bg-lt-primary active:shadow-sm hover:bg-lt-primary-darker focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lt-primary-lighter`}
             >
-              <EnvelopeIcon className="h-5 mr-1" />
+              <EnvelopeIcon className='h-5 mr-1' />
               Send
             </button>
           </div>
@@ -218,9 +217,9 @@ export const SocialSection: FComp<SocialSectionProps> = ({
 }) => (
   <div className={className}>
     {noText ? null : (
-      <p className="pt-4 font-semibold">Or find me on the web...</p>
+      <p className='pt-4 font-semibold'>Or find me on the web...</p>
     )}
-    <div className="flex mt-5 justify-around text-lt-bg dark:text-dk-bg">
+    <div className='flex mt-5 justify-around text-lt-bg dark:text-dk-bg'>
       {Object.entries(accounts).map(([key, account]) => (
         <LogoLink
           key={key}
