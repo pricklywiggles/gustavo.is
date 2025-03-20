@@ -6,9 +6,9 @@ import Script from 'next/script';
 export default async function DataForm({
   searchParams
 }: {
-  searchParams: { env: string };
+  searchParams: Promise<{ env: string }>;
 }) {
-  const envParam = await searchParams['env'];
+  const { env: envParam } = await searchParams;
   let src = 'https://source.tartle.co/scripts/endlink-landing.js';
   let completeUrl = '/tartle/completed';
   if (envParam) {

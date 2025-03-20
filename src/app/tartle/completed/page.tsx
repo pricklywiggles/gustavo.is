@@ -5,9 +5,9 @@ import Script from 'next/script';
 export default async function Completed({
   searchParams
 }: {
-  searchParams: { env: string };
+  searchParams: Promise<{ env: string }>;
 }) {
-  const envParam = await searchParams['env'];
+  const { env: envParam } = await searchParams;
 
   let src = 'https://source.tartle.co/scripts/endlink-completion.js';
   if (envParam) {

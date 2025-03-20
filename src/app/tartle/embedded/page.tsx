@@ -32,9 +32,9 @@ type Origin = keyof typeof origins;
 export default async function DataForm({
   searchParams
 }: {
-  searchParams: { env: Origin };
+  searchParams: Promise<{ env: Origin }>;
 }) {
-  const envParam = await searchParams['env'];
+  const { env: envParam } = await searchParams;
   let env: Origin = Object.keys(origins).includes(envParam)
     ? envParam
     : 'production';

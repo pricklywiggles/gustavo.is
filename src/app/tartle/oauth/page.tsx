@@ -6,7 +6,7 @@ import DVCArea from './components/DVCArea';
 async function Oauth({
   searchParams
 }: {
-  searchParams: { token: string; refreshToken: string };
+  searchParams: Promise<{ token: string; refreshToken: string }>;
 }) {
   const { token, refreshToken } = await searchParams;
   return (
