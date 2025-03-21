@@ -51,26 +51,18 @@ const DVCArea = ({
   const decodedToken = token ? jwtDecode<TokenPayload>(token) : null;
 
   const handleRefreshToken = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL}/api/tartle/refresh`,
-      {
-        method: 'POST',
-        body: JSON.stringify({ refresh_token: refreshToken })
-      }
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setToken(data.access_token);
-        setRefreshToken(data.refresh_token);
+    getRefreshedToken(
+      refreshToken,
+      (token, refreshToken) => {
+        setToken(token);
+        setRefreshToken(refreshToken);
         setError(null);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setToken('');
-        setRefreshToken('');
-      });
+      },
+      setError
+    );
   };
+
+  console.log({ token, refreshToken });
 
   return (
     <div className='border-2 border-gray-300 rounded-xl p-4 max-w-xl break-words'>
@@ -212,6 +204,36 @@ const fetchWelcomeData = async (
     setResult(data);
   } catch (err) {
     setResult(null);
+  }
+};
+
+const getRefreshedToken = async (
+  refreshToken: string,
+  onSuccess: (token: string, refreshToken: string) => void,
+  onError: (error: string) => void
+) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_APP_URL}/api/tartle/refresh`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ refresh_token: refreshToken })
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+      onSuccess(data.access_token, data.refresh_token);
+    } else {
+      onError(data.error_description);
+    }
+  } catch (err) {
+    onError(err instanceof Error ? err.message : 'An error occurred');
+    console.error(err);
   }
 };
 

@@ -34,8 +34,7 @@ export const POST = async (request: Request) => {
     const responseData = await response.json();
     console.log({ responseData });
     return NextResponse.json(responseData, {
-      status: response.status,
-      headers: response.headers
+      status: response.status
     });
   } catch (error) {
     console.error({ error });
