@@ -36,7 +36,6 @@ const SettingsForm = ({
           type='text'
           id='client_id'
           name='client_id'
-          required
         />
       </div>
 
@@ -47,7 +46,6 @@ const SettingsForm = ({
           type='text'
           id='client_secret'
           name='client_secret'
-          required
         />
       </div>
 
@@ -58,7 +56,6 @@ const SettingsForm = ({
           type='text'
           id='packet_id'
           name='packet_id'
-          required
         />
       </div>
 

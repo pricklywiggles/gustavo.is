@@ -14,6 +14,20 @@ export const updateSettings = async (
   };
 
   const testAppUserId = await getFingerprint();
+  const existingConfig = (await get(testAppUserId, {
+    consistentRead: true
+  })) as Settings;
+
+  const mergedConfig = Object.keys(settings).reduce<Settings>(
+    (acc, untypedKey) => {
+      const key = untypedKey as keyof Settings;
+      if (settings[key]) {
+        acc[key] = settings[key];
+      }
+      return acc;
+    },
+    existingConfig
+  );
 
   let operation = 'update';
 
@@ -40,7 +54,7 @@ export const updateSettings = async (
             {
               operation,
               key: testAppUserId,
-              value: settings
+              value: mergedConfig
             }
           ]
         })
