@@ -58,6 +58,10 @@ const DVCArea = ({
         setToken(token);
         setRefreshToken(refreshToken);
         setError(null);
+        const url = new URL(window.location.href);
+        url.searchParams.set('token', token);
+        url.searchParams.set('refreshToken', refreshToken);
+        window.history.replaceState({}, '', url.toString());
       },
       setError
     );
