@@ -3,6 +3,7 @@
 import { jwtDecode } from 'jwt-decode';
 import * as React from 'react';
 import DataSync from './DataSync';
+import { getClientId } from '@/app/actions';
 
 type TokenPayload = {
   sub: string;
@@ -29,12 +30,12 @@ const ClientIdLoader = ({
 }: {
   children: (clientId: string | null) => React.ReactNode;
 }) => {
-  const [result, setResult] = React.useState<string | null>(null);
+  const [clientId, setClientId] = React.useState<string | null>(null);
   React.useEffect(() => {
-    fetchWelcomeData(setResult);
+    getClientId().then(setClientId);
   }, []);
 
-  return children(result);
+  return children(clientId);
 };
 
 const DVCArea = ({
@@ -186,25 +187,6 @@ const DVCArea = ({
       )}
     </div>
   );
-};
-
-const fetchWelcomeData = async (
-  setResult: (clientId: string | null) => void
-) => {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL}/client_id`
-    );
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch welcome data');
-    }
-
-    const data = await response.json();
-    setResult(data);
-  } catch (err) {
-    setResult(null);
-  }
 };
 
 const getRefreshedToken = async (

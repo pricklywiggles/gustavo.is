@@ -1,6 +1,7 @@
 'use server';
 
 import { Settings } from '@/app/tartle/oauth/settings/page';
+import { get } from '@vercel/edge-config';
 
 export const updateSettings = async (
   previousState: { message: string },
@@ -51,4 +52,12 @@ export const updateSettings = async (
     console.error('Error updating settings:', error);
     return { message: 'An error occurred while updating settings' };
   }
+};
+
+export const getClientId = async () => {
+  const config = (await get(
+    process.env.EDGE_CONFIG_OBJECT_KEY as string
+  )) as Settings;
+
+  return config.client_id;
 };
