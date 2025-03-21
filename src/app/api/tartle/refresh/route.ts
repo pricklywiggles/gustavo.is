@@ -9,26 +9,34 @@ export const POST = async (request: Request) => {
     client_secret: string;
   };
 
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_TARTLE_API_URI}/oauth/token`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        client_id: config.client_id,
-        client_secret: config.client_secret,
-        redirect_uri: process.env.NEXT_PUBLIC_TARTLE_REDIRECT_URI,
-        refresh_token,
-        grant_type: 'refresh_token'
-      })
-    }
-  );
-
-  const responseData = await response.json();
-  return NextResponse.json(responseData, {
-    status: response.status,
-    headers: response.headers
-  });
+  let response;
+  try {
+    response = await fetch(
+      `${process.env.NEXT_PUBLIC_TARTLE_API_URI}/oauth/token`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          client_id: config.client_id,
+          client_secret: config.client_secret,
+          redirect_uri: process.env.NEXT_PUBLIC_TARTLE_REDIRECT_URI,
+          refresh_token,
+          grant_type: 'refresh_token'
+        })
+      }
+    );
+    const responseData = await response.json();
+    return NextResponse.json(responseData, {
+      status: response.status,
+      headers: response.headers
+    });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { error: 'Failed to refresh token' },
+      { status: 500 }
+    );
+  }
 };
