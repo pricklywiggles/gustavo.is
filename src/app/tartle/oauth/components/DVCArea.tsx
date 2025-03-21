@@ -50,7 +50,8 @@ const DVCArea = ({
 
   const decodedToken = token ? jwtDecode<TokenPayload>(token) : null;
 
-  const handleRefreshToken = async () => {
+  const handleRefreshToken = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_APP_URL}/api/tartle/refresh`,
       {
