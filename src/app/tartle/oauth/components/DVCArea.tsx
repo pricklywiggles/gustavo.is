@@ -31,6 +31,7 @@ const ClientIdLoader = ({
   children: (clientId: string | null) => React.ReactNode;
 }) => {
   const [clientId, setClientId] = React.useState<string | null>(null);
+
   React.useEffect(() => {
     getClientId().then(setClientId);
   }, []);
@@ -66,8 +67,6 @@ const DVCArea = ({
       setError
     );
   };
-
-  console.log({ token, refreshToken });
 
   return (
     <div className='border-2 border-gray-300 rounded-xl p-4 max-w-xl break-words'>

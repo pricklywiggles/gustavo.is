@@ -9,8 +9,7 @@ async function Oauth({
   searchParams: Promise<{ token: string; refreshToken: string }>;
 }) {
   const { token, refreshToken } = await searchParams;
-  console.log({ token, ref: refreshToken });
-  console.log('REFRESH');
+
   return (
     <>
       <Toolbar />

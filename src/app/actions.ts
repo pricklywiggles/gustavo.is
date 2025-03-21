@@ -70,7 +70,9 @@ export const updateSettings = async (
 export const getClientId = async () => {
   const testAppUserId = await getFingerprint();
 
-  const config = (await get(testAppUserId)) as Settings;
+  const config = (await get(testAppUserId, {
+    consistentRead: true
+  })) as Settings;
 
   return config.client_id;
 };

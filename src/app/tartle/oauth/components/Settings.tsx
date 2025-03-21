@@ -1,8 +1,9 @@
 'use client';
 
-import { updateSettings } from '@/app/actions';
+import { getClientId, updateSettings } from '@/app/actions';
 import { useActionState } from 'react';
 import * as React from 'react';
+import { useRouter } from 'next/navigation';
 const authorizeUrl = `${process.env.NEXT_PUBLIC_TARTLE_API_URI}/oauth/authorize`;
 
 const SettingsForm = ({
@@ -10,18 +11,21 @@ const SettingsForm = ({
 }: {
   setIsOpen: (isOpen: boolean) => void;
 }) => {
+  const router = useRouter();
   const [state, formAction] = useActionState(updateSettings, {
     message: ''
   });
+  const [reloadMessage, setReloadMessage] = React.useState(false);
 
   React.useEffect(() => {
     if (state.message === 'Settings updated successfully!') {
+      setReloadMessage(true);
       setTimeout(() => {
         setIsOpen(false);
-        window.location.reload();
-      }, 3000);
+        window.location.replace(window.location.origin + '/tartle/oauth');
+      }, 2000);
     }
-  }, [state.message, setIsOpen]);
+  }, [state.message, setIsOpen, router]);
 
   return (
     <form className='text-base flex flex-col gap-3' action={formAction}>
@@ -61,6 +65,9 @@ const SettingsForm = ({
       {state.message ? (
         <div className='border-2 rounded-lg mt-2 text-gray-400 p-2 border-white'>
           {state.message}
+          <div className='text-white-700'>
+            {reloadMessage ? 'Wait for reload...' : ''}
+          </div>
         </div>
       ) : null}
 
