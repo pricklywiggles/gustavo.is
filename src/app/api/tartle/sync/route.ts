@@ -29,14 +29,13 @@ export const POST = async (request: Request) => {
   let responseData;
   try {
     responseData = await response.json();
+    console.log({ responseData });
+
+    return NextResponse.json(responseData, {
+      status: response.status
+    });
   } catch (error) {
     console.error({ error });
+    return NextResponse.json({ error: 'Failed to sync data' }, { status: 500 });
   }
-
-  console.log({ responseData });
-
-  return NextResponse.json(responseData, {
-    status: response.status,
-    headers: response.headers
-  });
 };
