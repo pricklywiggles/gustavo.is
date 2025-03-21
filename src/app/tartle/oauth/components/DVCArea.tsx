@@ -3,7 +3,7 @@
 import { jwtDecode } from 'jwt-decode';
 import * as React from 'react';
 import DataSync from './DataSync';
-import { getConfigValue } from '@/app/actions';
+import { getConfigValue, refreshTartleToken } from '@/app/actions';
 
 type TokenPayload = {
   sub: string;
@@ -55,19 +55,19 @@ const DVCArea = ({
   const decodedToken = token ? jwtDecode<TokenPayload>(token) : null;
 
   const handleRefreshToken = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    getRefreshedToken(
-      refreshToken,
-      (token, refreshToken) => {
-        setToken(token);
-        setRefreshToken(refreshToken);
+    refreshTartleToken(refreshToken).then(({ success, data }) => {
+      if (success) {
+        setToken(data.access_token);
+        setRefreshToken(data.refresh_token);
         setError(null);
         const url = new URL(window.location.href);
         url.searchParams.set('token', token);
         url.searchParams.set('refreshToken', refreshToken);
         window.history.replaceState({}, '', url.toString());
-      },
-      setError
-    );
+      } else {
+        setError(data);
+      }
+    });
   };
 
   return (

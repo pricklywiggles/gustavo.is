@@ -157,3 +157,43 @@ export const syncTartleData = async (
     };
   }
 };
+
+export const refreshTartleToken = async (refreshToken: string) => {
+  try {
+    const testAppUserId = await getFingerprint();
+    const config = (await get(testAppUserId, {
+      consistentRead: true
+    })) as Settings;
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_TARTLE_API_URI}/oauth/token`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          client_id: config.client_id,
+          client_secret: config.client_secret,
+          redirect_uri: process.env.NEXT_PUBLIC_TARTLE_REDIRECT_URI,
+          refresh_token: refreshToken,
+          grant_type: 'refresh_token'
+        })
+      }
+    );
+
+    const responseData = await response.json();
+
+    return { success: response.ok, data: responseData };
+  } catch (error) {
+    return {
+      success: false,
+      data:
+        error instanceof Error
+          ? error.message
+          : typeof error === 'string'
+          ? error
+          : 'Unknown error'
+    };
+  }
+};
