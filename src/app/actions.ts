@@ -1,7 +1,7 @@
 'use server';
-
-import { Settings } from '@/app/tartle/oauth/settings/page';
+import { Settings } from '@/types/common';
 import { get } from '@vercel/edge-config';
+import { getFingerprint } from '@/utils/fingerprint';
 
 export const updateSettings = async (
   previousState: { message: string },
@@ -12,6 +12,19 @@ export const updateSettings = async (
     client_secret: formData.get('client_secret') as string,
     packet_id: formData.get('packet_id') as string
   };
+
+  const testAppUserId = await getFingerprint();
+
+  let operation = 'update';
+
+  try {
+    const existingConfig = await get(testAppUserId);
+    if (!existingConfig) {
+      operation = 'create';
+    }
+  } catch (error) {
+    console.error('Error getting existing config:', error);
+  }
 
   try {
     const response = await fetch(
@@ -25,8 +38,8 @@ export const updateSettings = async (
         body: JSON.stringify({
           items: [
             {
-              operation: 'update',
-              key: process.env.EDGE_CONFIG_OBJECT_KEY,
+              operation,
+              key: testAppUserId,
               value: settings
             }
           ]
@@ -55,9 +68,9 @@ export const updateSettings = async (
 };
 
 export const getClientId = async () => {
-  const config = (await get(
-    process.env.EDGE_CONFIG_OBJECT_KEY as string
-  )) as Settings;
+  const testAppUserId = await getFingerprint();
+
+  const config = (await get(testAppUserId)) as Settings;
 
   return config.client_id;
 };

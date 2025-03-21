@@ -4,11 +4,6 @@ import { updateSettings } from '@/app/actions';
 import { useActionState } from 'react';
 import * as React from 'react';
 const authorizeUrl = `${process.env.NEXT_PUBLIC_TARTLE_API_URI}/oauth/authorize`;
-export type Settings = {
-  client_id: string;
-  client_secret: string;
-  packet_id: string;
-};
 
 const SettingsForm = ({
   setIsOpen
@@ -24,7 +19,7 @@ const SettingsForm = ({
       setTimeout(() => {
         setIsOpen(false);
         window.location.reload();
-      }, 1000);
+      }, 3000);
     }
   }, [state.message, setIsOpen]);
 
@@ -85,7 +80,7 @@ export default function Settings({
   setIsOpen: (isOpen: boolean) => void;
 }) {
   return (
-    <div className='absolute top-20 left-0 grid grid-cols-1 place-items-center'>
+    <div className='absolute bg-blue-900 top-20 left-0 grid grid-cols-1 place-items-center'>
       <div className='border-2 p-4  rounded-xl  w-fit'>
         <div className='w-min mx-auto'>
           <div className='text-xs tracking-tight font-extrabold   sm:text-md md:text-lg lg:text-xl'>
