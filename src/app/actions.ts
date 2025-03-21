@@ -18,7 +18,7 @@ export const setConfigValues = async (settings: Partial<Settings>) => {
         settings[key] !== null &&
         settings[key] !== ''
       ) {
-        acc[key] = settings[key];
+        acc[key] = settings[key] as string;
       }
       return acc;
     },
