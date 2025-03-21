@@ -3,7 +3,7 @@
 import { jwtDecode } from 'jwt-decode';
 import * as React from 'react';
 import DataSync from './DataSync';
-import { getClientId } from '@/app/actions';
+import { getConfigValue } from '@/app/actions';
 
 type TokenPayload = {
   sub: string;
@@ -33,7 +33,7 @@ const ClientIdLoader = ({
   const [clientId, setClientId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    getClientId().then(setClientId);
+    getConfigValue('client_id').then(setClientId);
   }, []);
 
   return children(clientId);
@@ -41,10 +41,12 @@ const ClientIdLoader = ({
 
 const DVCArea = ({
   token: initialToken,
-  refreshToken: initialRefreshToken
+  refreshToken: initialRefreshToken,
+  initialPacketId
 }: {
   token: string;
   refreshToken: string;
+  initialPacketId: string;
 }) => {
   const [token, setToken] = React.useState(initialToken);
   const [refreshToken, setRefreshToken] = React.useState(initialRefreshToken);
@@ -112,7 +114,7 @@ const DVCArea = ({
               </div>
             </div>
           </div>
-          <DataSync token={token} />
+          <DataSync token={token} initialPacketId={initialPacketId} />
         </>
       ) : (
         <ClientIdLoader>
