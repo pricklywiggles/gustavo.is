@@ -6,9 +6,19 @@ import { getFingerprint } from '@/utils/fingerprint';
 // Core function to update settings
 export const setConfigValues = async (settings: Partial<Settings>) => {
   const testAppUserId = await getFingerprint();
-  const existingConfig = (await get(testAppUserId, {
-    consistentRead: true
-  })) as Settings;
+  let existingConfig: Settings | undefined = undefined;
+  let operation = 'create';
+
+  try {
+    existingConfig = (await get(testAppUserId, {
+      consistentRead: true
+    })) as Settings;
+    if (existingConfig) {
+      operation = 'update';
+    }
+  } catch (error) {
+    console.error('Error getting existing config:', error);
+  }
 
   const mergedConfig = Object.keys(settings).reduce<Settings>(
     (acc, untypedKey) => {
@@ -18,19 +28,8 @@ export const setConfigValues = async (settings: Partial<Settings>) => {
       }
       return acc;
     },
-    existingConfig
+    existingConfig || ({} as Settings)
   );
-
-  let operation = 'update';
-
-  try {
-    const existingConfig = await get(testAppUserId);
-    if (!existingConfig) {
-      operation = 'create';
-    }
-  } catch (error) {
-    console.error('Error getting existing config:', error);
-  }
 
   const response = await fetch(
     `${process.env.VERCEL_API_URI}/${process.env.EDGE_CONFIG_ID}/items`,
@@ -99,7 +98,7 @@ export const getConfigValue = async (key: (typeof allowedKeys)[number]) => {
     consistentRead: true
   })) as Settings;
 
-  return config[key];
+  return config?.[key] || '';
 };
 
 export const syncTartleData = async (
