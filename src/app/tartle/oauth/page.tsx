@@ -15,7 +15,7 @@ async function Oauth({
   return (
     <>
       <Toolbar clientId={clientId} packetId={packetId} />
-      <div className='mt-28 w-screen'>
+      <div className='mt-28 w-full'>
         <div className='w-min mx-auto'>
           <div className='text-sm tracking-tight font-extrabold   sm:text-md md:text-lg lg:text-xl'>
             <DVCArea

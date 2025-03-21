@@ -13,11 +13,7 @@ export const setConfigValues = async (settings: Partial<Settings>) => {
   const mergedConfig = Object.keys(settings).reduce<Settings>(
     (acc, untypedKey) => {
       const key = untypedKey as keyof Settings;
-      if (
-        settings[key] !== undefined &&
-        settings[key] !== null &&
-        settings[key] !== ''
-      ) {
+      if (settings[key]) {
         acc[key] = settings[key] as string;
       }
       return acc;

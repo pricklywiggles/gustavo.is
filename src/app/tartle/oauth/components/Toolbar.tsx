@@ -12,9 +12,15 @@ export default function Toolbar({
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
   return (
-    <div className='relative'>
+    <div className='relative flex justify-between m-4'>
       <button onClick={() => setIsOpen(!isOpen)}>
-        <CogIcon className='m-2 w-6 h-6 text-gray-400' />
+        <CogIcon className='w-6 h-6 text-gray-400' />
+      </button>
+      <button
+        className='bg-blue-500 mt-4 text-white p-2 rounded-md'
+        onClick={() => (window.location.href = '/tartle/oauth')}
+      >
+        Reset
       </button>
       {isOpen ? (
         <Settings
