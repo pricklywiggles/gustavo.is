@@ -1,16 +1,8 @@
 'use client';
 
-import {
-  getConfigValue,
-  setConfigValues,
-  syncTartleData,
-  updateSettings
-} from '@/app/actions';
-import { useState, useEffect } from 'react';
+import { syncTartleData } from '@/actions/formActions';
+import { useState } from 'react';
 import { useActionState } from 'react';
-type ApiError = {
-  errors: Record<string, string[]>;
-};
 
 const DataSync = ({
   token,

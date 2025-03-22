@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { get } from '@vercel/edge-config';
-import { getFingerprint } from '@/utils/fingerprint';
+import { getId } from '@/utils/fingerprint';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const authorizationCode = searchParams.get('code');
   const endpointUri = process.env.NEXT_PUBLIC_TARTLE_API_URI + '/oauth/token';
 
-  const testAppUserId = await getFingerprint(request);
+  const testAppUserId = await getId(request.headers);
 
   console.log({ testAppUserId });
 

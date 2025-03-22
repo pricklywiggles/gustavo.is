@@ -3,7 +3,8 @@
 import { jwtDecode } from 'jwt-decode';
 import * as React from 'react';
 import DataSync from './DataSync';
-import { getConfigValue, refreshTartleToken } from '@/app/actions';
+import { getConfigValueFromClient } from '@/actions/actions';
+import { refreshTartleToken } from '@/actions/tartleActions';
 
 type TokenPayload = {
   sub: string;
@@ -33,7 +34,7 @@ const ClientIdLoader = ({
   const [clientId, setClientId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    getConfigValue('client_id').then(setClientId);
+    getConfigValueFromClient('client_id').then(setClientId);
   }, []);
 
   if (clientId === '') {
@@ -61,20 +62,24 @@ const DVCArea = ({
 
   const decodedToken = token ? jwtDecode<TokenPayload>(token) : null;
 
-  const handleRefreshToken = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    refreshTartleToken(refreshToken).then(({ success, data }) => {
-      if (success) {
-        setToken(data.access_token);
-        setRefreshToken(data.refresh_token);
-        setError(null);
-        const url = new URL(window.location.href);
-        url.searchParams.set('token', token);
-        url.searchParams.set('refreshToken', refreshToken);
-        window.history.replaceState({}, '', url.toString());
-      } else {
-        setError(data);
-      }
-    });
+  const handleRefreshToken = async () => {
+    refreshTartleToken(refreshToken)
+      .then(({ success, data }) => {
+        if (success) {
+          setToken(data.access_token);
+          setRefreshToken(data.refresh_token);
+          setError(null);
+          const url = new URL(window.location.href);
+          url.searchParams.set('token', token);
+          url.searchParams.set('refreshToken', refreshToken);
+          window.history.replaceState({}, '', url.toString());
+        } else {
+          setError(data);
+        }
+      })
+      .catch((error) => {
+        setError(error instanceof Error ? error.message : 'Unknown error');
+      });
   };
 
   return (
@@ -106,7 +111,7 @@ const DVCArea = ({
               {error ? (
                 <div className='mt-2 border-2 border-red-500 bg-black rounded-xl p-4 max-w-xl break-words'>
                   <pre className='font-mono text-sm whitespace-pre-wrap'>
-                    {error}
+                    {JSON.stringify(error, null, 2)}
                   </pre>
                 </div>
               ) : null}
@@ -202,36 +207,6 @@ const DVCArea = ({
       )}
     </div>
   );
-};
-
-const getRefreshedToken = async (
-  refreshToken: string,
-  onSuccess: (token: string, refreshToken: string) => void,
-  onError: (error: string) => void
-) => {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL}/api/tartle/refresh`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ refresh_token: refreshToken })
-      }
-    );
-
-    const data = await response.json();
-
-    if (response.ok) {
-      onSuccess(data.access_token, data.refresh_token);
-    } else {
-      onError(data.error_description);
-    }
-  } catch (err) {
-    onError(err instanceof Error ? err.message : 'An error occurred');
-    console.error(err);
-  }
 };
 
 export default DVCArea;

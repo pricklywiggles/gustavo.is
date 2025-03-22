@@ -2,15 +2,16 @@
 import * as React from 'react';
 import { CogIcon } from '@heroicons/react/24/outline';
 import Settings from './Settings';
+import { setConfigValues } from '@/actions/actions';
 
-export default function Toolbar({
-  clientId,
-  packetId
-}: {
-  clientId: string;
-  packetId: string;
-}) {
+export default function Toolbar({ clientId }: { clientId: string }) {
   const [isOpen, setIsOpen] = React.useState(false);
+
+  const handleReset = async () => {
+    await setConfigValues({});
+    window.location.href = '/tartle/oauth';
+  };
+
   return (
     <div className='relative flex justify-between m-4'>
       <button onClick={() => setIsOpen(!isOpen)}>
@@ -18,17 +19,11 @@ export default function Toolbar({
       </button>
       <button
         className='bg-blue-500 mt-4 text-white p-2 rounded-md'
-        onClick={() => (window.location.href = '/tartle/oauth')}
+        onClick={handleReset}
       >
         Reset
       </button>
-      {isOpen ? (
-        <Settings
-          setIsOpen={setIsOpen}
-          clientId={clientId}
-          packetId={packetId}
-        />
-      ) : null}
+      {isOpen ? <Settings setIsOpen={setIsOpen} clientId={clientId} /> : null}
     </div>
   );
 }

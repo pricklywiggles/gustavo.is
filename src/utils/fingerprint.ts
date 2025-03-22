@@ -15,17 +15,8 @@ export interface Fingerprint {
   realIP: string | null;
 }
 
-interface FingerprintOptions {
-  request?: Request;
-  headers?: Headers;
-}
-
-export const getFingerprint = async (
-  options: FingerprintOptions = {}
-): Promise<string> => {
-  // Prioritize request headers, then passed headers, then global headers
-  const headersList =
-    options.request?.headers || options.headers || (await getHeaders());
+export const getId = async (headers?: Headers): Promise<string> => {
+  const headersList = headers || (await getHeaders());
 
   // Get IP from various headers
   const ipAddress =
@@ -34,21 +25,27 @@ export const getFingerprint = async (
     headersList.get('x-client-ip') ||
     '0.0.0.0';
 
+  const host = headersList.get('host');
+  const protocol =
+    headersList.get('x-forwarded-protocol') ||
+    headersList.get('x-forwarded-proto') ||
+    'https';
+
   const fingerprint: Fingerprint = {
     userAgent: headersList.get('user-agent'),
     acceptLanguage: headersList.get('accept-language'),
     acceptEncoding: headersList.get('accept-encoding'),
     ipAddress,
     connectionInfo: {
-      protocol: options.request?.url
-        ? new URL(options.request.url).protocol
-        : 'https',
-      host: headersList.get('host'),
+      protocol,
+      host,
       connection: headersList.get('connection')
     },
     forwardedFor: headersList.get('x-forwarded-for'),
     realIP: headersList.get('x-real-ip')
   };
+
+  console.log({ fingerprint });
 
   const hash = await createHash(fingerprint);
 

@@ -1,18 +1,16 @@
 'use client';
 
-import { updateSettings } from '@/app/actions';
+import { updateSettings } from '@/actions/formActions';
 import { useActionState } from 'react';
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function Settings({
   setIsOpen,
-  clientId: initialClientId,
-  packetId: initialPacketId
+  clientId: initialClientId
 }: {
   setIsOpen: (isOpen: boolean) => void;
   clientId: string;
-  packetId: string;
 }) {
   const router = useRouter();
   const [state, formAction] = useActionState(updateSettings, {
@@ -59,17 +57,10 @@ export default function Settings({
                       id='client_secret'
                       name='client_secret'
                       placeholder='********'
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor='packet_id'>Packet ID</label>
-                    <input
-                      className='border-2 border-gray-300 rounded-md p-2 text-gray-600'
-                      type='text'
-                      id='packet_id'
-                      name='packet_id'
-                      defaultValue={initialPacketId}
+                      data-1p-ignore
+                      data-lpignore='true'
+                      data-form-type='other'
+                      data-pw-ignore
                     />
                   </div>
                 </>
