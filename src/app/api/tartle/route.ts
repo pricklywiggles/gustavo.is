@@ -11,7 +11,9 @@ export async function GET(request: Request) {
 
   console.log({ testAppUserId });
 
-  const config = (await get(testAppUserId)) as {
+  const config = (await get(testAppUserId, {
+    consistentRead: true
+  })) as {
     client_id: string;
     client_secret: string;
   };
