@@ -59,10 +59,12 @@ const DVCArea = ({
   const [token, setToken] = React.useState(initialToken);
   const [refreshToken, setRefreshToken] = React.useState(initialRefreshToken);
   const [error, setError] = React.useState<string | null>(null);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const decodedToken = token ? jwtDecode<TokenPayload>(token) : null;
 
   const handleRefreshToken = async () => {
+    setIsLoading(true);
     refreshTartleToken(refreshToken)
       .then(({ success, data }) => {
         if (success) {
@@ -79,6 +81,9 @@ const DVCArea = ({
       })
       .catch((error) => {
         setError(error instanceof Error ? error.message : 'Unknown error');
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -105,8 +110,9 @@ const DVCArea = ({
               <button
                 className='bg-blue-500 mt-4 text-white p-2 rounded-md w-full'
                 onClick={handleRefreshToken}
+                disabled={isLoading}
               >
-                Refresh Token
+                {isLoading ? 'Refreshing...' : 'Refresh Token'}
               </button>
               {error ? (
                 <div className='mt-2 border-2 border-red-500 bg-black rounded-xl p-4 max-w-xl break-words'>
