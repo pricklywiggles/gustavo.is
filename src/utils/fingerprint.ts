@@ -45,8 +45,6 @@ export const getId = async (headers?: Headers): Promise<string> => {
     realIP: headersList.get('x-real-ip')
   };
 
-  console.log({ fingerprint });
-
   const hash = await createHash(fingerprint);
 
   return hash;

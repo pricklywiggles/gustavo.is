@@ -68,8 +68,12 @@ export const getConfigValueFromClient = async (
   if (!allowedKeys.includes(key)) {
     throw new Error('Invalid key');
   }
-
-  const config = await getConfig();
+  let config: Settings | undefined;
+  try {
+    config = await getConfig();
+  } catch (error) {
+    return '';
+  }
 
   return config?.[key] || '';
 };
