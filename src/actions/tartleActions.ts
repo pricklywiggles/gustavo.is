@@ -1,5 +1,5 @@
 'use server';
-import { getConfig } from './actions';
+import { getConfig, setConfigValues } from './actions';
 
 // Push data to a tartle packet on behalf of a user
 export const pushSellersPacket = async (
@@ -28,7 +28,7 @@ export const pushSellersPacket = async (
 };
 
 // Use a refresh_token to get a new tartle access token.
-export const refreshTartleToken = async (refreshToken: string) => {
+export const refreshTartleToken = async () => {
   try {
     const config = await getConfig();
 
@@ -41,13 +41,17 @@ export const refreshTartleToken = async (refreshToken: string) => {
           client_id: config.client_id,
           client_secret: config.client_secret,
           redirect_uri: process.env.NEXT_PUBLIC_TARTLE_REDIRECT_URI,
-          refresh_token: refreshToken,
+          refresh_token: config.refresh_token,
           grant_type: 'refresh_token'
         })
       }
     );
 
     const responseData = await response.json();
+    await setConfigValues({
+      token: responseData.access_token,
+      refresh_token: responseData.refresh_token
+    });
 
     return { success: response.ok, data: responseData };
   } catch (error) {

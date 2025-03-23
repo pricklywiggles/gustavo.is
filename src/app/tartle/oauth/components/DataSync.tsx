@@ -55,7 +55,7 @@ const DataSync = ({
           type='text'
           id='packet_id'
           name='packet_id'
-          value={packetId}
+          value={packetId || ''}
           onChange={(e) => setPacketId(e.target.value)}
         />
       </div>

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { get } from '@vercel/edge-config';
 import { getId } from '@/utils/fingerprint';
+import { Settings } from '@/types/common';
+import { setConfigValues } from '@/actions/actions';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -9,20 +11,14 @@ export async function GET(request: Request) {
 
   const testAppUserId = await getId(request.headers);
 
-  console.log({ testAppUserId });
-
   const config = (await get(testAppUserId, {
     consistentRead: true
-  })) as {
-    client_id: string;
-    client_secret: string;
-  };
+  })) as Settings;
 
   const params = {
     code: authorizationCode,
     grant_type: 'authorization_code',
-    code_verifier:
-      '141P2WU52o65kheE6tJzf2tI70Ib9uHn4Fp9_HtGa4vLfHKV2KCXOwDh4heqdZIJEizu5iTFyiDHxL_3FzYhdQ',
+    code_verifier: config.code_verifier,
     client_secret: config.client_secret,
     client_id: config.client_id,
     redirect_uri: process.env.NEXT_PUBLIC_TARTLE_REDIRECT_URI,
@@ -39,27 +35,29 @@ export async function GET(request: Request) {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.error_description || 'Failed to get token');
+    return NextResponse.json(
+      { error: errorData.error_description || 'Failed to get token' },
+      { status: 500 }
+    );
   }
 
   if (response.ok) {
     let data;
     try {
       data = await response.json();
+      setConfigValues({
+        token: data.access_token,
+        refresh_token: data.refresh_token
+      });
     } catch (error) {
       console.error(error);
     }
 
+    console.log({ data });
+
     if (data) {
-      return NextResponse.redirect(
-        new URL(
-          '/tartle/oauth?token=' +
-            data.access_token +
-            '&refreshToken=' +
-            data.refresh_token,
-          request.url
-        )
-      );
+      await wait(1000); // Wait for the edge config to be updated
+      return NextResponse.redirect(new URL('/tartle/oauth/test', request.url));
     } else {
       return NextResponse.json({ error: 'No data' }, { status: 500 });
     }
@@ -67,3 +65,5 @@ export async function GET(request: Request) {
 
   return NextResponse.json({ error: response.statusText }, { status: 500 });
 }
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

@@ -24,7 +24,11 @@ const actions = [
   'in Los Angeles.'
 ];
 
-const blockedPaths = ['/tartle/oauth', '/tartle/oauth/settings'];
+const blockedPaths = [
+  '/tartle/oauth/connect',
+  '/tartle/oauth/test',
+  '/tartle/oauth/settings'
+];
 
 export default function Header() {
   const pathname = usePathname();

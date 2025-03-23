@@ -2,6 +2,7 @@
 import { Settings } from '@/types/common';
 import { get } from '@vercel/edge-config';
 import { getId } from '@/utils/fingerprint';
+import { generateCodeVerifier } from '@/utils/pkce';
 
 // Core function to update settings
 export const setConfigValues = async (settings: Partial<Settings>) => {
@@ -18,6 +19,12 @@ export const setConfigValues = async (settings: Partial<Settings>) => {
     }
   } catch (error) {
     console.error('Error getting existing config:', error);
+  }
+
+  // Create a new verifier every time the client_id changes
+  if (settings.hasOwnProperty('client_id')) {
+    const verifier = await generateCodeVerifier();
+    settings['code_verifier'] = verifier;
   }
 
   const keys = Object.keys(settings);
@@ -61,33 +68,43 @@ export const setConfigValues = async (settings: Partial<Settings>) => {
 };
 
 // Used for getting config values from the client, prevents leaking sensitive config values
-const allowedKeys = ['packet_id', 'client_id'] as const;
+const allowedKeys = ['packet_id', 'client_id', 'code_verifier'] as const;
 export const getConfigValueFromClient = async (
   key: (typeof allowedKeys)[number]
 ) => {
   if (!allowedKeys.includes(key)) {
     throw new Error('Invalid key');
   }
-  let config: Settings | undefined;
-  try {
-    config = await getConfig();
-  } catch (error) {
-    return '';
-  }
+  const config = await getConfig();
 
-  return config?.[key] || '';
+  return config[key];
 };
 
 // Used in server functions to get the full config.
 export const getConfig = async () => {
   const testAppUserId = await getId();
-  const config = await get(testAppUserId, {
-    consistentRead: true
-  });
+  console.log({ testAppUserId });
+  let config: Settings | undefined;
 
-  if (!config) {
-    throw new Error(`No config found for ${testAppUserId}`);
+  try {
+    config = (await get(testAppUserId, {
+      consistentRead: true
+    })) as Settings;
+    console.log({ configss: config });
+  } catch (error) {
+    console.error('Error getting config:', error);
   }
 
-  return config as Settings;
+  if (!config) {
+    return {
+      client_id: '',
+      packet_id: '',
+      code_verifier: '',
+      token: '',
+      refresh_token: '',
+      client_secret: ''
+    };
+  }
+
+  return config;
 };

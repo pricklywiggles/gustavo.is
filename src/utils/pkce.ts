@@ -1,30 +1,27 @@
-const generateCodeVerifier = async (): Promise<string> => {
-  const buffer = new Uint8Array(32);
-  window.crypto.getRandomValues(buffer);
+import crypto from 'crypto';
+
+export const generateCodeVerifier = async (): Promise<string> => {
+  const buffer = crypto.randomBytes(32);
   return base64URLEncode(buffer);
 };
 
 export const generateCodeChallenge = async (
   codeVerifier: string
 ): Promise<string> => {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(codeVerifier);
-  const digest = await window.crypto.subtle.digest('SHA-256', data);
-  return base64URLEncode(new Uint8Array(digest));
+  if (!codeVerifier) {
+    return '';
+  }
+  const hash = crypto.createHash('sha256');
+  hash.update(codeVerifier);
+  return base64URLEncode(hash.digest());
 };
 
-const base64URLEncode = (buffer: Uint8Array): string => {
-  return btoa(String.fromCharCode.apply(null, Array.from(buffer)))
+const base64URLEncode = (buffer: Buffer | Uint8Array): string => {
+  return buffer
+    .toString('base64')
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=+$/, '');
-};
-
-// Usage:
-export const generatePKCEPair = async () => {
-  const codeVerifier = await generateCodeVerifier();
-  const codeChallenge = await generateCodeChallenge(codeVerifier);
-  return { codeVerifier, codeChallenge };
 };
 
 export const verifyPKCEPair = async (

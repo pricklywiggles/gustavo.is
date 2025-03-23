@@ -9,7 +9,7 @@ export default function Toolbar({ clientId }: { clientId: string }) {
 
   const handleReset = async () => {
     await setConfigValues({});
-    window.location.href = '/tartle/oauth';
+    window.location.href = '/tartle/oauth/connect';
   };
 
   return (

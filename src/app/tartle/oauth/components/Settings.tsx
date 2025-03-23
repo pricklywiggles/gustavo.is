@@ -23,7 +23,9 @@ export default function Settings({
       setReloadMessage(true);
       setTimeout(() => {
         setIsOpen(false);
-        window.location.replace(window.location.origin + '/tartle/oauth');
+        window.location.replace(
+          window.location.origin + '/tartle/oauth/connect'
+        );
       }, 2000);
     }
   }, [state.message, setIsOpen, router]);
