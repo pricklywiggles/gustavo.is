@@ -22,10 +22,10 @@ export const pushSellersPacket = async (
   );
   const responseData = isJson(response) ? await response.json() : null;
 
-  console.log({ responseData });
+  console.log({ status: response.status, responseData });
 
   if (!response.ok) {
-    throw new Error(responseData?.errors?.[0] || 'Failed to sync data');
+    throw new Error(responseData?.error || 'Failed to sync data');
   }
 
   return responseData;

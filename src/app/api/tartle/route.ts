@@ -43,7 +43,7 @@ export async function GET(request: Request) {
     let data;
     try {
       data = await response.json();
-      setConfigValues({
+      await setConfigValues({
         token: data.access_token,
         refresh_token: data.refresh_token
       });

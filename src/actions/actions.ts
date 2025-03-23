@@ -63,6 +63,8 @@ export const getConfig = async () => {
     userId
   ])) as Settings[];
 
+  console.log('config', { result });
+
   if (!result[0]) {
     return {
       client_id: '',
