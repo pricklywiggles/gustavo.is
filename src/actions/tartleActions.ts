@@ -7,6 +7,8 @@ export const pushSellersPacket = async (
   data: any,
   packetId: string
 ) => {
+  await setConfigValues({ packet_id: packetId });
+
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_TARTLE_API_URI}/api/v5/packets/${packetId}/sellers_packets/push`,
     {

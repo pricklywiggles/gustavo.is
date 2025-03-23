@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
-import { get } from '@vercel/edge-config';
 import { getId } from '@/utils/fingerprint';
-import { Settings } from '@/types/common';
-import { setConfigValues } from '@/actions/actions';
+import { getConfig, setConfigValues } from '@/actions/actions';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -11,9 +9,9 @@ export async function GET(request: Request) {
 
   const testAppUserId = await getId(request.headers);
 
-  const config = (await get(testAppUserId, {
-    consistentRead: true
-  })) as Settings;
+  const config = await getConfig();
+
+  console.log({ config });
 
   const params = {
     code: authorizationCode,
