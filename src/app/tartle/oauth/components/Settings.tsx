@@ -21,12 +21,8 @@ export default function Settings({
   React.useEffect(() => {
     if (state.message === 'Settings updated successfully!') {
       setReloadMessage(true);
-      setTimeout(() => {
-        setIsOpen(false);
-        window.location.replace(
-          window.location.origin + '/tartle/oauth/connect'
-        );
-      }, 2000);
+      window.location.replace(window.location.origin + '/tartle/oauth/connect');
+      setIsOpen(false);
     }
   }, [state.message, setIsOpen, router]);
 

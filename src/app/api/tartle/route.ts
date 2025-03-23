@@ -54,7 +54,6 @@ export async function GET(request: Request) {
     console.log({ data });
 
     if (data) {
-      await wait(1000); // Wait for the edge config to be updated
       return NextResponse.redirect(new URL('/tartle/oauth/test', request.url));
     } else {
       return NextResponse.json({ error: 'No data' }, { status: 500 });
@@ -63,5 +62,3 @@ export async function GET(request: Request) {
 
   return NextResponse.json({ error: response.statusText }, { status: 500 });
 }
-
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
