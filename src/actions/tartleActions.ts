@@ -22,6 +22,8 @@ export const pushSellersPacket = async (
   );
   const responseData = isJson(response) ? await response.json() : null;
 
+  console.log({ responseData });
+
   if (!response.ok) {
     throw new Error(responseData?.errors?.[0] || 'Failed to sync data');
   }
