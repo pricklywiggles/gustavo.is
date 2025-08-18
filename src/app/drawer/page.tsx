@@ -10,11 +10,19 @@ const weebhooks = {
 const DrawerPage = () => {
   const [res, setRes] = useState<string>('');
 
-  const testWebhook = async (id: string) => {
+  const testWebhook = async (id: string, body?: Record<string, any>) => {
     setRes('Testing...');
-    const response = await fetch(weebhooks[id as keyof typeof weebhooks])
-      .then((res) => res.json())
-      .catch((err) => setRes(err.message));
+
+    if (body) {
+      const response = await fetch(weebhooks[id as keyof typeof weebhooks], {
+        method: 'POST',
+        body: JSON.stringify(body)
+      });
+    } else {
+      const response = await fetch(weebhooks[id as keyof typeof weebhooks])
+        .then((res) => res.json())
+        .catch((err) => setRes(err.message));
+    }
   };
 
   return (
@@ -24,7 +32,7 @@ const DrawerPage = () => {
           <button
             className='bg-blue-500 text-white px-4 py-2 rounded-md'
             onClick={() => {
-              testWebhook('n8n');
+              testWebhook('n8n', { branch: 'main' });
             }}
           >
             Test N8N Webhook
