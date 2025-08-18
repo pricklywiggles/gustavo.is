@@ -67,6 +67,10 @@ export default function Header() {
       'relative mx-auto sm:flex sm:justify-between sm:items-center max-w-7xl p-4';
   }
 
+  if (pathname?.indexOf('drawer') !== -1) {
+    return null;
+  }
+
   return (
     <header>
       <div>
