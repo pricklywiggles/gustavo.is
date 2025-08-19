@@ -11,15 +11,17 @@ export async function GET(request: Request) {
 
   try {
     const res = await fetch(`https://webhooks.whpl.sh/sleep`, {
-      method: 'POST',
+      method: 'GET',
       headers: {
-        Authorization: `Bearer ${process.env.WEBHOOKS_TOKEN}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${process.env.WEBHOOKS_TOKEN}`
       }
     });
 
     if (!res.ok) {
-      return NextResponse.json({ error: 'Failed to sleep' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Failed to sleep', status: res.status },
+        { status: 500 }
+      );
     }
   } catch (err) {
     return NextResponse.json({ error: err }, { status: 500 });
