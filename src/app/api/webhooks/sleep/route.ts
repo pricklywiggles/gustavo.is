@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     if (!res.ok) {
       return NextResponse.json(
         {
-          error: `Failed to sleep status: ${res.status} p: ${p} token: ${process.env.WEBHOOKS_TOKEN}`
+          error: `Failed to sleep status: ${res.status}`
         },
         { status: 500 }
       );
@@ -27,7 +27,7 @@ export async function GET(request: Request) {
   } catch (err) {
     return NextResponse.json(
       {
-        error: `Failed to sleep p: ${p} token: ${process.env.WEBHOOKS_TOKEN}`
+        error: `Failed to sleep`
       },
       { status: 500 }
     );
