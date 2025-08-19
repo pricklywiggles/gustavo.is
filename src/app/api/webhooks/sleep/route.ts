@@ -6,7 +6,7 @@ export async function GET(request: Request) {
   const p = searchParams.get('p');
 
   if (p !== process.env.SLEEP_PASSWORD) {
-    return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    return NextResponse.json({ error: `Invalid token ${p}` }, { status: 401 });
   }
 
   fetch(`https://webhooks.whpl.sh/sleep`, {
@@ -23,4 +23,6 @@ export async function GET(request: Request) {
     .catch((err) => {
       return NextResponse.json({ error: err.message }, { status: 500 });
     });
+
+  return NextResponse.json({ message: 'SUCCESS' }, { status: 200 });
 }
