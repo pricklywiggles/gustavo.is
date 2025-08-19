@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
-  //Grab the "p" url param
   const { searchParams } = new URL(request.url);
   const p = searchParams.get('p');
 
@@ -19,12 +18,19 @@ export async function GET(request: Request) {
 
     if (!res.ok) {
       return NextResponse.json(
-        { error: 'Failed to sleep', status: res.status },
+        {
+          error: `Failed to sleep status: ${res.status} p: ${p} token: ${process.env.WEBHOOKS_TOKEN}`
+        },
         { status: 500 }
       );
     }
   } catch (err) {
-    return NextResponse.json({ error: err }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: `Failed to sleep p: ${p} token: ${process.env.WEBHOOKS_TOKEN}`
+      },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({ message: 'SUCCESS' }, { status: 200 });
