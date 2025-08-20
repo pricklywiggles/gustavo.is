@@ -2,40 +2,63 @@
 
 import { useState } from 'react';
 
-const weebhooks = {
+const webhooks = {
   n8n: 'https://n8n.apps.lunamanor.com/webhook-test/a082bf1c-57a1-47fd-be87-442a59772525',
   github: 'https://apps.lunamanor.com/api/deploy/ue_xnzbUEy-UZSbIES5Ge'
 };
 
 const DrawerPage = () => {
   const [res, setRes] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
 
-  const testWebhook = async (id: string, body?: Record<string, any>) => {
+  const testWebhook = async (url: string, body?: Record<string, any>) => {
     setRes('Testing...');
     let response;
 
     if (body) {
-      response = fetch(weebhooks[id as keyof typeof weebhooks], {
+      response = fetch(url, {
         method: 'POST',
         body: JSON.stringify(body)
       });
     } else {
-      response = fetch(weebhooks[id as keyof typeof weebhooks]);
+      response = fetch(url);
     }
 
+    console.log('response', response);
+
     response
-      .then((res) => setRes(JSON.stringify(res.json())))
+      .then((res) => res.json())
+      .then((data) => {
+        setRes('error' in data ? data.error : JSON.stringify(data));
+      })
       .catch((err) => setRes(err.message));
   };
 
   return (
     <div className='w-full min-h-100vh'>
-      <div className='p-20 w-fit mx-auto'>
+      <div className='grid grid-cols-1 p-20 gap-4 w-fit mx-auto'>
         <div className='flex gap-2'>
           <button
             className='bg-blue-500 text-white px-4 py-2 rounded-md'
             onClick={() => {
-              testWebhook('n8n');
+              testWebhook(`/api/webhooks/sleep?p=${password}`);
+            }}
+          >
+            Test Sleep Webhook
+          </button>
+          <input
+            type='text'
+            placeholder='Password'
+            className='border-2 border-gray-300 p-2 rounded-md'
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        <div className='flex gap-2'>
+          <button
+            className='bg-blue-500 text-white px-4 py-2 rounded-md'
+            onClick={() => {
+              testWebhook(webhooks.n8n);
             }}
           >
             Test N8N Webhook
@@ -43,13 +66,13 @@ const DrawerPage = () => {
           <button
             className='bg-blue-500 text-white px-4 py-2 rounded-md'
             onClick={() => {
-              testWebhook('github', { branch: 'main' });
+              testWebhook(webhooks.github, { branch: 'main' });
             }}
           >
             Test Github Webhook
           </button>
         </div>
-        <div className='mt-4 border-2 border-gray-300 p-4 rounded-md'>
+        <div className=' border-2 border-gray-300 p-4 rounded-md'>
           <p>{res}</p>
         </div>
       </div>
