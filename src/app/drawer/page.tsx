@@ -24,12 +24,16 @@ const DrawerPage = () => {
       response = fetch(url);
     }
 
-    console.log('response', response);
-
     response
       .then((res) => res.json())
       .then((data) => {
-        setRes('error' in data ? data.error : JSON.stringify(data));
+        setRes(
+          'error' in data
+            ? data.error
+            : 'message' in data
+            ? data.message
+            : JSON.stringify(data)
+        );
       })
       .catch((err) => setRes(err.message));
   };
@@ -44,7 +48,7 @@ const DrawerPage = () => {
               testWebhook(`/api/webhooks/sleep?p=${password}`);
             }}
           >
-            Test Sleep Webhook
+            Nap
           </button>
           <input
             type='text'
