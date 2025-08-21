@@ -28,7 +28,7 @@ export const ContactSection: FComp = () => {
               <div className='mt-2'>
                 <p className='text-sm text-gray-600'>
                   I will get back to you as soon as possible, feel free to also
-                  reach out to me on LinkedIn, Twitter or GitHub
+                  reach out to me on LinkedIn, Twitter or GitHub!
                 </p>
               </div>
             </div>
