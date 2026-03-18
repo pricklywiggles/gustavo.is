@@ -1,10 +1,8 @@
-import Head from 'next/head';
 import '@/app/globals.css';
 import React from 'react';
 import { BeatingHeart } from '@/components/sprinkles';
 import { ContactSection, SocialSection } from '@/components/contact';
 import { ProfilePhoto } from '@/components/profile-photo';
-// import Sparkles from '@/components/sparkles';
 import Link from 'next/link';
 import { Projects } from '@/components/projects';
 import { buildStaticMetadata } from '@/utils/opengraph';
@@ -24,7 +22,7 @@ export default function Home() {
                 <span className='relative text-indigo-600'>
                   I&apos;m Gustavo
                   <span
-                    className={`${archia.variable} absolute -right-4 sm:-right-8 -bottom-0 tracking-tighter font-archia text-tiny text-gray-600 dark:text-gray-400`}
+                    className={`${archia.variable} absolute -right-4 sm:-right-8 bottom-0 tracking-tighter font-archia text-tiny text-gray-600 dark:text-gray-400`}
                   >
                     ..but you can call me goose
                   </span>
