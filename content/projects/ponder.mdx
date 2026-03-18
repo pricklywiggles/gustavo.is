@@ -1,0 +1,110 @@
+---
+title: "Ponder — A Group Blogging Platform"
+slug: ponder
+company: Ponder
+role: Co-founder & Lead Developer
+period: "2019–2021"
+stack:
+  - React
+  - GraphQL
+  - Neo4j
+  - Apollo Server
+  - Urql
+  - Vercel
+  - DigitalOcean
+  - Styled Components
+description: "A blogging platform focused on simplicity, aimed at people who wanted to publish a blog collaboratively."
+published: true
+---
+
+## Inception and Purpose
+
+Founded in early 2019 by [Kristen Pavle](http://twitter.com/khpavle), [Dave Gorum](https://twitter.com/davegorum) and me (Gustavo Gallegos), Ponder was a blogging platform focused on simplicity aimed at people that wanted to publish a blog collaboratively.
+
+We built a product where friends could create content together, have private discussions and publish their work to the web.
+
+We worked hard to design a product that would promote meaningful content and meaningful discussions as a small counterbalance to prevailing social media trends.
+
+## Lessons Learned
+
+### Utility is paramount
+
+Although finding my co-founders was not only unexpected but also quick, the process of distilling our purpose and ideas into a cohesive product plan took some time. Refining the market need and its proposed solution must happen as soon as humanly possible to begin testing your assumptions. The details of establishing a company and its principles can be a small side project or postponed in favor of small, incremental rounds of development to test utility in order to validate the product idea.
+
+### Ask for help and honor the need of being part of a community
+
+Being the only technical founder sometimes felt like a lonely affair, especially being the first time back as a developer after several years of working as a Technical Program Manager. Even the technologies I knew had changed drastically in just a few years (just look at javascript), not to mention the new ones like GraphQL and graph databases. As time passed I became more excited about what I was learning, but sometimes I felt there wasn't someone to effectively share that excitement with. Thankfully this led me to search out communities where I could not only to ask for learning help but also to share the way I felt in general, mostly in Discord groups (shout out to @kentcdodds). This helped me stay in touch with like-minded people I could learn from.
+
+### Be decisive when choosing a stack
+
+The good news about being the technology officer is that you get to call the shots about what tech to use, the bad news is having to face the tyranny of choice. I learned that you should time-box doing due diligence and research, get feedback from people you trust, make a decision and stick with it. It is very unlikely that the benefits of switching to a new framework, language, or tech once you've made significant progress will outweigh the compound gains of having learned your original choice. **Consistency and mastery trump perfection.**
+
+### Be open to change
+
+Situations change. My understanding of situations also changes, I must always be open to change my assumptions of what the product should be based on the available evidence. At times it was difficult to change course when it involved the loss of work that was already done, especially because development time was our most needed resource. I learned to analyze the data at hand and course correct to the reality that it presents, no matter the sunk costs.
+
+### Open communication is essential
+
+2019–2020 in hindsight was not the best time to start a company (understatement of the year). Even though remote collaboration has come a long way, prior to the pandemic it was easy to get together with my partners and hash out big ideas and lay out a direction and plan of action, course correcting as we went. Even small amounts of face to face interaction quickly became impossible come 2020. I learned for a team to charge ahead in the same direction at such an early stage, everyone must be frank about not only their technical challenges but their emotional state and personal relationship with work. When building a company with others, it's important to help people understand how you feel about the work and how they can help you make things better.
+
+### Continuously learn with clear direction informed by excitement
+
+I've never learned so many things and applied them in such a short period of time. I learned you have to start before you feel confident, and incrementally refactor as you learn more. When looking at old code I learned to stop cringing and instead thank myself for having taken that first step. I learned that learning itself is addictive so it must be done with focus and direction towards a goal or it can become an obstacle to producing results. Finally, I learned that I must factor in excitement as a compass to help guide me on what areas to focus, making the work feel more like **play**.
+
+## Technologies and Integrations
+
+<TechStack items={["React", "Urql", "Neo4j Aura", "Apollo GraphQL Server", "Vercel", "DigitalOcean", "Styled Components"]} />
+
+- **React** — SPA bundled with Parcel, modern hook-based architecture
+- **Urql** — Lightweight GraphQL client with normalized cache, homegrown auth exchange, and subscriptions for real-time notifications
+- **Neo4j Aura** — Graph database with Cypher resolvers for complex queries and Cypher GraphQL directives for simple queries
+- **Apollo GraphQL Server** — JWT auth with expiration/refresh, authentication directives, PubSub subscriptions
+- **Vercel** — SPA client deployment, utility lambda functions, domain management
+- **DigitalOcean** — GraphQL server hosting, production/development/staging environments, S3-compatible storage
+- **Integrations** — Postmark (email), Segment (analytics), Unsplash (photos), Sentry (exceptions)
+
+## Feature Showcase
+
+### Editor
+
+<Video src="https://player.vimeo.com/video/482506828" title="Ponder Editor Walkthrough" />
+
+- Chatlog-style blog post authoring
+- Optimistic updates with continuous auto-save
+- Independent inputs can be reordered, edited or deleted
+- Images via file upload or drag and drop, stored in DigitalOcean Spaces
+
+### Conversations
+
+<Video src="https://player.vimeo.com/video/482506771" title="Ponder Conversations" />
+
+- One-on-one conversations for more meaningful discussions
+- Private to the group — conversations are not published to the blog
+- Real-time in-app notifications powered by GraphQL subscriptions
+- Email notifications via PostMark
+
+### Collections
+
+<Video src="https://player.vimeo.com/video/482505654" title="Ponder Collections" />
+
+- Organize content by adding posts to collections shared with all members
+- Personalize collections with cover image and metadata
+- Assign unique URLs to collection feeds
+
+### Groups
+
+<Video src="https://player.vimeo.com/video/482507258" title="Ponder Groups" />
+
+- Create up to 10 different blogs with any number of members
+- Each blog is private and isolated with its own members
+- Privacy-first: different identity per blog with seamless context switching
+- Owner can assign and revoke admin privileges
+- Pinnable announcements for member feeds
+
+### Publishing
+
+<Video src="https://player.vimeo.com/video/482507338" title="Ponder Publishing" />
+
+- Published content available at personalized ponder.to/[blog] URLs
+- Customizable moods (color themes, layout, font and styling presets)
+- Public blog site is a separate SSR Next.js application

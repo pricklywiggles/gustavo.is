@@ -34,12 +34,14 @@
     "react-hook-form": "^7.45.0",
     "server-only": "^0.0.1",
     "tailwindcss": "4.2.2",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "velite": "^0.3.1"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
       "unrs-resolver",
-      "sharp"
+      "sharp",
+      "esbuild"
     ]
   },
   "devDependencies": {
