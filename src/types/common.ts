@@ -5,4 +5,4 @@ export type Props<T> = {
   children?: React.ReactNode;
 } & T;
 
-export type FComp<T = {}> = (props: Props<T>) => JSX.Element;
+export type FComp<T = {}> = (props: Props<T>) => React.JSX.Element;

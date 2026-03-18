@@ -104,7 +104,7 @@ export default function Header() {
               </div>
               <div className='fixed top-0 right-0 z-10 sm:hidden m-6'>
                 <button
-                  className='block bg-lt-bg-8 dark:bg-dk-bg-8 rounded-full dark:focus:text-dk-primary dark:hover:text-dk-primary focus:outline-none'
+                  className='block bg-lt-bg-8 dark:bg-dk-bg-8 rounded-full dark:focus:text-dk-primary dark:hover:text-dk-primary focus:outline-hidden'
                   onClick={toggleMenuOpen}
                   type='button'
                   aria-label='open menu'
@@ -153,7 +153,7 @@ export default function Header() {
               />
               <button
                 onClick={toggleTheme}
-                className='ml-3 mb-10 sm:mb-0 h-8 w-8 border  border-transparent shadow-sm text-md sm:text-sm active:animate-font-bounce rounded-full hover:ring-1 hover:ring-offset-2 hover:ring-accentlight dark:hover:ring-accentdark hover:border-dotted focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-accentlight dark:focus:ring-accentdark'
+                className='ml-3 mb-10 sm:mb-0 h-8 w-8 border  border-transparent shadow-xs text-md sm:text-sm active:animate-font-bounce rounded-full hover:ring-1 hover:ring-offset-2 hover:ring-accentlight dark:hover:ring-accentdark hover:border-dotted focus:outline-hidden focus:ring-1 focus:ring-offset-2 focus:ring-accentlight dark:focus:ring-accentdark'
                 type='button'
               >
                 {isLoaded ? (

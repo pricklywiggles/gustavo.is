@@ -20,7 +20,7 @@ export const TechnologyCard: FComp<TechnologyCardProps> = ({
   const logo = logos[id as keyof typeof logos];
   return (
     <div className="">
-      <div className="relative bg-cyan-400 p-4 z-10 border-1 border-gray-500 shadow-lg w-min rounded-full">
+      <div className="relative bg-cyan-400 p-4 z-10 border border-gray-500 shadow-lg w-min rounded-full">
         {logo ? (
           React.createElement(logo.component, {
             className: `w-14 h-14 ${
