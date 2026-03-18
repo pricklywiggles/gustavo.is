@@ -15,8 +15,8 @@ const NavLink: FComp<NavLinkProps> = ({ href, className, children }) => {
   }
 
   return (
-    <Link href={href} legacyBehavior>
-      <a className={className}>{children}</a>
+    <Link href={href} className={className}>
+      {children}
     </Link>
   );
 };

@@ -51,7 +51,7 @@ export const ProjectCard: FComp<ProjectCardProps> = ({
         </div>
         <div className="flex p-2 flex-col justify-around border-l sm:border-l-0 sm:border-t border-dk-bg-400 px-2 text-center w-48 h-48">
           <div className="self-center">
-            <div className=" text-md font-semibold border-2 border-lt-bg-darker bg-lt-bg-lighter px-2 uppercase mt-0 sm:-mt-10 rounded-full shadow-sm">
+            <div className=" text-md font-semibold border-2 border-lt-bg-darker bg-lt-bg-lighter px-2 uppercase mt-0 sm:-mt-10 rounded-full shadow-xs">
               {title}
             </div>
           </div>

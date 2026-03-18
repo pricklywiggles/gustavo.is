@@ -1,139 +1,479 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-:root {
-  --measure: 60ch;
-  --coolGray-900-rgb: 17, 24, 39;
-  --gray-900-rgb: 24, 24, 27;
-  --cyan-100-rgb: 207, 250, 254;
-  --cyan-200-rgb: 165, 243, 252;
-  --gray-200-rgb: 228, 228, 231;
+@custom-variant dark (&:is(.dark *));
 
-  --bgcolor-dark-rgb: var(--gray-900-rgb);
-  --bgcolor-light-hsl: 223, 74%, 92%;
-  --bgcolor-light-rgb: var(--gray-200-rgb);
+@theme {
+  --shadow-well: 0 2px 0 hsla(0, 0%, 100%, 0.15);
 
-  --invert: invert(0);
-  --blur: blur(0px);
+  --text-tiny: 0.6rem;
+  --text-tiny--letter-spacing: 0em;
+  --text-tiny--line-height: 1rem;
+
+  --font-sans: var(--font-wotfard);
+  --font-archia: var(--font-archia);
+  --font-quirky: var(--font-indie-flower);
+  --font-mono:
+    var(--font-basier-mono), ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, 'Liberation Mono', 'Courier New', monospace;
+  --font-code: var(--font-basier-mono);
+
+  --scale-90: 0.9;
+  --scale-101: 1.01;
+
+  --fill-blue: #1e40af;
+
+  --color-cyan-50: #ecfeff;
+  --color-cyan-100: #cffafe;
+  --color-cyan-200: #a5f3fc;
+  --color-cyan-300: #67e8f9;
+  --color-cyan-400: #22d3ee;
+  --color-cyan-500: #06b6d4;
+  --color-cyan-600: #0891b2;
+  --color-cyan-700: #0e7490;
+  --color-cyan-800: #155e75;
+  --color-cyan-900: #164e63;
+  --color-cyan-950: #083344;
+
+  --color-yellow-50: #fefce8;
+  --color-yellow-100: #fef9c3;
+  --color-yellow-200: #fef08a;
+  --color-yellow-300: #fde047;
+  --color-yellow-400: #facc15;
+  --color-yellow-500: #eab308;
+  --color-yellow-600: #ca8a04;
+  --color-yellow-700: #a16207;
+  --color-yellow-800: #854d0e;
+  --color-yellow-900: #713f12;
+  --color-yellow-950: #422006;
+
+  --color-coolGray-50: #f9fafb;
+  --color-coolGray-100: #f3f4f6;
+  --color-coolGray-200: #e5e7eb;
+  --color-coolGray-300: #d1d5db;
+  --color-coolGray-400: #9ca3af;
+  --color-coolGray-500: #6b7280;
+  --color-coolGray-600: #4b5563;
+  --color-coolGray-700: #374151;
+  --color-coolGray-800: #1f2937;
+  --color-coolGray-900: #111827;
+  --color-coolGray-950: #030712;
+
+  --color-blueGray-50: #f8fafc;
+  --color-blueGray-100: #f1f5f9;
+  --color-blueGray-200: #e2e8f0;
+  --color-blueGray-300: #cbd5e1;
+  --color-blueGray-400: #94a3b8;
+  --color-blueGray-500: #64748b;
+  --color-blueGray-600: #475569;
+  --color-blueGray-700: #334155;
+  --color-blueGray-800: #1e293b;
+  --color-blueGray-900: #0f172a;
+  --color-blueGray-950: #020617;
+
+  --color-lt-primary-50: #eef2ff;
+  --color-lt-primary-100: #e0e7ff;
+  --color-lt-primary-200: #c7d2fe;
+  --color-lt-primary-300: #a5b4fc;
+  --color-lt-primary-400: #818cf8;
+  --color-lt-primary-500: #6366f1;
+  --color-lt-primary-600: #4f46e5;
+  --color-lt-primary-700: #4338ca;
+  --color-lt-primary-800: #3730a3;
+  --color-lt-primary-900: #312e81;
+  --color-lt-primary-950: #1e1b4b;
+  --color-lt-primary-lightest: #818cf8;
+  --color-lt-primary-lighter: #6366f1;
+  --color-lt-primary: #4f46e5;
+  --color-lt-primary-darker: #4338ca;
+  --color-lt-primary-darkest: #3730a3;
+
+  --color-lt-bg-8: rgba(228, 228, 231, 0.8);
+  --color-lt-bg-50: #f9fafb;
+  --color-lt-bg-100: #f3f4f6;
+  --color-lt-bg-200: #e5e7eb;
+  --color-lt-bg-300: #d1d5db;
+  --color-lt-bg-400: #9ca3af;
+  --color-lt-bg-500: #6b7280;
+  --color-lt-bg-600: #4b5563;
+  --color-lt-bg-700: #374151;
+  --color-lt-bg-800: #1f2937;
+  --color-lt-bg-900: #111827;
+  --color-lt-bg-950: #030712;
+  --color-lt-bg-lightest: #f9fafb;
+  --color-lt-bg-lighter: #f3f4f6;
+  --color-lt-bg: hsla(219, 83%, 92%, 100%);
+  --color-lt-bg-darker: #d1d5db;
+  --color-lt-bg-darkest: #9ca3af;
+
+  --color-lt-accent-50: #eef2ff;
+  --color-lt-accent-100: #e0e7ff;
+  --color-lt-accent-200: #c7d2fe;
+  --color-lt-accent-300: #a5b4fc;
+  --color-lt-accent-400: #818cf8;
+  --color-lt-accent-500: #6366f1;
+  --color-lt-accent-600: #4f46e5;
+  --color-lt-accent-700: #4338ca;
+  --color-lt-accent-800: #3730a3;
+  --color-lt-accent-900: #312e81;
+  --color-lt-accent-950: #1e1b4b;
+  --color-lt-accent: #155e75;
+
+  --color-error-50: #fef2f2;
+  --color-error-100: #fee2e2;
+  --color-error-200: #fecaca;
+  --color-error-300: #fca5a5;
+  --color-error-400: #f87171;
+  --color-error-500: #ef4444;
+  --color-error-600: #dc2626;
+  --color-error-700: #b91c1c;
+  --color-error-800: #991b1b;
+  --color-error-900: #7f1d1d;
+  --color-error-950: #450a0a;
+  --color-error: #ef4444;
+
+  --color-dk-primary-50: #eef2ff;
+  --color-dk-primary-100: #e0e7ff;
+  --color-dk-primary-200: #c7d2fe;
+  --color-dk-primary-300: #a5b4fc;
+  --color-dk-primary-400: #818cf8;
+  --color-dk-primary-500: #6366f1;
+  --color-dk-primary-600: #4f46e5;
+  --color-dk-primary-700: #4338ca;
+  --color-dk-primary-800: #3730a3;
+  --color-dk-primary-900: #312e81;
+  --color-dk-primary-950: #1e1b4b;
+  --color-dk-primary-lightest: #818cf8;
+  --color-dk-primary-lighter: #6366f1;
+  --color-dk-primary: #4f46e5;
+  --color-dk-primary-darker: #4338ca;
+  --color-dk-primary-darkest: #3730a3;
+
+  --color-dk-bg-0: rgba(24, 25, 28, 0);
+  --color-dk-bg-8: rgba(24, 25, 28, 0.8);
+  --color-dk-bg-50: #f9fafb;
+  --color-dk-bg-100: #f3f4f6;
+  --color-dk-bg-200: #e5e7eb;
+  --color-dk-bg-300: #d1d5db;
+  --color-dk-bg-400: #9ca3af;
+  --color-dk-bg-500: #6b7280;
+  --color-dk-bg-600: #4b5563;
+  --color-dk-bg-700: #374151;
+  --color-dk-bg-800: #1f2937;
+  --color-dk-bg-900: #111827;
+  --color-dk-bg-950: #030712;
+  --color-dk-bg-1000: rgb(18, 18, 18);
+  --color-dk-bg-lightest: #374151;
+  --color-dk-bg-lighter: #1f2937;
+  --color-dk-bg: #111827;
+  --color-dk-bg-darker: rgb(18, 18, 18);
+  --color-dk-bg-darkest: rgb(0, 0, 0);
+
+  --color-dk-accent-50: #fefce8;
+  --color-dk-accent-100: #fef9c3;
+  --color-dk-accent-200: #fef08a;
+  --color-dk-accent-300: #fde047;
+  --color-dk-accent-400: #facc15;
+  --color-dk-accent-500: #eab308;
+  --color-dk-accent-600: #ca8a04;
+  --color-dk-accent-700: #a16207;
+  --color-dk-accent-800: #854d0e;
+  --color-dk-accent-900: #713f12;
+  --color-dk-accent-950: #422006;
+  --color-dk-accent: #fef08a;
+
+  --color-primary: #f6f1ed;
+
+  --color-accentdark-50: #fefce8;
+  --color-accentdark-100: #fef9c3;
+  --color-accentdark-200: #fef08a;
+  --color-accentdark-300: #fde047;
+  --color-accentdark-400: #facc15;
+  --color-accentdark-500: #eab308;
+  --color-accentdark-600: #ca8a04;
+  --color-accentdark-700: #a16207;
+  --color-accentdark-800: #854d0e;
+  --color-accentdark-900: #713f12;
+  --color-accentdark-950: #422006;
+  --color-accentdark: #fef08a;
+
+  --color-accentlight-50: #eef2ff;
+  --color-accentlight-100: #e0e7ff;
+  --color-accentlight-200: #c7d2fe;
+  --color-accentlight-300: #a5b4fc;
+  --color-accentlight-400: #818cf8;
+  --color-accentlight-500: #6366f1;
+  --color-accentlight-600: #4f46e5;
+  --color-accentlight-700: #4338ca;
+  --color-accentlight-800: #3730a3;
+  --color-accentlight-900: #312e81;
+  --color-accentlight-950: #1e1b4b;
+  --color-accentlight: #312e81;
+
+  --color-zIndex--10: -10;
+
+  --ease-boing: cubic-bezier(0.77, 0, 0.175, 1);
+
+  --animate-typewrite:
+    typewrite 4s steps(29) 1s 1 normal both, blink 600ms steps(29) infinite;
+  --animate-blinky: blink 600ms steps(29) infinite;
+  --animate-font-bounce: font-bounce 0.5s 0s cubic-bezier(0.18, 1.06, 0.6, 0.95)
+    none;
+  --animate-font-beat: font-bounce-small 1s 0s
+    cubic-bezier(0.18, 1.06, 0.6, 0.95) infinite;
+  --animate-scroll-lg: scroll-lg 35s linear infinite;
+  --animate-beat: beat 1s 0s cubic-bezier(0.18, 1.06, 0.6, 0.95) infinite;
+  --animate-hero-scroll: hero-scroll 35s linear infinite;
+  --animate-concept-scroll: concept-scroll 240s linear infinite;
+  --animate-fade-in: fade-in 0.5s ease-in forwards;
+
+  --max-width-measure: var(--measure);
+
+  --background-image-concept-doodle: url('/hero-pattern-lg.png');
+  --background-image-ponder-hero: url('/ponder-hero.png');
+  --background-image-ponder-blogs-hero: url('/ponder-blogs-hero.png');
+  --background-image-concept-positive: url('/concept-positive.png');
+  --background-image-concept-negative: url('/concept-negative.png');
+  --background-image-concept-positive-bw: url('/concept-positive-bw.png');
+
+  --background-size-hero: 800px auto;
+
+  @keyframes typewrite {
+    from {
+      width: 0%;
+    }
+    to {
+      width: 100%;
+    }
+  }
+  @keyframes blink {
+    from {
+      border-right: 2px solid;
+      border-color: darkgray;
+    }
+    to {
+      border-right: 2px solid transparent;
+    }
+  }
+  @keyframes font-bounce {
+    0%,
+    100% {
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+    }
+    50% {
+      font-size: 1.875rem;
+      line-height: 2.25rem;
+    }
+  }
+  @keyframes font-accent {
+    0%,
+    100% {
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+    }
+    50% {
+      font-size: 1.875rem;
+      line-height: 2.25rem;
+    }
+  }
+  @keyframes font-bounce-small {
+    0%,
+    100% {
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+    }
+    50% {
+      font-size: 1.25rem;
+      line-height: 1.75rem;
+    }
+  }
+  @keyframes scroll-lg {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(-1278px);
+    }
+  }
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @keyframes beat {
+    0% {
+      transform: scale(1.2);
+    }
+    100% {
+      transform: scale(0.8);
+    }
+  }
+  @keyframes hero-scroll {
+    0% {
+      transform: rotate(-13deg) translateY(0);
+    }
+    100% {
+      transform: rotate(-13deg) translateY(-1278px);
+    }
+  }
+  @keyframes concept-scroll {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(-3853px);
+    }
+  }
 }
 
-@layer utilities {
-  .bg-blur-20 {
-    backdrop-filter: blur(20px);
-  }
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
 
-  .bg-blur-50 {
-    backdrop-filter: blur(50px);
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
   }
+}
 
-  .bg-blur-0 {
-    backdrop-filter: none;
-  }
-  .dark-gradient {
-    background: linear-gradient(
-      to bottom,
-      rgb(var(--bgcolor-dark-rgb)),
-      rgb(var(--bgcolor-dark-rgb)),
-      rgb(var(--bgcolor-dark-rgb)),
-      rgba(var(--bgcolor-dark-rgb), 0)
-    );
-  }
+@utility bg-blur-20 {
+  backdrop-filter: blur(20px);
+}
 
-  .link {
-    @apply font-semibold border-b-4 border-indigo-500 text-indigo-500 hover:border-indigo-600 hover:text-indigo-600;
-  }
+@utility bg-blur-50 {
+  backdrop-filter: blur(50px);
+}
 
-  .invert-0 {
-    filter: invert(0%);
-  }
-  .invert-50 {
-    filter: invert(50%);
-  }
+@utility bg-blur-0 {
+  backdrop-filter: none;
+}
 
-  .invert-80 {
-    --invert: invert(80%);
-  }
+@utility dark-gradient {
+  background: linear-gradient(
+    to bottom,
+    rgb(var(--bgcolor-dark-rgb)),
+    rgb(var(--bgcolor-dark-rgb)),
+    rgb(var(--bgcolor-dark-rgb)),
+    rgba(var(--bgcolor-dark-rgb), 0)
+  );
+}
 
-  .blur-10 {
-    --blur: blur(10px);
-  }
+@utility link {
+  @apply font-semibold border-b-4 border-indigo-500 text-indigo-500 hover:border-indigo-600 hover:text-indigo-600;
+}
 
-  .blur-1 {
-    --blur: blur(1px);
-  }
+@utility invert-0 {
+  filter: invert(0%);
+}
 
-  .blur-5 {
-    --blur: blur(5px);
-  }
+@utility invert-50 {
+  filter: invert(50%);
+}
 
-  .filter {
-    filter: var(--invert) var(--blur);
-  }
+@utility invert-80 {
+  --invert: invert(80%);
+}
 
-  .well-shadow {
-    box-shadow: inset 0 2px 2px rgb(0, 0, 0, 0.4),
-      0 2px 0 rgb(255, 255, 255, 0.4);
-  }
+@utility blur-10 {
+  --blur: blur(10px);
+}
 
-  .aspect-ratio-none {
-    padding-bottom: 0;
-  }
-  .aspect-ratio-square {
-    padding-bottom: 100%;
-  }
-  .aspect-ratio-16\/9 {
-    padding-bottom: 56.25%;
-  }
-  .aspect-ratio-4\/3 {
-    padding-bottom: 75%;
-  }
-  .aspect-ratio-21\/9 {
-    padding-bottom: 42.86%;
-  }
+@utility blur-1 {
+  --blur: blur(1px);
+}
 
-  .light-gradient {
-    background: linear-gradient(
-      to bottom,
-      hsl(var(--bgcolor-light-hsl)),
-      hsl(var(--bgcolor-light-hsl)),
-      hsl(var(--bgcolor-light-hsl)),
-      hsla(var(--bgcolor-light-hsl), 0)
-    );
-  }
+@utility blur-5 {
+  --blur: blur(5px);
+}
 
-  .box {
-    @apply block p-5;
-  }
+@utility filter {
+  filter: var(--invert) var(--blur);
+}
 
+@utility well-shadow {
+  box-shadow:
+    inset 0 2px 2px rgb(0, 0, 0, 0.4),
+    0 2px 0 rgb(255, 255, 255, 0.4);
+}
+
+@utility aspect-ratio-none {
+  padding-bottom: 0;
+}
+
+@utility aspect-ratio-square {
+  padding-bottom: 100%;
+}
+
+@utility aspect-ratio-16/9 {
+  padding-bottom: 56.25%;
+}
+
+@utility aspect-ratio-4/3 {
+  padding-bottom: 75%;
+}
+
+@utility aspect-ratio-21/9 {
+  padding-bottom: 42.86%;
+}
+
+@utility light-gradient {
+  background: linear-gradient(
+    to bottom,
+    hsl(var(--bgcolor-light-hsl)),
+    hsl(var(--bgcolor-light-hsl)),
+    hsl(var(--bgcolor-light-hsl)),
+    hsla(var(--bgcolor-light-hsl), 0)
+  );
+}
+
+@utility box {
+  @apply block p-5;
+}
+
+@utility sts-10 {
   /* Some css var trickery to make every-layout stacks */
-  .sts-10 {
-    --space: theme('spacing.10');
-  }
+  --space: --spacing(10);
+}
 
-  .stack {
-    @apply flex flex-col justify-items-start;
-  }
-  .stack > * {
+@utility stack {
+  @apply flex flex-col justify-items-start;
+  & > * {
     margin-top: 0;
     margin-bottom: 0;
   }
-  .stack > * + * {
+  & > * + * {
     margin-top: var(--space);
   }
+}
 
+@utility current-link {
   /* decoration for current navlink */
-  a.current-link:hover {
+  &a:hover {
     cursor: default;
   }
 
-  .current-link::before {
+  &::before {
     content: '\2022';
     position: absolute;
     margin-left: -0.6em;
   }
+}
 
-  .card-logo::after {
+@utility card-logo {
+  &::after {
     display: block;
     content: '';
     position: absolute;
@@ -151,14 +491,32 @@
     opacity: 0.52;
     transition: transform 0.65s cubic-bezier(0.18, 0.9, 0.58, 1);
   }
+}
 
-  .card-logo-hover::after {
+@utility card-logo-hover {
+  &::after {
     transform: translate(-50%, -40%);
   }
+}
 
-  .transition-fill {
-    transition: fill 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  }
+@utility transition-fill {
+  transition: fill 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:root {
+  --measure: 60ch;
+  --coolGray-900-rgb: 17, 24, 39;
+  --gray-900-rgb: 24, 24, 27;
+  --cyan-100-rgb: 207, 250, 254;
+  --cyan-200-rgb: 165, 243, 252;
+  --gray-200-rgb: 228, 228, 231;
+
+  --bgcolor-dark-rgb: var(--gray-900-rgb);
+  --bgcolor-light-hsl: 223, 74%, 92%;
+  --bgcolor-light-rgb: var(--gray-200-rgb);
+
+  --invert: invert(0);
+  --blur: blur(0px);
 }
 
 body[data-bgtransition='loaded'] {

@@ -196,7 +196,7 @@ export const ContactForm: FComp<ContactFormProps> = ({
               type='submit'
               className={`flex items-center justify-center ${
                 isDialog ? 'w-full py-2 mt-4' : 'py-3 ml-auto px-6 -mb-2'
-              } border border-transparent text-base shadow-md font-medium rounded-md text-white bg-lt-primary active:shadow-sm hover:bg-lt-primary-darker focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lt-primary-lighter`}
+              } border border-transparent text-base shadow-md font-medium rounded-md text-white bg-lt-primary active:shadow-xs hover:bg-lt-primary-darker focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-lt-primary-lighter`}
             >
               <EnvelopeIcon className='h-5 mr-1' />
               Send

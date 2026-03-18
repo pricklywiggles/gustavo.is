@@ -9,9 +9,9 @@ type ContactData = {
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-let client: postmark.ServerClient;
-if (isProduction)
-  client = new postmark.ServerClient(process.env.POSTMARK_API_TOKEN || '');
+function getClient() {
+  return new postmark.ServerClient(process.env.POSTMARK_API_TOKEN || '');
+}
 
 export async function POST(req: NextRequest) {
   if (isProduction) {
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Invalid Email' }, { status: 400 });
     } else {
       try {
-        await client.sendEmail({
+        await getClient().sendEmail({
           From: process.env.POSTMARK_SENDER || '',
           To: process.env.POSTMARK_RECIPIENT,
           Subject: 'Gustavo.is CONTACT FORM',
