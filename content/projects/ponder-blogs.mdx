@@ -1,0 +1,77 @@
+---
+title: "Ponder Blogs — A Public Blog Destination"
+slug: ponder-blogs
+company: Ponder
+role: Co-founder & Lead Developer
+period: "2019–2021"
+stack:
+  - Next.js
+  - Apollo GraphQL Server
+  - Neo4j
+  - Styled Components
+  - Vercel
+description: "A destination site where anyone could read the public content authored with Ponder, powered by SSR and SSG for blazing fast load times."
+published: true
+---
+
+## Inception and Purpose
+
+Ponder Blogs was a destination site where anyone could read the public content authored with Ponder.
+
+Powered by Next.js, Ponder Blogs was a mixture of SSR (server side rendered) and SSG (statically generated) content, making it blazingly fast while still allowing for dynamic elements and instant publishing as well as advanced features like allowing authors to choose theme and layout variations.
+
+I was in charge of development, while the beautiful design was the work of my co-founder [Dave Gorum](https://twitter.com/davegorum).
+
+## Lessons Learned
+
+### Cutting edge technologies are not always the best solution
+
+Perhaps this is better explained through example: Next.js is an amazing framework. After writing the Ponder client in standalone React, writing the blogs site with Next.js was a revelation. It allowed me to build fast and focus on the important aspects of the product. As we were beginning to build, Next released a new feature called Incremental Static Regeneration (ISR), which did on-the-fly static site generation at request time instead of compile time. It was way faster than SSR, worked like magic and had minimal setup. Unfortunately our feature-set included the ability for authors to change the theme of their site, and there was no way of making that feature "feel" right with ISR, since one couldn't invalidate the existing cache across all the blog's pages at once. It was a painful but right decision to use SSR instead no matter how much better ISR was in every other respect.
+
+### Don't let the ideal be the enemy of the good
+
+In a way I think both me and Dave (co-founder) really like polished experiences (in design and code respectively). This being our company and it being a startup we learned that good and working is better than perfect and under development. This also led me to develop better practices for incremental refactoring.
+
+### Incremental refactoring is almost always better than rewrites
+
+The drive to rewrite something is especially strong when you are new at something. You're learning so much so fast that pretty soon you realize you could've done things so much better. This feeling felt like a trap — what is paramount is results in the form of having a working product. However, I got much better at achieving the same result by instead doing incremental refactoring which helped me keep the speed of development while also increasing stability.
+
+### Code clarity through consistency is better than perfection
+
+Even in a development team of one I sometimes faced the issue of wanting to change the way I did something, either stylistically or syntactically, because I learned new things or people showed me better ways of expressing things. When you're iterating fast though, I found 99% of the time it's better to stick to a correct (if not perfect) set of rules, have a linter enforce them and just forget about it.
+
+### As time spent working grows, so should my mindfulness practice
+
+Last but probably the most valuable lesson for me was that it is not enough for me to maintain my mindfulness practice as my work volume fluctuates — it is imperative that my practice grows proportional to it. There's a certain momentum (what I've heard being referred to as "codebrain") that my mind builds when programming that if left unchecked will continue on and bleed into the rest of my day (or most often, night), resulting in a too active mind, less clarity and less sleep, in turn affecting the work. Ironically, I've found it's especially necessary for me to do this when the work is the most fun. I learned to stop frequently and take some time to meditate, then go back to work or go back about my day.
+
+## Technologies and Integrations
+
+<TechStack items={["Next.js", "Apollo GraphQL Server", "Neo4j Aura", "Styled Components", "Vercel"]} />
+
+- **Next.js** — Server side rendering for speedy yet up-to-date member content, static site generation for non-dynamic content, OpenGraph metadata for social media unfurling
+- **Apollo GraphQL Server** — Fully directive-based model for Cypher queries with no explicit resolvers, shared codebase from Ponder client but separate schema ensures privacy of non-published data
+- **Neo4j Aura** — Graph database with optimized indexes for speedy blogs data retrieval
+- **Styled Components** — CSS-in-JS powers customized author-side "moods" (themes)
+- **Vercel** — Native Next.js deployment, lambda function for waitlist signup, domain management
+
+## Feature Showcase
+
+### Walkthrough
+
+<Video src="https://player.vimeo.com/video/484970796" title="Ponder Blogs Walkthrough" />
+
+- Simple and elegant design by Dave Gorum to showcase content from Ponder communities
+- Blazing fast load times thanks to SSR/SSG
+- Chronological, collection-based and member-based content streams per blog
+- Personalized blog info page
+- Personalized member profiles
+- Built-in high-fidelity OpenGraph metadata for beautiful social media unfurls
+
+### Customization
+
+<Video src="https://player.vimeo.com/video/482506771" title="Ponder Blogs Customization" />
+
+- Customize your blog's color palette with Moods
+- Personalize your typeface with font family presets
+- Preset layout options
+- Show the world what your group blog is all about through taglines, description, logos and special link
