@@ -53,7 +53,7 @@ const GROUND_TOPS = {
   g4: 83.4,   // +11.1% (leaves 16.6% visible to bottom)
 }
 
-// Character height in px — adjust if proportions look off
+// Character dimensions — desktop size (mobile is 35% smaller, set in className below)
 const CHARACTER_HEIGHT = 400
 const CHARACTER_WIDTH = 200
 
@@ -166,16 +166,11 @@ export function ParallaxHero() {
           style={{ top: `${GROUND_TOPS.g4}%`, height: '200%', background: COLORS.ground4 }}
         />
 
-        {/* ── Lego character ──────────────────────────── */}
-        {/* Positioned so feet land exactly on the top edge of ground band 1 */}
+        {/* Feet anchored to g3 top edge via bottom positioning — no pixel calc needed */}
         <div
           data-parallax={PARALLAX.character}
-          className="absolute"
-          style={{
-            // top edge at (g3_top - character height) so feet land on g3's top edge
-            top: `calc(${GROUND_TOPS.g3}% - ${CHARACTER_HEIGHT}px + 40px)`,
-            left: '4%',
-          }}
+          className="absolute left-[4%]"
+          style={{ bottom: `${100 - GROUND_TOPS.g3}%` }}
         >
           <Image
             src="/lego-hero.png"
@@ -183,7 +178,7 @@ export function ParallaxHero() {
             width={CHARACTER_WIDTH}
             height={CHARACTER_HEIGHT}
             priority
-            className="object-contain"
+            className="object-contain object-bottom w-32.5 h-65 sm:w-50 sm:h-100"
           />
         </div>
       </div>
