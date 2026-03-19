@@ -57,13 +57,21 @@ const GROUND_TOPS = {
 const CHARACTER_HEIGHT = 400
 const CHARACTER_WIDTH = 200
 
+// Scroll progress (0–1) at which all ground bands have collapsed to the horizon.
+// = (g4_initial% - HORIZON_PCT%) / (ground4_factor * 100%) = 23.4 / 45 ≈ 0.52
+const CONVERGENCE_PROGRESS = 0.55
+
+// Scale the character shrinks to after convergence (tune freely)
+const SHRINK_SCALE = 0.001
+
 export function ParallaxHero() {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<HTMLDivElement>(null)
+  const characterRef = useRef<HTMLDivElement>(null)
 
   useGSAP(
     () => {
-      if (!wrapperRef.current || !sceneRef.current) return
+      if (!wrapperRef.current || !sceneRef.current || !characterRef.current) return
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
       const vh = window.innerHeight
@@ -85,6 +93,19 @@ export function ParallaxHero() {
             },
           })
         })
+
+      // After convergence: shrink character toward the horizon, feet and left edge stay fixed.
+      gsap.set(characterRef.current, { transformOrigin: 'bottom left' })
+      gsap.to(characterRef.current, {
+        scale: SHRINK_SCALE,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: wrapperRef.current,
+          start: `top+=${CONVERGENCE_PROGRESS * vh} top`,
+          end: 'bottom 55%',
+          scrub: true,
+        },
+      })
     },
     { scope: sceneRef },
   )
@@ -168,6 +189,7 @@ export function ParallaxHero() {
 
         {/* Feet anchored to g3 top edge via bottom positioning — no pixel calc needed */}
         <div
+          ref={characterRef}
           data-parallax={PARALLAX.character}
           className="absolute left-[4%]"
           style={{ bottom: `${100 - GROUND_TOPS.g3}%` }}
