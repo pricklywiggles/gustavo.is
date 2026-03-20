@@ -1,4 +1,5 @@
-import Header from '@/components/header';
+// import Header from '@/components/header'; // kept for reference during transition
+import { SiteHeader } from '@/components/header/SiteHeader';
 import './globals.css';
 import { wotfard } from '@/fonts/fonts';
 
@@ -32,7 +33,7 @@ export default function RootLayout({
       <body
         className={`${wotfard.variable} font-sans text-gray-800 bg-lt-bg dark:text-gray-300 dark:bg-dk-bg`}
       >
-        {/* <Header /> */}
+        <SiteHeader />
         {children}
       </body>
     </html>
