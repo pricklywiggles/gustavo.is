@@ -1,11 +1,6 @@
-// import Header from '@/components/header'; // kept for reference during transition
 import { SiteHeader } from '@/components/header/SiteHeader';
 import './globals.css';
 import { wotfard, wavesSignal, pixelRobot } from '@/fonts/fonts';
-import { Geist } from "next/font/google";
-import { cn } from "@/lib/utils";
-
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata = {
   title: 'Gustavo Gallegos',
@@ -18,7 +13,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang='en' suppressHydrationWarning className={cn("font-sans", geist.variable)}>
+    <html
+      lang='en'
+      suppressHydrationWarning
+      className={`${wotfard.variable} ${wavesSignal.variable} ${pixelRobot.variable}`}
+    >
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -34,9 +33,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body
-        className={`${wotfard.variable} ${wavesSignal.variable} ${pixelRobot.variable} font-sans text-gray-800 bg-lt-bg dark:text-gray-300 dark:bg-dk-bg`}
-      >
+      <body>
         <SiteHeader />
         {children}
       </body>
