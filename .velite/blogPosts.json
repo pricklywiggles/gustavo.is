@@ -1,0 +1,14 @@
+[
+  {
+    "title": "Hello World",
+    "slug": "hello-world",
+    "date": "2024-01-01T00:00:00.000Z",
+    "description": "A sample blog post to validate the content pipeline.",
+    "tags": [
+      "meta"
+    ],
+    "published": false,
+    "code": "const{Fragment:e,jsx:n,jsxs:t}=arguments[0];function _createMdxContent(r){const o={em:\"em\",h2:\"h2\",p:\"p\",strong:\"strong\",...r.components};return t(e,{children:[n(o.p,{children:\"This is a sample blog post to validate the Velite content pipeline works correctly.\"}),\"\\n\",n(o.h2,{children:\"Test Heading\"}),\"\\n\",t(o.p,{children:[\"Some paragraph text with \",n(o.strong,{children:\"bold\"}),\" and \",n(o.em,{children:\"italic\"}),\" formatting.\"]})]})}return{default:function(e={}){const{wrapper:t}=e.components||{};return t?n(t,{...e,children:n(_createMdxContent,{...e})}):_createMdxContent(e)}};",
+    "permalink": "/blog/hello-world"
+  }
+]
