@@ -3,8 +3,25 @@ import './globals.css';
 import { wotfard, wavesSignal, pixelRobot } from '@/fonts/fonts';
 
 export const metadata = {
-  title: 'Gustavo Gallegos',
-  description: "Gustavo's personal website"
+  metadataBase: new URL('https://gustavo.is'),
+  title: {
+    default: 'Gustavo Gallegos',
+    template: '%s — Gustavo Gallegos',
+  },
+  description: 'Staff Software Engineer. Previously at Microsoft and Jawbone.',
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://gustavo.is',
+    siteName: 'Gustavo Gallegos',
+    title: 'Gustavo Gallegos',
+    description: 'Staff Software Engineer. Previously at Microsoft and Jawbone.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Gustavo Gallegos',
+    description: 'Staff Software Engineer. Previously at Microsoft and Jawbone.',
+  },
 };
 
 export default function RootLayout({
