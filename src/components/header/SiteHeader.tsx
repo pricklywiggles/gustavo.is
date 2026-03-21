@@ -11,17 +11,17 @@ const HEADER_HEIGHT = 80
 
 export function SiteHeader() {
   const headerRef = useRef<HTMLElement>(null)
+  const nameRef = useRef<HTMLSpanElement>(null)
 
   useGSAP(() => {
-    if (!headerRef.current) return
+    if (!headerRef.current || !nameRef.current) return
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       gsap.set(headerRef.current, { opacity: 1 })
       return
     }
 
-    // Fade in over the first 200px of scroll via raw scroll position.
-    // onUpdate gives us precise progress so opacity tracks scroll exactly.
+    // onUpdate is required — plain scrub doesn't drive opacity precisely enough.
     ScrollTrigger.create({
       trigger: 'body',
       start: 'top top',
@@ -31,15 +31,29 @@ export function SiteHeader() {
         if (headerRef.current) headerRef.current.style.opacity = String(self.progress)
       },
     })
+
+    // back.out overshoot makes the scale briefly exceed 1 before settling — same scroll range as the fade.
+    gsap.fromTo(
+      nameRef.current,
+      { scale: 0 },
+      {
+        scale: 1,
+        ease: 'back.out(1.5)',
+        scrollTrigger: {
+          trigger: 'body',
+          start: 'top top',
+          end: '+=200',
+          scrub: true,
+        },
+      },
+    )
   })
 
+  // backdrop-filter covers the gradient zone too, so content dissolves into blur before it fully hides.
   return (
-    // Single element: solid amber at top grading to transparent at the bottom edge.
-    // backdrop-filter blurs content behind the whole bar, including the transparent
-    // gradient zone — so content approaching the header dissolves into blurred colour.
     <header
       ref={headerRef}
-      className="fixed top-0 left-0 right-0 z-50"
+      className="fixed top-0 left-0 right-0 z-50 flex items-center px-6"
       style={{
         height: HEADER_HEIGHT,
         opacity: 0,
@@ -47,6 +61,14 @@ export function SiteHeader() {
         backdropFilter: 'blur(14px)',
         WebkitBackdropFilter: 'blur(14px)',
       }}
-    />
+    >
+      <span
+        ref={nameRef}
+        className="text-6xl tracking-widest uppercase text-gray-800"
+        style={{ fontFamily: 'var(--font-waves-signal)' }}
+      >
+        Gustavo Gallegos
+      </span>
+    </header>
   )
 }

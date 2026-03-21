@@ -8,17 +8,16 @@ import { useGSAP } from '@gsap/react'
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
 
-// Tuning constants — adjust freely during experimentation
 const PARALLAX = {
-  sky1: 0.02,  // top/zenith — barely moves
+  sky1: 0.02,
   sky2: 0.05,
-  sky3: 0.08,  // nearest horizon — moves most of sky bands
+  sky3: 0.08,
   sun: 0.06,
   ground1: 0.15,
   ground2: 0.25,
   ground3: 0.35,
   ground4: 0.45,
-  character: 0.35, // moves with ground3 (second band from bottom)
+  character: 0.35, // matches ground3 so character stands on that band
 }
 
 const COLORS = {
@@ -53,7 +52,6 @@ const GROUND_TOPS = {
   g4: 83.4,   // +11.1% (leaves 16.6% visible to bottom)
 }
 
-// Character dimensions — desktop size (mobile is 35% smaller, set in className below)
 const CHARACTER_HEIGHT = 400
 const CHARACTER_WIDTH = 200
 
@@ -61,13 +59,13 @@ const CHARACTER_WIDTH = 200
 // = (g4_initial% - HORIZON_PCT%) / (ground4_factor * 100%) = 23.4 / 45 ≈ 0.52
 const CONVERGENCE_PROGRESS = 0.55
 
-// Scale the character shrinks to after convergence (tune freely)
 const SHRINK_SCALE = 0.001
 
 export function ParallaxHero() {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<HTMLDivElement>(null)
   const characterRef = useRef<HTMLDivElement>(null)
+  const sunRef = useRef<HTMLDivElement>(null)
 
   useGSAP(
     () => {
@@ -94,7 +92,19 @@ export function ParallaxHero() {
           })
         })
 
-      // After convergence: shrink character toward the horizon, feet and left edge stay fixed.
+      gsap.set(sunRef.current, { transformOrigin: 'center center' })
+      gsap.to(sunRef.current, {
+        scale: 1.3,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: wrapperRef.current,
+          start: `top+=${CONVERGENCE_PROGRESS * vh} top`,
+          end: 'bottom 55%',
+          scrub: true,
+        },
+      })
+
+      // transformOrigin keeps feet on the ground and left edge fixed as scale drops.
       gsap.set(characterRef.current, { transformOrigin: 'bottom left' })
       gsap.to(characterRef.current, {
         scale: SHRINK_SCALE,
@@ -118,32 +128,24 @@ export function ParallaxHero() {
         className="sticky top-0 h-screen overflow-hidden"
         style={{ background: COLORS.sky1 }}
       >
-        {/* ── Sky — 3 contiguous bands, widening toward horizon ── */}
-
-        {/* Sky 1 — pale golden top. Visible: 12.6% */}
         <div
           data-parallax={PARALLAX.sky1}
           className="absolute w-full"
           style={{ top: `${SKY_TOPS.s1}%`, height: '200%', background: COLORS.sky1 }}
         />
-
-        {/* Sky 2 — warm peach mid. Visible: 18.9% */}
         <div
           data-parallax={PARALLAX.sky2}
           className="absolute w-full"
           style={{ top: `${SKY_TOPS.s2}%`, height: '200%', background: COLORS.sky2 }}
         />
-
-        {/* Sky 3 — warm orange near horizon. Visible: 28.4% */}
         <div
           data-parallax={PARALLAX.sky3}
           className="absolute w-full"
           style={{ top: `${SKY_TOPS.s3}%`, height: '200%', background: COLORS.sky3 }}
         />
 
-        {/* ── Sun ─────────────────────────────────────── */}
-        {/* Large circle, right side, straddling the horizon */}
         <div
+          ref={sunRef}
           data-parallax={PARALLAX.sun}
           className="absolute rounded-full"
           style={{
@@ -156,31 +158,22 @@ export function ParallaxHero() {
           }}
         />
 
-        {/* ── Ground ──────────────────────────────────── */}
-        {/* Each band extends well below the viewport so it never shows a bottom edge */}
-
-        {/* Ground 1 — light sand, nearest horizon. Visible height: ~4.9% */}
+        {/* height: 200% ensures bands never expose a bottom edge as they parallax up */}
         <div
           data-parallax={PARALLAX.ground1}
           className="absolute w-full"
           style={{ top: `${GROUND_TOPS.g1}%`, height: '200%', background: COLORS.ground1 }}
         />
-
-        {/* Ground 2. Visible height: ~7.4% */}
         <div
           data-parallax={PARALLAX.ground2}
           className="absolute w-full"
           style={{ top: `${GROUND_TOPS.g2}%`, height: '200%', background: COLORS.ground2 }}
         />
-
-        {/* Ground 3. Visible height: ~11.1% */}
         <div
           data-parallax={PARALLAX.ground3}
           className="absolute w-full"
           style={{ top: `${GROUND_TOPS.g3}%`, height: '200%', background: COLORS.ground3 }}
         />
-
-        {/* Ground 4 — darkest, floor. Visible height: ~16.6% */}
         <div
           data-parallax={PARALLAX.ground4}
           className="absolute w-full"
