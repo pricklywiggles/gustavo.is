@@ -70,7 +70,7 @@ function DesktopNavLink({ label, href, Icon }: NavLinkDef) {
     >
       {/* Warm sand pill — blooms in from 90% scale */}
       <span
-        className="absolute inset-0 rounded-full bg-sky-2/25 scale-90 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 ease-out"
+        className="absolute inset-0 rounded-full bg-sky-2/65 scale-90 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 ease-out"
         aria-hidden
       />
       <span className="relative z-10">
@@ -234,9 +234,9 @@ export function SiteHeader() {
         style={{
           opacity: 0,
           background:
-            'linear-gradient(to bottom, oklch(0.9338 0.0650 89.92 / 70%) 85%, oklch(0.9338 0.0650 89.92 / 0%) 100%)',
-          backdropFilter: 'blur(14px)',
-          WebkitBackdropFilter: 'blur(14px)',
+            'linear-gradient(to bottom, oklch(0.9338 0.0650 89.92 / 90%) 93%, oklch(0.9338 0.0650 89.92 / 0%) 100%)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
         }}
       >
         <span
