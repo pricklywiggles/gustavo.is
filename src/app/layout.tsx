@@ -52,7 +52,9 @@ export default function RootLayout({
       </head>
       <body>
         <SiteHeader />
-        {children}
+        <main id="main-content">
+          {children}
+        </main>
       </body>
     </html>
   );

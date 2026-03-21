@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
-import { motion, AnimatePresence, useAnimation } from 'motion/react'
+import { motion, AnimatePresence, useAnimation, useReducedMotion } from 'motion/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
@@ -62,14 +62,19 @@ const NAV_LINKS: NavLinkDef[] = [
 
 function ShakeIcon({ Icon }: { Icon: IconComponent }) {
   const controls = useAnimation()
+  const reducedMotion = useReducedMotion()
   return (
     <motion.span
       className="flex items-center"
       animate={controls}
-      onHoverStart={() =>
+      onHoverStart={() => {
+        if (reducedMotion) return
         controls.start({ rotate: [0, -7, 6, -4, 2, 0], transition: { duration: 0.32, ease: 'easeInOut' } })
-      }
-      onHoverEnd={() => controls.start({ rotate: 0, transition: { duration: 0.1 } })}
+      }}
+      onHoverEnd={() => {
+        if (reducedMotion) return
+        controls.start({ rotate: 0, transition: { duration: 0.1 } })
+      }}
     >
       <Icon size={18} />
     </motion.span>
@@ -96,6 +101,29 @@ function DesktopNavLink({ label, href, Icon }: NavLinkDef) {
   )
 }
 
+function HeartFooter() {
+  const reducedMotion = useReducedMotion()
+  return (
+    <motion.p
+      className="text-xs text-gray-600 font-sans tracking-widest flex items-center justify-center gap-1.5"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ delay: 0.45, duration: 0.3 }}
+    >
+      Made with{' '}
+      <motion.span
+        aria-hidden
+        animate={reducedMotion ? {} : { scale: [1, 1.4, 1] }}
+        transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 1.2, ease: 'easeInOut' }}
+      >
+        ❤️
+      </motion.span>
+      {' '}in Los Angeles
+    </motion.p>
+  )
+}
+
 function MobileNavLink({ label, href, Icon, onClose }: NavLinkDef & { onClose: () => void }) {
   return (
     <a
@@ -118,7 +146,14 @@ export function SiteHeader() {
   const nameRef = useRef<HTMLSpanElement>(null)
   const navRef = useRef<HTMLElement>(null)
   const mobileNavRef = useRef<HTMLElement>(null)
+  const hamburgerRef = useRef<HTMLButtonElement>(null)
+  const overlayRef = useRef<HTMLDivElement>(null)
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  const closeMenu = () => {
+    setMobileOpen(false)
+    hamburgerRef.current?.focus()
+  }
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -128,13 +163,41 @@ export function SiteHeader() {
     }
   }, [mobileOpen])
 
-  // Close on Escape
+  // Close on Escape and return focus to hamburger
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMobileOpen(false)
+      if (e.key === 'Escape' && mobileOpen) closeMenu()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
+  }, [mobileOpen])
+
+  // Focus trap: move focus into overlay on open, trap Tab within it
+  useEffect(() => {
+    if (!mobileOpen || !overlayRef.current) return
+
+    const focusable = overlayRef.current.querySelectorAll<HTMLElement>(
+      'a[href], button, [tabindex]:not([tabindex="-1"])',
+    )
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+    first?.focus()
+
+    const trap = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last?.focus() }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first?.focus() }
+      }
+    }
+    document.addEventListener('keydown', trap)
+    return () => document.removeEventListener('keydown', trap)
+  }, [mobileOpen])
+
+  // Desktop nav is invisible until GSAP scrolls it in — keep it out of tab order until then
+  useEffect(() => {
+    navRef.current?.setAttribute('inert', '')
   }, [])
 
   // Stagger mobile nav links in when the menu opens
@@ -156,6 +219,8 @@ export function SiteHeader() {
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       gsap.set(headerRef.current, { opacity: 1 })
+      gsap.set(navRef.current, { opacity: 1 })
+      navRef.current.removeAttribute('inert')
       return
     }
 
@@ -224,6 +289,7 @@ export function SiteHeader() {
           start: `top+=${heroEnd - 200} top`,
           end: `top+=${heroEnd} top`,
           scrub: true,
+          onEnter: () => navRef.current?.removeAttribute('inert'),
         },
       },
     )
@@ -245,13 +311,23 @@ export function SiteHeader() {
         if (headerRef.current) headerRef.current.style.opacity = '1'
         gsap.set(letters, { scale: 1, opacity: 1 })
         gsap.set(Array.from(letters).slice(1), { scale: 0, opacity: 0 })
-        if (navRef.current) gsap.set(navRef.current, { opacity: 1, y: 0 })
+        if (navRef.current) {
+          navRef.current.removeAttribute('inert')
+          gsap.set(navRef.current, { opacity: 1, y: 0 })
+        }
       },
     })
   })
 
   return (
     <>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-100 focus:px-4 focus:py-2 focus:bg-white focus:text-gray-900 focus:rounded focus:shadow-lg focus:outline-none"
+      >
+        Skip to main content
+      </a>
+
       {/* backdrop-filter covers the gradient zone too, so content dissolves into blur before it fully hides. */}
       <header
         ref={headerRef}
@@ -294,9 +370,11 @@ export function SiteHeader() {
 
         {/* Mobile toggle — always at z-50, above the bloom overlay */}
         <button
+          ref={hamburgerRef}
           onClick={() => setMobileOpen((v) => !v)}
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={mobileOpen}
+          aria-controls="mobile-nav"
           className="md:hidden relative z-50 text-gray-800 hover:opacity-70 transition-opacity p-1"
         >
           <AnimatePresence mode="wait" initial={false}>
@@ -331,6 +409,10 @@ export function SiteHeader() {
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
+            ref={overlayRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation menu"
             className="fixed inset-0 z-40 md:hidden flex flex-col px-8 pt-24 pb-12"
             style={{
               background: 'oklch(0.9338 0.0650 89.92 / 96%)',
@@ -342,12 +424,12 @@ export function SiteHeader() {
             exit={{ clipPath: 'circle(0% at calc(100% - 34px) 30px)' }}
             transition={{ duration: 0.45, ease: [0.4, 0, 0.15, 1] }}
           >
-            <nav ref={mobileNavRef} className="flex flex-col gap-6 mt-4" aria-label="Mobile navigation">
+            <nav id="mobile-nav" ref={mobileNavRef} className="flex flex-col gap-6 mt-4" aria-label="Mobile navigation">
               {NAV_LINKS.map((link) => (
                 <MobileNavLink
                   key={link.label}
                   {...link}
-                  onClose={() => setMobileOpen(false)}
+                  onClose={closeMenu}
                 />
               ))}
             </nav>
@@ -357,23 +439,7 @@ export function SiteHeader() {
               className="mt-auto pt-8 border-t"
               style={{ borderColor: 'var(--color-ground-2)', opacity: 0.4 }}
             >
-              <motion.p
-                className="text-xs text-gray-600 font-sans tracking-widest flex items-center justify-center gap-1.5"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ delay: 0.45, duration: 0.3 }}
-              >
-                Made with{' '}
-                <motion.span
-                  aria-hidden
-                  animate={{ scale: [1, 1.4, 1] }}
-                  transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 1.2, ease: 'easeInOut' }}
-                >
-                  ❤️
-                </motion.span>
-                {' '}in Los Angeles
-              </motion.p>
+              <HeartFooter />
             </div>
           </motion.div>
         )}
