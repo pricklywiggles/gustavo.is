@@ -1,10 +1,28 @@
 import { SiteHeader } from '@/components/header/SiteHeader';
+import { SiteFooter } from '@/components/footer/SiteFooter';
 import './globals.css';
 import { wotfard, wavesSignal, pixelRobot } from '@/fonts/fonts';
 
 export const metadata = {
-  title: 'Gustavo Gallegos',
-  description: "Gustavo's personal website"
+  metadataBase: new URL('https://gustavo.is'),
+  title: {
+    default: 'Gustavo Gallegos',
+    template: '%s — Gustavo Gallegos',
+  },
+  description: 'Product designer and engineer. Previously at Microsoft and Ponder.',
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://gustavo.is',
+    siteName: 'Gustavo Gallegos',
+    title: 'Gustavo Gallegos',
+    description: 'Product designer and engineer. Previously at Microsoft and Ponder.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Gustavo Gallegos',
+    description: 'Product designer and engineer. Previously at Microsoft and Ponder.',
+  },
 };
 
 export default function RootLayout({
@@ -36,6 +54,7 @@ export default function RootLayout({
       <body>
         <SiteHeader />
         {children}
+        <SiteFooter />
       </body>
     </html>
   );
