@@ -65,6 +65,12 @@ Prefer these tools over their defaults (find, grep, cat, etc.):
 
 When uncertain if a tool is installed, check with `which <tool>` before using it.
 
+## Color Values
+- Always use `oklch()` for color values — never hex, rgb, or hsl.
+- oklch is perceptually uniform, wide-gamut, and what Tailwind v4 and shadcn/ui v4 use by default.
+- Convert with: `node -e "..."` (see globals.css for the conversion script pattern) or a color tool.
+- Opacity variant syntax: `oklch(L C H / 70%)` — not `rgba()`.
+
 ## Commenting rules (mandatory)
 - No comments duplicating obvious code (e.g., no `// loop through array`).
 - Comments ONLY for non-obvious "why": business logic, edge cases, workarounds, or historical decisions.
