@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
+import { motion, AnimatePresence, useAnimation } from 'motion/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
@@ -60,6 +60,22 @@ const NAV_LINKS: NavLinkDef[] = [
   { label: 'GitHub', href: 'https://github.com/pricklywiggles', Icon: GitHubIcon },
 ]
 
+function ShakeIcon({ Icon }: { Icon: IconComponent }) {
+  const controls = useAnimation()
+  return (
+    <motion.span
+      className="flex items-center"
+      animate={controls}
+      onHoverStart={() =>
+        controls.start({ rotate: [0, -7, 6, -4, 2, 0], transition: { duration: 0.32, ease: 'easeInOut' } })
+      }
+      onHoverEnd={() => controls.start({ rotate: 0, transition: { duration: 0.1 } })}
+    >
+      <Icon size={18} />
+    </motion.span>
+  )
+}
+
 function DesktopNavLink({ label, href, Icon }: NavLinkDef) {
   const isIconOnly = !!Icon
   return (
@@ -74,32 +90,26 @@ function DesktopNavLink({ label, href, Icon }: NavLinkDef) {
         aria-hidden
       />
       <span className="relative z-10">
-        {Icon ? <Icon size={18} /> : label}
+        {Icon ? <ShakeIcon Icon={Icon} /> : label}
       </span>
     </a>
   )
 }
 
-function MobileNavLink({
-  label,
-  href,
-  Icon,
-  index,
-  onClose,
-}: NavLinkDef & { index: number; onClose: () => void }) {
+function MobileNavLink({ label, href, Icon, onClose }: NavLinkDef & { onClose: () => void }) {
   return (
-    <motion.a
+    <a
       href={href}
       onClick={onClose}
-      className="flex items-center gap-4 text-2xl text-gray-800 font-sans hover:opacity-70 transition-opacity py-1"
-      initial={{ opacity: 0, x: 16 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 12 }}
-      transition={{ delay: index * 0.06 + 0.22, duration: 0.25, ease: 'easeOut' }}
+      className="group relative flex items-center gap-4 text-2xl text-gray-800 font-sans py-1"
     >
-      {Icon && <Icon size={22} />}
-      <span>{label}</span>
-    </motion.a>
+      <span
+        className="absolute -inset-y-2 -inset-x-4 rounded-xl bg-sky-2/65 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-out"
+        aria-hidden
+      />
+      {Icon && <span className="relative z-10"><Icon size={22} /></span>}
+      <span className="relative z-10">{label}</span>
+    </a>
   )
 }
 
@@ -107,6 +117,7 @@ export function SiteHeader() {
   const headerRef = useRef<HTMLElement>(null)
   const nameRef = useRef<HTMLSpanElement>(null)
   const navRef = useRef<HTMLElement>(null)
+  const mobileNavRef = useRef<HTMLElement>(null)
   const [mobileOpen, setMobileOpen] = useState(false)
 
   // Lock body scroll when mobile menu is open
@@ -125,6 +136,20 @@ export function SiteHeader() {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [])
+
+  // Stagger mobile nav links in when the menu opens
+  useEffect(() => {
+    if (!mobileOpen || !mobileNavRef.current) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const links = mobileNavRef.current.querySelectorAll<HTMLElement>('a')
+    gsap.set(links, { opacity: 0, x: 14 })
+    gsap.fromTo(
+      links,
+      { opacity: 0, x: 14 },
+      { opacity: 1, x: 0, duration: 0.28, ease: 'power2.out', stagger: 0.08, delay: 0.25 },
+    )
+  }, [mobileOpen])
 
   useGSAP(() => {
     if (!headerRef.current || !nameRef.current || !navRef.current) return
@@ -241,7 +266,7 @@ export function SiteHeader() {
       >
         <span
           ref={nameRef}
-          className="text-[1.8rem] md:text-6xl tracking-widest uppercase text-gray-800"
+          className="text-[1.8rem] md:text-4xl lg:text-5xl tracking-widest uppercase text-gray-800"
           style={{ fontFamily: 'var(--font-waves-signal)' }}
         >
           {'Gustavo Gallegos'.split('').map((char, i) => (
@@ -317,30 +342,37 @@ export function SiteHeader() {
             exit={{ clipPath: 'circle(0% at calc(100% - 34px) 30px)' }}
             transition={{ duration: 0.45, ease: [0.4, 0, 0.15, 1] }}
           >
-            <nav className="flex flex-col gap-6 mt-4" aria-label="Mobile navigation">
-              {NAV_LINKS.map((link, i) => (
+            <nav ref={mobileNavRef} className="flex flex-col gap-6 mt-4" aria-label="Mobile navigation">
+              {NAV_LINKS.map((link) => (
                 <MobileNavLink
                   key={link.label}
                   {...link}
-                  index={i}
                   onClose={() => setMobileOpen(false)}
                 />
               ))}
             </nav>
 
-            {/* Ground-line footer — subtle branding at bottom of menu */}
+            {/* Ground-line footer */}
             <div
               className="mt-auto pt-8 border-t"
               style={{ borderColor: 'var(--color-ground-2)', opacity: 0.4 }}
             >
               <motion.p
-                className="text-xs text-gray-600 font-sans tracking-widest uppercase"
+                className="text-xs text-gray-600 font-sans tracking-widest flex items-center justify-center gap-1.5"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ delay: 0.45, duration: 0.3 }}
               >
-                gustavo.is
+                Made with{' '}
+                <motion.span
+                  aria-hidden
+                  animate={{ scale: [1, 1.4, 1] }}
+                  transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 1.2, ease: 'easeInOut' }}
+                >
+                  ❤️
+                </motion.span>
+                {' '}in Los Angeles
               </motion.p>
             </div>
           </motion.div>

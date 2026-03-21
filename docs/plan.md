@@ -143,3 +143,10 @@ _OpenGraph, sitemap, llms.txt, and modern discoverability best practices._
 _Derive dark palette, implement `.dark` overrides, add toggle to SiteHeader._
 
 Deferred until all features above are complete. The CSS variable structure already supports it.
+
+---
+
+## Embellishments
+_Nice-to-haves to revisit after the main plan is complete._
+
+- Beach and palm tree motif at the bottom of the mobile menu sheet
