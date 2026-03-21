@@ -1,9 +1,11 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
+import { Menu } from 'lucide-react'
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
 gsap.registerPlugin(ScrollTrigger, useGSAP)
 
 function GitHubIcon({ size = 20 }: { size?: number }) {
@@ -33,6 +35,7 @@ export function SiteHeader() {
   const headerRef = useRef<HTMLElement>(null)
   const nameRef = useRef<HTMLSpanElement>(null)
   const navRef = useRef<HTMLElement>(null)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   useGSAP(() => {
     if (!headerRef.current || !nameRef.current || !navRef.current) return
@@ -162,9 +165,10 @@ export function SiteHeader() {
         ))}
       </span>
 
+      {/* Desktop nav — animated by GSAP, hidden on mobile */}
       <nav
         ref={navRef}
-        className="flex items-center gap-5 text-sm text-gray-800 font-sans"
+        className="hidden md:flex items-center gap-5 text-sm text-gray-800 font-sans"
         style={{ opacity: 0 }}
       >
         {NAV_LINKS.map(({ label, href, Icon }) => (
@@ -178,6 +182,42 @@ export function SiteHeader() {
           </a>
         ))}
       </nav>
+
+      {/* Mobile menu — Sheet from right, not GSAP controlled */}
+      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <SheetTrigger
+          aria-label="Open menu"
+          className="md:hidden text-gray-800 hover:opacity-70 transition-opacity"
+        >
+          <Menu size={22} />
+        </SheetTrigger>
+        <SheetContent
+          side="right"
+          className="w-64 pt-16"
+          style={{
+            background: 'rgba(250, 232, 184, 0.92)',
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
+            borderLeft: '1px solid rgba(174, 148, 112, 0.3)',
+          }}
+        >
+          <SheetTitle className="sr-only">Navigation</SheetTitle>
+          <nav className="flex flex-col gap-6 text-gray-800 font-sans">
+            {NAV_LINKS.map(({ label, href, Icon }) => (
+              <a
+                key={label}
+                href={href}
+                aria-label={label}
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-3 text-base hover:opacity-70 transition-opacity"
+              >
+                {Icon ? <Icon size={18} /> : null}
+                {label}
+              </a>
+            ))}
+          </nav>
+        </SheetContent>
+      </Sheet>
     </header>
   )
 }
