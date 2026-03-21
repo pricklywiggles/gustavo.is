@@ -43,7 +43,7 @@ export function SiteHeader() {
     }
 
     // onUpdate is required — plain scrub doesn't drive opacity precisely enough.
-    ScrollTrigger.create({
+    const opacityTrigger = ScrollTrigger.create({
       trigger: 'body',
       start: 'top top',
       end: '+=200',
@@ -122,9 +122,11 @@ export function SiteHeader() {
       onEnter: () => {
         if (frozen) return
         frozen = true
+        opacityTrigger.kill()
         letterInTween.scrollTrigger?.kill()
         letterOutTween.scrollTrigger?.kill()
         navTween.scrollTrigger?.kill()
+        if (headerRef.current) headerRef.current.style.opacity = '1'
         gsap.set(letters, { scale: 1, opacity: 1 })
         gsap.set(Array.from(letters).slice(1), { scale: 0, opacity: 0 })
         if (navRef.current) gsap.set(navRef.current, { opacity: 1, y: 0 })
