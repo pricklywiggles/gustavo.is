@@ -59,7 +59,7 @@ const CHARACTER_WIDTH = 200
 // = (g4_initial% - HORIZON_PCT%) / (ground4_factor * 100%) = 23.4 / 45 ≈ 0.52
 const CONVERGENCE_PROGRESS = 0.55
 
-const SHRINK_SCALE = 0.001
+const SHRINK_SCALE = 0.1
 
 export function ParallaxHero() {
   const wrapperRef = useRef<HTMLDivElement>(null)
