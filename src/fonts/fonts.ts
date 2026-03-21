@@ -33,6 +33,18 @@ export const basierMono = localFont({
   src: './basierMono/basiercirclemono-regular-webfont.ttf'
 });
 
+export const wavesSignal = localFont({
+  variable: '--font-waves-signal',
+  src: './waves-signal/waves-signal.woff2',
+  display: 'swap'
+});
+
+export const pixelRobot = localFont({
+  variable: '--font-pixel-robot',
+  src: './pixel-robot/pixel-robot.woff2',
+  display: 'swap'
+});
+
 export const indieFlower = Indie_Flower({
   subsets: ['latin'],
   display: 'swap',

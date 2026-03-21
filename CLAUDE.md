@@ -64,3 +64,11 @@ Prefer these tools over their defaults (find, grep, cat, etc.):
 - CSV: `xsv` for querying and filtering CSV files
 
 When uncertain if a tool is installed, check with `which <tool>` before using it.
+
+## Commenting rules (mandatory)
+- No comments duplicating obvious code (e.g., no `// loop through array`).
+- Comments ONLY for non-obvious "why": business logic, edge cases, workarounds, or historical decisions.
+- Prefer refactoring unclear code over commenting it.
+- Keep comments as brief as possible; prefer a single sentence.
+- No commented-out code — delete it instead.
+- No function/class doc headers unless the symbol is public API or auto-documented.
