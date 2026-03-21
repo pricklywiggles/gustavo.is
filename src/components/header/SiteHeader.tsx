@@ -7,7 +7,6 @@ import { useGSAP } from '@gsap/react'
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
 
-const HEADER_HEIGHT = 80
 
 export function SiteHeader() {
   const headerRef = useRef<HTMLElement>(null)
@@ -32,17 +31,44 @@ export function SiteHeader() {
       },
     })
 
-    // back.out overshoot makes the scale briefly exceed 1 before settling — same scroll range as the fade.
+    const letters = nameRef.current.querySelectorAll<HTMLElement>('.letter')
+    const vh = window.innerHeight
+    // ParallaxHero wrapper is 200vh tall; exit animation completes as it leaves the viewport.
+    const heroEnd = vh * 2
+
+    // Stagger distributes each letter's animation across the scroll range left-to-right.
+    // back.out overshoot makes each letter briefly exceed scale 1 before settling.
     gsap.fromTo(
-      nameRef.current,
-      { scale: 0 },
+      letters,
+      { scale: 0, opacity: 0 },
       {
         scale: 1,
-        ease: 'back.out(1.5)',
+        opacity: 1,
+        ease: 'back.out(2)',
+        // stagger: 0.1,
         scrollTrigger: {
           trigger: 'body',
           start: 'top top',
-          end: '+=200',
+          end: '+=800',
+          scrub: true,
+        },
+      },
+    )
+
+    // All letters except the first G exit with the same staggered bounce-then-shrink.
+    // back.in briefly overshoots above scale 1 before collapsing to 0.
+    gsap.fromTo(
+      Array.from(letters).slice(1),
+      { scale: 1, opacity: 1 },
+      {
+        scale: 0,
+        opacity: 0,
+        ease: 'back.in(2)',
+        stagger: { each: 0.04, from: 'end' },
+        scrollTrigger: {
+          trigger: 'body',
+          start: `top+=${heroEnd - 300} top`,
+          end: `top+=${heroEnd} top`,
           scrub: true,
         },
       },
@@ -53,9 +79,8 @@ export function SiteHeader() {
   return (
     <header
       ref={headerRef}
-      className="fixed top-0 left-0 right-0 z-50 flex items-center px-6"
+      className="fixed top-0 left-0 right-0 z-50 flex items-center px-6 h-15 md:h-20"
       style={{
-        height: HEADER_HEIGHT,
         opacity: 0,
         background: 'linear-gradient(to bottom, rgba(250, 232, 184, 0.7) 85%, rgba(250, 232, 184, 0.7) 100%)',
         backdropFilter: 'blur(14px)',
@@ -64,10 +89,18 @@ export function SiteHeader() {
     >
       <span
         ref={nameRef}
-        className="text-6xl tracking-widest uppercase text-gray-800"
+        className="text-[1.8rem] md:text-6xl tracking-widest uppercase text-gray-800"
         style={{ fontFamily: 'var(--font-waves-signal)' }}
       >
-        Gustavo Gallegos
+        {'Gustavo Gallegos'.split('').map((char, i) => (
+          <span
+            key={i}
+            className="letter inline-block"
+            style={char === ' ' ? { opacity: 1 } : undefined}
+          >
+            {char === ' ' ? '\u00A0' : char}
+          </span>
+        ))}
       </span>
     </header>
   )
