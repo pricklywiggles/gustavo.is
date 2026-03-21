@@ -1,7 +1,7 @@
 // import Header from '@/components/header'; // kept for reference during transition
 import { SiteHeader } from '@/components/header/SiteHeader';
 import './globals.css';
-import { wotfard, wavesSignal } from '@/fonts/fonts';
+import { wotfard, wavesSignal, pixelRobot } from '@/fonts/fonts';
 
 export const metadata = {
   title: 'Gustavo Gallegos',
@@ -31,7 +31,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${wotfard.variable} ${wavesSignal.variable} font-sans text-gray-800 bg-lt-bg dark:text-gray-300 dark:bg-dk-bg`}
+        className={`${wotfard.variable} ${wavesSignal.variable} ${pixelRobot.variable} font-sans text-gray-800 bg-lt-bg dark:text-gray-300 dark:bg-dk-bg`}
       >
         <SiteHeader />
         {children}
