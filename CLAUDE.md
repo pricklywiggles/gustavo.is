@@ -71,6 +71,9 @@ When uncertain if a tool is installed, check with `which <tool>` before using it
 - Convert with: `node -e "..."` (see globals.css for the conversion script pattern) or a color tool.
 - Opacity variant syntax: `oklch(L C H / 70%)` — not `rgba()`.
 
+## Git & PR Hygiene
+- Never add "Generated with Claude Code", "Co-Authored-By: Claude", or any AI attribution to commit messages, PR titles, PR bodies, or code comments.
+
 ## Commenting rules (mandatory)
 - No comments duplicating obvious code (e.g., no `// loop through array`).
 - Comments ONLY for non-obvious "why": business logic, edge cases, workarounds, or historical decisions.

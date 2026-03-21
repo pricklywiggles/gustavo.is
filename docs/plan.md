@@ -27,7 +27,7 @@ The remaining work is restructured around **features**, not technical layers. Ea
 
 ## Remaining Feature Workstreams
 
-### F1: Navigation <-- NEXT
+### F1: Navigation ✅ DONE
 _Finish desktop nav design + redesign mobile navigation from scratch._
 
 **Interactive session** — begin by discussing direction with Gustavo before any code.
@@ -40,7 +40,7 @@ _Finish desktop nav design + redesign mobile navigation from scratch._
 
 ---
 
-### F2: Introduction Component
+### F2: Introduction Component <-- NEXT
 _Scroll-driven "I'm ____ with ____" rotating text + accompanying media._
 
 **Interactive session** — begin by discussing direction with Gustavo before any code.
