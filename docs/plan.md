@@ -40,23 +40,21 @@ _Finish desktop nav design + redesign mobile navigation from scratch._
 
 ---
 
-### F2: Introduction Component <-- NEXT
+### F2: Introduction Component ✅ DONE (PR #19)
 _Scroll-driven "I'm ____ with ____" rotating text + accompanying media._
 
-**Interactive session** — begin by discussing direction with Gustavo before any code.
+- Scroll-pinned section with three slides (engineer / dog dad / tinkerer)
+- Text: slow upward drift → scale+fade exit, snap-in from below with ScrollTrigger snap
+- Photo strip: polaroid cards on a curved SVG clothesline, photos swap per slide (stagger slide-out right / slide-in left)
+- Responsive card counts: 4 mobile / 5 tablet / 6 desktop
+- Bricolage Grotesque adopted as site-wide sans font (replacing Wotfard)
+- Placeholder Kiwi photos and copy in place — see Finishing Touches for real content
 
-- Design the intro section that appears after the hero
-- Core mechanic: as the user scrolls, pairs of text strings rotate into a sentence slot (counter/carousel style), each accompanied by related media (photos, links, illustrations)
-- Example pairs: "a LA-based software engineer … a history of shipping great products", "a dog dad … a wonderful pooch"
-- Media can be photos, product links, illustrations — each pair gets its own visual treatment
-- Scroll-driven via GSAP ScrollTrigger
-- Mobile-responsive layout
-
-**Key files:** New component `src/components/landing/IntroSection.tsx`, content data TBD
+**Key files:** `src/components/landing/IntroSection.tsx`, `src/fonts/fonts.ts`, `src/app/globals.css`
 
 ---
 
-### F3: Product Timeline
+### F3: Product Timeline <-- NEXT
 _Interactive scroll-driven timeline of career products._
 
 **Interactive session** — begin by discussing direction with Gustavo before any code.
