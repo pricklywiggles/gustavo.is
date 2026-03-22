@@ -13,12 +13,14 @@ type Photo = { src: string; alt: string }
 const SLIDES: { subject: string; predicate: string; photos: Photo[] }[] = [
   {
     subject: 'an LA based software engineer',
-    predicate: 'a proven record of product launches',
+    predicate: 'many big product launches under his belt',
     photos: [
       { src: '/photos/kiwi_1.png', alt: 'Kiwi' },
       { src: '/photos/kiwi_2.png', alt: 'Kiwi' },
       { src: '/photos/kiwi_3.png', alt: 'Kiwi' },
       { src: '/photos/kiwi_1.png', alt: 'Kiwi' },
+      { src: '/photos/kiwi_2.png', alt: 'Kiwi' },
+      { src: '/photos/kiwi_3.png', alt: 'Kiwi' },
     ],
   },
   {
@@ -29,6 +31,8 @@ const SLIDES: { subject: string; predicate: string; photos: Photo[] }[] = [
       { src: '/photos/kiwi_3.png', alt: 'Kiwi' },
       { src: '/photos/kiwi_1.png', alt: 'Kiwi' },
       { src: '/photos/kiwi_2.png', alt: 'Kiwi' },
+      { src: '/photos/kiwi_3.png', alt: 'Kiwi' },
+      { src: '/photos/kiwi_1.png', alt: 'Kiwi' },
     ],
   },
   {
@@ -39,15 +43,17 @@ const SLIDES: { subject: string; predicate: string; photos: Photo[] }[] = [
       { src: '/photos/kiwi_1.png', alt: 'Kiwi' },
       { src: '/photos/kiwi_2.png', alt: 'Kiwi' },
       { src: '/photos/kiwi_3.png', alt: 'Kiwi' },
+      { src: '/photos/kiwi_1.png', alt: 'Kiwi' },
+      { src: '/photos/kiwi_2.png', alt: 'Kiwi' },
     ],
   },
 ]
 
 // Per-position tilt — feels hand-placed
-const ALL_ROTATIONS = [-3, 1.5, -2.5, 2]
+const ALL_ROTATIONS = [-3, 1.5, -2.5, 2, -1, 3]
 
 // Curved string: sag amount at centre (px, in the strip's coordinate space)
-const SAG_PX = 14
+const SAG_PX = 18
 // SVG viewBox height — must comfortably contain the curve + stroke
 const SVG_H = SAG_PX * 2 + 6
 // Y of the string endpoints in the viewBox (small top margin so stroke isn't clipped)
@@ -70,13 +76,14 @@ export function IntroSection() {
   const sectionRef = useRef<HTMLElement>(null)
   const subjectRefs = useRef<Array<HTMLSpanElement | null>>([])
   const predicateRefs = useRef<Array<HTMLSpanElement | null>>([])
-  const [cardCount, setCardCount] = useState(4)
+  const photoCardRefs = useRef<Array<Array<HTMLDivElement | null>>>([])
+  const [cardCount, setCardCount] = useState(6)
 
   useEffect(() => {
     const update = () => {
-      if (window.innerWidth < 640) setCardCount(2)
-      else if (window.innerWidth < 768) setCardCount(3)
-      else setCardCount(4)
+      if (window.innerWidth < 640) setCardCount(4)
+      else if (window.innerWidth < 768) setCardCount(5)
+      else setCardCount(6)
     }
     update()
     window.addEventListener('resize', update)
@@ -91,8 +98,23 @@ export function IntroSection() {
 
       const subjects = subjectRefs.current.filter(Boolean) as HTMLSpanElement[]
       const predicates = predicateRefs.current.filter(Boolean) as HTMLSpanElement[]
+      const rotations = ALL_ROTATIONS.slice(0, cardCount)
 
-      gsap.set([...subjects.slice(1), ...predicates.slice(1)], { y: 80, opacity: 0 })
+      // Scale must expand rightward so text doesn't drift left
+      gsap.set([...subjects, ...predicates], { transformOrigin: 'left center' })
+
+      // Set rotation via GSAP (not inline style) so x animations compose cleanly
+      SLIDES.forEach((_, slideIdx) => {
+        const cards = (photoCardRefs.current[slideIdx] ?? []).filter(Boolean) as HTMLDivElement[]
+        cards.forEach((card, cardIdx) => {
+          gsap.set(card, { rotation: rotations[cardIdx], transformOrigin: 'top center' })
+        })
+        if (slideIdx > 0) {
+          gsap.set(cards, { x: -500, opacity: 0 })
+        }
+      })
+
+      gsap.set([...subjects.slice(1), ...predicates.slice(1)], { y: 80, opacity: 0, scale: 0.94 })
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -101,33 +123,32 @@ export function IntroSection() {
           end: `+=${(SLIDES.length - 1) * window.innerHeight}`,
           pin: true,
           scrub: 0.8,
+          snap: {
+            snapTo: 1 / (SLIDES.length - 1),
+            duration: { min: 0.2, max: 0.5 },
+            ease: 'power1.inOut',
+            delay: 0.05,
+          },
         },
       })
 
       for (let i = 0; i < SLIDES.length - 1; i++) {
-        tl.to(
-          [subjects[i], predicates[i]],
-          { y: -24, ease: 'none', duration: 0.6 },
-          i,
-        )
-        tl.to(
-          [subjects[i], predicates[i]],
-          { y: -140, opacity: 0, ease: 'power3.in', duration: 0.4 },
-          i + 0.6,
-        )
-        tl.to(
-          [subjects[i + 1], predicates[i + 1]],
-          { y: 0, opacity: 1, ease: 'power4.out', duration: 0.35 },
-          i + 0.65,
-        )
+        const outCards = (photoCardRefs.current[i] ?? []).filter(Boolean) as HTMLDivElement[]
+        const inCards = (photoCardRefs.current[i + 1] ?? []).filter(Boolean) as HTMLDivElement[]
+
+        tl.to([subjects[i], predicates[i]], { y: -24, ease: 'none', duration: 0.6 }, i)
+
+        tl.to([subjects[i], predicates[i]], { y: -120, opacity: 0, scale: 1.1, ease: 'power3.in', duration: 0.4 }, i + 0.6)
+        tl.to(outCards, { x: 500, opacity: 0, ease: 'power2.in', duration: 0.35, stagger: 0.03 }, i + 0.6)
+
+        tl.to([subjects[i + 1], predicates[i + 1]], { y: 0, opacity: 1, scale: 1, ease: 'power4.out', duration: 0.35 }, i + 0.65)
+        tl.to(inCards, { x: 0, opacity: 1, ease: 'power3.out', duration: 0.35, stagger: 0.03 }, i + 0.65)
       }
     },
     { scope: sectionRef },
   )
 
-  const cards = SLIDES[0].photos.slice(0, cardCount)
   const offsets = computeStringOffsets(cardCount)
-  const rotations = ALL_ROTATIONS.slice(0, cardCount)
 
   // SVG bezier path: string endpoints at STRING_Y0, control point at centre with full sag
   const controlY = STRING_Y0 + SAG_PX * 2
@@ -148,7 +169,7 @@ export function IntroSection() {
           I&apos;m
         </p>
 
-        <div className="relative overflow-hidden">
+        <div className="relative">
           {SLIDES.map((slide, i) => (
             <span
               key={i}
@@ -171,7 +192,7 @@ export function IntroSection() {
           with
         </p>
 
-        <div className="relative overflow-hidden">
+        <div className="relative">
           {SLIDES.map((slide, i) => (
             <span
               key={i}
@@ -189,7 +210,7 @@ export function IntroSection() {
       </div>
 
       {/* Bottom 1/3 — photo strip */}
-      <div className="flex-1 relative" aria-hidden="true">
+      <div className="flex-1 relative overflow-hidden" aria-hidden="true">
         {/* Curved string — bezier sags under the weight of the cards */}
         <svg
           className="absolute inset-x-0 top-0 w-full"
@@ -207,31 +228,33 @@ export function IntroSection() {
           />
         </svg>
 
-        {/* Cards — marginTop places each clothespin exactly on the curve */}
-        <div className="absolute inset-0 flex items-start justify-around">
-          {cards.map((photo, i) => (
-            <div
-              key={i}
-              className="flex flex-col items-center"
-              style={{
-                transform: `rotate(${rotations[i]}deg)`,
-                transformOrigin: 'top center',
-                marginTop: offsets[i],
-              }}
-            >
-              <Clothespin />
-              <Image
-                src={photo.src}
-                alt={photo.alt}
-                width={407}
-                height={640}
-                className="block w-16 sm:w-20 md:w-24 h-auto"
-                style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.40)) drop-shadow(0 1px 3px rgba(0,0,0,0.3))' }}
-                sizes="(max-width: 640px) 64px, (max-width: 768px) 80px, 96px"
-              />
-            </div>
-          ))}
-        </div>
+        {/* All slide photo rows — GSAP animates x/rotation, marginTop places pins on curve */}
+        {SLIDES.map((slide, slideIdx) => (
+          <div key={slideIdx} className="absolute inset-0 flex items-start justify-around">
+            {slide.photos.slice(0, cardCount).map((photo, cardIdx) => (
+              <div
+                key={cardIdx}
+                ref={el => {
+                  if (!photoCardRefs.current[slideIdx]) photoCardRefs.current[slideIdx] = []
+                  photoCardRefs.current[slideIdx][cardIdx] = el
+                }}
+                className="flex flex-col items-center"
+                style={{ marginTop: offsets[cardIdx] }}
+              >
+                <Clothespin />
+                <Image
+                  src={photo.src}
+                  alt={photo.alt}
+                  width={407}
+                  height={640}
+                  className="block w-16 sm:w-20 md:w-24 h-auto"
+                  style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.40)) drop-shadow(0 1px 3px rgba(0,0,0,0.3))' }}
+                  sizes="(max-width: 640px) 64px, (max-width: 768px) 80px, 96px"
+                />
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
     </section>
   )

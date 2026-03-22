@@ -146,10 +146,11 @@ Deferred until all features above are complete. The CSS variable structure alrea
 
 ---
 
-## Embellishments
+## Finishing touches
 _Nice-to-haves to revisit after the main plan is complete._
 
 - Beach and palm tree motif at the bottom of the mobile menu sheet
 - Correct site icon for desktop and mobile using best practices
 - Gradients on hero color bands
+- IntroSection (F2): replace placeholder Kiwi photos with the real per-slide photos, and finalize the predicate copy for each slide
 
