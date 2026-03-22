@@ -1,6 +1,6 @@
 import { SiteHeader } from '@/components/header/SiteHeader';
 import './globals.css';
-import { wotfard, wavesSignal, pixelRobot } from '@/fonts/fonts';
+import { bricolageGrotesque, wavesSignal, pixelRobot } from '@/fonts/fonts';
 
 export const metadata = {
   metadataBase: new URL('https://gustavo.is'),
@@ -33,7 +33,7 @@ export default function RootLayout({
     <html
       lang='en'
       suppressHydrationWarning
-      className={`${wotfard.variable} ${wavesSignal.variable} ${pixelRobot.variable}`}
+      className={`${bricolageGrotesque.variable} ${wavesSignal.variable} ${pixelRobot.variable}`}
     >
       <head>
         <script

@@ -1,5 +1,12 @@
-import { Indie_Flower } from 'next/font/google';
+import { Bricolage_Grotesque, Indie_Flower } from 'next/font/google';
 import localFont from 'next/font/local';
+
+export const bricolageGrotesque = Bricolage_Grotesque({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-bricolage-grotesque',
+  axes: ['wdth'],
+});
 
 export const wotfard = localFont({
   variable: '--font-wotfard',

@@ -27,7 +27,7 @@ The remaining work is restructured around **features**, not technical layers. Ea
 
 ## Remaining Feature Workstreams
 
-### F1: Navigation ✅ DONE
+### F1: Navigation ✅ DONE (+ WCAG AA fixes in PR #18)
 _Finish desktop nav design + redesign mobile navigation from scratch._
 
 **Interactive session** — begin by discussing direction with Gustavo before any code.
@@ -150,3 +150,6 @@ Deferred until all features above are complete. The CSS variable structure alrea
 _Nice-to-haves to revisit after the main plan is complete._
 
 - Beach and palm tree motif at the bottom of the mobile menu sheet
+- Correct site icon for desktop and mobile using best practices
+- Gradients on hero color bands
+

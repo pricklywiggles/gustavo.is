@@ -22,7 +22,7 @@
 
 **Footer:** "Made with ❤️ in Los Angeles" with a beating heart — `motion.span` animating `scale: [1, 1.4, 1]` on infinite repeat with 1.2s delay between beats. Fades in after bloom completes (`delay: 0.45`).
 
-**Accessibility:** Body scroll locked when open (`overflow: hidden`), Escape key closes menu, `aria-expanded` on toggle button.
+**Accessibility:** Body scroll locked when open (`overflow: hidden`), Escape key closes menu, `aria-expanded` on toggle button. Full WCAG AA audit done post-implementation — see Accessibility section below.
 
 ## Rejected Approaches
 
@@ -30,6 +30,21 @@
 - Motion `staggerChildren` variants for link entrance: reliable post-animation flicker that couldn't be resolved
 - Per-link Motion `delay` props: same flicker issue
 - `whileHover` for icon shake: animation gets stuck on a frame if cursor exits quickly
+
+## Accessibility (PR #18)
+
+WCAG AA audit run after F1 merged. All critical issues fixed:
+
+- **Focus trap:** Tab/Shift+Tab cycles within the mobile overlay while open
+- **Focus return:** `closeMenu()` helper calls `hamburgerRef.current?.focus()` on every close path
+- **Skip link:** `<a href="#main-content">` as first focusable element; `<main id="main-content">` wraps `{children}` in `layout.tsx`
+- **`aria-controls`:** Hamburger has `aria-controls="mobile-nav"`; overlay has `role="dialog" aria-modal="true" aria-label="Navigation menu"`
+- **Invisible nav in tab order (M3/M4):** Desktop nav starts with `inert` attribute, removed by GSAP imperatively at three points: `navTween` `onEnter`, freeze `onEnter`, and reduced-motion path
+- **Reduced motion (M5/M6):** `ShakeIcon` uses `useReducedMotion()` to skip animation; `HeartFooter` component passes `animate={}` when reduced motion is preferred
+
+**Deferred:**
+- M8: `DummyLink` with `href="#"` — deferred until final nav links are decided
+- Minor: hamburger tap target size (~30px, below 44px ideal), focus ring contrast at 50% opacity, footer text at `opacity: 0.4`
 
 ## Open Items
 
