@@ -105,7 +105,7 @@ function HeartFooter() {
   const reducedMotion = useReducedMotion()
   return (
     <motion.p
-      className="text-xs text-gray-600 font-sans tracking-widest flex items-center justify-center gap-1.5"
+      className="text-xs text-gray-600 font-sans tracking-widest flex items-center justify-end gap-1.5"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -135,23 +135,26 @@ function MobileMenuGraphic() {
       preserveAspectRatio="xMidYMax meet"
     >
       {/* Ocean — flat, horizon at 15% from bottom, visible left of island */}
-      <rect x="0" y="680" width="390" height="120" fill="oklch(0.73 0.05 200)" />
+      <rect x="-100" y="680" width="390" height="120" fill="oklch(0.73 0.05 200)" />
       {/* Island — ellipsoid, offset right so ocean shows on left */}
       <ellipse cx="420" cy="750" rx="400" ry="80" fill="oklch(0.7891 0.0452 81.82)" />
-      {/* Palm trunk — curved, 60% of previous height */}
+      {/* Palm trunk — curved, base 60px lower */}
       <path
-        d="M 340,670 C 282,545 250,435 255,350"
+        d="M 340,730 C 282,605 250,435 255,350"
         stroke="oklch(0.4572 0.0543 59.52)"
         strokeWidth="14"
         strokeLinecap="round"
       />
       {/* Palm fronds — wider, elongated, drooping */}
-      <path d="M 255,350 C 195,265 115,280 45,375 C 115,345 205,325 155,350" fill="oklch(0.48 0.09 110)" />
+
+      <path d="M 255,350 C 195,265 115,280 45,375 C 115,345 205,325 155,350" fill="oklch(0.51 0.09 110)" />
       <path d="M 255,350 C 210,258 145,230 90,300 C 148,268 210,300 255,350" fill="oklch(0.46 0.09 110)" />
-      <path d="M 255,350 C 200,248 120,240 180,245 C 222,210 255,278 255,350" fill="oklch(0.48 0.09 110)" />
+      <path d="M 255,350 C 200,248 120,240 180,245 C 222,210 255,278 255,350" fill="oklch(0.51 0.09 110)" />
       <path d="M 255,350 C 205,248 328,228 330,260 C 325,258 280,282 255,350" fill="oklch(0.46 0.09 110)" />
-      <path d="M 255,350 C 255,278 368,292 385,345 C 366,320 302,318 255,350" fill="oklch(0.48 0.09 110)" />
+      <path d="M 255,350 C 255,278 368,292 385,345 C 366,320 302,318 255,350" fill="oklch(0.51 0.09 110)" />
       <path d="M 255,350 C 300,270 358,368 375,380 C 348,378 295,332 255,350" fill="oklch(0.46 0.09 110)" />
+      {/* Two coconuts — rounded ellipses, different tilt angles */}
+      {/* <ellipse cx="265" cy="353" rx="10" ry="13" transform="rotate(-26, 265, 353)" fill="oklch(0.62 0.07 72)" /> */}
     </svg>
   )
 }
@@ -453,7 +456,7 @@ export function SiteHeader() {
             role="dialog"
             aria-modal="true"
             aria-label="Navigation menu"
-            className="fixed inset-0 z-40 md:hidden flex flex-col px-8 pt-24 pb-12 overflow-hidden"
+            className="fixed inset-0 z-40 md:hidden flex flex-col px-8 pt-24 pb-4 overflow-hidden"
             style={{
               background: 'oklch(0.9338 0.0650 89.92 / 96%)',
               backdropFilter: 'blur(20px)',
@@ -487,7 +490,7 @@ export function SiteHeader() {
 
             {/* Ground-line footer */}
             <div
-              className="mt-auto pt-8 border-t"
+              className="mt-auto"
               style={{ borderColor: 'var(--color-ground-2)', opacity: 0.4 }}
             >
               <HeartFooter />
