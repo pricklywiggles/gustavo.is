@@ -138,12 +138,10 @@ function MobileMenuGraphic() {
       <rect x="-100" y="680" width="390" height="120" fill="oklch(0.73 0.05 200)" />
       {/* Island — ellipsoid, offset right so ocean shows on left */}
       <ellipse cx="420" cy="750" rx="400" ry="80" fill="oklch(0.7891 0.0452 81.82)" />
-      {/* Palm trunk — curved, base 60px lower */}
+      {/* Palm trunk — filled tapered shape: wide flat base (~30px), narrows to ~12px at crown */}
       <path
-        d="M 340,730 C 282,605 250,435 255,350"
-        stroke="oklch(0.4572 0.0543 59.52)"
-        strokeWidth="14"
-        strokeLinecap="round"
+        d="M 325,730 C 267,605 244,435 249,350 L 261,350 C 261,435 297,605 355,730 Z"
+        fill="oklch(0.4572 0.0543 59.52)"
       />
       {/* Palm fronds — wider, elongated, drooping */}
 
@@ -154,7 +152,8 @@ function MobileMenuGraphic() {
       <path d="M 255,350 C 255,278 368,292 385,345 C 366,320 302,318 255,350" fill="oklch(0.51 0.09 110)" />
       <path d="M 255,350 C 300,270 358,368 375,380 C 348,378 295,332 255,350" fill="oklch(0.46 0.09 110)" />
       {/* Two coconuts — rounded ellipses, different tilt angles */}
-      {/* <ellipse cx="265" cy="353" rx="10" ry="13" transform="rotate(-26, 265, 353)" fill="oklch(0.62 0.07 72)" /> */}
+      <ellipse cx="248" cy="350" rx="10" ry="13" transform="rotate(-22, 248, 350)" fill="oklch(0.62 0.07 72)" />
+      <ellipse cx="265" cy="353" rx="10" ry="13" transform="rotate(16, 265, 353)" fill="oklch(0.62 0.07 72)" />
     </svg>
   )
 }
