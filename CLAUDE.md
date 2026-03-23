@@ -7,9 +7,10 @@ Personal portfolio site for Gustavo Gallegos. Currently undergoing a full refres
 **Dev server:** `pnpm dev` (port 3001)
 
 ## Branching Strategy
-- All work happens on `site-refresh` branch (or feature branches off it)
-- Nothing merges to `master` until the full refresh is complete
-- Feature branches: `site-refresh/<feature-name>`
+- Feature branches are cut from `site-refresh` and PR back into `site-refresh`
+- `master` is NEVER the PR target — nothing touches master until the full refresh ships
+- Feature branch naming: flat `f<N>-<description>` format (e.g. `f2-intro-section`)
+- Always pass `--base site-refresh` when creating PRs with `gh pr create`
 
 ## Stack
 - **Framework:** Next.js 16.2 + React 19 (upgrading from 13.4)

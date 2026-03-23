@@ -1,23 +1,12 @@
 import { ParallaxHero } from '@/components/hero/ParallaxHero';
+import { IntroSection } from '@/components/landing/IntroSection';
 
 export default function Home() {
   return (
     <main>
       <ParallaxHero />
-      <div
-        style={{
-          height: '100vh',
-          background: '#6E5038',
-          border: '1px solid #ccc'
-        }}
-      />
-      <div
-        style={{
-          height: '100vh',
-          background: '#6E5038',
-          border: '1px solid #ccc'
-        }}
-      />
+      <IntroSection />
+      <div className="h-32" /> {/* bottom padding so last section can scroll up fully while we test */}
     </main>
   );
 }
