@@ -105,7 +105,7 @@ function HeartFooter() {
   const reducedMotion = useReducedMotion()
   return (
     <motion.p
-      className="text-xs text-gray-600 font-sans tracking-widest flex items-center justify-center gap-1.5"
+      className="text-xs text-gray-600 font-sans tracking-widest flex items-center justify-end gap-1.5"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -121,6 +121,42 @@ function HeartFooter() {
       </motion.span>
       {' '}in Los Angeles
     </motion.p>
+  )
+}
+
+function MobileMenuGraphic() {
+  return (
+    <svg
+      viewBox="0 0 390 800"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className="w-full h-full"
+      preserveAspectRatio="xMidYMax meet"
+    >
+      {/* Ocean — flat, horizon at 15% from bottom, visible left of island */}
+      <rect x="-100" y="680" width="390" height="120" fill="oklch(0.73 0.05 200)" />
+      {/* Island — ellipsoid, offset right so ocean shows on left */}
+      <ellipse cx="420" cy="750" rx="400" ry="80" fill="oklch(0.7891 0.0452 81.82)" />
+      {/* Scale palm 75% around trunk base (340,730) so it stays planted on the island */}
+      <g transform="translate(340, 730) scale(0.75) translate(-340, -730)">
+        {/* Palm trunk — tapered filled shape: wide flat base (~30px), narrows to ~12px at crown */}
+        <path
+          d="M 325,730 C 267,605 244,435 249,350 L 261,350 C 261,435 297,605 355,730 Z"
+          fill="oklch(0.4572 0.0543 59.52)"
+        />
+        {/* Palm fronds — wider, elongated, drooping */}
+        <path d="M 255,350 C 195,265 115,280 45,375 C 115,345 205,325 155,350" fill="oklch(0.51 0.09 110)" />
+        <path d="M 255,350 C 210,258 145,230 90,300 C 148,268 210,300 255,350" fill="oklch(0.46 0.09 110)" />
+        <path d="M 255,350 C 200,248 120,240 180,245 C 222,210 255,278 255,350" fill="oklch(0.51 0.09 110)" />
+        <path d="M 255,350 C 205,248 328,228 330,260 C 325,258 280,282 255,350" fill="oklch(0.46 0.09 110)" />
+        <path d="M 255,350 C 255,278 368,292 385,345 C 366,320 302,318 255,350" fill="oklch(0.51 0.09 110)" />
+        <path d="M 255,350 C 300,270 358,368 375,380 C 348,378 295,332 255,350" fill="oklch(0.46 0.09 110)" />
+        {/* Two coconuts — rounded ellipses, different tilt angles */}
+        <ellipse cx="248" cy="350" rx="10" ry="13" transform="rotate(22, 248, 350)" fill="oklch(0.62 0.07 72)" />
+        <ellipse cx="265" cy="353" rx="10" ry="13" transform="rotate(-16, 265, 353)" fill="oklch(0.62 0.07 72)" />
+      </g>
+    </svg>
   )
 }
 
@@ -421,7 +457,7 @@ export function SiteHeader() {
             role="dialog"
             aria-modal="true"
             aria-label="Navigation menu"
-            className="fixed inset-0 z-40 md:hidden flex flex-col px-8 pt-24 pb-12"
+            className="fixed inset-0 z-40 md:hidden flex flex-col px-8 pt-24 pb-4 overflow-hidden"
             style={{
               background: 'oklch(0.9338 0.0650 89.92 / 96%)',
               backdropFilter: 'blur(20px)',
@@ -432,6 +468,22 @@ export function SiteHeader() {
             exit={{ clipPath: 'circle(0% at calc(100% - 34px) 30px)' }}
             transition={{ duration: 0.45, ease: [0.4, 0, 0.15, 1] }}
           >
+            {/* Palm tree graphic — fades in after bloom completes */}
+            <motion.div
+              className="absolute inset-0 pointer-events-none"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ delay: 0.3, duration: 0.4 }}
+            >
+              <MobileMenuGraphic />
+              {/* Atmospheric haze — CSS gradient always covers the real left edge regardless of SVG scaling */}
+              <div
+                className="absolute inset-0"
+                style={{ background: 'linear-gradient(to right, oklch(0.9338 0.0650 89.92 / 0.62) 0%, oklch(0.9338 0.0650 89.92 / 0%) 52%)' }}
+              />
+            </motion.div>
+
             <nav id="mobile-nav" ref={mobileNavRef} className="flex flex-col gap-6 mt-4" aria-label="Mobile navigation">
               {NAV_LINKS.map((link) => (
                 <MobileNavLink
@@ -444,7 +496,7 @@ export function SiteHeader() {
 
             {/* Ground-line footer */}
             <div
-              className="mt-auto pt-8 border-t"
+              className="mt-auto"
               style={{ borderColor: 'var(--color-ground-2)', opacity: 0.4 }}
             >
               <HeartFooter />
