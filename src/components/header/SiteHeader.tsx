@@ -475,6 +475,11 @@ export function SiteHeader() {
               transition={{ delay: 0.3, duration: 0.4 }}
             >
               <MobileMenuGraphic />
+              {/* Atmospheric haze — CSS gradient always covers the real left edge regardless of SVG scaling */}
+              <div
+                className="absolute inset-0"
+                style={{ background: 'linear-gradient(to right, oklch(0.9338 0.0650 89.92 / 0.62) 0%, oklch(0.9338 0.0650 89.92 / 0%) 52%)' }}
+              />
             </motion.div>
 
             <nav id="mobile-nav" ref={mobileNavRef} className="flex flex-col gap-6 mt-4" aria-label="Mobile navigation">
