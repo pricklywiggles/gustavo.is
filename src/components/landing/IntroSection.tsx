@@ -21,6 +21,8 @@ const SLIDES: { subject: string; predicate: string; photos: Photo[] }[] = [
       { src: '/photos/kiwi_1.png', alt: 'Kiwi' },
       { src: '/photos/kiwi_2.png', alt: 'Kiwi' },
       { src: '/photos/kiwi_3.png', alt: 'Kiwi' },
+      { src: '/photos/kiwi_1.png', alt: 'Kiwi' },
+      { src: '/photos/kiwi_2.png', alt: 'Kiwi' },
     ],
   },
   {
@@ -33,6 +35,8 @@ const SLIDES: { subject: string; predicate: string; photos: Photo[] }[] = [
       { src: '/photos/kiwi_2.png', alt: 'Kiwi' },
       { src: '/photos/kiwi_3.png', alt: 'Kiwi' },
       { src: '/photos/kiwi_1.png', alt: 'Kiwi' },
+      { src: '/photos/kiwi_2.png', alt: 'Kiwi' },
+      { src: '/photos/kiwi_3.png', alt: 'Kiwi' },
     ],
   },
   {
@@ -45,29 +49,34 @@ const SLIDES: { subject: string; predicate: string; photos: Photo[] }[] = [
       { src: '/photos/kiwi_3.png', alt: 'Kiwi' },
       { src: '/photos/kiwi_1.png', alt: 'Kiwi' },
       { src: '/photos/kiwi_2.png', alt: 'Kiwi' },
+      { src: '/photos/kiwi_3.png', alt: 'Kiwi' },
+      { src: '/photos/kiwi_1.png', alt: 'Kiwi' },
     ],
   },
 ]
 
 // Per-position tilt — feels hand-placed
-const ALL_ROTATIONS = [-3, 1.5, -2.5, 2, -1, 3]
+const ALL_ROTATIONS = [-3, 1.5, -2.5, 2, -1, 3, -2, 1]
 
 // Curved string: sag amount at centre (px, in the strip's coordinate space)
-const SAG_PX = 18
+const SAG_PX = 28
 // SVG viewBox height — must comfortably contain the curve + stroke
 const SVG_H = SAG_PX * 2 + 6
 // Y of the string endpoints in the viewBox (small top margin so stroke isn't clipped)
 const STRING_Y0 = 3
+// Fractional horizontal inset on each side — string runs edge-to-edge but photos are inset
+const STRIP_INSET = 0.05
 
 /**
- * For n cards laid out with justify-around, card i has its centre at
- * fractional x = (2i+1)/(2n). The bezier Y at that position is:
- *   y(p) = STRING_Y0 + 4 * SAG_PX * p * (1-p)
- * Using this as marginTop makes each clothespin top touch the curve exactly.
+ * Photos are inset STRIP_INSET from each edge, laid out with justify-around in the
+ * remaining (1 - 2*STRIP_INSET) fraction. Card i's fractional x on the full SVG width:
+ *   p = STRIP_INSET + (2i+1)/(2n) * (1 - 2*STRIP_INSET)
+ * The bezier Y at that position: y(p) = STRING_Y0 + 4 * SAG_PX * p * (1-p)
  */
 function computeStringOffsets(count: number): number[] {
+  const span = 1 - 2 * STRIP_INSET
   return Array.from({ length: count }, (_, i) => {
-    const p = (2 * i + 1) / (2 * count)
+    const p = STRIP_INSET + ((2 * i + 1) / (2 * count)) * span
     return Math.round(STRING_Y0 + 4 * SAG_PX * p * (1 - p))
   })
 }
@@ -77,13 +86,13 @@ export function IntroSection() {
   const subjectRefs = useRef<Array<HTMLSpanElement | null>>([])
   const predicateRefs = useRef<Array<HTMLSpanElement | null>>([])
   const photoCardRefs = useRef<Array<Array<HTMLDivElement | null>>>([])
-  const [cardCount, setCardCount] = useState(6)
+  const [cardCount, setCardCount] = useState(8)
 
   useEffect(() => {
     const update = () => {
-      if (window.innerWidth < 640) setCardCount(4)
-      else if (window.innerWidth < 768) setCardCount(5)
-      else setCardCount(6)
+      if (window.innerWidth < 640) setCardCount(6)
+      else if (window.innerWidth < 768) setCardCount(7)
+      else setCardCount(8)
     }
     update()
     window.addEventListener('resize', update)
@@ -163,7 +172,7 @@ export function IntroSection() {
       {/* Top 2/3 — text */}
       <div className="flex-2 flex flex-col justify-center px-8 sm:px-14 md:px-20 lg:px-28 xl:px-36">
         <p
-          className="text-6xl sm:text-7xl md:text-8xl font-light leading-[1.05]"
+          className="text-6xl sm:text-7xl md:text-8xl font-extrabold leading-[1.05]"
           style={{ color: 'var(--color-sky-1)' }}
         >
           I&apos;m
@@ -186,7 +195,7 @@ export function IntroSection() {
         </div>
 
         <p
-          className="text-6xl sm:text-7xl md:text-8xl font-light leading-[1.05] mt-3 sm:mt-4 md:mt-5"
+          className="text-6xl sm:text-7xl md:text-8xl font-extrabold leading-[1.05] mt-3 sm:mt-4 md:mt-5"
           style={{ color: 'var(--color-sky-1)' }}
         >
           with
@@ -230,7 +239,7 @@ export function IntroSection() {
 
         {/* All slide photo rows — GSAP animates x/rotation, marginTop places pins on curve */}
         {SLIDES.map((slide, slideIdx) => (
-          <div key={slideIdx} className="absolute inset-0 flex items-start justify-around">
+          <div key={slideIdx} className="absolute inset-0 flex items-start justify-around" style={{ paddingLeft: '5%', paddingRight: '5%' }}>
             {slide.photos.slice(0, cardCount).map((photo, cardIdx) => (
               <div
                 key={cardIdx}

@@ -195,9 +195,13 @@ export function SiteHeader() {
     return () => document.removeEventListener('keydown', trap)
   }, [mobileOpen])
 
-  // Desktop nav is invisible until GSAP scrolls it in — keep it out of tab order until then
+  // Desktop nav is invisible until GSAP scrolls it in — keep it out of tab order until then.
+  // Skip if already scrolled past the hero on load (GSAP will expose it immediately).
   useEffect(() => {
-    navRef.current?.setAttribute('inert', '')
+    const heroEnd = window.innerHeight * 2
+    if (window.scrollY < heroEnd) {
+      navRef.current?.setAttribute('inert', '')
+    }
   }, [])
 
   // Stagger mobile nav links in when the menu opens
@@ -294,29 +298,33 @@ export function SiteHeader() {
       },
     )
 
-    // onEnter fires when scroll crosses heroEnd going forward (onLeave requires an `end` to fire).
-    // Kill the ScrollTriggers directly — killing the tween alone doesn't kill its trigger.
-    // gsap.set() then writes the final values so nothing can reverse them on scroll-back.
+    // Kill all scroll-driven triggers and lock to final values.
+    // Called both from onEnter (normal scroll) and immediately on load if already past heroEnd
+    // (ScrollTrigger onEnter does not fire for triggers whose start is already behind on init).
     let frozen = false
+    const lockToFinalState = () => {
+      if (frozen) return
+      frozen = true
+      opacityTrigger.kill()
+      letterInTween.scrollTrigger?.kill()
+      letterOutTween.scrollTrigger?.kill()
+      navTween.scrollTrigger?.kill()
+      if (headerRef.current) headerRef.current.style.opacity = '1'
+      gsap.set(letters, { scale: 1, opacity: 1 })
+      gsap.set(Array.from(letters).slice(1), { scale: 0, opacity: 0 })
+      if (navRef.current) {
+        navRef.current.removeAttribute('inert')
+        gsap.set(navRef.current, { opacity: 1, y: 0 })
+      }
+    }
+
     ScrollTrigger.create({
       trigger: 'body',
       start: `top+=${heroEnd} top`,
-      onEnter: () => {
-        if (frozen) return
-        frozen = true
-        opacityTrigger.kill()
-        letterInTween.scrollTrigger?.kill()
-        letterOutTween.scrollTrigger?.kill()
-        navTween.scrollTrigger?.kill()
-        if (headerRef.current) headerRef.current.style.opacity = '1'
-        gsap.set(letters, { scale: 1, opacity: 1 })
-        gsap.set(Array.from(letters).slice(1), { scale: 0, opacity: 0 })
-        if (navRef.current) {
-          navRef.current.removeAttribute('inert')
-          gsap.set(navRef.current, { opacity: 1, y: 0 })
-        }
-      },
+      onEnter: lockToFinalState,
     })
+
+    if (window.scrollY >= heroEnd) lockToFinalState()
   })
 
   return (
