@@ -124,6 +124,38 @@ function HeartFooter() {
   )
 }
 
+function MobileMenuGraphic() {
+  return (
+    <svg
+      viewBox="0 0 390 800"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className="w-full h-full"
+      preserveAspectRatio="xMidYMax meet"
+    >
+      {/* Ocean — flat, horizon at 15% from bottom, visible left of island */}
+      <rect x="0" y="680" width="390" height="120" fill="oklch(0.73 0.05 200)" />
+      {/* Island — ellipsoid, offset right so ocean shows on left */}
+      <ellipse cx="420" cy="750" rx="400" ry="80" fill="oklch(0.7891 0.0452 81.82)" />
+      {/* Palm trunk — curved, 60% of previous height */}
+      <path
+        d="M 340,670 C 282,545 250,435 255,350"
+        stroke="oklch(0.4572 0.0543 59.52)"
+        strokeWidth="14"
+        strokeLinecap="round"
+      />
+      {/* Palm fronds — wider, elongated, drooping */}
+      <path d="M 255,350 C 195,265 115,280 45,375 C 115,345 205,325 155,350" fill="oklch(0.48 0.09 110)" />
+      <path d="M 255,350 C 210,258 145,230 90,300 C 148,268 210,300 255,350" fill="oklch(0.46 0.09 110)" />
+      <path d="M 255,350 C 200,248 120,240 180,245 C 222,210 255,278 255,350" fill="oklch(0.48 0.09 110)" />
+      <path d="M 255,350 C 205,248 328,228 330,260 C 325,258 280,282 255,350" fill="oklch(0.46 0.09 110)" />
+      <path d="M 255,350 C 255,278 368,292 385,345 C 366,320 302,318 255,350" fill="oklch(0.48 0.09 110)" />
+      <path d="M 255,350 C 300,270 358,368 375,380 C 348,378 295,332 255,350" fill="oklch(0.46 0.09 110)" />
+    </svg>
+  )
+}
+
 function MobileNavLink({ label, href, Icon, onClose }: NavLinkDef & { onClose: () => void }) {
   return (
     <a
@@ -421,7 +453,7 @@ export function SiteHeader() {
             role="dialog"
             aria-modal="true"
             aria-label="Navigation menu"
-            className="fixed inset-0 z-40 md:hidden flex flex-col px-8 pt-24 pb-12"
+            className="fixed inset-0 z-40 md:hidden flex flex-col px-8 pt-24 pb-12 overflow-hidden"
             style={{
               background: 'oklch(0.9338 0.0650 89.92 / 96%)',
               backdropFilter: 'blur(20px)',
@@ -432,6 +464,17 @@ export function SiteHeader() {
             exit={{ clipPath: 'circle(0% at calc(100% - 34px) 30px)' }}
             transition={{ duration: 0.45, ease: [0.4, 0, 0.15, 1] }}
           >
+            {/* Palm tree graphic — fades in after bloom completes */}
+            <motion.div
+              className="absolute inset-0 pointer-events-none"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ delay: 0.3, duration: 0.4 }}
+            >
+              <MobileMenuGraphic />
+            </motion.div>
+
             <nav id="mobile-nav" ref={mobileNavRef} className="flex flex-col gap-6 mt-4" aria-label="Mobile navigation">
               {NAV_LINKS.map((link) => (
                 <MobileNavLink
