@@ -65,3 +65,5 @@ yarn-error.log*
 
 .vercel
 .env*.local
+
+.playwright-mcp
