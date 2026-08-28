@@ -42,6 +42,16 @@ const nextConfig = {
 			},
 		],
 	},
+	async redirects() {
+		// The pre-redesign URL; external links and search results still point at it.
+		return [
+			{
+				source: "/remembering/ponder_blogs",
+				destination: "/remembering/ponder-blogs",
+				permanent: true,
+			},
+		];
+	},
 	async headers() {
 		return [
 			{
