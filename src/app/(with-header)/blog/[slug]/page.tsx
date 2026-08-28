@@ -65,38 +65,42 @@ export default async function BlogPostPage({
 	return (
 		<>
 			<JsonLd data={blogPostingJsonLd(postSummary(page))} />
-			<main
-				data-curtain-target={page.url}
-				data-surface="dusk-earth"
-				className="bg-dusk-earth text-pale-dune"
-			>
-				<ScrollReset />
-				<article>
-					<BlogPostHero
-						title={page.data.title}
-						dateTime={blogDateTime(page.data.date)}
-						dateLabel={formatBlogDate(page.data.date)}
-						standfirst={page.data.description}
-						tags={page.data.tags}
-						cover={cover}
-					/>
-					{/* Content-width seam: full bleed here read as a wall between
+			{/* A short post must still fill the viewport: main grows and the footer sits at
+			    the bottom, so the light body ground never shows under the dark earth. */}
+			<div className="flex min-h-svh flex-col">
+				<main
+					data-curtain-target={page.url}
+					data-surface="dusk-earth"
+					className="flex-1 bg-dusk-earth text-pale-dune"
+				>
+					<ScrollReset />
+					<article>
+						<BlogPostHero
+							title={page.data.title}
+							dateTime={blogDateTime(page.data.date)}
+							dateLabel={formatBlogDate(page.data.date)}
+							standfirst={page.data.description}
+							tags={page.data.tags}
+							cover={cover}
+						/>
+						{/* Content-width seam: full bleed here read as a wall between
 					    title and body. The closing seam stays full bleed. */}
-					<div className="mx-auto w-full max-w-3xl px-6 sm:px-8">
-						<div className="mx-auto max-w-[65ch]">
-							<GroundStrata />
+						<div className="mx-auto w-full max-w-3xl px-6 sm:px-8">
+							<div className="mx-auto max-w-[65ch]">
+								<GroundStrata />
+							</div>
 						</div>
-					</div>
-					<section className="mx-auto w-full max-w-3xl px-6 pt-14 pb-20 sm:px-8 sm:pt-16 sm:pb-24">
-						<div className="blog-prose prose mx-auto">
-							<Mdx components={blogMdxComponents} />
-						</div>
-					</section>
-					<GroundStrata flip />
-				</article>
-			</main>
-			{/* Sibling of <main>, never inside it (landmark demotion). */}
-			<SiteFooter />
+						<section className="mx-auto w-full max-w-3xl px-6 pt-14 pb-20 sm:px-8 sm:pt-16 sm:pb-24">
+							<div className="blog-prose prose mx-auto">
+								<Mdx components={blogMdxComponents} />
+							</div>
+						</section>
+						<GroundStrata flip />
+					</article>
+				</main>
+				{/* Sibling of <main>, never inside it (landmark demotion). */}
+				<SiteFooter />
+			</div>
 		</>
 	);
 }
