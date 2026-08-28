@@ -1,7 +1,9 @@
 import { ChevronLeft } from "lucide-react";
+import Image from "next/image";
 import { CurtainLink } from "@/components/curtain-link";
 import { ScrollFadeIn } from "@/components/scroll-fade-in";
 import { FOCUS_OUTLINE } from "@/lib/focus-ring";
+import type { PostCover } from "@/lib/post-cover";
 
 /**
  * Contrast on Dusk Earth: eyebrow Noon Sun 5.08:1, title 6.03:1, standfirst 4.88:1.
@@ -13,13 +15,18 @@ export function BlogPostHero({
 	dateLabel,
 	standfirst,
 	tags,
+	cover,
 }: {
 	title: string;
 	dateTime: string;
 	dateLabel: string;
 	standfirst?: string;
 	tags: string[];
+	cover?: PostCover;
 }) {
+	// Each optional block steps the rise back by one beat after the one before it.
+	const tagsDelay = standfirst ? 0.22 : 0.16;
+	const coverDelay = tags.length > 0 ? tagsDelay + 0.06 : tagsDelay;
 	return (
 		<header className="bg-dusk-earth">
 			{/* pt-28 clears the overlaid riding bar, like the retro hero. */}
@@ -60,7 +67,7 @@ export function BlogPostHero({
 					{tags.length > 0 ? (
 						<ScrollFadeIn
 							as="ul"
-							delay={standfirst ? 0.22 : 0.16}
+							delay={tagsDelay}
 							className="mt-7 flex flex-wrap gap-2"
 						>
 							{tags.map((tag) => (
@@ -71,6 +78,20 @@ export function BlogPostHero({
 									{tag}
 								</li>
 							))}
+						</ScrollFadeIn>
+					) : null}
+					{cover ? (
+						<ScrollFadeIn as="figure" delay={coverDelay} className="mt-10">
+							{/* Above the fold on every post, so it loads eagerly. */}
+							<Image
+								src={cover.src}
+								width={cover.width}
+								height={cover.height}
+								alt={cover.alt}
+								priority
+								sizes="(min-width: 48rem) 42rem, 100vw"
+								className="h-auto w-full rounded-xl"
+							/>
 						</ScrollFadeIn>
 					) : null}
 				</div>

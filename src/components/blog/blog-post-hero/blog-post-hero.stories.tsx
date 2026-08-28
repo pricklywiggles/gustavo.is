@@ -46,6 +46,20 @@ export const Minimal: Story = {
 	args: { tags: [] },
 };
 
+/** The cover rises last, one beat after the tags, as a full-measure figure. */
+export const WithCover: Story = {
+	args: {
+		...Full.args,
+		cover: {
+			src: "/og/blog.jpg",
+			width: 1200,
+			height: 630,
+			alt: "Lego Gustavo walking his dog Kiwi beneath the Hollywood sign",
+		},
+	},
+	render: Full.render,
+};
+
 /**
  * A long title wraps on its own balance point, and the standfirst delay steps back to
  * 0.16 when there are no tags to follow it.

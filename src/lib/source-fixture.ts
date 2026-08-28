@@ -11,6 +11,7 @@ type Frontmatter = {
 	tags: string[];
 	draft: boolean;
 	image?: string;
+	imageAlt?: string;
 };
 
 const post = (
@@ -43,6 +44,7 @@ export const BLOG_FIXTURE = [
 			tags: ["t"],
 			draft: false,
 			image: "./new.webp",
+			imageAlt: "A new thing",
 		},
 		// What remarkCoverExport's `export const cover` looks like after bundling.
 		{

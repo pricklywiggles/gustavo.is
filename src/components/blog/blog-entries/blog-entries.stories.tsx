@@ -58,6 +58,23 @@ export const Rail: Story = {
 	args: { entries: ENTRIES },
 };
 
+/**
+ * A cover becomes a trailing thumbnail. Entries without one keep the two-column rail, so
+ * the two shapes can share a list.
+ */
+export const WithCovers: Story = {
+	args: {
+		entries: ENTRIES.map((entry, i) =>
+			i === 1
+				? entry
+				: {
+						...entry,
+						cover: { src: "/og/blog.jpg", width: 1200, height: 630, alt: "" },
+					},
+		),
+	},
+};
+
 /** Descriptions are optional; a post without one collapses to date and title. */
 export const WithoutDescriptions: Story = {
 	args: {

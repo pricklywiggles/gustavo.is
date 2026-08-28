@@ -1,6 +1,9 @@
+import Image from "next/image";
 import { CurtainLink } from "@/components/curtain-link";
 import { ScrollFadeIn } from "@/components/scroll-fade-in";
 import { FOCUS_RING } from "@/lib/focus-ring";
+import type { PostCover } from "@/lib/post-cover";
+import { cn } from "@/lib/utils";
 
 export type BlogEntry = {
 	url: string;
@@ -10,6 +13,7 @@ export type BlogEntry = {
 	dateTime: string;
 	/** Pre-formatted label; the server owns locale and timezone. */
 	dateLabel: string;
+	cover?: PostCover;
 };
 
 /**
@@ -37,7 +41,15 @@ export function BlogEntries({ entries }: { entries: BlogEntry[] }) {
 					    past the text column while the type stays on grid. */}
 					<CurtainLink
 						href={entry.url}
-						className={`-mx-5 group block rounded-xl p-5 transition-colors duration-200 hover:bg-pale-dune/10 focus-visible:bg-pale-dune/10 sm:-mx-6 sm:grid sm:grid-cols-[7rem_1fr] sm:gap-x-6 sm:p-6 ${FOCUS_RING.dark}`}
+						className={cn(
+							"-mx-5 group block rounded-xl p-5 transition-colors duration-200 hover:bg-pale-dune/10 focus-visible:bg-pale-dune/10 sm:-mx-6 sm:p-6",
+							// With a cover the thumbnail takes a trailing column on every width;
+							// on phones it spans both text rows so date and title stay stacked.
+							entry.cover
+								? "grid grid-cols-[1fr_auto] gap-x-4 sm:grid-cols-[7rem_1fr_auto] sm:gap-x-6"
+								: "sm:grid sm:grid-cols-[7rem_1fr] sm:gap-x-6",
+							FOCUS_RING.dark,
+						)}
 					>
 						{/* Noon Sun holds 5.08:1 on the dark earth. */}
 						<time
@@ -46,7 +58,13 @@ export function BlogEntries({ entries }: { entries: BlogEntry[] }) {
 						>
 							{entry.dateLabel}
 						</time>
-						<span className="mt-1.5 block sm:mt-0">
+						<span
+							className={cn(
+								"mt-1.5 block sm:mt-0",
+								entry.cover &&
+									"col-start-1 row-start-2 sm:col-start-2 sm:row-start-1",
+							)}
+						>
 							<h2 className="font-medium text-pale-dune text-xl leading-snug transition-colors duration-200 group-hover:text-first-light group-focus-visible:text-first-light">
 								{entry.title}
 							</h2>
@@ -58,6 +76,19 @@ export function BlogEntries({ entries }: { entries: BlogEntry[] }) {
 								</p>
 							) : null}
 						</span>
+						{entry.cover ? (
+							// Decorative in the list: the title is the link's name.
+							<span className="col-start-2 row-span-2 row-start-1 self-start sm:col-start-3 sm:row-span-1">
+								<Image
+									src={entry.cover.src}
+									width={entry.cover.width}
+									height={entry.cover.height}
+									alt=""
+									sizes="6rem"
+									className="size-20 rounded-lg object-cover sm:size-24"
+								/>
+							</span>
+						) : null}
 					</CurtainLink>
 				</ScrollFadeIn>
 			))}
