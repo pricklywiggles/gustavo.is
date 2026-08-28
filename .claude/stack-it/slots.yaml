@@ -1,0 +1,268 @@
+project:
+  description: Personal site at gustavo.is — an about/personal presence, a portfolio of work, and a blog, with a working contact form and newsletter signup. Rebuild of an existing live site (nothing to preserve). Operator is US-based.
+  type: web-app
+  platforms: [web]
+slots:
+  - slot: language/runtime
+    required: true
+    rationale: Gates every other slot in the list.
+    preference: TypeScript on Node (user-selected via Next.js)
+    source: nodejs/Release schedule.json (Node 20 EOL 2026-04-30; 24 Active LTS; 26 Current)
+
+  - slot: runtime version pinning
+    required: true
+    rationale: Host build images drift by documented policy, so the version must be pinned explicitly rather than inherited.
+    preference: null
+    source: Vercel build image defaults to Node 24.x; corepack removed from Node 25+
+
+  - slot: rendering model
+    required: true
+    rationale: Static vs on-demand cascades into hosting, image pipeline, and how the form endpoints are wired.
+    preference: null
+    source: web.dev "Rendering on the Web"
+
+  - slot: site framework/generator
+    required: true
+    rationale: Provides routing, templating, and the content build.
+    preference: Next.js (user-selected)
+    source: null
+
+  - slot: package manager + lockfile
+    required: true
+    rationale: A committed lockfile is what makes the build reproducible.
+    preference: null
+    source: npm 12 GA 2026-07-08 blocks lifecycle scripts by default; pnpm defaults to a 24h minimumReleaseAge
+
+  - slot: content source/authoring pipeline
+    required: true
+    rationale: Blog and portfolio entries need a defined home and a path from written text to built page; MDX alone gives no frontmatter parsing, typed schemas, or collection queries.
+    preference: files committed to this repo (user-selected)
+    source: null
+
+  - slot: content format
+    required: true
+    rationale: Long-form posts need an authoring format.
+    preference: MDX (user-selected)
+    source: null
+
+  - slot: schema validation
+    required: true
+    rationale: Post frontmatter and contact-form payloads both need validation — build-time to catch a typo'd date that silently breaks a listing, runtime because form input is untrusted.
+    preference: null
+    source: OWASP Top 10 (untrusted input must be validated server-side)
+
+  - slot: URL/permalink and redirect strategy
+    required: true
+    rationale: No existing URLs to preserve (user-confirmed), so this is a clean design decision — but still a one-way door once the site is live again.
+    preference: null
+    source: W3C "Cool URIs don't change"
+
+  - slot: styling approach
+    required: true
+    rationale: A portfolio is judged on its visual design.
+    preference: Tailwind CSS (user-selected)
+    source: null
+
+  - slot: UI component primitives
+    required: true
+    rationale: Accessible, unstyled primitives for the interactive parts (menus, dialogs, form controls) so keyboard and screen-reader behavior isn't hand-rolled.
+    preference: Radix (user-selected)
+    source: null
+
+  - slot: component layer/design system
+    required: true
+    rationale: A copy-in component layer over the primitives, giving styled defaults without a runtime dependency.
+    preference: shadcn/ui (user-selected)
+    source: null
+
+  - slot: prose/long-form typographic styling
+    required: true
+    rationale: Rendered MDX emits unclassed headings, paragraphs, and blockquotes that Tailwind targets with nothing by default; the blog is unreadable until this is decided.
+    preference: null
+    source: null
+
+  - slot: animation
+    required: true
+    rationale: User intends to animate, which also makes honoring prefers-reduced-motion an accessibility obligation rather than a nicety.
+    preference: Motion + GSAP (user-selected)
+    source: MDN prefers-reduced-motion
+
+  - slot: image optimization
+    required: true
+    rationale: The portfolio carries images throughout, which makes them the likely LCP element on most pages.
+    preference: null
+    source: web.dev responsive images
+
+  - slot: hosting + CDN/deployment
+    required: true
+    rationale: Determines how headers, redirects, and functions are configured; the domain already lives here.
+    preference: Vercel (user-selected; gustavo.is already resolves to vercel-dns.com)
+    source: null
+
+  - slot: cache-control + asset fingerprinting
+    required: true
+    rationale: Long-lived caching of assets only works if the build emits hashed filenames.
+    preference: null
+    source: web.dev "Love your cache"
+
+  - slot: server-side function runtime
+    required: true
+    rationale: The contact form and newsletter signup need code that runs at request time.
+    preference: Vercel Functions via Next.js route handlers (implied by Vercel + Next.js; to confirm)
+    source: null
+
+  - slot: domain/DNS/TLS management
+    required: true
+    rationale: gustavo.is must keep resolving through the rebuild; this slot also owns certificate automation and the SPF/DKIM/DMARC records the newsletter requires.
+    preference: Vercel DNS (already in place)
+    source: NCSC "Managing public domain names"; CA/B Forum SC-081v3 (certs capped at 200 days, 47 by 2029)
+
+  - slot: transactional email delivery
+    required: true
+    rationale: A contact form that actually sends needs a delivery path that survives spam filtering.
+    preference: null
+    source: null
+
+  - slot: newsletter subscriber management
+    required: true
+    rationale: Signups must be stored, consent recorded, and broadcasts sent with a working unsubscribe.
+    preference: null
+    source: RFC 8058 (one-click unsubscribe)
+
+  - slot: form abuse protection
+    required: true
+    rationale: A public endpoint that sends email will be found and abused; rate limiting is a cost control as much as a security one.
+    preference: null
+    source: OWASP Automated Threats; W3C "Inaccessibility of CAPTCHA" (honeypots rank above visual CAPTCHA)
+
+  - slot: secrets management
+    required: true
+    rationale: The email and analytics integrations carry API keys that must never reach the repo or the client bundle.
+    preference: null
+    source: OWASP Secrets Management Cheat Sheet
+
+  - slot: security response headers
+    required: true
+    rationale: HSTS and a content security policy are configured per-host, so the mechanism is chosen alongside hosting.
+    preference: null
+    source: OWASP Secure Headers Project; web.dev strict-csp
+
+  - slot: supply-chain policy
+    required: true
+    rationale: Install-script execution, dependency cooldown, and lockfile policy must be set deliberately; the local npm 12 already blocks scripts by default, so this will surface at install whether or not it is decided.
+    preference: null
+    source: OWASP Top 10:2025 A03; CISA axios alert 2026-04-20 (min-release-age=7, ignore-scripts=true)
+
+  - slot: analytics + consent posture
+    required: true
+    rationale: User wants privacy-conscious visitor stats; operator is US-based, so no consent-banner regime applies and this is picked on merit alone.
+    preference: Plausible, self-hosted (user-selected)
+    source: null
+
+  - slot: content backup/durability
+    required: true
+    rationale: The writing is the only irreplaceable asset here, and a single git remote is one copy in the account most likely to be lost or compromised.
+    preference: null
+    source: CISA 3-2-1 backup guidance
+
+  - slot: social/sharing metadata
+    required: true
+    rationale: A portfolio and blog get shared as links, and without Open Graph tags those links render blank.
+    preference: null
+    source: ogp.me
+
+  - slot: browser support target
+    required: true
+    rationale: An explicit support target gates the CSS available; Tailwind v4 also declares its own browser floor, which may set this by proxy.
+    preference: null
+    source: web.dev Baseline
+
+  - slot: type system
+    required: false
+    rationale: Implied by the chosen component stack; the live question is which major version, given TypeScript 7.0 shipped 2026-07-08 and is inside the supply-chain cooldown window.
+    preference: TypeScript (user-selected)
+    source: null
+
+  - slot: testing
+    required: false
+    rationale: The form and newsletter endpoints are the part that genuinely warrants tests.
+    preference: Vitest (user-selected)
+    source: null
+
+  - slot: component workshop
+    required: false
+    rationale: Isolated component development and visual review; heavy for a personal site, but user-selected.
+    preference: Storybook (user-selected)
+    source: null
+
+  - slot: web fonts/typography loading
+    required: false
+    rationale: User has a specific typeface; the open questions are format conversion (files on disk are TTF-only), subsetting, and which weights actually ship.
+    preference: Wotfard (user-supplied local files at ~/repository/pricklywiggles/fonts/wotfard — 7 TTF weights, no WOFF2, no license file present)
+    source: web.dev optimize-web-fonts
+
+  - slot: linting/formatting
+    required: false
+    rationale: Next 16 removed `next lint`, so this now needs an explicit choice rather than a framework default.
+    preference: null
+    source: null
+
+  - slot: CI
+    required: false
+    rationale: Vercel ships git-push builds, so separate CI is only needed for checks that must run before deploy.
+    preference: null
+    source: null
+
+  - slot: error tracking
+    required: false
+    rationale: A contact form that silently stops delivering is the one failure that would otherwise go unnoticed.
+    preference: null
+    source: null
+
+  - slot: feed/syndication
+    required: false
+    rationale: A feed is near-free to emit from an existing blog and is how regular readers follow it.
+    preference: null
+    source: RSS 2.0; RFC 4287 (Atom)
+
+  - slot: syntax highlighting
+    required: false
+    rationale: Only needed if posts contain code; the real axis is build-time vs shipping a parser to every reader.
+    preference: null
+    source: null
+
+  - slot: dark mode/theming
+    required: false
+    rationale: Optional, but silently defaulting to light is the failure mode worth deciding against explicitly.
+    preference: null
+    source: MDN light-dark()
+
+  - slot: accessibility target
+    required: false
+    rationale: Not legally required of a personal site, but nearly free to build in and expensive to retrofit; target 2.2 AA, never 3.0 (still a Working Draft).
+    preference: null
+    source: W3C WCAG 2.2 (Recommendation)
+
+  - slot: OG image generation
+    required: false
+    rationale: One static share image, a per-post generated one, or none — a genuine cost axis rather than a freebie.
+    preference: null
+    source: null
+
+  - slot: on-site search
+    required: false
+    rationale: None is defensible at personal-blog content volume; a client-side index taxes every visitor for the few who search.
+    preference: null
+    source: null
+
+  - slot: crawl and indexing control
+    required: false
+    rationale: Covers sitemap, robots.txt, and whether AI crawlers are allowed; Google's under-500-pages sitemap exemption applies here.
+    preference: null
+    source: RFC 9309; Google Search Central (robots.txt is not an index-control mechanism)
+
+  - slot: content licensing
+    required: false
+    rationale: Silence means all rights reserved, which is coherent; worth an explicit decision because Creative Commons grants are irrevocable.
+    preference: null
+    source: Berne Convention (protection is automatic)

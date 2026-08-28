@@ -1,0 +1,80 @@
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { BlogEntries, type BlogEntry } from "@/components/blog/blog-entries";
+
+/**
+ * The index's editorial rail. Entry titles stay Wotfard medium on purpose: the list
+ * reads as UI rather than as titles, so the Two Voices Rule keeps Kitora out of it.
+ *
+ * Hover or tab through an entry: the wash lifts the ground, and the muted roles must
+ * brighten with it. At rest they clear AA on Dusk Earth; on the lightened ground the
+ * resting opacities would fall to 3.74:1 and 4.06:1, so the stepped set takes over.
+ */
+const meta = {
+	title: "Blog/Blog entries",
+	component: BlogEntries,
+	parameters: { layout: "fullscreen" },
+	decorators: [
+		(StoryComponent) => (
+			<div className="min-h-screen bg-dusk-earth px-8 py-14">
+				<div className="mx-auto max-w-3xl">
+					<StoryComponent />
+				</div>
+			</div>
+		),
+	],
+} satisfies Meta<typeof BlogEntries>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+const ENTRIES: BlogEntry[] = [
+	{
+		url: "/blog/hello-world",
+		title: "Hello world",
+		description:
+			"Why this site exists, what it is built on, and what I plan to write about now that there is somewhere to put it.",
+		dateTime: "2026-07-16",
+		dateLabel: "July 16, 2026",
+	},
+	{
+		url: "/blog/one-ramp",
+		title: "One ramp, no dark mode",
+		description:
+			"Every surface colour on this site comes from a single warm ramp. Here is what that constraint bought me, and the two places I had to break it on purpose.",
+		dateTime: "2026-06-02",
+		dateLabel: "June 2, 2026",
+	},
+	{
+		url: "/blog/pinned-scroll",
+		title: "Pinning a scroll story without losing your mind",
+		description:
+			"Measurement inside a pinned ScrollTrigger lies to you in ways that are entirely predictable once you know where the lie comes from.",
+		dateTime: "2026-04-19",
+		dateLabel: "April 19, 2026",
+	},
+];
+
+export const Rail: Story = {
+	args: { entries: ENTRIES },
+};
+
+/** Descriptions are optional; a post without one collapses to date and title. */
+export const WithoutDescriptions: Story = {
+	args: {
+		entries: ENTRIES.map(({ description: _description, ...entry }) => entry),
+	},
+};
+
+/**
+ * Only the first four entries stagger as a batch. Past that a lone entry deep in the
+ * list rises immediately rather than waiting out its absolute position.
+ */
+export const PastTheStaggerBatch: Story = {
+	args: {
+		entries: Array.from({ length: 7 }, (_, i) => ({
+			...ENTRIES[i % ENTRIES.length],
+			url: `/blog/entry-${i}`,
+			title: `${ENTRIES[i % ENTRIES.length].title} (${i + 1})`,
+		})),
+	},
+};

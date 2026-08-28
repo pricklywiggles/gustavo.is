@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      # pnpm version comes from package.json's packageManager field.
+      - run: corepack enable
+      - name: Authenticate the Motion+ registry
+        # User-level on purpose: an unresolved ${VAR} in the repo .npmrc breaks local installs.
+        run: echo "//api.motion.dev/npm/:_authToken=${MOTION_TOKEN}" >> "$HOME/.npmrc"
+        env:
+          MOTION_TOKEN: ${{ secrets.MOTION_TOKEN }}
+      - run: pnpm install --frozen-lockfile
+      # tsc needs the gitignored .source and next-env.d.ts.
+      - run: pnpm exec fumadocs-mdx
+      - run: pnpm exec next typegen
+      - run: pnpm exec biome check .
+      - run: pnpm exec tsc --noEmit
+      # The storybook vitest project needs headless chromium.
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm exec vitest run
+
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - run: corepack enable
+      - name: Authenticate the Motion+ registry
+        run: echo "//api.motion.dev/npm/:_authToken=${MOTION_TOKEN}" >> "$HOME/.npmrc"
+        env:
+          MOTION_TOKEN: ${{ secrets.MOTION_TOKEN }}
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
