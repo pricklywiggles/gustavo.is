@@ -65,16 +65,17 @@ export default async function BlogPostPage({
 	return (
 		<>
 			<JsonLd data={blogPostingJsonLd(postSummary(page))} />
-			{/* A short post must still fill the viewport: main grows and the footer sits at
-			    the bottom, so the light body ground never shows under the dark earth. */}
+			{/* A short post must still fill the viewport: the body section absorbs the spare
+			    height so the closing seam stays on the footer and the light body ground
+			    never shows under the dark earth. */}
 			<div className="flex min-h-svh flex-col">
 				<main
 					data-curtain-target={page.url}
 					data-surface="dusk-earth"
-					className="flex-1 bg-dusk-earth text-pale-dune"
+					className="flex flex-1 flex-col bg-dusk-earth text-pale-dune"
 				>
 					<ScrollReset />
-					<article>
+					<article className="flex flex-1 flex-col">
 						<BlogPostHero
 							title={page.data.title}
 							dateTime={blogDateTime(page.data.date)}
@@ -90,7 +91,7 @@ export default async function BlogPostPage({
 								<GroundStrata />
 							</div>
 						</div>
-						<section className="mx-auto w-full max-w-3xl px-6 pt-14 pb-20 sm:px-8 sm:pt-16 sm:pb-24">
+						<section className="mx-auto w-full max-w-3xl flex-1 px-6 pt-14 pb-20 sm:px-8 sm:pt-16 sm:pb-24">
 							<div className="blog-prose prose mx-auto">
 								<Mdx components={blogMdxComponents} />
 							</div>
