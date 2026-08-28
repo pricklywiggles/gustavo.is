@@ -1,4 +1,5 @@
 {
+	"installCommand": "echo \"//api.motion.dev/npm/:_authToken=${MOTION_TOKEN}\" >> \"$HOME/.npmrc\" && pnpm install",
 	"rewrites": [
 		{
 			"source": "/api/pa",

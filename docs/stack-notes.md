@@ -85,7 +85,7 @@ Pending: the newsletter subscribe endpoint the lockfile decides on (`/api/subscr
 
 ## Platform
 
-- Vercel, Hobby plan; the ToS risk of a portfolio on a non-commercial plan is accepted by the owner. Git-push builds are the CI; nothing else gates a deploy. Two project env vars are required before any deploy works: `ENABLE_EXPERIMENTAL_COREPACK=1` and `MOTION_TOKEN`. Hobby limits that matter: one concurrent build, a 60s function ceiling, and no Log Drains (part of why Sentry earns its place).
+- Vercel, Hobby plan; the ToS risk of a portfolio on a non-commercial plan is accepted by the owner. Git-push builds are the CI; nothing else gates a deploy. Two project env vars are required before any deploy works: `ENABLE_EXPERIMENTAL_COREPACK=1` and `MOTION_TOKEN`. The `installCommand` in `vercel.json` writes that token into the build's user-level `.npmrc` before `pnpm install`, the same way `ci.yml` does, because pnpm reads no auth from an env var on its own. Hobby limits that matter: one concurrent build, a 60s function ceiling, and no Log Drains (part of why Sentry earns its place).
 - DNS and TLS are on Vercel. Resend's SPF, DKIM and MX records go on the sending subdomain, with DMARC starting at `p=none`. Domain expiry is the likeliest way the site dies: keep auto-renew, a live payment method, and MFA on the registrar, Vercel and GitHub accounts.
 - The writing is the only irreplaceable asset: mirror the repo to a second git host and back up the Plausible databases separately.
 <!-- stack-it:stack end -->
