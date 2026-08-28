@@ -32,8 +32,13 @@ export function ogImage(key: OgImage) {
 	return { ...OG_IMAGES[key], ...OG_SIZE };
 }
 
-/** A page's own picture, dimensions unknown, e.g. a post's frontmatter image. */
-export type CustomImage = { url: string; alt: string };
+/** A page's own picture, e.g. a post's cover; dimensions when the bundler knows them. */
+export type CustomImage = {
+	url: string;
+	alt: string;
+	width?: number;
+	height?: number;
+};
 
 type PageMetadataInput = {
 	path: string;

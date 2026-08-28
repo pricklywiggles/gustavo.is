@@ -20,7 +20,7 @@ export type PostSummary = {
 	/** ISO date, YYYY-MM-DD. */
 	date: string;
 	tags: string[];
-	/** Representative image, a path under public/. */
+	/** The cover's served path (hashed under /_next/static/media). */
 	image?: string;
 };
 

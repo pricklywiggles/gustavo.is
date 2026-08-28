@@ -14,6 +14,15 @@
         "value": "999px",
         "createdAt": "2026-08-27T21:54:46.989Z",
         "reason": "pill radius is a shipped idiom: rounded-full appears 20x in src/ including the cta() recipe; DESIGN.md's rounded scale just does not enumerate the pill"
+      },
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "src/components/blog/blog-mdx-components/blog-mdx-components.tsx"
+        ],
+        "createdAt": "2026-08-28T20:17:05.400Z",
+        "reason": "Claude: src is a guarded prop of the MDX img bridge (returns null when missing), not a literal empty src"
       }
     ]
   }

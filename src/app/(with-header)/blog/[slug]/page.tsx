@@ -9,7 +9,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { blogDateTime, formatBlogDate } from "@/lib/blog-date";
 import { postSummary } from "@/lib/llms-content";
 import { pageMetadata } from "@/lib/site-metadata";
-import { blogSource } from "@/lib/source";
+import { blogSource, coverOf } from "@/lib/source";
 import { blogPostingJsonLd } from "@/lib/structured-data";
 
 export function generateStaticParams() {
@@ -25,12 +25,18 @@ export async function generateMetadata({
 	const page = blogSource.getPage([slug]);
 	// Drafts 404 below, so their metadata must not leak into that response.
 	if (!page || page.data.draft) return {};
+	const cover = coverOf(page);
 	return pageMetadata({
 		path: page.url,
 		title: page.data.title,
 		description: page.data.description,
-		image: page.data.image
-			? { url: page.data.image, alt: page.data.title }
+		image: cover
+			? {
+					url: cover.src,
+					width: cover.width,
+					height: cover.height,
+					alt: page.data.title,
+				}
 			: "blog",
 		article: {
 			publishedTime: blogDateTime(page.data.date),

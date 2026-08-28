@@ -7,7 +7,7 @@ import {
 	postMarkdown,
 	retrospectiveMarkdown,
 } from "./llms";
-import { publishedPosts } from "./source";
+import { coverOf, publishedPosts } from "./source";
 
 type Post = ReturnType<typeof publishedPosts>[number];
 
@@ -18,7 +18,7 @@ export function postSummary(post: Post): PostSummary {
 		description: post.data.description,
 		date: blogDateTime(post.data.date),
 		tags: post.data.tags,
-		image: post.data.image,
+		image: coverOf(post)?.src,
 	};
 }
 

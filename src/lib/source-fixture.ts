@@ -13,9 +13,14 @@ type Frontmatter = {
 	image?: string;
 };
 
-const post = (file: string, data: Frontmatter) => ({
+const post = (
+	file: string,
+	data: Frontmatter,
+	exports: Record<string, unknown> = {},
+) => ({
 	info: { path: file, fullPath: `content/blog/${file}` },
 	...data,
+	_exports: exports,
 	getText: async () => `Body of ${data.title}.\n`,
 });
 
@@ -28,15 +33,26 @@ export const BLOG_FIXTURE = [
 		tags: [],
 		draft: false,
 	}),
-	post("new.mdx", {
-		title: "New",
-		slug: "new-post",
-		date: new Date("2026-01-01"),
-		description: "The new one.",
-		tags: ["t"],
-		draft: false,
-		image: "/og/blog.jpg",
-	}),
+	post(
+		"new.mdx",
+		{
+			title: "New",
+			slug: "new-post",
+			date: new Date("2026-01-01"),
+			description: "The new one.",
+			tags: ["t"],
+			draft: false,
+			image: "./new.webp",
+		},
+		// What remarkCoverExport's `export const cover` looks like after bundling.
+		{
+			cover: {
+				src: "/_next/static/media/new.abc123.webp",
+				width: 1200,
+				height: 630,
+			},
+		},
+	),
 	post("draft.mdx", {
 		title: "Draft",
 		slug: "draft-post",
