@@ -26,8 +26,10 @@ const postSchema = (postPath: string) =>
 			description: z.string().optional(),
 			tags: z.array(z.string()).default([]),
 			draft: z.boolean().default(false),
-			/** Cover image, `./name.webp` beside the post; drives the OG card and BlogPosting.image. */
+			/** Cover image, `./name.webp` beside the post: hero figure, index thumbnail, OG card, BlogPosting.image. */
 			image: z.string().optional(),
+			/** Alt text for the cover; omit when the picture is decorative. */
+			imageAlt: z.string().optional(),
 		})
 		.refine((post) => post.draft || post.description, {
 			message:

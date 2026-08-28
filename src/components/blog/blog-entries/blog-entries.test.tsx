@@ -49,6 +49,25 @@ describe("BlogEntries", () => {
 		expect(links[1].querySelector("p")).toBeNull();
 	});
 
+	it("renders a cover as a decorative thumbnail inside the link", () => {
+		render(
+			<BlogEntries
+				entries={[
+					{
+						...ENTRIES[0],
+						cover: { src: "/cover.webp", width: 900, height: 600, alt: "" },
+					},
+					ENTRIES[1],
+				]}
+			/>,
+		);
+		const [withCover, withoutCover] = screen.getAllByRole("link");
+		const img = withCover.querySelector("img");
+		expect(img?.getAttribute("alt")).toBe("");
+		expect(img?.getAttribute("src")).toContain("cover.webp");
+		expect(withoutCover.querySelector("img")).toBeNull();
+	});
+
 	it("keeps dates as machine-readable time elements", () => {
 		render(<BlogEntries entries={ENTRIES} />);
 		const time = screen.getByText("Jul 16, 2026");

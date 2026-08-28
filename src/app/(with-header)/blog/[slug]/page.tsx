@@ -60,6 +60,7 @@ export default async function BlogPostPage({
 	if (!page || page.data.draft) notFound();
 
 	const Mdx = page.data.body;
+	const cover = coverOf(page);
 
 	return (
 		<>
@@ -77,6 +78,7 @@ export default async function BlogPostPage({
 						dateLabel={formatBlogDate(page.data.date)}
 						standfirst={page.data.description}
 						tags={page.data.tags}
+						cover={cover}
 					/>
 					{/* Content-width seam: full bleed here read as a wall between
 					    title and body. The closing seam stays full bleed. */}

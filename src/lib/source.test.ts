@@ -26,6 +26,7 @@ describe("coverOf", () => {
 			src: "/_next/static/media/new.abc123.webp",
 			width: 1200,
 			height: 630,
+			alt: "A new thing",
 		});
 	});
 

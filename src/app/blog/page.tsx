@@ -6,7 +6,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { blogDateTime, formatBlogDate } from "@/lib/blog-date";
 import { BLOG_DESCRIPTION } from "@/lib/site";
 import { pageMetadata } from "@/lib/site-metadata";
-import { publishedPosts } from "@/lib/source";
+import { coverOf, publishedPosts } from "@/lib/source";
 
 export const metadata = pageMetadata({
 	path: "/blog",
@@ -22,6 +22,7 @@ export default function BlogIndexPage() {
 		description: page.data.description,
 		dateTime: blogDateTime(page.data.date),
 		dateLabel: formatBlogDate(page.data.date),
+		cover: coverOf(page),
 	}));
 
 	return (
