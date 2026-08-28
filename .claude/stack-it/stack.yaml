@@ -1,0 +1,707 @@
+format: 2
+project:
+  description: Personal site at gustavo.is. About, two project retrospectives under /remembering, and a blog, with a contact form. Rebuild of an existing live site (no URLs to preserve). Operator US-based. Blog posts as MDX files in-repo; retrospectives as typed data. Fully prerendered except one dynamic route handler (/api/contact); the newsletter endpoint is decided but not built.
+  type: web-app
+  platforms: [web]
+stack:
+  - slot: language/runtime
+    choice: Node.js
+    version: 24.x
+    install:
+      - 'nvm install 24 && nvm use 24'
+      - 'Add to package.json: "engines": { "node": "24.x" }'
+    caveats:
+      - 'Vercel does NOT support Node 26. Only 24.x (default), 22.x, 20.x are available. Local machine ran Node 26.0.0 at decision time (a dev/prod split); it now runs 24.19.0 via volta, matching the pin.'
+      - 'Node 24 is Active LTS. Node 26 becomes LTS Oct 2026; revisit then.'
+      - 'engines.node in package.json overrides the Vercel Project Settings dropdown. Only major versions are selectable; Vercel auto-patches minor/patch.'
+      - 'Corepack was removed from Node 25+, so it is present on this project''s Node 24 pin only. NOW RELEVANT: the project switched to pnpm (see package manager slot), and Vercel does not honor package.json''s "packageManager" field without Corepack explicitly enabled via the ENABLE_EXPERIMENTAL_COREPACK=1 project env var.'
+    notes: 'https://vercel.com/docs/functions/runtimes/node-js/node-js-versions — doc last updated 2026-02-27; Node 20 sunset date not stated there, re-check nearer launch.'
+
+  - slot: package manager + lockfile
+    choice: pnpm
+    version: 11.11.0
+    install:
+      - 'pnpm --version  # verify 11.11.0 (already installed locally)'
+      - 'pnpm import  # converts an existing package-lock.json to pnpm-lock.yaml, preserving exact resolved versions rather than a fresh re-resolve'
+      - 'pnpm install  # commit pnpm-lock.yaml'
+      - '"packageManager": "pnpm@11.11.0" in package.json'
+    caveats:
+      - 'RE-PICKED from npm mid-pipeline, after install-stack and scaffold-and-verify had both already run to completion on npm 12.0.1. Deliberate user request, not a correction — npm was researched, pinned, installed, and fully verified working before this switch.'
+      - 'Migrated with `pnpm import` (not a fresh `pnpm install`), specifically to preserve the exact already-vetted resolved versions from package-lock.json rather than let pnpm re-resolve semver ranges to whatever is newest today — re-resolving would have silently undone every cooldown-aware version pin this whole pipeline made.'
+      - 'Verified the conversion actually preserved versions, not just that it ran: compared the pnpm install dependency tree output against package.json — every version matched exactly.'
+      - 'Vercel''s package-managers doc (updated 2026-07-01) lists supported pnpm majors as 6, 7, 8, 9, 10 — pnpm 11 is NOT listed, the same gap npm 12 had. Auto-detection is by pnpm-lock.yaml''s lockfileVersion field, not an explicit version entry, so this is a documentation-lag caution, not proof of failure.'
+      - 'Pinning on Vercel needs Corepack: "packageManager": "pnpm@11.11.0" alone is NOT respected by Vercel out of the box. Requires the ENABLE_EXPERIMENTAL_COREPACK=1 project env var, or an explicit installCommand in vercel.json. Without either, an explicit `pnpm install` override falls back to the OLDEST pnpm in Vercel''s build image (pnpm 6) — a real, easy-to-hit trap.'
+      - '`pnpm run <script> <args>` differs from npm''s argument-passing convention: pnpm forwards trailing args to the underlying command directly (`pnpm run dev -p 4200`). Including npm''s explicit `--` separator (`pnpm run dev -- -p 4200`) breaks it — Next.js received a literal "-p" as its project directory argument and failed to start. Confirmed by hitting this directly.'
+      - 'pnpm 11.11.0 published 2026-07-09 — 7-8 days old at switch time, right at this project''s own 7-day cooldown boundary but past it. No GHSA/CVE advisory affects 11.11.0; the one 11.x-line advisory (path traversal via manifest version, CAND-PNPM-038) was fixed by 11.5.3, well before this pin.'
+      - 'EVERY OTHER SLOT''S `install:` list in this file still shows `npm install <pkg> --save-exact` — those are accurate, unedited HISTORICAL records of the exact command run when that package was first installed, before this switch. They are not wrong, just no longer the reproduction path. For any package added from here forward, use `pnpm add <pkg>@<version> --save-exact` (or `pnpm add -D` for devDependencies) instead.'
+    notes: 'https://pnpm.io/cli/import | https://vercel.com/docs/package-managers | https://vercel.com/docs/deployments/configure-a-build#corepack'
+
+  - slot: supply-chain policy
+    choice: pnpm allowBuilds allowlist + minimumReleaseAge cooldown, both in pnpm-workspace.yaml
+    version: n/a (configuration)
+    install:
+      - 'Create pnpm-workspace.yaml containing minimumReleaseAge: 10080 (minutes — 7 days, matching this project''s original npm policy, not pnpm''s own weaker 1440/24h default)'
+      - 'Add allowBuilds: { sharp: true, esbuild: true, fsevents: true, "@sentry/cli": false } to the same file, after individually reviewing each package'
+      - 'Add overrides: { "@babel/core": "7.29.7" } to the same file (see the testing slot); pnpm does not read package.json overrides'
+      - 'pnpm approve-builds  # interactive alternative to hand-editing allowBuilds; pnpm approve-builds --all approves everything pending non-interactively'
+      - 'git add pnpm-workspace.yaml  # must be committed so the allowlist and cooldown reach CI'
+    caveats:
+      - 'RE-PICKED when the project switched from npm to pnpm (see package manager slot). This is the pnpm-native equivalent of the same policy, not a new decision.'
+      - 'CRITICAL, VERSION-SPECIFIC: onlyBuiltDependencies (the pnpm mechanism this project would have used on an earlier pnpm major) was REMOVED in pnpm v11 — replaced by allowBuilds, which is a package-name -> boolean MAP, not a plain array. Also removed in v11: onlyBuiltDependenciesFile, neverBuiltDependencies, ignoredBuiltDependencies, ignoreDepScripts. Any pre-v11 pnpm documentation or muscle memory describing this will be wrong for this pin.'
+      - 'CRITICAL, FILE LOCATION: minimumReleaseAge and allowBuilds both live in pnpm-workspace.yaml, NOT .npmrc and NOT package.json. pnpm does not read npm''s min-release-age key from .npmrc at all.'
+      - 'pnpm blocks dependency build/install/postinstall scripts BY DEFAULT, same posture as npm 12 — nothing here is a downgrade in strictness from the npm-era policy.'
+      - 'fsevents did not actually resolve into pnpm''s dependency tree in this project (npm needed it twice, via vite and playwright separately) — pnpm''s optional-dependency resolution differs from npm''s here. Kept in allowBuilds defensively in case a future dependency change reintroduces it; harmless if unused.'
+      - '@sentry/cli is explicitly denied (false): its postinstall only falls back to a binary download that the @sentry/cli-<platform> optional dependency already provides, so approving it would add nothing but one more trusted script.'
+      - 'Provenance is not a malware check: the TanStack wave (May 2026) published packages carrying valid SLSA Build L3 attestations. Do not treat provenance as a safety signal. (Carried over from the npm-era policy — still true regardless of package manager.)'
+      - 'Do not enable auto-merge for dependency updates — cooldown plus auto-merge still auto-merges, just later. (Also carried over — still applies.)'
+    notes: 'https://pnpm.io/settings | https://pnpm.io/cli/approve-builds | CISA axios alert 2026-04-20 | OWASP Top 10:2025 A03'
+
+  - slot: site framework/generator
+    choice: Next.js (App Router)
+    version: 16.2.10
+    install:
+      - 'npx create-next-app@16.2.10 . --typescript --app --no-eslint --use-npm'
+      - 'npm install next@16.2.10 react@19.2.7 react-dom@19.2.7 --save-exact'
+    caveats:
+      - 'Published 2026-07-01 (15 days) — just outside the cooldown window.'
+      - 'Next 16 REMOVED `next lint`, and `next build` no longer runs linting. The `eslint` key in next.config is also gone. Linting is now a separate step (see Biome).'
+      - 'Turbopack is the default bundler in Next 16 for both dev and build.'
+      - 'React2Shell (CVE-2025-55182 / CVE-2025-66478, CVSS 10.0, RSC RCE, actively exploited from 2025-12-05) is fixed in React 19.2.1+ / Next 16.0.7+. These pins are well past it — not affected.'
+      - 'Do NOT use output: "export" — it disables Route Handlers that read request data, which the contact form and newsletter both need.'
+      - 'Never enable SPA-fallback routing: it returns 200 OK for unmatched paths and destroys real 404s on a blog.'
+    notes: 'https://nextjs.org/docs/app/guides/upgrading/version-16 | https://react.dev/blog/2025/12/03/critical-security-vulnerability-in-react-server-components'
+
+  - slot: type system
+    choice: TypeScript
+    version: 6.0.3
+    install:
+      - 'npm install -D typescript@6.0.3 --save-exact'
+    caveats:
+      - 'DELIBERATELY NOT 7.0.2. TypeScript''s own announcement: "TypeScript 7.0 does not yet expose a stable programmatic API, and so tools ... can only currently rely on TypeScript 6.0." This blocks any compiler-API consumer.'
+      - '@typescript-eslint/eslint-plugin@8.64.0 declares peer "typescript": ">=4.8.4 <6.1.0" — it does not support 7.0, or even 6.1. Not a blocker here since we use Biome, but it shows how far the ecosystem is from 7.0.'
+      - 'Next 16 declares a TypeScript FLOOR of 5.1.0 and no ceiling — it does not bless or block 7.0.'
+      - '@storybook/nextjs-vite@10.4.6 declares NO typescript peer at all (the >= 4.9.x peer appears only at 10.5.2), so 6.0.3 is unconstrained here.'
+      - 'Revisit at TypeScript 7.1, which is when the stable programmatic API is expected. 6.0.3 published 2026-04-16 (91 days) — well vetted.'
+    notes: 'https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/'
+
+  - slot: rendering model
+    choice: Fully prerendered static, with one dynamic route handler (/api/contact)
+    version: n/a (architecture)
+    install:
+      - 'Leave pages statically rendered by default (App Router default).'
+      - 'Optionally enable in next.config.mjs:  const nextConfig = { cacheComponents: true }'
+      - 'Keep src/app/api/contact/route.ts as an ordinary dynamic Route Handler; src/app/api/subscribe/route.ts is planned (newsletter slot) but not built.'
+    caveats:
+      - 'experimental.ppr is REMOVED in Next 16 — superseded by Cache Components. cacheLife/cacheTag are now stable (no unstable_ prefix).'
+      - 'cacheComponents is opt-in, not default. An about/portfolio/blog has no per-request input, so plain static is already correct; enable Cache Components only if a real need appears.'
+    notes: 'https://nextjs.org/docs/app/api-reference/config/next-config-js/cacheComponents | web.dev "Rendering on the Web"'
+
+  - slot: styling approach
+    choice: Tailwind CSS
+    version: 4.3.2
+    install:
+      - 'npm install tailwindcss@4.3.2 @tailwindcss/postcss@4.3.2 postcss@8.5.16 --save-exact'
+      - 'Create postcss.config.mjs:  const config = { plugins: { "@tailwindcss/postcss": {} } }; export default config;'
+      - 'In app/globals.css:  @import "tailwindcss";'
+    caveats:
+      - 'NOT 4.3.3 — that shipped 2026-07-16 (today), inside the cooldown window. 4.3.2 published 2026-06-29 (17 days).'
+      - 'Tailwind v4 is CSS-first: no tailwind.config.js. Tokens go in @theme.'
+      - 'Open friction with Next 16 + Turbopack: PostCSS plugin warnings (vercel/next.js #88443, #90860) and arbitrary-value classes reportedly dropped under Turbopack in some 16.1.x builds (tailwindlabs/tailwindcss #19825). Unresolved upstream — expect noise, not breakage.'
+    notes: 'https://tailwindcss.com/docs/installation/framework-guides/nextjs'
+
+  - slot: browser support target
+    choice: Tailwind v4 floor — Safari 16.4+, Chrome 111+, Firefox 128+
+    version: n/a (policy)
+    install:
+      - 'Add to package.json:  "browserslist": ["Safari >= 16.4", "Chrome >= 111", "Firefox >= 128"]'
+    caveats:
+      - 'This is set BY Tailwind v4, not chosen independently — v4 core depends on @property, color-mix(), and cascade layers. Tailwind 3.4 would be required for broader support.'
+      - 'Safe to rely on (Baseline Widely Available as of June 2026): CSS nesting, :has(), loading="lazy".'
+      - 'Enhancement only (Baseline Newly, not Widely): light-dark(), @property, text-wrap: balance, view transitions, AVIF, fetchpriority.'
+    notes: 'https://tailwindcss.com/docs/compatibility | web.dev/baseline'
+
+  - slot: prose/long-form typographic styling
+    choice: "@tailwindcss/typography"
+    version: 0.5.20
+    install:
+      - 'npm install -D @tailwindcss/typography@0.5.20 --save-exact'
+      - 'In app/globals.css after the tailwind import:  @plugin "@tailwindcss/typography";'
+      - 'Wrap rendered MDX:  <article className="prose">{content}</article>'
+    caveats:
+      - 'v4 registration is the @plugin directive in CSS — there is no config file to add it to.'
+      - 'Customize via @utility with --tw-prose-* variables.'
+      - 'dark:prose-invert is not needed — this site is light-only by decision.'
+    notes: 'https://github.com/tailwindlabs/tailwindcss-typography (the official tailwindcss.com/plugins/typography page 404s; README is the live source)'
+
+  - slot: UI component primitives
+    choice: Base UI
+    version: 1.6.0
+    install:
+      - 'npm uninstall radix-ui'
+      - 'npm install @base-ui/react@1.6.0 --save-exact'
+      - 'Import per-component, e.g.:  import { Button } from "@base-ui/react/button"'
+    caveats:
+      - 'RE-PICKED FROM RADIX mid-pipeline, after install-stack had already installed and verified radix-ui@1.6.2. User asked to compare the two, then explicitly chose to switch. This is a deliberate re-decision, not a correction of an error — the original Radix pick was researched, pinned, and working.'
+      - 'Package name matters: the current package is @base-ui/react. @base-ui-components/react (the old name) is DEPRECATED — "Package was renamed to @base-ui/react". Do not install the old name.'
+      - 'Base UI is a joint effort between Radix''s original creators, the MUI (Material UI) team, and Floating UI — a new API (uses a `render` prop instead of Radix''s `asChild`/Slot pattern) built from accumulated experience, not Radix under a new name.'
+      - 'Maturity gap vs what was replaced: Base UI hit 1.0 on 2025-12-11 (~7 months old at switch time) vs Radix''s 1.0 on 2022-12-21 (~3.5 years). Weekly downloads ~5.9M vs Radix''s 60-146M depending on which package is counted — Radix has far more production hours behind it. Component coverage is broad (40+) but Hover Card was not found in Base UI''s current component list; verify before relying on it.'
+      - 'Confirmed still-active, NOT a case of Radix being sidelined: shadcn''s own July 2026 changelog states "Radix is not being deprecated. We still support it, and every update and new component will ship for both libraries." Radix''s GitHub repo showed commits the day before and the day of this switch — independently verified, not just taking shadcn''s word for it.'
+      - 'The concrete reason this switch is defensible for THIS project: Base UI ships a first-party CSPProvider and this site runs a strict Content-Security-Policy (see security response headers slot). Radix has no equivalent.'
+      - 'shadcn''s own reasoning (verbatim from their changelog) is adoption/stability signal, not a technical-superiority claim: "Base UI is stable... 6M+ weekly downloads... Projects created on shadcn/create now pick Base UI over Radix 2 to 1. The community already made the call." That adoption-ratio figure is shadcn''s own internal telemetry, not externally auditable.'
+      - 'Zero GHSA/CVE advisories found for either @base-ui/react or radix-ui at the versions involved.'
+    notes: 'https://base-ui.com/react/overview/quick-start | https://ui.shadcn.com/docs/changelog/2026-07-base-ui-default | https://github.com/mui/base-ui'
+
+  - slot: component layer/design system
+    choice: shadcn/ui (copy-in components via CLI)
+    version: 4.13.0 (CLI only — components become your source)
+    install:
+      - 'npx shadcn@4.13.0 init --base base --preset nova --template next --yes --reinstall'
+      - '(Switching an already-initialized project between base libraries also needs --force, and the CLI still asks a y/N confirmation that --yes does not cover — pipe it: printf "y\n" | npx ...)'
+      - 'npx shadcn@4.13.0 add button   # etc, per component'
+    caveats:
+      - 'RE-PICKED: this project switched from Radix to Base UI mid-pipeline (see UI component primitives slot for the full rationale). --base now reads `base`, not `radix`. shadcn changed its DEFAULT to Base UI in July 2026 (changelog 2026-07-base-ui-default) — --base still must be passed explicitly regardless of which library you want, since relying on the default means a future shadcn release could flip it again without warning.'
+      - 'SWITCHING AFTER INIT has its own prompts beyond first-init: re-running init with a different --base on a project that already has components.json shows "Would you like to re-install existing UI components?" (needs --reinstall) and then a distinct "You are switching from radix to base... Would you like to continue?" confirmation that neither --yes nor --force covers — pipe "y\n" via stdin. Verify the switch actually happened by reading components.json''s "style" field and the regenerated component''s import line directly; do not trust the flags alone.'
+      - 'shadcn is copy-in, not a runtime dependency. Pinning the CLI pins nothing upstream — once copied, components are your code, frozen until you re-run add/diff/migrate.'
+      - 'CLI published 2026-07-03 (13 days). npx bypasses min-release-age, so cooldown does not protect this invocation.'
+      - 'Registry installs fetch component source over HTTP from a registry URL at runtime. That fetch is outside npm''s --allow-remote gate. Only use the official @shadcn registry; third-party registries are an arbitrary-code-execution path.'
+      - 'components.json writes a legacy `tailwind.config` key — vestigial under v4 CSS-first config. The `css` field is the one that matters.'
+      - 'INSTALL-TIME DIVERGENCE (recorded here per the install-stack contract): `init` is no longer a single non-interactive command even with -y. It now prompts for a named preset (Nova/Vega/Maia/Lyra/Mira/Luma/Sera/Rhea/Custom) regardless of --yes. -b/--base radix and -p/--preset nova together produced components.json with "style": "radix-nova" and button.tsx importing { Slot } from "radix-ui" — confirmed Radix, not Base UI. --defaults would have silently pulled preset base-nova (Base UI) instead; do not use --defaults on this CLI version.'
+      - 'init pulled real runtime infrastructure not anticipated by Phase 2 research: class-variance-authority 0.7.1, clsx 2.1.1, tailwind-merge 3.6.0, lucide-react 1.24.0 (iconLibrary: lucide in components.json), tw-animate-css 1.4.0, plus `@import "shadcn/tailwind.css"` and `@import "tw-animate-css"` in globals.css. All legitimate current shadcn 4.13 architecture; keep them. They are the only caret-ranged entries in package.json, and components.json records style "base-nova".'
+      - 'init OVERWRITES globals.css and layout.tsx without asking: it injected its own next/font/google Geist import into layout.tsx (clobbering an existing next/font/local wiring) and wrote a circular `--font-sans: var(--font-sans)` in globals.css plus a full .dark {} variable block. If a font is already wired before running init, re-point --font-sans/--font-heading at the real font variable afterward and check layout.tsx for an injected Google Font import.'
+      - 'Do NOT strip the @custom-variant dark (&:is(.dark *)) line even on a light-only site — every generated component ships dark: utility classes, and this selector is what keeps them permanently inert (nothing ever applies a .dark class). Removing it makes dark: fall back to Tailwind''s prefers-color-scheme default, which partially dark-shifts components on OS dark mode while the rest of the site stays light. Do strip the .dark {} variable block itself — those values are genuinely dead code when no toggle ever applies the class.'
+      - 'The shadcn CLI package itself must be in devDependencies, not dependencies — plain `npm install` without -D during any manual step will misfile it.'
+      - 'A separate, SESSION-LEVEL quarantine hook (independent of this project''s own .npmrc min-release-age policy) blocked re-invoking shadcn@4.13.0 for the Base UI switch: it had crossed the hook''s own 14-day boundary as real time passed since the original init. This was the SAME already-installed, already-verified CLI version used earlier in the same session for the original Radix init — overridden via the hook''s own documented override flag after confirming it was a re-use of an already-vetted package, not a fresh unvetted install. If this fires on a truly new install, do not override without actually vetting the package first.'
+    notes: 'https://ui.shadcn.com/docs/installation/next | https://ui.shadcn.com/docs/changelog/2026-02-radix-ui | https://ui.shadcn.com/docs/changelog/2026-07-base-ui-default'
+
+  - slot: content source/authoring pipeline
+    choice: fumadocs-mdx (used standalone as a content layer, without fumadocs-ui)
+    version: 15.1.0
+    install:
+      - 'npm install fumadocs-mdx@15.1.0 fumadocs-core@16.11.0 @types/mdx@2.0.14 --save-exact'
+      - 'Create next.config.mjs (MUST be .mjs):  import { createMDX } from "fumadocs-mdx/next"; const withMDX = createMDX(); export default withMDX(config);'
+      - 'Create source.config.ts with one defineCollections call for blog (content/blog), with postprocess.includeProcessedMarkdown for the /llms.mdx mirrors; the runtime loader is src/lib/source.ts'
+      - 'The .source folder is generated automatically on `next dev` / `next build` — do not commit it'
+    caveats:
+      - 'Published 2026-07-07 (9 days) — vetted. 15.2.0 (1 day old) deliberately excluded; its only change is an additive, opt-in macro API.'
+      - 'Confirmed usable WITHOUT fumadocs-ui: neither fumadocs-mdx nor fumadocs-core depends on it. We keep our own Tailwind/shadcn design.'
+      - 'Turbopack works. fumadocs-mdx sidesteps the JS→Rust serialization limit by reading source.config.ts in Node rather than passing plugin functions as Turbopack loader options. This is exactly why raw @next/mdx would have been painful here.'
+      - 'peerDependencies: next ^15.3.0 || ^16.0.0, react ^19.2.0, fumadocs-core ^16.7.0 — all satisfied.'
+      - 'Depends on zod ^4.4.3 — exactly our pin.'
+      - 'No postinstall/preinstall scripts — nothing to allowlist under npm 12.'
+      - 'fumadocs-core 16.11.5 is 1 day old; pinning 16.11.0 (9 days) instead.'
+      - 'No blog-preset schema ships with it — define your own zod object for title/date/tags/draft/description. Sorting and filtering are plain array ops over source.getPages(), not a library API.'
+      - 'It is a docs framework''s content layer. Adopted deliberately for Turbopack support; if it ever starts imposing a docs-site worldview, @next/mdx + gray-matter + zod is the fallback.'
+      - 'The work collection this slot originally defined was deleted: the portfolio retrospectives are typed-data pages at /remembering/* (src/components/retrospective/), not MDX. blog is the only collection.'
+    notes: 'https://www.fumadocs.dev/docs/mdx/next | https://www.fumadocs.dev/docs/mdx/collections | https://www.fumadocs.dev/docs/mdx/performance'
+
+  - slot: content format
+    choice: MDX
+    version: n/a (via fumadocs-mdx 15.1.0)
+    install:
+      - 'Content lives in content/blog/*.mdx (the only collection)'
+    caveats:
+      - 'MDX''s own docs acknowledge it breaks some Markdown: "Indented code does not work in MDX", and autolinks do not work. Use fenced code blocks.'
+      - 'CommonMark 0.31.2 and GFM 0.29 are frozen specs — stable, not abandoned.'
+    notes: 'https://mdxjs.com/docs/what-is-mdx/'
+
+  - slot: schema validation
+    choice: Zod
+    version: 4.4.3
+    install:
+      - 'npm install zod@4.4.3 --save-exact'
+      - 'Use for BOTH the frontmatter schema (source.config.ts) and the contact payload (src/lib/contact-schema.ts, shared by the client form and the route handler so validation cannot drift)'
+    caveats:
+      - 'Published 2026-05-04 (73 days) — well vetted. Exactly the version fumadocs-mdx depends on.'
+      - 'Zod 4 breaking changes from v3: .strict()/.passthrough() deprecated in favour of z.strictObject()/z.looseObject(); defaults now apply within optional fields.'
+      - 'GHSA-m95q-7qp3-xv42 (email-validation DoS) affects <3.22.3 only — not applicable.'
+      - 'Server-side validation is mandatory for the form endpoints; client validation is a UX nicety, not a control.'
+    notes: 'https://zod.dev/v4/changelog | OWASP Top 10 (untrusted input)'
+
+  - slot: syntax highlighting
+    choice: Shiki (build-time, bundled via fumadocs-core)
+    version: n/a (transitive — fumadocs-core 16.11.0 depends on shiki ^4.2.0)
+    install:
+      - 'No separate install — do NOT add shiki or rehype-pretty-code manually'
+      - 'Configure in source.config.ts:  defineConfig({ mdxOptions: { rehypeCodeOptions: { themes: { light: codeTheme }, defaultColor: "light", icon: false } } }) with codeTheme from src/lib/code-theme.ts; pass themes (plural), since a bare theme key loses to the preset default in the shallow merge'
+    caveats:
+      - 'Build-time, so no parser or grammars ship to readers.'
+      - 'Configuring via rehypeCodeOptions (rather than raw rehype plugin functions) is what keeps this Turbopack-safe.'
+    notes: 'https://www.fumadocs.dev/docs/headless/mdx/rehype-code'
+
+  - slot: web fonts/typography loading
+    choice: Wotfard (body) + Kitora Bold (display and legend roles), self-hosted via next/font/local, converted to WOFF2 and subset
+    version: n/a (user-supplied licensed files; masters kept outside the repo)
+    install:
+      - 'pip install "fonttools[woff2]"'
+      - 'For each weight:  pyftsubset wotfard-regular-webfont.ttf --flavor=woff2 --output-file=Wotfard-Regular-latin.woff2 --unicodes="U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD" --layout-features="*"'
+      - 'Copy the resulting .woff2 files into src/fonts/ (Kitora-Bold.woff2 prepared the same way, 140KB OTF to 24KB)'
+      - 'Define both in src/app/fonts.ts:  localFont({ src: [...seven weights], variable: "--font-wotfard", display: "swap", adjustFontFallback: "Arial" }) and localFont({ src: "../fonts/Kitora-Bold.woff2", weight: "700", variable: "--font-kitora", display: "swap", adjustFontFallback: "Arial" })'
+      - 'Apply fontVariables (both variable classes) on <html>; Storybook mirrors that placement in .storybook/preview.tsx because the role tokens resolve at :root'
+      - 'In globals.css:  --font-sans: var(--font-wotfard); --font-display: var(--font-kitora); --font-legend: var(--font-kitora)'
+    caveats:
+      - 'Licensed. Wotfard (Atipo Foundry) and Kitora Bold are both held under their foundry webfont licenses; the records live outside the repo. Only the Latin-subset WOFF2 files ship and the OTF masters are gitignored, which is what foundry licenses ask of self-hosted webfonts.'
+      - 'Source files are TTF-only. WOFF2 is ~30-50% smaller for identical glyphs — convert, do not ship TTF.'
+      - 'next/font/local does NOT subset local fonts (only Google fonts get automatic subsetting). Pre-subsetting is mandatory, not optional.'
+      - 'All seven Wotfard weights ship (100 through 700 in src/app/fonts.ts). Each is ~100KB before conversion; trim any a weight audit shows unused.'
+      - 'No italic files exist in the set. Browsers will synthesise oblique; if real italics matter, they must be sourced.'
+      - 'next/font self-hosts and preloads automatically; adjustFontFallback: "Arial" supplies fallback metrics to limit layout shift.'
+    notes: 'https://nextjs.org/docs/app/api-reference/components/font | https://fonttools.readthedocs.io/en/latest/subset/ | https://www.atipofoundry.com/fonts/wotfard'
+
+  - slot: animation
+    choice: Motion (React layout/exit) + GSAP with ScrollTrigger (pinning/scrubbing)
+    version: motion 12.42.2 | gsap 3.15.0 | @gsap/react 2.1.2
+    install:
+      - 'npm install motion@12.42.2 gsap@3.15.0 @gsap/react@2.1.2 --save-exact'
+      - 'Motion in RSC: import * as motion from "motion/react-client"  (avoids marking the whole file "use client")'
+      - 'Motion elsewhere: "use client" + import { motion } from "motion/react"'
+      - 'GSAP: "use client" + gsap.registerPlugin(ScrollTrigger, useGSAP), then useGSAP(() => {...}, { scope: container })'
+      - 'Reduced motion is handled per component, not app-wide: Motion''s useReducedMotion (mount-gated, since it is truthy on a reduced client''s first render) and gsap.matchMedia(); there is no <MotionConfig reducedMotion="user"> wrapper'
+      - 'For GSAP, branch on reduced motion via gsap.matchMedia() with reduceMotion: "(prefers-reduced-motion: reduce)"'
+    caveats:
+      - 'BOTH ARE JUSTIFIED, not redundant. GSAP ScrollTrigger does viewport PINNING; Motion documents no equivalent. Motion has layout/AnimatePresence (FLIP + React-tree-aware exit animations); GSAP has no equivalent. Each covers what the other cannot.'
+      - 'RULE: never animate the same property on the same element from both libraries — they will fight frame by frame. Assign ownership per element/section.'
+      - 'Measured gzip at these exact versions: GSAP core 27.7KB, ScrollTrigger 17.6KB (45.3KB combined). Motion full package 45.4KB, but drops to ~4.6KB with LazyMotion + m, +15KB for domAnimation or +25KB for domMax. Use LazyMotion.'
+      - '@gsap/react 2.1.2 (2025-01-15, 547 days) is CONFIRMED THE CORRECT AND ONLY official React package: maintainer greensock, repo greensock/react, single dist-tag, no prerelease. gsap@3.15.0 core has NO ./react subpath — core did not absorb React support.'
+      - 'ITS AGE IS NOT A RISK SIGNAL — verified from source, not inferred. The whole of useGSAP is 2,325 bytes and imports only { useEffect, useLayoutEffect, useRef } from react, plus gsap. React 19 removed propTypes/defaultProps on function components, string refs, legacy context, ReactDOM.render and findDOMNode — useGSAP touches none of them. There is nothing here for React 19 to break. The package is dormant because it is feature-complete, not because it is abandoned.'
+      - 'PROOF the code path is actively maintained: GSAP core 3.15.0 (2026-04-13) shipped a bugfix explicitly naming useGSAP — "...the ScrollTrigger was created inside a gsap.context() (including in the React useGSAP() hook), they wouldn''t be associated with that context and therefore may not be cleaned up properly". useGSAP is a thin wrapper over gsap.context(), which lives in core; core is maintained (pushed 2026-04-13, only 6 open issues), so the wrapper needs no commits. This bugfix is itself a reason to be on 3.15.0.'
+      - 'greensock/react issue #14 ("Please add react-19 support") is NOT a bug report: no repro was given, and Jack Doyle (GSAP''s creator) replied 2025-06-02 asking for "a minimal demo that shows a problem with using GSAP in React 19". The reporter never answered. No React 19 breakage report exists on GitHub or the GSAP forums.'
+      - 'No official GreenSock statement confirms OR denies React 19 support — React 19 is simply not mentioned in the docs. Absence of confirmation, not evidence of a problem.'
+      - 'ESCAPE HATCH if it ever does break: GreenSock documents useGSAP as "a drop-in replacement for React''s Effects that automatically handles cleanup using gsap.context()". Dropping the dependency means calling gsap.context() inside useEffect and returning ctx.revert() — roughly ten lines, officially documented, with contextSafe() needed only for handlers created outside the initial effect run.'
+      - 'MINOR SOURCE-LEVEL WART (internal to the library): useGSAP calls a hook conditionally — `deferCleanup && useIsomorphicLayoutEffect(...)`. Safe in practice because deferCleanup derives from dependencies.length, which is static per call site. But never write a useGSAP call whose dependency array CHANGES LENGTH between renders, or React throws "Rendered fewer hooks than expected".'
+      - 'gsap.com docs explicitly cover this exact setup: "If you''re using the app router / react server components, you need to drop a ''use client'' at the top of your file for useGSAP() to work" and "This hook is safe to use in Next or other server-side rendering environments, provided it is used in client-side components." Turbopack is not mentioned either way.'
+      - 'GSAP is FREE for commercial use including all former Club plugins (ScrollTrigger, SplitText, MorphSVG) since 2025-04-30 under Webflow. It is NOT open source: a proprietary Standard License that Webflow may terminate at its discretion, barring use in competing no-code animation builders. Irrelevant to this site, but it is a revocable grant, not a right.'
+      - 'Motion is MIT. Motion+ (£299 one-time) is optional extras only.'
+      - 'Use motion/react imports — NOT framer-motion. Some Motion doc pages still show the old import path.'
+      - 'No official guidance exists from either project on running both. Ownership split is a community convention.'
+      - 'CVE-2020-28478 (GSAP prototype pollution) affects <3.6.0 — not applicable.'
+    notes: 'https://motion.dev/docs/react-installation | https://motion.dev/docs/react-reduce-bundle-size | https://gsap.com/resources/React | https://gsap.com/standard-license/'
+
+  - slot: premium animation components
+    choice: Motion+ (motion-plus, aliased to @motionplus/core from Motion's private registry)
+    version: 2.12.0
+    install:
+      - 'In .npmrc:  @motionplus:registry=https://api.motion.dev/npm/  (auth stays outside the repo: user-level npm config locally, the MOTION_TOKEN env var on Vercel)'
+      - 'pnpm add motion-plus@npm:@motionplus/core@2.12.0 --save-exact'
+      - 'Import from motion-plus/react (Ticker, AnimateNumber) and motion-plus/curtains (curtains, blinds)'
+    caveats:
+      - 'Added after the pipeline ran; recorded 2026-08-27 from the code. One-time paid license on top of MIT Motion; the package is private-registry only, so a Vercel install without MOTION_TOKEN fails with 401.'
+      - 'In use: Ticker for the retrospective tech band, AnimateNumber for the landing counter, curtains/blinds for the site-wide CurtainLink page transitions.'
+      - 'Same LazyMotion rule as Motion: full motion components throw inside a strict LazyMotion provider.'
+    notes: 'https://motion.dev/plus'
+
+  - slot: transactional email delivery
+    choice: Resend
+    version: 6.17.2 (+ react-email 6.6.9, optional templating)
+    install:
+      - 'npm install resend@6.17.2 --save-exact'
+      - 'npm install react-email@6.6.9 --save-exact   # optional templating — see divergence note'
+      - 'Route handler: const resend = new Resend(process.env.RESEND_API_KEY); await resend.emails.send({ from, to, subject, react })'
+      - 'Add gustavo.is in the Resend dashboard and copy the generated SPF/DKIM/MX records into Vercel DNS'
+      - 'Env: RESEND_API_KEY (required; without it /api/contact returns a graceful 500), CONTACT_EMAIL_TO and RESEND_FROM as optional overrides (see .env.example)'
+    caveats:
+      - 'INSTALL-TIME CORRECTION: @react-email/components@1.0.12, as originally pinned here, is DEPRECATED — "Package no longer supported" on every package in its dependency tree. Confirmed via the official react-email 6.0.0 release notes this was intentional, not an accident: all @react-email/* sub-packages (components, button, html, etc.) were consolidated directly into the `react-email` package itself. Official migration: `import { Button, Html, Head, render } from "react-email"` instead of from @react-email/components. It also moves to dependencies, not devDependencies — it now exports render, not just components.'
+      - 'Installed react-email@6.6.9, not the 6.9.0 latest — 6.9.0 was published one day before install (2026-07-15), inside the cooldown window. 6.6.9 is the nearest version that had cleared 7 days at install time.'
+      - 'Published 2026-07-08 (8 days) — clears the window by one day.'
+      - 'Free tier: 3,000 emails/month, capped at 100/day, 1 domain, 30-day data retention. Ample for a personal contact form.'
+      - 'Resend recommends sending from a SUBDOMAIN (e.g. send.gustavo.is) to isolate sending reputation from the apex domain.'
+      - 'API rate limit is 5 requests/second per team; exceeding returns HTTP 429.'
+      - 'NEVER let the recipient or subject be caller-controlled — OWASP classes form-to-email relay abuse as an implementation flaw. Hardcode the recipient.'
+      - 'Encode submission content wherever it renders, including in the notification email itself.'
+      - 'CSRF tokens are NOT applicable here — a cookie-less third-party endpoint has no session to ride.'
+      - 'The exact DNS values are domain-specific and only appear in the Resend dashboard after adding the domain.'
+    notes: 'https://resend.com/docs/send-with-nextjs | https://resend.com/docs/dashboard/domains/introduction'
+
+  - slot: newsletter subscriber management
+    choice: Resend Audiences + Broadcasts (same vendor as transactional)
+    version: n/a (via resend 6.17.2)
+    install:
+      - 'Create an Audience in the Resend dashboard; store its id as an env var'
+      - 'In app/api/subscribe/route.ts:  await resend.contacts.create({ email, audienceId, unsubscribed: false })'
+      - 'Build the double opt-in flow manually: send a confirmation email via resend.emails.send, and only call contacts.create after the recipient confirms'
+      - 'Include {{{RESEND_UNSUBSCRIBE_URL}}} in broadcast templates'
+      - 'Set headers explicitly: List-Unsubscribe and List-Unsubscribe-Post: List-Unsubscribe=One-Click'
+    caveats:
+      - 'STATUS 2026-08-27: decided, not built. No src/app/api/subscribe route exists and nothing in src references Audiences; the install steps above are the plan, not a record.'
+      - 'Resend has NO native double opt-in. It must be built. Double opt-in is the defence against subscription-bombing (OWASP OAT-019) — worth building even though nothing compels it at this volume.'
+      - 'Free tier is 1,000 contacts. Marketing is billed separately from transactional — one vendor, two billing lines.'
+      - 'Whether Resend auto-injects List-Unsubscribe HEADERS (as opposed to the body-link token) for Broadcasts is NOT confirmed in its docs. Set both headers explicitly rather than assume.'
+      - 'Consent must be recorded (GDPR Art 7(1)). Not legally binding on a US operator at this scale, but subscriber consent records cost nothing and are simply correct.'
+      - 'Bulk-sender regimes (Gmail/Yahoo 5,000/day) do NOT apply at this volume.'
+    notes: 'https://resend.com/docs/api-reference/contacts/create-contact | https://resend.com/docs/dashboard/emails/add-unsubscribe-to-transactional-emails | RFC 8058'
+
+  - slot: form abuse protection
+    choice: Vercel BotID (Basic) + accessible honeypot + Vercel Firewall rate limiting
+    version: botid 1.5.11
+    install:
+      - 'npm install botid@1.5.11 --save-exact'
+      - 'next.config.mjs:  import { withBotId } from "botid/next/config"; export default withBotId(nextConfig)'
+      - 'src/instrumentation-client.ts (Next loads exactly one instrumentation-client file and src/ wins; a root copy is dead):  initBotId({ protect: [{ path: "/api/contact", method: "POST" }] })'
+      - 'In each route handler:  const v = await checkBotId(); if (v.isBot) return NextResponse.json({ error: "Access denied" }, { status: 403 })'
+      - 'Add a rate-limiting rule in the Vercel Firewall dashboard (Hobby allows 1 rate-limit rule, 3 custom rules total)'
+      - 'Honeypot field: <div style="position:absolute;left:-9999px" aria-hidden="true"><label htmlFor="website">Leave empty</label><input id="website" name="website" tabIndex={-1} autoComplete="off" /></div>'
+    caveats:
+      - 'BotID Basic is FREE on all plans including Hobby. Deep Analysis (Kasada-powered) is Pro/Enterprise only at $1/1000 calls.'
+      - 'Vercel Hobby: 3 total custom firewall rules, 1 rate-limiting rule, Fixed Window only (Token Bucket is Enterprise). Window 10s–10min. 1,000,000 included allowed requests.'
+      - 'CORRECTION TO EARLIER CLAIM: I previously asserted W3C mandates aria-hidden + tabindex="-1" on honeypots. That could NOT be confirmed in w3.org/TR/turingtest, which only says the field is "hidden from the user by markup such as CSS-Hidden". The aria-hidden + tabIndex pattern is community best practice, not W3C-normative. It IS necessary with off-screen positioning (which does not remove the field from the a11y tree or tab order) — which is why it is used above.'
+      - 'What W3C DOES support: "Inaccessibility of CAPTCHA" documents that visual/audio CAPTCHA excludes disabled users and is increasingly ineffective. That is the real argument for honeypot-over-CAPTCHA.'
+      - 'BotID blocks curl in production: test via fetch from an actual page, not the command line.'
+      - 'checkBotId() needs Vercel''s edge infrastructure, so the handler fails open off-Vercel: BotID only enforces on real deployments.'
+      - 'Honeypots alone do not stop sophisticated bots that skip hidden fields. Layer with rate limiting.'
+    notes: 'https://vercel.com/docs/botid/get-started | https://vercel.com/docs/vercel-firewall/vercel-waf/rate-limiting | https://www.w3.org/TR/turingtest/'
+
+  - slot: server-side function runtime
+    choice: Vercel Functions via Next.js Route Handlers
+    version: n/a (platform)
+    install:
+      - 'src/app/api/contact/route.ts, an ordinary POST handler, no adapter needed (the subscribe handler is planned, not built)'
+    caveats:
+      - 'Hobby limits: 1M function invocations/month, 4 hours Active CPU/month, 60-second execution ceiling. Vastly beyond what two form endpoints will use.'
+      - 'This handler is the only non-static route on the site. Everything else prerenders.'
+    notes: 'https://vercel.com/docs/plans/hobby'
+
+  - slot: secrets management
+    choice: Vercel Sensitive Environment Variables
+    version: n/a (platform)
+    install:
+      - 'Add RESEND_API_KEY and SENTRY_AUTH_TOKEN as Sensitive Environment Variables in the Vercel dashboard (RESEND_AUDIENCE_ID once the newsletter endpoint exists); SENTRY_ORG, SENTRY_PROJECT and NEXT_PUBLIC_SENTRY_DSN are plain env vars, and ENABLE_EXPERIMENTAL_COREPACK=1 plus MOTION_TOKEN are required for the build itself'
+      - 'Mirror into .env.local for development (already gitignored)'
+      - 'Never prefix a secret with NEXT_PUBLIC_'
+    caveats:
+      - 'NEXT_PUBLIC_ variables are inlined into the client bundle at BUILD time and shipped to every visitor. Changing one requires a rebuild.'
+      - 'Sensitive Environment Variables are encrypted at rest and never displayed in plaintext again after creation — record them in a password manager at creation time.'
+      - 'Vercel has no separate secrets-manager product; Sensitive env vars are the first-party mechanism.'
+      - 'Enable phishing-resistant MFA on the Vercel, registrar, and GitHub accounts. That is the largest single blast radius in this whole stack, and it is not a package.'
+    notes: 'https://vercel.com/docs/environment-variables/system-environment-variables'
+
+  - slot: security response headers
+    choice: Next.js headers() in next.config.mjs. CSP script-src allows 'unsafe-inline'; everything else strict.
+    version: n/a (configuration)
+    install:
+      - 'In next.config.mjs (not .ts, fumadocs-mdx requires the ESM config file), add an async headers() returning: Content-Security-Policy, Strict-Transport-Security (max-age=63072000; includeSubDomains; production only, since Safari caches HSTS from http://localhost and then force-upgrades dev), X-Content-Type-Options: nosniff, Referrer-Policy: strict-origin-when-cross-origin, X-Frame-Options: DENY, Permissions-Policy: camera=(), microphone=(), geolocation=()'
+      - 'CSP as shipped: default-src ''self''; script-src ''self'' ''unsafe-inline'' (plus ''unsafe-eval'' in development only); style-src ''self'' ''unsafe-inline''; img-src ''self'' data:; font-src ''self''; frame-src https://player.vimeo.com (the retrospective walkthrough embeds only); object-src ''none''; base-uri ''self''; form-action ''self''; frame-ancestors ''none''; upgrade-insecure-requests (production only: Safari applies it to localhost subresources, WebKit bug 250776)'
+      - 'Also set poweredByHeader: false in nextConfig — Next emits X-Powered-By: Next.js by default, unnecessary information disclosure per OWASP guidance.'
+      - 'VERIFY LIVE, not just that the build succeeds: `pnpm run build && pnpm run start -p <port>`, then curl/httpie the actual response headers. Config that parses is not proof the headers are emitted — confirmed this in practice, including re-verifying after adding poweredByHeader to confirm X-Powered-By was actually gone from the response.'
+      - 'VERIFY HYDRATION LIVE IN A REAL BROWSER, not just that headers are present. A syntactically valid, header-present CSP can still silently break the entire app — see the scaffold-and-verify finding below. Check for real React hydration (e.g. inspect a DOM node for a __reactProps$/__reactFiber$ key) after any CSP change, not just that the page renders.'
+    caveats:
+      - 'CORRECTED DURING scaffold-and-verify (stage 4), replacing this slot''s original decide-stage plan: the original CSP shipped with script-src ''self'' and NO unsafe-inline, believing (per stage-1/stage-2 research) that this was compatible with a hash-based or SRI-based approach for a static site. It was not. Confirmed empirically: this CSP silently blocked React from EVER hydrating any page on the site. Zero DOM elements carried React fiber attachments; every interactive feature was dead (forms fell back to native browser submission, animations never ran) while the page still LOOKED correct, because the static server-rendered HTML painted fine — this is a genuinely dangerous failure mode because nothing about it looks broken at a glance or shows up as a build/lint/type error.'
+      - 'ROOT CAUSE: Next.js streams its own RSC hydration payload via inline <script> tags on every single page (the `(self.__next_f=self.__next_f||[]).push(...)` pattern) — framework-wide behavior, not specific to this project''s code. This content differs per page/build, so it cannot be hash-allowlisted in the CSP the way static assets can.'
+      - 'NONCE-BASED CSP IS STILL IMPOSSIBLE HERE, confirmed directly from Next''s current docs (fetched during the scaffold-and-verify investigation, not just recalled): "To use a nonce, your page must be dynamically rendered... Static pages are generated at build time, when no request or response headers exist—so no nonce can be injected." Also confirmed: PPR/Cache Components are explicitly documented as incompatible with nonce-based CSP even if dynamic rendering were adopted elsewhere.'
+      - 'CORRECTION to the previous claim that "experimental.sri... is the doc-provided hash-based alternative that preserves static generation": re-checked directly against Next''s current CSP guide. SRI''s actual mechanism is tamper-detection via the `integrity` attribute on externally-loaded `<script src>` files — it is NOT a CSP script-src allowlisting mechanism, and Next''s own docs do not confirm it covers INLINE scripts (like the __next_f payload) at all. Do not treat SRI as a solved answer for this problem; it was never actually verified to apply here.'
+      - 'DECISION, made explicitly by the user after being shown the three real tradeoffs (allow inline scripts / force dynamic rendering for real nonces / try experimental SRI and accept the uncertainty): script-src carries ''unsafe-inline''. Rationale specific to this project: nothing in this app renders visitor-submitted content back into the page as raw HTML — MDX posts are author-written, not visitor-submitted, and the contact form''s data goes straight to Resend via the API, never reflected in the DOM. There is no actual injection point in this app that a strict script-src would be guarding against, so the residual risk this accepts is low here specifically. This reasoning does NOT generalize to a future feature that renders any user-supplied content as HTML (e.g. comments, a CMS preview) — revisit this decision if one is ever added.'
+      - 'style-src also needs ''unsafe-inline'' — Radix/Base UI and the surrounding component ecosystem inject inline styles at runtime; unrelated to the script-src issue above, decided earlier in install-stage.'
+      - 'React''s OWN dev-mode debugging also needs eval() (for reconstructing call stacks) and is blocked by CSP without unsafe-eval — confirmed via Next''s dev-mode error overlay. VERIFIED THIS IS DEV-ONLY: React''s own console message states "React will never use eval() in production mode," and a real `next build && next start` production server run showed zero eval-related console output. Do not add unsafe-eval to fix a dev-only cosmetic warning.'
+      - 'form-action, frame-ancestors and base-uri do NOT fall back to default-src. Omitting them is a real bypass, not a cosmetic gap.'
+      - 'X-XSS-Protection is NOT recommended by OWASP (it has created vulnerabilities). Omit it or set 0. Expect-CT and HPKP are dead.'
+      - 'Do NOT copy the OWASP Secure Headers baseline wholesale: its Cache-Control: no-store is for pages with sensitive data and would destroy caching on a blog, and Cross-Origin-Embedder-Policy: require-corp breaks embeds and buys nothing here.'
+      - 'headers() in next.config is preferred over vercel.json: Next-native and portable.'
+      - 'HSTS preload is a one-way door — removal takes months of browser releases. Not adopted.'
+      - 'next.config.mjs changes require a dev-server RESTART — this file is not part of Turbopack''s hot-reload/Fast Refresh coverage. Editing it and expecting the change to apply without restarting the server is a real, easy-to-make mistake.'
+    notes: 'https://nextjs.org/docs/app/guides/content-security-policy | https://owasp.org/www-project-secure-headers/ | https://github.com/vercel/next.js/issues/89754 | https://github.com/vercel/next.js/tree/canary/examples/with-strict-csp'
+
+  - slot: cache-control + asset fingerprinting
+    choice: Next.js content-hashed output + Vercel Edge defaults
+    version: n/a (automatic)
+    install:
+      - 'No action required — verify after first deploy that /_next/static/* returns Cache-Control: public, max-age=31536000, immutable'
+    caveats:
+      - 'Next hashes filenames under .next/static by default and Vercel serves them immutable for a year, automatically. Because assets are content-hashed, a new build produces new URLs — no stale-asset risk.'
+      - 'This slot turned out to be free. Verify rather than configure.'
+    notes: 'https://vercel.com/docs/edge-network/caching'
+
+  - slot: image optimization
+    choice: next/image (Vercel loader)
+    version: n/a (built into Next 16.2.10)
+    install:
+      - 'Use <Image> with explicit width/height for all portfolio imagery'
+      - 'Use the unoptimized prop for SVGs and images under ~10KB'
+      - 'images.remotePatterns in next.config.mjs allows https://i.ytimg.com/vi/** only (the blog''s YouTube-card thumbnails), with explicit empty port and search since omitting them wildcards both'
+    caveats:
+      - 'Hobby quota: 5,000 image transformations/month, 300,000 cache reads, 100,000 cache writes. Counted per unique SOURCE image transformed, not per pageview — repeated views of a cached variant do not recount. A portfolio with a finite image set will not approach this.'
+      - 'Hobby cannot exceed the quota without upgrading — it does not bill over, it stops.'
+      - 'Escape hatches if it ever bites: unoptimized prop, a custom loader, or narrowing images.qualities / deviceSizes / imageSizes.'
+      - 'No image CDN needed: CDNs solve on-demand variants for user-supplied images at scale; this image set is finite and known at build time.'
+      - 'Images are almost certainly the LCP element on portfolio pages — dimensions and srcset are non-negotiable.'
+    notes: 'https://vercel.com/docs/image-optimization/limits-and-pricing'
+
+  - slot: social/sharing metadata
+    choice: Next.js Metadata API
+    version: n/a (built into Next 16.2.10)
+    install:
+      - 'Export a static metadata object from src/app/layout.tsx with metadataBase and the "%s | gustavo.is" title template as the site-wide floor'
+      - 'Pages build their metadata through pageMetadata() / retrospectiveMetadata() in src/lib/site-metadata.ts (canonical, OG, Twitter derived from OG); JSON-LD (Person, WebSite, BlogPosting, Article) comes from src/lib/structured-data.ts with employment history from the landing data'
+    caveats:
+      - 'Page-level metadata merges with and overrides layout defaults.'
+      - 'Open Graph is a de-facto convention with no standards body and no version. Only twitter:card is needed — X falls back to OG.'
+      - 'Structured data beyond Article is a depreciating asset: Google dropped six rich-result types in June 2025. ProfilePage is explicitly INVALID for an About page.'
+    notes: 'https://nextjs.org/docs/app/api-reference/functions/generate-metadata | https://ogp.me/'
+
+  - slot: OG image generation
+    choice: Static OG cards in public/og/ (1200x630), referenced through the Metadata API
+    version: n/a (static assets)
+    install:
+      - 'Author one card per surface in public/og/ (default.jpg, blog.jpg, ponder.png, ponder-blogs.png) at 1200x630'
+      - 'Map them in OG_IMAGES in src/lib/site-metadata.ts; pageMetadata() sets openGraph.images and the Twitter card derives from it'
+    caveats:
+      - 'REVISED 2026-08-27 from the code: next/og (ImageResponse) was the plan, but the site ships hand-made static cards and no opengraph-image.tsx exists. Static cards cost no function invocations and let each set piece get a designed card rather than a templated one.'
+      - 'If per-post generated cards are ever wanted, next/og runs on the Node runtime by default (node:fs can read the Wotfard WOFF2) and bills as ordinary Function invocations, not Image Optimization transformations.'
+    notes: 'https://nextjs.org/docs/app/api-reference/functions/generate-metadata#opengraph-image'
+
+  - slot: feed/syndication
+    choice: feed (RSS/Atom/JSON Feed generator)
+    version: 6.0.0
+    install:
+      - 'npm install feed@6.0.0 --save-exact'
+      - 'Create src/app/feed.xml/route.ts returning the generated XML with Content-Type: application/xml'
+    caveats:
+      - 'Published 2026-07-05 (11 days) — vetted.'
+      - 'Next has no official feed convention (unlike sitemap/robots) — a Route Handler is the documented pattern.'
+      - 'Feed specs (RSS 2.0, RFC 4287) are frozen but stable.'
+      - 'Alternative if the dependency ever rots: hand-rolling the XML is roughly 20 lines.'
+    notes: 'https://github.com/jpmonette/feed'
+
+  - slot: URL/permalink and redirect strategy
+    choice: Explicit frontmatter slugs for /blog/<slug>; retrospectives at fixed routes under /remembering/<name>
+    version: n/a (policy)
+    install:
+      - 'Add a required `slug` field to the zod frontmatter schema — never derive it from the title'
+      - 'Route via src/app/(with-header)/blog/[slug]/page.tsx; src/lib/source.ts overrides the loader''s slugs(file) to [file.data.slug], so a wrong override silently breaks routing'
+    caveats:
+      - 'Title-derived slugs break URLs the moment a title is edited — the exact failure W3C warns about in "Cool URIs don''t change". An explicit slug field costs nothing and prevents it permanently.'
+      - 'Nothing to preserve from the current site (user-confirmed), so there is no redirect map. This is a one-time free choice.'
+      - 'Once live, treat URLs as permanent. Google advises holding any future redirects at least a year.'
+    notes: 'https://www.w3.org/Provider/Style/URI'
+
+  - slot: crawl and indexing control
+    choice: Next.js sitemap.ts + robots.ts conventions
+    version: n/a (built into Next 16.2.10)
+    install:
+      - 'Create app/sitemap.ts returning URL entries generated from the content collections'
+      - 'Create src/app/robots.ts returning a Robots object (allow all, disallow /api/ and /sentry-tunnel)'
+      - 'Serve /llms.txt, /llms-full.txt and per-page markdown mirrors at /llms.mdx/<path> from route handlers (src/app/llms*.txt, src/app/llms.mdx, src/lib/llms.ts)'
+    caveats:
+      - 'robots.txt is NOT an index-control mechanism — Google is explicit that it "is not a mechanism for keeping a web page out of Google". Use noindex metadata for that.'
+      - 'Google''s under-500-pages sitemap exemption genuinely applies here, so the sitemap is courtesy rather than necessity. It is free from the convention, so emit it.'
+      - 'AI crawler policy: robots.txt allows every crawler, AI ones included (the site exists to be found). llms.txt is NOT honoured by any known crawler (its own site calls it "a proposal", Google''s AI docs never mention it, Lighthouse marks it optional/N/A; IETF AIPREF''s attach draft expired 2025-10-28). The original decision was not to adopt it; REVERSED in code: the site ships it anyway as a near-free courtesy generated from the same content the pages use.'
+    notes: 'https://nextjs.org/docs/app/api-reference/file-conventions/metadata/sitemap | RFC 9309'
+
+  - slot: testing
+    choice: Vitest + Testing Library
+    version: vitest 4.1.10 | @vitejs/plugin-react 6.0.3 | jsdom 29.1.1 | @testing-library/react 16.3.2 | @testing-library/dom 10.4.1 | vite-tsconfig-paths 6.1.1 | @vitest/coverage-v8 4.1.10 (installed, no coverage config wired)
+    install:
+      - 'npm install -D vitest@4.1.10 @vitejs/plugin-react@6.0.3 jsdom@29.1.1 @testing-library/react@16.3.2 @testing-library/dom@10.4.1 vite-tsconfig-paths@6.1.1 --save-exact'
+      - 'vitest.config.mts defines two projects: a jsdom project (setupFiles: vitest.setup.ts) and a "storybook" browser project from @storybook/addon-vitest that runs stories headless in Chromium via @vitest/browser-playwright; pnpm test runs both'
+      - 'vitest.setup.ts is load-bearing: manual RTL cleanup (16.3.2 has no /vitest auto-cleanup entrypoint), a window.matchMedia polyfill answering matches: false (ScrollTrigger calls it at module load), and ScrollTrigger.disable() after the run so its sync interval cannot outlive jsdom'
+      - 'Add to package.json scripts:  "test": "vitest"'
+    caveats:
+      - 'Vitest 4.1.10 published 2026-07-06 (10 days) — outside the window AND patched against all three June 2026 CVEs. There is no cooldown-vs-CVE conflict here.'
+      - 'Patched: GHSA-5xrq-8626-4rwp (UI arbitrary file read, fixed 4.1.0+), GHSA-2h32-95rg-cppp (browser-mode otelCarrier XSS, fixed 4.1.6+), GHSA-g8mr-85jm-7xhm (browser CDP proxy RCE, fixed 4.1.8+).'
+      - 'DOCUMENTED LIMITATION: "Since async Server Components are new to the React ecosystem, Vitest currently does not support them." Sync Server and Client Components test fine; async Server Components need E2E. Plan the slice accordingly.'
+      - 'The highest-value tests here are the two route handlers — the form and newsletter endpoints. Most other correctness is caught by build-time gates (typecheck, zod schema validation), not a test runner.'
+      - 'Vitest peers vite ^6 || ^7 || ^8 — Vite 8 is fine.'
+      - 'INSTALL-TIME CONFLICT, resolved: @vitejs/plugin-react''s optional peer @rolldown/plugin-babel (only needed for React Compiler support, unused here) pulled Babel 8, conflicting with shadcn''s own Babel 7 toolchain already installed. npm eagerly tries to resolve optional peers and hard-fails the whole install on a conflict rather than skipping them. Fixed with an "@babel/core": "7.29.7" override — satisfies both shadcn''s need and @rolldown/plugin-babel''s own peer range (^7.29.0 || ^8.0.0-rc.1), so peer-dep checking stayed on everywhere else. LOCATION CHANGED when the project switched to pnpm: this override now lives in pnpm-workspace.yaml''s overrides map, not package.json — pnpm does not read a top-level "overrides" field from package.json at all (confirmed against pnpm''s own package.json schema docs, which lists no such field). Verified after the switch: exactly one @babel/core version (7.29.7) resolved in the pnpm virtual store, no duplicate Babel 8 anywhere in the tree.'
+      - 'fsevents@2.3.3 (Vite''s macOS file watcher, via vite@8.1.4) needed its install script approved under npm 12 — legitimate, approved.'
+    notes: 'https://nextjs.org/docs/app/guides/testing/vitest'
+
+  - slot: component workshop
+    choice: Storybook (Next.js Vite framework)
+    version: 10.4.6 (storybook, @storybook/nextjs-vite, @storybook/addon-vitest, @storybook/addon-a11y) | playwright 1.61.1 | @vitest/browser-playwright 4.1.10
+    install:
+      - 'npx create-storybook@10.4.6 --type nextjs --builder vite --package-manager npm --features docs test a11y --yes --no-dev --disable-telemetry'
+      - 'This installs @storybook/addon-docs alongside addon-vitest and addon-a11y (from --features docs) — an addition beyond the original plan, kept since it is legitimate first-party Storybook tooling, not a supply-chain concern.'
+      - 'REMOVE @chromatic-com/storybook after install — see caveats. `npm uninstall @chromatic-com/storybook` and strip it from .storybook/main.ts addons array.'
+      - 'FIX vite version after install — see caveats. Check package.json; if it was written as a `^` range for a version published inside the cooldown window, pin it to the nearest vetted patch exactly.'
+      - 'ADD to .storybook/preview.tsx — the CLI does NOT do this automatically: import "../src/app/globals.css"'
+      - 'Playwright browsers install automatically as part of create-storybook when --features test is selected; no separate `npx playwright install` needed in current versions.'
+    caveats:
+      - 'Pinned 10.4.6 (published 2026-06-16, 30 days) rather than 10.5.2 — Storybook shipped TWO releases on 2026-07-16, and no 10.5.x has cleared the cooldown window. create-storybook@10.4.6 exists as a resolvable version, so the pin is real and will not fall through to latest.'
+      - 'INSTALL-TIME DIVERGENCE #1: the CLI writes vite as a `^` range, not an exact pin, and it can point at a version published the same day as install — confirmed in practice (wrote "^8.1.5", published that day, while node_modules had already resolved 8.1.4 at 7 days/vetted, an internally inconsistent state npm did not reconcile on its own). Always check and pin vite exactly after this CLI runs.'
+      - 'INSTALL-TIME DIVERGENCE #2: @chromatic-com/storybook (a SaaS visual-testing integration) is added by every nextjs/vite Storybook scaffold regardless of which --features are selected — no CLI flag excludes it. It was never part of this stack''s decisions. Remove it after install: uninstall the package and delete it from .storybook/main.ts''s addons array.'
+      - 'INSTALL-TIME DIVERGENCE #3: .storybook/preview.tsx does NOT import globals.css by default, even though this is exactly the step needed for Tailwind to render in the Storybook canvas. Add the import manually. Verify with a real `npm run build-storybook`, not just that the install succeeds — that is what actually proves Tailwind, the Radix-based components, and every addon compose correctly.'
+      - 'Next 16 IS supported: @storybook/nextjs-vite@10.4.6 peers next ^14.1.0 || ^15.0.0 || ^16.0.0. The docs never state this; the package manifest does. All 10.4.6 packages peer storybook ^10.4.6 consistently.'
+      - 'TAILWIND RESOLVED: @storybook/nextjs-vite reuses Next''s own PostCSS config automatically ("this framework will automatically handle your PostCSS config for you"). Do NOT add @tailwindcss/vite to viteFinal — that is only needed for non-Next Vite frameworks. If the framework pin ever changes to @storybook/react-vite, that changes.'
+      - '@storybook/nextjs-vite@10.4.6 declares NO typescript peer (the >= 4.9.x constraint appears only at 10.5.2), so TypeScript 6.0.3 is unconstrained.'
+      - 'Storybook runs a Vite pipeline alongside Next 16''s Turbopack. Two bundlers in one repo is inherent to this choice.'
+      - 'Playwright browsers download via the explicit `npx playwright install` CLI command, NOT an npm lifecycle script — so npm 12''s script blocking does not interfere.'
+      - 'CVE-2026-27148 (dev-server WebSocket hijacking → XSS/RCE) is fixed in 10.2.10; 10.4.6 is well past it. Dev server only, never production.'
+      - 'GHSA-8452-54wp-rmv6: a PUBLISHED Storybook build can expose .env variables. Do not deploy the Storybook output publicly.'
+      - 'Honest note: Storybook positions itself as a workshop for teams sharing design systems. For a solo personal site it is a real setup and maintenance cost. Retained at user request.'
+    notes: 'https://storybook.js.org/docs/get-started/frameworks/nextjs-vite | https://storybook.js.org/docs/writing-tests/integrations/vitest-addon'
+
+  - slot: linting/formatting
+    choice: Biome (lint + format in one tool)
+    version: 2.5.3
+    install:
+      - 'npm install -D -E @biomejs/biome@2.5.3'
+      - 'npx @biomejs/biome init'
+      - 'Add scripts:  "lint": "biome lint", "format": "biome format --write", "check": "biome check --write"'
+    caveats:
+      - 'Pinned 2.5.3 (2026-07-08, 8 days) not 2.5.4 (1 day old). 2.5.4 is confirmed a pure bugfix/perf release with no security content, so nothing is lost by waiting.'
+      - 'Next 16 removed `next lint` and `next build` no longer lints. Linting must be wired up explicitly — it is not a framework default any more.'
+      - 'Chosen over ESLint + Prettier partly to avoid that dependency corner: eslint-config-prettier was compromised in CVE-2025-54313 (malicious install.js). One tool, far fewer packages.'
+      - 'Biome auto-detects the react and next domains from package.json and enables their recommended rules with no config.'
+      - 'Biome''s a11y rule group covers most eslint-plugin-jsx-a11y equivalents and is on by default — so eslint-plugin-jsx-a11y is not needed. Parity is not 100%; verify any specific rule you depend on.'
+      - 'Next 16 ships no Biome migration codemod (the codemod is ESLint-only), but create-next-app offers Biome as a first-class linter choice.'
+      - 'INSTALL-TIME FIX #1: Biome''s CSS parser does not understand Tailwind v4 directives (@apply, @plugin, @theme) by default and aborts formatting globals.css with a parse error. Fix: add `"css": { "parser": { "tailwindDirectives": true } }` to biome.json — Biome''s own error message names the exact option.'
+      - 'INSTALL-TIME FIX #2: `biome check --write` flagged lint/a11y/noSvgWithoutTitle on the Storybook onboarding SVGs under src/stories/ and create-next-app''s demo icons in public/. Both were excluded rather than hand-fixed. CURRENT (2026-08-27): src/stories/ is gone, so biome.json has `"files": { "includes": ["**", "!public", "!.impeccable"] }`, with vcs.useIgnoreFile, tab indentation, double quotes, and organizeImports on.'
+      - 'Run `biome check --write` for real against the actual codebase as the verification step here, not just confirm the config parses — that is what surfaces gaps like the two above.'
+    notes: 'https://biomejs.dev/guides/getting-started/ | https://biomejs.dev/linter/domains/'
+
+  - slot: accessibility target
+    choice: WCAG 2.2 AA
+    version: n/a (policy)
+    install:
+      - 'Rely on Biome a11y rules at lint time and @storybook/addon-a11y in the workshop'
+      - 'Honor prefers-reduced-motion per component: useReducedMotion (mount-gated) on the Motion side, gsap.matchMedia() on the GSAP side'
+    caveats:
+      - 'Not legally required of a personal site (the EAA excludes them), but nearly free chosen up front and expensive to retrofit — a genuine one-way door.'
+      - 'NEVER target WCAG 3.0 — still a Working Draft (WD-20260303).'
+      - 'Because this site animates, honoring prefers-reduced-motion is an accessibility obligation, not a preference.'
+      - 'Base UI primitives supply the keyboard and screen-reader behaviour that is most often hand-rolled wrong.'
+    notes: 'https://www.w3.org/TR/WCAG22/'
+
+  - slot: error tracking
+    choice: Sentry
+    version: "@sentry/nextjs 10.70.0"
+    install:
+      - 'npm install @sentry/nextjs@10.64.0 --save-exact'
+      - 'pnpm add @sentry/nextjs@10.70.0 --save-exact  # bumped from 10.64.0 while wiring it up'
+      - 'Configured manually, no wizard: withSentryConfig in next.config.mjs (tunnelRoute "/sentry-tunnel", source-map upload only when SENTRY_AUTH_TOKEN is set, telemetry off), server/edge init in src/instrumentation.ts with onRequestError = captureRequestError, browser init in src/instrumentation-client.ts with onRouterTransitionStart, captureException in error.tsx and global-error.tsx'
+      - 'Errors only: tracesSampleRate 0, no replay, enableLogs false, sendDefaultPii false; environment from VERCEL_ENV (server) / NEXT_PUBLIC_VERCEL_ENV (client) falling back to NODE_ENV; without NEXT_PUBLIC_SENTRY_DSN the SDK stays disabled'
+    caveats:
+      - 'Pinned 10.64.0 (2026-07-07, 9 days). 10.66.0 shipped today; Sentry releases roughly weekly, so a fresh version is normal cadence rather than a signal.'
+      - 'Sentry declares a minimum of Next.js 13.2.0. Explicit Next 16 support was not confirmed from Sentry docs at decision time; confirmed in practice at 10.70.0, with withSentryConfig wrapping withBotId(withMDX(config)) through build and runtime.'
+      - 'The real justification is narrow: a contact form that silently stops delivering is the one failure that would otherwise go unnoticed. Instrument the endpoints, not the whole site.'
+      - 'Free tier ~5,000 errors/month — verify current numbers at sentry.io/pricing.'
+      - 'Vercel Hobby does NOT include Log Drains (Pro/Enterprise only). Dashboard runtime logs exist but cannot be exported — which is part of why an external error tracker earns its place here.'
+    notes: 'https://docs.sentry.io/platforms/javascript/guides/nextjs/'
+
+  - slot: analytics + consent posture
+    choice: Plausible Community Edition, self-hosted on the user's existing VPS, proxied through Vercel
+    version: instance 3.2.1 | @plausible-analytics/tracker 0.4.6
+    install:
+      - 'The instance (Plausible CE v3.2.1: postgres, clickhouse and community-edition containers) is managed outside this repo at metrics.whpl.sh; the earlier in-repo compose recipe under infra/plausible/ was dropped 2026-08-26'
+      - 'pnpm add @plausible-analytics/tracker@0.4.6 --save-exact'
+      - 'vercel.json rewrite: /api/pa -> https://metrics.whpl.sh/api/event (a path without the words analytics, stats or plausible)'
+      - 'src/lib/analytics.ts: init({ domain, endpoint: "/api/pa", outboundLinks: true, customProperties: () => ({ motion }) }) inside initAnalytics(), called from src/instrumentation-client.ts and inert unless NEXT_PUBLIC_VERCEL_ENV === "production"; custom events go through track(), a no-op until init ran'
+      - 'Create a custom-event goal in the Plausible site settings for each name in EVENTS (Contact: Opened, Contact: Sent, Contact: Failed, Video: Played, 404); nothing is backfilled'
+    caveats:
+      - 'Self-hosting was the user''s explicit choice on an existing VPS with 2GB+ free. My earlier claim that it "costs more" assumed renting a new box and was wrong.'
+      - 'Requires three containers: postgres:16-alpine, clickhouse/clickhouse-server:24.12-alpine, ghcr.io/plausible/community-edition:v3.2.1. Cannot run on Vercel. CPU must support SSE 4.2 (x86) or NEON (ARM) — a ClickHouse requirement.'
+      - 'v3.2.1 fixes CVE-2026-8467 (unauthenticated RCE via an exposed /storybook endpoint from the phoenix_storybook dependency), which affected all of 3.0.0–3.2.0. 3.2.1 removes the endpoint entirely. Patches are NOT backported — staying current is mandatory, not optional.'
+      - 'NO OFFICIAL BACKUP DOCUMENTATION EXISTS. Confirmed: the CE wiki has no backup page. Write your own: `docker compose exec plausible_db pg_dump -U postgres plausible_db > backup.sql` for Postgres, and ClickHouse''s BACKUP DATABASE command (which first requires registering a backups disk via a config.d override — not preconfigured in CE).'
+      - 'The compose.yml already mounts ClickHouse low-resource overrides (mark_cache_size 500MB, max_threads 1). But there is NO docker memory limit — on a shared VPS, add deploy.resources.limits.memory in compose.override.yml so ClickHouse cannot starve your other services. Not documented by Plausible.'
+      - 'DISABLE_REGISTRATION defaults to invite_only, not open — better than feared, but set it to true once your account exists.'
+      - 'Postgres 5432 and ClickHouse 8123/9000 are NOT published externally in the default compose.yml (internal Docker network only). Do not add port mappings in an override.'
+      - 'Upgrades are manual: git pull the new tag, docker compose up -d, prune old images.'
+      - 'CE lacks vs Cloud: funnels, user journeys, ecommerce goals, SSO, Sites API, advanced bot filtering (CE has basic only), CSV/API export, Looker Studio connector.'
+      - 'The Vercel rewrite satisfies Plausible''s X-Forwarded-For requirement automatically — a custom Edge Function proxy would not. Without the real visitor IP, Plausible''s bot filter drops events SILENTLY.'
+      - 'Avoid the words analytics/stats/plausible in the rewrite path — ad blockers match on them.'
+      - 'Script is 2.8KB, sets no cookies and uses no device storage. Operator is US-based, so no consent banner is required regardless.'
+      - 'AGPLv3.'
+      - 'Superseded 2026-08-26: the in-repo compose recipe (infra/plausible/) was dropped for an instance managed outside this repo at metrics.whpl.sh, and the legacy script.js tag gave way to the npm tracker (the script v2 API, CE 3.1.0+). Custom events, custom props, scroll depth and outbound links are all in CE; funnels are not.'
+    notes: 'https://github.com/plausible/community-edition/wiki | https://plausible.io/docs/proxy/guides/vercel | https://clickhouse.com/docs/en/operations/backup'
+
+  - slot: Core Web Vitals monitoring
+    choice: Vercel Speed Insights
+    version: "@vercel/speed-insights 2.0.0"
+    install:
+      - 'pnpm add @vercel/speed-insights@2.0.0 --save-exact'
+      - 'Render <SpeedInsights /> from @vercel/speed-insights/next in src/app/layout.tsx, gated on isProductionDeploy() (NEXT_PUBLIC_VERCEL_ENV === "production")'
+      - 'Enable Speed Insights for the project in the Vercel dashboard; nothing records until then'
+    caveats:
+      - 'Added after the pipeline ran; recorded 2026-08-27 from the code.'
+      - 'Production only on purpose: in dev the script loads from va.vercel-scripts.com, which the CSP blocks, and preview deploys would spend the Hobby quota (10k events/month over a 7-day window; past the cap, recording pauses until the next day).'
+    notes: 'https://vercel.com/docs/speed-insights'
+
+  - slot: hosting + CDN/deployment
+    choice: Vercel (Hobby plan)
+    version: n/a (platform)
+    install:
+      - 'Connect the git repository to a Vercel project'
+      - 'Set engines.node to 24.x so the build image matches'
+      - 'Point gustavo.is at the project (DNS already on Vercel)'
+    caveats:
+      - 'TOS RISK, ACKNOWLEDGED AND ACCEPTED BY USER: Vercel''s Terms define Hobby as personal/non-commercial only, and define commercial usage to include "any Deployment used for the purpose of financial gain of anyone involved in any part of the production of the project". A portfolio soliciting work sits within that clause. Vercel reserves the right to disable or terminate Hobby deployments with or without notice. User has chosen Hobby knowingly.'
+      - 'Hobby limits: 100GB fast data transfer, 1M edge requests, 1M function invocations, 4hrs Active CPU, 5,000 image transformations/month, 60s function ceiling, 1 concurrent build, 1 seat.'
+      - 'No Log Drains on Hobby.'
+      - 'Vercel ships git-push builds, so no separate CI product is needed.'
+      - 'Preview deploys are architected around PR review — near-zero value for a solo author, but free.'
+    notes: 'https://vercel.com/legal/terms | https://vercel.com/docs/plans/hobby'
+
+  - slot: domain/DNS/TLS management
+    choice: Vercel DNS (already in place) + Resend sending records
+    version: n/a (platform)
+    install:
+      - 'Verify gustavo.is nameservers remain ns1/ns2.vercel-dns.com'
+      - 'Add the Resend-generated SPF (TXT), DKIM (TXT), and MX records for the sending subdomain'
+      - 'Add DMARC:  _dmarc.gustavo.is TXT "v=DMARC1; p=none; rua=mailto:<your-address>;"'
+      - 'Confirm registrar auto-renew is on, with a payment method that will not expire'
+      - 'Enable phishing-resistant MFA on the registrar and Vercel accounts'
+    caveats:
+      - 'DOMAIN EXPIRY IS THE SINGLE MOST LIKELY WAY THIS SITE DIES, and it appears on no stack list. Auto-renew plus a live payment method plus registrar lock matter more than anything else in this file.'
+      - 'TLS is automatic on Vercel. Certificates are now capped at 200 days (CA/B Forum SC-081v3), dropping to 100 in March 2027 and 47 in March 2029 — automation is structural, not a convenience.'
+      - 'Start DMARC at p=none for monitoring. Only advance to quarantine/reject once SPF and DKIM are confirmed passing. DMARC is now Standards Track (RFC 9989, May 2026).'
+      - 'Send from a subdomain (send.gustavo.is), not the apex, to isolate sending reputation.'
+      - 'Apex CNAME is forbidden by RFC 1034; ALIAS/flattening is proprietary per-provider and is a real migration cost if you ever leave Vercel.'
+      - 'Certificate Transparency makes every hostname public — any preview/staging subdomain is world-readable once it gets a cert.'
+      - 'If a subdomain is ever decommissioned, retire the DNS record BEFORE the resource, or you leave a dangling record open to subdomain takeover.'
+    notes: 'https://www.ncsc.gov.uk/guidance/managing-public-domain-names | https://resend.com/docs/dashboard/domains/dmarc'
+
+  - slot: content backup/durability
+    choice: git mirror to a second host, independent of the primary
+    version: n/a (procedure)
+    install:
+      - 'Create an empty repo on a second provider (e.g. Codeberg, GitLab, or a self-hosted remote on the same VPS as Plausible)'
+      - 'git clone --mirror <primary-url> gustavo-is-mirror.git'
+      - 'cd gustavo-is-mirror.git && git push --mirror <secondary-url>'
+      - 'Refresh periodically:  git fetch -p origin && git push --mirror <secondary-url>'
+    caveats:
+      - 'The writing is the only irreplaceable asset in this project. Everything else is reinstallable from this YAML.'
+      - 'A single git remote is one copy in one account — and that account is the one most likely to be compromised or locked out. CISA 3-2-1: three copies, two media, one offsite.'
+      - 'The VPS already exists for Plausible, so it is a natural second remote and costs nothing extra.'
+      - 'Also back up the Plausible databases (see the analytics slot) — that data is NOT in git.'
+    notes: 'CISA 3-2-1 backup guidance'
+
+  - slot: dark mode/theming
+    choice: None — light only
+    version: n/a
+    install:
+      - 'No action. Do not install next-themes.'
+    caveats:
+      - 'Decided explicitly rather than defaulted — silently shipping light-only is the failure mode this slot exists to prevent.'
+      - 'Avoids next-themes 0.4.6, which last shipped 2025-03-11 (492 days) with open React 19 issues (a script-tag warning, and stale state under Activity/Cache Components).'
+      - 'If added later: Tailwind v4 class strategy is @custom-variant dark (&:where(.dark, .dark *)); CSS light-dark() is Baseline Newly and reaches Widely on 2026-11-13, but needs Safari 17.5+ vs Tailwind''s 16.4 floor.'
+    notes: null
+
+  - slot: on-site search
+    choice: None
+    version: n/a
+    install:
+      - 'No action.'
+    caveats:
+      - 'Defensible at personal-blog content volume — a client-side index taxes every visitor to serve the few who search.'
+      - 'Google removed the sitelinks searchbox in Nov 2024, so the last external incentive is gone.'
+      - 'If added later, Pagefind 1.5.2 is build-time over the built HTML and would fit this stack cleanly.'
+    notes: null
+
+  - slot: content licensing
+    choice: All rights reserved (no explicit license)
+    version: n/a
+    install:
+      - 'No action. Optionally add a © line in the footer.'
+    caveats:
+      - 'Coherent by default: protection is automatic under the Berne Convention, so silence means all rights reserved.'
+      - 'Deliberately reversible. Creative Commons grants are IRREVOCABLE — anyone who receives the work under CC keeps those rights permanently, even if you later change your mind. Staying silent keeps the door open; CC closes it forever.'
+    notes: 'https://creativecommons.org/faq/'
+
+  - slot: CI
+    choice: Vercel git-push builds (no separate CI system)
+    version: n/a (platform)
+    install:
+      - 'No action — Vercel builds on push automatically'
+      - 'Run biome check and vitest locally before pushing'
+    caveats:
+      - 'A separate CI product would mean holding a long-lived deploy token — added attack surface for no gain on a solo project.'
+      - 'Next 16 no longer lints during build, so lint is not enforced by the deploy. If you want it gated, add a GitHub Action later.'
+      - 'Do not enable dependency auto-merge — with cooldown it just auto-merges later, which is the same risk deferred.'
+    notes: null

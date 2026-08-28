@@ -1,0 +1,263 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+	/* Hero palette — raw values from design-decisions.md */
+	--color-sky-1: oklch(0.9338 0.065 89.92);
+	--color-sky-2: oklch(0.8381 0.0889 69.43);
+	--color-sky-3: oklch(0.7537 0.1378 49.92);
+	--color-sun: oklch(0.8803 0.1348 86.06);
+	--color-ground-1: oklch(0.7891 0.0452 81.82);
+	--color-ground-2: oklch(0.681 0.0587 75.53);
+	--color-ground-3: oklch(0.5665 0.0595 67.97);
+	--color-ground-4: oklch(0.4572 0.0543 59.52);
+	--color-header-bg: oklch(0.9338 0.065 89.92 / 70%);
+
+	/* Semantic surface tokens — structured so .dark {} overrides can be added in WS11 */
+	--color-bg: oklch(0.9912 0.0069 88.64);
+	--color-surface: oklch(0.9567 0.0333 88.06);
+	--color-text: oklch(0.2781 0.0296 256.85);
+	--color-text-muted: oklch(0.551 0.0234 264.36);
+	--color-error: oklch(0.6368 0.2078 25.33);
+
+	--shadow-well: 0 2px 0 hsla(0, 0%, 100%, 0.15);
+
+	--text-tiny: 0.6rem;
+	--text-tiny--letter-spacing: 0em;
+	--text-tiny--line-height: 1rem;
+
+	--font-sans: var(--font-bricolage-grotesque);
+	--font-display: var(--font-waves-signal);
+	--font-pixel: var(--font-pixel-robot);
+	--font-mono:
+		var(--font-basier-mono), ui-monospace, SFMono-Regular, Menlo, Monaco,
+		Consolas, "Liberation Mono", "Courier New", monospace;
+	--font-code: var(--font-basier-mono);
+
+	--ease-boing: cubic-bezier(0.77, 0, 0.175, 1);
+
+	--animate-fade-in: fade-in 0.5s ease-in forwards;
+
+	@keyframes fade-in {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+	*,
+	::after,
+	::before,
+	::backdrop,
+	::file-selector-button {
+		border-color: var(--color-gray-200, currentcolor);
+	}
+	* {
+		@apply border-border outline-ring/50;
+	}
+	body {
+		@apply bg-background text-foreground;
+	}
+	html {
+		@apply font-sans;
+	}
+
+	/* Display headings use Waves Signal; content headings use Wotfard */
+	h1 {
+		font-family: var(--font-display);
+		@apply text-5xl font-normal tracking-widest uppercase leading-tight;
+	}
+	h2 {
+		@apply text-3xl font-bold leading-snug;
+	}
+	h3 {
+		@apply text-xl font-semibold leading-snug;
+	}
+	h4 {
+		@apply text-lg font-semibold;
+	}
+}
+
+@utility bg-blur-20 {
+	backdrop-filter: blur(20px);
+}
+
+@utility bg-blur-50 {
+	backdrop-filter: blur(50px);
+}
+
+@utility bg-blur-0 {
+	backdrop-filter: none;
+}
+
+@utility well-shadow {
+	box-shadow:
+		inset 0 2px 2px rgb(0, 0, 0, 0.4),
+		0 2px 0 rgb(255, 255, 255, 0.4);
+}
+
+@utility stack {
+	@apply flex flex-col justify-items-start;
+	& > * {
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+	& > * + * {
+		margin-top: var(--space);
+	}
+}
+
+@utility transition-fill {
+	transition: fill 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Prose override — wire typography plugin to our palette and fonts */
+@utility prose-site {
+	--tw-prose-body: oklch(0.2781 0.0296 256.85);
+	--tw-prose-headings: oklch(0.4572 0.0543 59.52);
+	--tw-prose-lead: oklch(0.5665 0.0595 67.97);
+	--tw-prose-links: oklch(0.4572 0.0543 59.52);
+	--tw-prose-bold: oklch(0.2781 0.0296 256.85);
+	--tw-prose-counters: oklch(0.681 0.0587 75.53);
+	--tw-prose-bullets: oklch(0.8381 0.0889 69.43);
+	--tw-prose-hr: oklch(0.88 0.045 83);
+	--tw-prose-quotes: oklch(0.4572 0.0543 59.52);
+	--tw-prose-quote-borders: oklch(0.7537 0.1378 49.92);
+	--tw-prose-captions: oklch(0.681 0.0587 75.53);
+	--tw-prose-code: oklch(0.4572 0.0543 59.52);
+	--tw-prose-pre-code: oklch(0.9338 0.065 89.92);
+	--tw-prose-pre-bg: oklch(0.35 0.04 60);
+	--tw-prose-th-borders: oklch(0.88 0.045 83);
+	--tw-prose-td-borders: oklch(0.9338 0.065 89.92);
+	font-family: var(--font-sans);
+	max-width: var(--measure);
+}
+
+:root {
+	--measure: 60ch;
+	--background: oklch(0.9912 0.0069 88.64); /* warm off-white */
+	--foreground: oklch(0.2781 0.0296 256.85); /* warm dark text */
+	--card: oklch(0.9912 0.0069 88.64);
+	--card-foreground: oklch(0.2781 0.0296 256.85);
+	--popover: oklch(0.9912 0.0069 88.64);
+	--popover-foreground: oklch(0.2781 0.0296 256.85);
+	--primary: oklch(0.4572 0.0543 59.52); /* ground-4: dark warm earth */
+	--primary-foreground: oklch(0.9912 0.0069 88.64);
+	--secondary: oklch(0.9338 0.065 89.92); /* sky-1: pale golden */
+	--secondary-foreground: oklch(0.4572 0.0543 59.52);
+	--muted: oklch(0.9567 0.0333 88.06); /* surface: warm light */
+	--muted-foreground: oklch(0.681 0.0587 75.53); /* ground-2 */
+	--accent: oklch(0.8381 0.0889 69.43); /* sky-2: warm peach/amber */
+	--accent-foreground: oklch(0.4572 0.0543 59.52);
+	--destructive: oklch(0.577 0.245 27.325);
+	--border: oklch(0.88 0.045 83); /* warm tan */
+	--input: oklch(0.88 0.045 83);
+	--ring: oklch(0.7537 0.1378 49.92); /* sky-3: orange focus ring */
+	--chart-1: oklch(0.7537 0.1378 49.92); /* sky-3 */
+	--chart-2: oklch(0.681 0.0587 75.53); /* ground-2 */
+	--chart-3: oklch(0.5665 0.0595 67.97); /* ground-3 */
+	--chart-4: oklch(0.8803 0.1348 86.06); /* sun */
+	--chart-5: oklch(0.4572 0.0543 59.52); /* ground-4 */
+	--radius: 0.625rem;
+	--sidebar: oklch(0.9567 0.0333 88.06);
+	--sidebar-foreground: oklch(0.2781 0.0296 256.85);
+	--sidebar-primary: oklch(0.4572 0.0543 59.52);
+	--sidebar-primary-foreground: oklch(0.9912 0.0069 88.64);
+	--sidebar-accent: oklch(0.9338 0.065 89.92);
+	--sidebar-accent-foreground: oklch(0.4572 0.0543 59.52);
+	--sidebar-border: oklch(0.88 0.045 83);
+	--sidebar-ring: oklch(0.7537 0.1378 49.92);
+}
+
+@theme inline {
+	--font-heading: var(--font-display);
+	--font-sans: var(--font-bricolage-grotesque);
+	--color-sidebar-ring: var(--sidebar-ring);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar: var(--sidebar);
+	--color-chart-5: var(--chart-5);
+	--color-chart-4: var(--chart-4);
+	--color-chart-3: var(--chart-3);
+	--color-chart-2: var(--chart-2);
+	--color-chart-1: var(--chart-1);
+	--color-ring: var(--ring);
+	--color-input: var(--input);
+	--color-border: var(--border);
+	--color-destructive: var(--destructive);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-accent: var(--accent);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-muted: var(--muted);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-secondary: var(--secondary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-primary: var(--primary);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-popover: var(--popover);
+	--color-card-foreground: var(--card-foreground);
+	--color-card: var(--card);
+	--color-foreground: var(--foreground);
+	--color-background: var(--background);
+	--radius-sm: calc(var(--radius) * 0.6);
+	--radius-md: calc(var(--radius) * 0.8);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) * 1.4);
+	--radius-2xl: calc(var(--radius) * 1.8);
+	--radius-3xl: calc(var(--radius) * 2.2);
+	--radius-4xl: calc(var(--radius) * 2.6);
+}
+
+.dark {
+	--background: oklch(0.145 0 0);
+	--foreground: oklch(0.985 0 0);
+	--card: oklch(0.205 0 0);
+	--card-foreground: oklch(0.985 0 0);
+	--popover: oklch(0.205 0 0);
+	--popover-foreground: oklch(0.985 0 0);
+	--primary: oklch(0.922 0 0);
+	--primary-foreground: oklch(0.205 0 0);
+	--secondary: oklch(0.269 0 0);
+	--secondary-foreground: oklch(0.985 0 0);
+	--muted: oklch(0.269 0 0);
+	--muted-foreground: oklch(0.708 0 0);
+	--accent: oklch(0.269 0 0);
+	--accent-foreground: oklch(0.985 0 0);
+	--destructive: oklch(0.704 0.191 22.216);
+	--border: oklch(1 0 0 / 10%);
+	--input: oklch(1 0 0 / 15%);
+	--ring: oklch(0.556 0 0);
+	--chart-1: oklch(0.87 0 0);
+	--chart-2: oklch(0.556 0 0);
+	--chart-3: oklch(0.439 0 0);
+	--chart-4: oklch(0.371 0 0);
+	--chart-5: oklch(0.269 0 0);
+	--sidebar: oklch(0.205 0 0);
+	--sidebar-foreground: oklch(0.985 0 0);
+	--sidebar-primary: oklch(0.488 0.243 264.376);
+	--sidebar-primary-foreground: oklch(0.985 0 0);
+	--sidebar-accent: oklch(0.269 0 0);
+	--sidebar-accent-foreground: oklch(0.985 0 0);
+	--sidebar-border: oklch(1 0 0 / 10%);
+	--sidebar-ring: oklch(0.556 0 0);
+}

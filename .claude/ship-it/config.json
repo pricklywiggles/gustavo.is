@@ -1,0 +1,94 @@
+{
+	"repo": {
+		"mainBranch": "main",
+		"mergeStrategy": "merge",
+		"slug": "pricklywiggles/personal-website"
+	},
+
+	"source": {
+		"default": "tracker",
+		"tracker": {
+			"type": "linear",
+			"project": "gustavo.is",
+			"team": "Fractally",
+			"idPrefix": "FRA-"
+		}
+	},
+
+	"houseRules": "@CLAUDE.md",
+
+	"safety": [
+		"No em dashes anywhere (code comments, commit messages, PR bodies, docs); no AI attribution in commits or PRs.",
+		"This is NOT the Next.js you know: read node_modules/next/dist/docs/ before touching a Next API.",
+		"Two-library rule: GSAP owns scroll-driven transforms, Motion owns load and component animation; never both on the same property of the same element.",
+		"Read src/components/landing/README.md before changing anything in src/components/landing/."
+	],
+
+	"verify": [
+		"node_modules/.bin/biome check {changedFiles}",
+		"node_modules/.bin/tsc --noEmit",
+		"node_modules/.bin/vitest run"
+	],
+
+	"worktree": {
+		"enabled": true,
+		"root": ".claude/worktrees",
+		"prepare": ".claude/ship-it/prepare-worktree.sh {wt} {main}",
+		"qaNotes": [
+			"Turbopack serves stale builds: if a worktree dev server acts stale, kill it and rm -rf .next first. Run only one dev server at a time; port 3000 is the convention.",
+			"Motion+ (motion-plus) comes from a private registry. The offline store install covers worktrees; any non-offline install needs the auth in the user-level ~/.npmrc."
+		]
+	},
+
+	"concurrency": { "maxLanes": 3 },
+
+	"planning": {
+		"enabled": true,
+		"postBack": true,
+		"depth": "adaptive"
+	},
+
+	"review": {
+		"reviewers": [
+			{
+				"name": "pr-review",
+				"kind": "agent",
+				"ref": "pr-review-toolkit:code-reviewer",
+				"install": "pr-review-toolkit@claude-plugins-official"
+			},
+			{
+				"name": "codex",
+				"kind": "agent",
+				"ref": "codex:codex-rescue"
+			}
+		],
+		"applyWarranted": true
+	},
+
+	"ci": { "watch": true, "fixAttempts": 2 },
+
+	"docs": {
+		"enabled": true,
+		"jobs": [
+			{
+				"name": "design",
+				"mechanic": "curate-serial",
+				"ref": "impeccable",
+				"target": "DESIGN.md",
+				"appliesWhen": "design"
+			},
+			{
+				"name": "landing-readme",
+				"mechanic": "curate-serial",
+				"ref": "doc-readme",
+				"target": "src/components/landing/README.md",
+				"appliesWhen": "architecture"
+			}
+		]
+	},
+
+	"prTemplate": {
+		"sections": ["Summary", "Linear", "Verification"],
+		"verification": "two-part: (1) automated checks run with results; (2) a GitHub checkbox list of concrete visual QA steps with exact URLs, viewports, and interactions to try (entrances, scroll behavior, reduced motion, mobile menu). Never 'left to the reviewer'."
+	}
+}

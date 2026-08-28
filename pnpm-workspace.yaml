@@ -1,0 +1,19 @@
+# 7 days in minutes: this project's supply-chain cooldown, deliberately stricter than
+# pnpm's own 24h default.
+minimumReleaseAge: 10080
+
+# Install scripts are blocked by default; each package here was individually reviewed
+# via `pnpm approve-builds`.
+allowBuilds:
+  sharp: true
+  esbuild: true
+  fsevents: true
+  # Deliberately denied: its postinstall only falls back to a binary download the
+  # @sentry/cli-<platform> optional dependency already provides.
+  '@sentry/cli': false
+
+# pnpm does not read package.json's "overrides"; they must live here. Pins Babel 7:
+# @vitejs/plugin-react's optional @rolldown/plugin-babel (unused) pulls Babel 8,
+# conflicting with shadcn's Babel 7 toolchain.
+overrides:
+  "@babel/core": "7.29.7"

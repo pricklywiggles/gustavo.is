@@ -1,0 +1,8 @@
+{
+	"rewrites": [
+		{
+			"source": "/api/pa",
+			"destination": "https://metrics.whpl.sh/api/event"
+		}
+	]
+}

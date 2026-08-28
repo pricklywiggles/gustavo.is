@@ -1,0 +1,494 @@
+{
+	"schemaVersion": 2,
+	"generatedAt": "2026-08-24T21:45:16Z",
+	"title": "Design System: gustavo.is",
+	"extensions": {
+		"colorMeta": {
+			"dusk-earth": {
+				"role": "primary",
+				"displayName": "Dusk Earth",
+				"canonical": "oklch(0.4572 0.0543 59.52)",
+				"tonalRamp": [
+					"oklch(0.15 0.0326 59.52)",
+					"oklch(0.27 0.0391 59.52)",
+					"oklch(0.39 0.0456 59.52)",
+					"oklch(0.51 0.0521 59.52)",
+					"oklch(0.63 0.05 59.52)",
+					"oklch(0.75 0.0434 59.52)",
+					"oklch(0.87 0.0369 59.52)",
+					"oklch(0.95 0.0326 59.52)"
+				]
+			},
+			"pale-dune": {
+				"role": "secondary",
+				"displayName": "Pale Dune",
+				"canonical": "oklch(0.9338 0.065 89.92)",
+				"tonalRamp": [
+					"oklch(0.15 0.039 89.92)",
+					"oklch(0.27 0.0468 89.92)",
+					"oklch(0.39 0.0546 89.92)",
+					"oklch(0.51 0.0624 89.92)",
+					"oklch(0.63 0.0598 89.92)",
+					"oklch(0.75 0.052 89.92)",
+					"oklch(0.87 0.0442 89.92)",
+					"oklch(0.95 0.039 89.92)"
+				]
+			},
+			"amber-mirage": {
+				"role": "tertiary",
+				"displayName": "Amber Mirage",
+				"canonical": "oklch(0.8381 0.0889 69.43)",
+				"tonalRamp": [
+					"oklch(0.15 0.0533 69.43)",
+					"oklch(0.27 0.064 69.43)",
+					"oklch(0.39 0.0747 69.43)",
+					"oklch(0.51 0.0853 69.43)",
+					"oklch(0.63 0.0818 69.43)",
+					"oklch(0.75 0.0711 69.43)",
+					"oklch(0.87 0.0605 69.43)",
+					"oklch(0.95 0.0533 69.43)"
+				]
+			},
+			"horizon-blaze": {
+				"role": "accent",
+				"displayName": "Horizon Blaze",
+				"canonical": "oklch(0.7537 0.1378 49.92)",
+				"tonalRamp": [
+					"oklch(0.15 0.0827 49.92)",
+					"oklch(0.27 0.0992 49.92)",
+					"oklch(0.39 0.1158 49.92)",
+					"oklch(0.51 0.1323 49.92)",
+					"oklch(0.63 0.1268 49.92)",
+					"oklch(0.75 0.1102 49.92)",
+					"oklch(0.87 0.0937 49.92)",
+					"oklch(0.95 0.0827 49.92)"
+				]
+			},
+			"noon-sun": {
+				"role": "accent",
+				"displayName": "Noon Sun",
+				"canonical": "oklch(0.8803 0.1348 86.06)",
+				"tonalRamp": [
+					"oklch(0.15 0.0809 86.06)",
+					"oklch(0.27 0.0971 86.06)",
+					"oklch(0.39 0.1132 86.06)",
+					"oklch(0.51 0.1294 86.06)",
+					"oklch(0.63 0.124 86.06)",
+					"oklch(0.75 0.1078 86.06)",
+					"oklch(0.87 0.0917 86.06)",
+					"oklch(0.95 0.0809 86.06)"
+				]
+			},
+			"dune-tan": {
+				"role": "reserve",
+				"displayName": "Dune Tan",
+				"canonical": "oklch(0.7891 0.0452 81.82)",
+				"tonalRamp": [
+					"oklch(0.15 0.0271 81.82)",
+					"oklch(0.27 0.0325 81.82)",
+					"oklch(0.39 0.038 81.82)",
+					"oklch(0.51 0.0434 81.82)",
+					"oklch(0.63 0.0416 81.82)",
+					"oklch(0.75 0.0362 81.82)",
+					"oklch(0.87 0.0307 81.82)",
+					"oklch(0.95 0.0271 81.82)"
+				]
+			},
+			"desert-clay": {
+				"role": "reserve",
+				"displayName": "Desert Clay",
+				"canonical": "oklch(0.681 0.0587 75.53)",
+				"tonalRamp": [
+					"oklch(0.15 0.0352 75.53)",
+					"oklch(0.27 0.0423 75.53)",
+					"oklch(0.39 0.0493 75.53)",
+					"oklch(0.51 0.0564 75.53)",
+					"oklch(0.63 0.054 75.53)",
+					"oklch(0.75 0.047 75.53)",
+					"oklch(0.87 0.0399 75.53)",
+					"oklch(0.95 0.0352 75.53)"
+				]
+			},
+			"canyon-brown": {
+				"role": "accent",
+				"displayName": "Canyon Brown",
+				"canonical": "oklch(0.5665 0.0595 67.97)",
+				"tonalRamp": [
+					"oklch(0.15 0.0357 67.97)",
+					"oklch(0.27 0.0428 67.97)",
+					"oklch(0.39 0.05 67.97)",
+					"oklch(0.51 0.0571 67.97)",
+					"oklch(0.63 0.0547 67.97)",
+					"oklch(0.75 0.0476 67.97)",
+					"oklch(0.87 0.0405 67.97)",
+					"oklch(0.95 0.0357 67.97)"
+				]
+			},
+			"first-light": {
+				"role": "neutral",
+				"displayName": "First Light",
+				"canonical": "oklch(0.9912 0.0069 88.64)",
+				"tonalRamp": [
+					"oklch(0.15 0.0041 88.64)",
+					"oklch(0.27 0.005 88.64)",
+					"oklch(0.39 0.0058 88.64)",
+					"oklch(0.51 0.0066 88.64)",
+					"oklch(0.63 0.0063 88.64)",
+					"oklch(0.75 0.0055 88.64)",
+					"oklch(0.87 0.0047 88.64)",
+					"oklch(0.95 0.0041 88.64)"
+				]
+			},
+			"sand-haze": {
+				"role": "neutral",
+				"displayName": "Sand Haze",
+				"canonical": "oklch(0.9567 0.0333 88.06)",
+				"tonalRamp": [
+					"oklch(0.15 0.02 88.06)",
+					"oklch(0.27 0.024 88.06)",
+					"oklch(0.39 0.028 88.06)",
+					"oklch(0.51 0.032 88.06)",
+					"oklch(0.63 0.0306 88.06)",
+					"oklch(0.75 0.0266 88.06)",
+					"oklch(0.87 0.0226 88.06)",
+					"oklch(0.95 0.02 88.06)"
+				]
+			},
+			"sand-line": {
+				"role": "neutral",
+				"displayName": "Sand Line",
+				"canonical": "oklch(0.88 0.045 83)",
+				"tonalRamp": [
+					"oklch(0.15 0.027 83)",
+					"oklch(0.27 0.0324 83)",
+					"oklch(0.39 0.0378 83)",
+					"oklch(0.51 0.0432 83)",
+					"oklch(0.63 0.0414 83)",
+					"oklch(0.75 0.036 83)",
+					"oklch(0.87 0.0306 83)",
+					"oklch(0.95 0.027 83)"
+				]
+			},
+			"dusk-ink": {
+				"role": "neutral",
+				"displayName": "Dusk Ink",
+				"canonical": "oklch(0.2781 0.0296 256.85)",
+				"tonalRamp": [
+					"oklch(0.15 0.0178 256.85)",
+					"oklch(0.27 0.0213 256.85)",
+					"oklch(0.39 0.0249 256.85)",
+					"oklch(0.51 0.0284 256.85)",
+					"oklch(0.63 0.0272 256.85)",
+					"oklch(0.75 0.0237 256.85)",
+					"oklch(0.87 0.0201 256.85)",
+					"oklch(0.95 0.0178 256.85)"
+				]
+			},
+			"warning-ember": {
+				"role": "accent",
+				"displayName": "Warning Ember",
+				"canonical": "oklch(0.577 0.245 27.325)",
+				"tonalRamp": [
+					"oklch(0.15 0.147 27.325)",
+					"oklch(0.27 0.1764 27.325)",
+					"oklch(0.39 0.2058 27.325)",
+					"oklch(0.51 0.2352 27.325)",
+					"oklch(0.63 0.2254 27.325)",
+					"oklch(0.75 0.196 27.325)",
+					"oklch(0.87 0.1666 27.325)",
+					"oklch(0.95 0.147 27.325)"
+				]
+			},
+			"stratos": {
+				"role": "scene",
+				"displayName": "Stratos",
+				"canonical": "oklch(0.36 0.09 258)",
+				"tonalRamp": [
+					"oklch(0.15 0.054 258)",
+					"oklch(0.27 0.0648 258)",
+					"oklch(0.39 0.0756 258)",
+					"oklch(0.51 0.0864 258)",
+					"oklch(0.63 0.0828 258)",
+					"oklch(0.75 0.072 258)",
+					"oklch(0.87 0.0612 258)",
+					"oklch(0.95 0.054 258)"
+				]
+			},
+			"zenith-blue": {
+				"role": "scene",
+				"displayName": "Zenith Blue",
+				"canonical": "oklch(0.52 0.13 250)",
+				"tonalRamp": [
+					"oklch(0.15 0.078 250)",
+					"oklch(0.27 0.0936 250)",
+					"oklch(0.39 0.1092 250)",
+					"oklch(0.51 0.1248 250)",
+					"oklch(0.63 0.1196 250)",
+					"oklch(0.75 0.104 250)",
+					"oklch(0.87 0.0884 250)",
+					"oklch(0.95 0.078 250)"
+				]
+			},
+			"day-sky": {
+				"role": "scene",
+				"displayName": "Day Sky",
+				"canonical": "oklch(0.8 0.075 235)",
+				"tonalRamp": [
+					"oklch(0.15 0.045 235)",
+					"oklch(0.27 0.054 235)",
+					"oklch(0.39 0.063 235)",
+					"oklch(0.51 0.072 235)",
+					"oklch(0.63 0.069 235)",
+					"oklch(0.75 0.06 235)",
+					"oklch(0.87 0.051 235)",
+					"oklch(0.95 0.045 235)"
+				]
+			},
+			"open-sea": {
+				"role": "scene",
+				"displayName": "Open Sea",
+				"canonical": "oklch(0.55 0.105 232)",
+				"tonalRamp": [
+					"oklch(0.15 0.063 232)",
+					"oklch(0.27 0.0756 232)",
+					"oklch(0.39 0.0882 232)",
+					"oklch(0.51 0.1008 232)",
+					"oklch(0.63 0.0966 232)",
+					"oklch(0.75 0.084 232)",
+					"oklch(0.87 0.0714 232)",
+					"oklch(0.95 0.063 232)"
+				]
+			},
+			"deep-sea": {
+				"role": "scene",
+				"displayName": "Deep Sea",
+				"canonical": "oklch(0.4 0.095 240)",
+				"tonalRamp": [
+					"oklch(0.15 0.057 240)",
+					"oklch(0.27 0.0684 240)",
+					"oklch(0.39 0.0798 240)",
+					"oklch(0.51 0.0912 240)",
+					"oklch(0.63 0.0874 240)",
+					"oklch(0.75 0.076 240)",
+					"oklch(0.87 0.0646 240)",
+					"oklch(0.95 0.057 240)"
+				]
+			}
+		},
+		"typographyMeta": {
+			"display": {
+				"displayName": "Display",
+				"purpose": "The page's one headline moment, one per page. Kitora 700."
+			},
+			"headline": {
+				"displayName": "Headline",
+				"purpose": "Section titles. Kitora 700."
+			},
+			"title": {
+				"displayName": "Title",
+				"purpose": "Standalone card headings and sub-section titles. Kitora 700; hierarchy within the title voice comes from size alone."
+			},
+			"legend": {
+				"displayName": "Legend",
+				"purpose": "Instrument text: panorama roles, the year, the counter and its label. Kitora 700."
+			},
+			"body": {
+				"displayName": "Body",
+				"purpose": "Paragraph copy, blog and retrospective content, 65 to 75ch measure. Wotfard 400."
+			},
+			"label": {
+				"displayName": "Label",
+				"purpose": "Form labels, nav items, metadata. Wotfard 500, sentence case, never a tracked eyebrow."
+			}
+		},
+		"shadows": [
+			{
+				"name": "pressed",
+				"value": "inset 0 2px 2px rgb(0 0 0 / 0.4), 0 2px 0 rgb(255 255 255 / 0.4)",
+				"purpose": "The signature well, a Lego-brick-like inset. Buttons on :active, paired with the 1px press-down translate."
+			},
+			{
+				"name": "pressed-soft",
+				"value": "inset 0 2px 2px rgb(0 0 0 / 0.1), 0 2px 0 rgb(255 255 255 / 0.55)",
+				"purpose": "The same well at card scale, for large resting surfaces like the contact scene's card."
+			},
+			{
+				"name": "raised",
+				"value": "inset 0 2px 2px rgb(255 255 255 / 0.5), 0 2px 8px rgb(0 0 0 / 0.45)",
+				"purpose": "The inverse coin, a lit top edge with a soft drop, for the one element that must sit proud of the surface (the video play button)."
+			}
+		],
+		"motion": [
+			{
+				"name": "ease-out-expo",
+				"value": "cubic-bezier(0.16, 1, 0.3, 1)",
+				"purpose": "The house entrance curve (src/lib/motion-tokens.ts EASE_OUT_EXPO): fast arrival, long settle."
+			},
+			{
+				"name": "sun-crest-spring",
+				"value": "spring(bounce 0.28, visualDuration 0.6s)",
+				"purpose": "The sun-crest pop: a disc springs up over a horizon with slight overshoot (SUN_CREST_SPRING)."
+			},
+			{
+				"name": "cta-transition",
+				"value": "150ms color/background transitions, 1px translate-down press",
+				"purpose": "The shared CTA recipe's interaction timing (src/lib/cta.ts)."
+			}
+		],
+		"breakpoints": [
+			{
+				"name": "sm",
+				"value": "640px"
+			},
+			{
+				"name": "md",
+				"value": "768px"
+			},
+			{
+				"name": "lg",
+				"value": "1024px"
+			}
+		]
+	},
+	"components": [
+		{
+			"name": "Primary Button",
+			"kind": "button",
+			"refersTo": "button-primary",
+			"description": "The shipped CTA archetype via the cta() recipe in src/lib/cta.ts (contact send, say-hello, showcase links, 404 return home): Dusk Earth on light ground, pressed well on :active.",
+			"html": "<button class=\"ds-btn-primary\">Say hello</button>",
+			"css": ".ds-btn-primary { background: oklch(0.4572 0.0543 59.52); color: oklch(0.9912 0.0069 88.64); border: none; border-radius: 10px; height: 44px; padding: 0 20px; font-family: Wotfard, ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: background 150ms, box-shadow 150ms, transform 150ms; } .ds-btn-primary:hover { background: oklch(0.4572 0.0543 59.52 / 85%); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px oklch(0.5665 0.0595 67.97); } .ds-btn-primary:active { transform: translateY(1px); box-shadow: inset 0 2px 2px rgb(0 0 0 / 0.4), 0 2px 0 rgb(255 255 255 / 0.4); } .ds-btn-primary:disabled { opacity: 0.6; pointer-events: none; }"
+		},
+		{
+			"name": "Secondary Button",
+			"kind": "button",
+			"refersTo": "button-secondary",
+			"description": "Pale Dune fill with Dusk Earth text; same geometry and press treatment as primary.",
+			"html": "<button class=\"ds-btn-secondary\">See the work</button>",
+			"css": ".ds-btn-secondary { background: oklch(0.9338 0.065 89.92); color: oklch(0.4572 0.0543 59.52); border: none; border-radius: 10px; height: 44px; padding: 0 20px; font-family: Wotfard, ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: background 150ms, box-shadow 150ms, transform 150ms; } .ds-btn-secondary:hover { background: oklch(0.8381 0.0889 69.43); } .ds-btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 3px oklch(0.5665 0.0595 67.97); } .ds-btn-secondary:active { transform: translateY(1px); box-shadow: inset 0 2px 2px rgb(0 0 0 / 0.4), 0 2px 0 rgb(255 255 255 / 0.4); }"
+		},
+		{
+			"name": "Outline CTA Button",
+			"kind": "button",
+			"description": "cta({ variant: \"outline\" }) from src/lib/cta.ts (contact cancel, intro's See my work, showcase secondary links): same geometry, the border replaces the fill and the press skips the well.",
+			"html": "<button class=\"ds-btn-outline\">See my work</button>",
+			"css": ".ds-btn-outline { background: transparent; color: oklch(0.2781 0.0296 256.85); border: 1px solid oklch(0.4572 0.0543 59.52 / 0.3); border-radius: 10px; height: 44px; padding: 0 20px; font-family: Wotfard, ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: background 150ms, border-color 150ms, transform 150ms; } .ds-btn-outline:hover { background: oklch(0.9567 0.0333 88.06); } .ds-btn-outline:focus-visible { outline: none; box-shadow: 0 0 0 3px oklch(0.5665 0.0595 67.97); } .ds-btn-outline:active { transform: translateY(1px); } .ds-btn-outline:disabled { opacity: 0.6; pointer-events: none; }"
+		},
+		{
+			"name": "Text Input",
+			"kind": "input",
+			"refersTo": "input-default",
+			"description": "Contact-form field: First Light on Sand Line stroke, Horizon Blaze focus border, Canyon Brown ring on light ground.",
+			"html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Your name\" />",
+			"css": ".ds-input { background: oklch(0.9912 0.0069 88.64); color: oklch(0.2781 0.0296 256.85); border: 1px solid oklch(0.88 0.045 83); border-radius: 8px; height: 40px; padding: 0 12px; font-family: Wotfard, ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; transition: border-color 150ms, box-shadow 150ms; } .ds-input::placeholder { color: oklch(0.2781 0.0296 256.85 / 0.75); } .ds-input:focus { outline: none; border-color: oklch(0.7537 0.1378 49.92); box-shadow: 0 0 0 3px oklch(0.5665 0.0595 67.97); }"
+		},
+		{
+			"name": "Text Link (dark ground)",
+			"kind": "custom",
+			"refersTo": "link-dark",
+			"description": "The blog reading page's link: Noon Sun on Dusk Earth, no underline, focus is a Noon Sun highlighter swipe.",
+			"html": "<p class=\"ds-link-dark-demo\">A sentence carrying <a class=\"ds-link-dark\" href=\"#\">a text link</a> through it.</p>",
+			"css": ".ds-link-dark-demo { background: oklch(0.4572 0.0543 59.52); padding: 20px 24px; border-radius: 8px; font-family: Wotfard, ui-sans-serif, system-ui, sans-serif; font-size: 1rem; line-height: 1.6; color: oklch(0.9338 0.065 89.92); margin: 0; } .ds-link-dark { border-radius: 6px; font-weight: 500; color: oklch(0.8803 0.1348 86.06); text-decoration: none; transition: color 150ms ease-out, background-color 150ms ease-out; } .ds-link-dark:hover { color: oklch(0.9567 0.0333 88.06); } .ds-link-dark:focus-visible { outline: 4px solid oklch(0.8803 0.1348 86.06); outline-offset: 0; background: oklch(0.8803 0.1348 86.06); color: oklch(0.2781 0.0296 256.85); }"
+		},
+		{
+			"name": "Text Link (light ground)",
+			"kind": "custom",
+			"refersTo": "link-light",
+			"description": "The retrospective prose link: Dusk Earth on Pale Dune, Amber Mirage hover fill, focus inverts to First Light on Dusk Earth.",
+			"html": "<p class=\"ds-link-light-demo\">A sentence carrying <a class=\"ds-link-light\" href=\"#\">a text link</a> through it.</p>",
+			"css": ".ds-link-light-demo { background: oklch(0.9338 0.065 89.92); padding: 20px 24px; border-radius: 8px; font-family: Wotfard, ui-sans-serif, system-ui, sans-serif; font-size: 1rem; line-height: 1.6; color: oklch(0.2781 0.0296 256.85); margin: 0; } .ds-link-light { border-radius: 6px; font-weight: 500; color: oklch(0.4572 0.0543 59.52); text-decoration: none; transition: color 150ms ease-out, background-color 150ms ease-out; } .ds-link-light:hover { outline: 4px solid oklch(0.8381 0.0889 69.43); outline-offset: 0; background: oklch(0.8381 0.0889 69.43); color: oklch(0.2781 0.0296 256.85); } .ds-link-light:focus-visible { outline: 4px solid oklch(0.4572 0.0543 59.52); outline-offset: 0; background: oklch(0.4572 0.0543 59.52); color: oklch(0.9912 0.0069 88.64); }"
+		},
+		{
+			"name": "Nav Link",
+			"kind": "nav",
+			"description": "Header link wearing the navPill recipe from src/lib/cta.ts: fully-rounded hover pill one ramp step below the bar; the active route carries aria-current with no visual marker.",
+			"html": "<nav class=\"ds-nav\"><a class=\"ds-nav-link\" href=\"#\">Blog</a><a class=\"ds-nav-link\" aria-current=\"page\" href=\"#\">Work</a></nav>",
+			"css": ".ds-nav { display: flex; gap: 4px; } .ds-nav-link { color: oklch(0.4572 0.0543 59.52); text-decoration: none; font-family: Wotfard, ui-sans-serif, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.01em; padding: 6px 14px; border-radius: 999px; transition: background 150ms; } .ds-nav-link:hover { background: oklch(0.9338 0.065 89.92); } .ds-nav-link:focus-visible { outline: none; box-shadow: 0 0 0 3px oklch(0.5665 0.0595 67.97); }"
+		},
+		{
+			"name": "Card",
+			"kind": "card",
+			"description": "Sand Haze on First Light with the pressed-soft well at rest; shows both voices, Kitora title over Wotfard body.",
+			"html": "<div class=\"ds-card\"><h3 class=\"ds-card-title\">Feature showcase</h3><p class=\"ds-card-body\">One ramp step of separation from the page, never white-on-white, depth by touch rather than a drop shadow.</p></div>",
+			"css": ".ds-card { background: oklch(0.9567 0.0333 88.06); border: 1px solid oklch(0.88 0.045 83); border-radius: 14px; padding: 24px; box-shadow: inset 0 2px 2px rgb(0 0 0 / 0.1), 0 2px 0 rgb(255 255 255 / 0.55); max-width: 36ch; } .ds-card-title { font-family: Kitora, Wotfard, ui-sans-serif, system-ui, sans-serif; font-size: 1.25rem; font-weight: 700; line-height: 1.3; word-spacing: -0.1em; color: oklch(0.2781 0.0296 256.85); margin: 0 0 8px; } .ds-card-body { font-family: Wotfard, ui-sans-serif, system-ui, sans-serif; font-size: 1rem; font-weight: 400; line-height: 1.6; color: oklch(0.2781 0.0296 256.85); margin: 0; }"
+		}
+	],
+	"narrative": {
+		"northStar": "The Long Horizon",
+		"overview": "The system is built from one scene: a golden-hour desert horizon, sky bands parallaxing from pale dune-gold down through amber to a blazing near-horizon orange, a small Lego-avatar figure walking toward it. That scene is the strategic metaphor. A visitor scrolling the hero isn't watching decoration. They're watching the vantage point widen, the same way 26 years across product, QA, program management, and engineering widens what one person can see and do. The site never says this in words. It shows it, in the work, and lets the horizon carry the feeling.\n\nEverything runs on a single warm palette (with one scoped cool exception, see the Cool Branch) and two typefaces with locked jobs: Kitora Bold for anything title-like, Wotfard for anything that reads as sentences. There is no light/dark toggle. Precision comes from restraint. Warmth and playfulness come from materiality, the Lego figure, the tactile \"pressed\" surfaces, never from decoration bolted onto an otherwise generic template.\n\nThis explicitly rejects the cookie-cutter developer-portfolio look: the generic centered hero, the identical icon-plus-heading project cards, the templated GitHub-README-as-website feel. Nothing here should read as swappable with any other dev's portfolio.",
+		"keyCharacteristics": [
+			"One warm palette, no theme switch. The golden-hour scene is the brand, not a mode.",
+			"Two voices: Kitora speaks in titles, Wotfard speaks in sentences. Never a third face.",
+			"Tactile, \"pressed\" surfaces on interactive elements. Buttons and cards read as physically real, not flat vector shapes.",
+			"The horizon/range metaphor is shown through content and motion, never stated as copy."
+		],
+		"rules": [
+			{
+				"name": "The One Ramp Rule",
+				"body": "Every surface color, from the palest background to the darkest text, comes from this single warm ramp. The Cool Branch is the one scoped exception and may not grow. If a new color doesn't sit on the ramp, it doesn't belong on the site, including any future \"dark mode,\" which this system does not have.",
+				"section": "colors"
+			},
+			{
+				"name": "The Rare Blaze Rule",
+				"body": "Horizon Blaze is a focus/data color, not a decoration. It shows up on a ring, a chart line, a rare accent, never as a background flood.",
+				"section": "colors"
+			},
+			{
+				"name": "The Ground Picks the Ring Rule",
+				"body": "The focus ring is chosen by the ground it lands on, never by habit: opaque Horizon Blaze on dark surfaces (6.41:1 on Dusk Ink, 3.20:1 on Dusk Earth), opaque Canyon Brown on light warm ones (3.77:1 on Pale Dune, 4.04:1 on Sand Haze, 4.47:1 on First Light). Both live in `src/lib/focus-ring.ts`, keyed by `Tone`: `FOCUS_RING` hugs controls that carry their own padding (buttons, pills, inputs, media boxes), and `FOCUS_OUTLINE` is the same colour stepped 3px out for bare text and glyphs, where a hugging ring crowds the letters. Blaze on Pale Dune measures 1.89:1 and is not an indicator; the /50 blaze tint the dark ring once wore fell to 2.63:1 on Dusk Ink and was retired for the same reason. Every recipe that renders a control therefore requires a `tone`: `cta`, `navPill`, `textLink`, and the bar themes.",
+				"section": "colors"
+			},
+			{
+				"name": "The Unbroken Ground Rule",
+				"body": "Every page closes on Dusk Earth and hands off to the Dusk Earth footer with no visible seam. The closing ground runs continuously to the bottom of the page.",
+				"section": "colors"
+			},
+			{
+				"name": "The Two Voices Rule",
+				"body": "Kitora speaks in titles, Wotfard speaks in sentences. If it's a set piece or a standalone heading, it's Kitora; if the reader is meant to read it as prose or UI, it's Wotfard. A third typeface never enters.",
+				"section": "typography"
+			},
+			{
+				"name": "The Pressed Rule",
+				"body": "Anything a visitor can click or press gets the well treatment on interaction, never an ambient drop shadow at rest. Depth here means \"you can touch this,\" not \"this is floating above the page.\"",
+				"section": "elevation"
+			},
+			{
+				"name": "The Scroll Story Rule",
+				"body": "The landing page narrates by scroll. The hero's parallax scene is the opening line, and subsequent landing sections continue the story as scroll-driven sequences, chapters revealed by the visitor's own movement, not static blocks with a fade-in bolted on.",
+				"section": "motion"
+			},
+			{
+				"name": "The Sheet Rule",
+				"body": "Elements that visually belong to a scene move with the scene. Nothing that reads as part of a parallax world may scroll away at document speed while its world is pinned. The site header rides the hero's top sky band and exits in lockstep with it rather than scrolling off on its own.",
+				"section": "motion"
+			},
+			{
+				"name": "The Tasteful Microinteraction Rule",
+				"body": "Interactive elements get microinteractions wherever tasteful: hover pills, press states, focus transitions. If a microinteraction doesn't clarify state or add warmth, it doesn't ship; motion is never decoration for its own sake.",
+				"section": "motion"
+			},
+			{
+				"name": "Reduced Motion Is a Design, Not a Disable",
+				"body": "Every effect ships with a `prefers-reduced-motion` alternative that still reads as designed: static illustrations, crossfades or instant states, hovers that swap color without movement.",
+				"section": "motion"
+			}
+		],
+		"dos": [
+			"Do keep every color on the One Ramp. If a new UI need arises, find its answer on the warm ramp before reaching for an unrelated hue.",
+			"Do pick tint steps from the ladder (10/30/50/75/85) and contrast-check text tints against their real background.",
+			"Do reserve the Pressed treatment for things a visitor actually interacts with; flat/tonal everywhere else.",
+			"Do route every text link through `textLink({ tone })` and every control's focus ring through a recipe's `tone`. A hand-rolled link or ring is a bug, not a variant.",
+			"Do let work and case-study content demonstrate the PM/QA/program-management/engineering range through what it contains, never through a stated claim of breadth (per PRODUCT.md's Positioning).",
+			"Do keep the contact form as the one clear call to action; no competing secondary CTA."
+		],
+		"donts": [
+			"Don't build the cookie-cutter developer-portfolio template look: generic centered hero, identical project cards, no personal voice. (Direct from PRODUCT.md's anti-reference.)",
+			"Don't add a third typeface, and don't let Kitora write sentences or Wotfard carry set-piece titles. See the Two Voices Rule.",
+			"Don't hand-write shadow values; use `shadow-pressed`, `shadow-pressed-soft`, `shadow-raised`.",
+			"Don't use gradient text, side-stripe borders, or a tiny uppercase tracked eyebrow above every section. None of that belongs in a system this restrained.",
+			"Don't underline a link. Hue and weight carry the role, and focus is the highlighter swipe; the underline is not a fallback this system keeps.",
+			"Don't introduce a light/dark theme toggle. This system has one palette, full stop. The `dark:` variant is deliberately neutered in `globals.css`."
+		]
+	}
+}
