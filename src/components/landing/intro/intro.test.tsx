@@ -90,8 +90,39 @@ describe("IntroSection", () => {
 		).toBeDefined();
 		expect(screen.getByText(/pair programming with my dog Kiwi/)).toBeDefined();
 		const video = container.querySelector("video");
-		expect(video?.getAttribute("src")).toBe("/scene_home.webm");
 		expect(video?.hasAttribute("controls")).toBe(false);
+		// No <source> list: a file named in the markup gets fetched by whichever engine
+		// claims it at parse time, before the mount effect can choose.
+		expect(video?.querySelector("source")).toBeNull();
+	});
+
+	it("picks the WebM on mount for a non-WebKit engine", () => {
+		// jsdom has no webkitPresentationMode, so it stands in for Firefox and Chromium.
+		const { container } = render(<IntroSection />);
+		expect(container.querySelector("video")?.getAttribute("src")).toBe(
+			"/scene_home.webm",
+		);
+	});
+
+	it("picks the HEVC file on mount for WebKit", () => {
+		Object.defineProperty(
+			HTMLVideoElement.prototype,
+			"webkitPresentationMode",
+			{
+				value: "inline",
+				configurable: true,
+			},
+		);
+		try {
+			const { container } = render(<IntroSection />);
+			expect(container.querySelector("video")?.getAttribute("src")).toBe(
+				"/scene_home.mov",
+			);
+		} finally {
+			delete (
+				HTMLVideoElement.prototype as { webkitPresentationMode?: unknown }
+			).webkitPresentationMode;
+		}
 	});
 
 	it("renders both calls to action", () => {
