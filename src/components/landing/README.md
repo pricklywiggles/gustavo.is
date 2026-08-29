@@ -110,11 +110,29 @@ Bullets name the file.
     `[data-quote-result]`) or keep the query inside a function-based
     value that GSAP evaluates later (`counterPoint`).
 
-## Hero: the sheet, the hole, and iOS Safari (FRA-185)
+## iOS scroll smoothness: the hero's one clock and the projects overlay (FRA-185)
 
 The hero is CSS sticky, not a GSAP pin, so the pin-reverted rules above
-do not apply; these do.
+do not apply; these do. The rule behind all of them: desktop, Android,
+and macOS Safari keep their pre-branch behavior exactly (`scrub: true`,
+raw scroll samples, the video's shadow). Only iOS changes.
 
+- The gate is a device test, `isIOSDevice()` in `src/lib/ios-device.ts`:
+  touch plus an iPhone/iPad/iPod user agent, or a Macintosh one with more
+  than one touch point (iPadOS 13+). Never a browser sniff: Safari and
+  Chrome on iOS share WebKit's scroll reporting and take the same path.
+  Evaluate it inside the `gsap.matchMedia` callbacks; it is false during
+  SSR. Media-query gates (`hover: hover`, `pointer: coarse`,
+  `ScrollTrigger.isTouch === 1`) were rejected: they sweep Android in.
+- Scrub: `scrollScrub()` (`src/lib/scroll-scrub.ts`) is `true` everywhere
+  and 0.25s on iOS, which reports scroll positions sparsely and sometimes
+  wrongly (the touchmove bug ScrollTrigger works around), so each raw
+  sample paints as a step. The hero, the intro headline, and the projects
+  rail resolve it at runtime. `AnimatedLines` defaults to `true` in scrub
+  and pin modes; the intro is its only consumer passing `scrub`, and a
+  test pins that. Work history, landfall, and vista stay on `scrub: true`.
+  Progress-driven side effects (video cue, sheet visibility) read the raw
+  trigger progress, which is the real scroll.
 - Viewport height comes from the scene's `h-screen` box (`metrics.vh`),
   and the intro measures its own section the same way. `innerHeight` on
   iOS Safari is the toolbar-dependent visual height: small at the top of
@@ -124,37 +142,62 @@ do not apply; these do.
   resize on touch-only devices (`ignoreMobileResize` defaults to
   `isTouch === 1`), so no refresh fires mid-gesture; the mismatch was
   the number itself.
-- Every scrub is `scrub: SCRUB` (0.25s), never `true`. iOS Safari reports
-  scroll positions sparsely and sometimes wrongly (the touchmove bug
-  ScrollTrigger works around); with `true` each sample paints as a step,
-  with a number the ticker interpolates. Progress-driven side effects
-  (video cue, sheet visibility, the hole's y offset) keep reading the raw
-  trigger progress, which is the real scroll.
-- The hole is an SVG clip-path over the whole sheet, and each write of
-  its `d` re-rasterizes the clip on the main thread. Writes are coalesced
-  to one per frame through `gsap.ticker` and skipped when the path string
-  is unchanged, so the sway and breath tweens cost nothing while the hole
-  is closed (the frame-only path is constant). Before this the two
-  time-based tweens rewrote the clip ~120 times a second through the
-  whole first half of the hero. The setup and refresh writes stay
+- One clock on iOS. Off iOS the sheet scrolls natively after its 1vh
+  stick and the hole's timeline (133.333vh to 233.333vh) assigns
+  `hole.yOff` from raw progress; both are the raw scroll, so they agree.
+  With a numeric scrub they cannot: the hole's growth trails the
+  catch-up while `yOff` follows the finger, and no scrub value fixes it
+  (smoothing `yOff` instead drifts the reveal off the video by ~250px at
+  flick speed). So on iOS the motion callback turns the `display:
+  contents` carrier around the sheet into a sticky element of
+  `CARRIER_VH` (106.667vh; stick distance exactly `REVEAL_COMPLETE_VH`)
+  and makes the sheet its absolute child, and one scrubbed timeline from
+  100vh to 233.333vh moves the sheet's `y` by -133.333vh, climbs `yOff`
+  by +133.333vh (path coordinates are sheet-local), and grows the hole
+  from 33.333vh in. The sheet's rect follows the native sheet's line at
+  every scroll position (probed to 0.001vh); at completion its remainder
+  is exactly the carrier's box, so the carrier's native release continues
+  the line. The styles are `gsap.set` inside the context so a
+  reduced-motion flip reverts them. Do not extend `--hero-pin` to keep
+  the 240vh sheet stuck (page length and every downstream anchor change)
+  and do not raise the scrub.
+- Clip writes: `hero/hero-hole.ts` owns the path and a per-frame writer
+  (`createClipWriter`). Four callers (scroll, growth, sway, breath)
+  collapse to one write per frame; none while the path is unchanged (the
+  closed hole's frame-only path is constant), none while the sheet is
+  hidden past the reveal (the sway and breath tweens pause with it and
+  resume with one synchronous write), none after disposal. Disposal is a
+  flag: `gsap.ticker.add(fn, true)` returns a wrapper that
+  `ticker.remove(fn)` never matches. Setup and refresh writes stay
   synchronous: a clip referencing an empty path hides the sheet for a
   frame.
-- The same rule reaches past the hero: `AnimatedLines` defaults its scrub
-  and pin modes to 0.25s (the intro headline and every reveal built on
-  it), the projects rail scrubs use `RAIL_SCRUB`, and `WarpStarfield`
-  low-passes the `sceneScroll` sample it places the settled headline
-  with (`SCROLL_SMOOTHING`, 80ms), since that overlay is DOM text moved
-  by JavaScript against a page the compositor scrolls on its own. Keep
-  that one short: the overlay should read as glued to the page, and at
-  the scrubs' 0.25s it trailed the finger and settled like a spring.
-- The intro video's drop-shadow filter applies only under
-  `@media (hover: hover)`. A filter on a playing video is re-rendered
-  every video frame, and on phones that ran under the hole's per-frame
-  clip raster; phones get the plain alpha video.
-- Still on the table if iPhones remain stepped: `ScrollTrigger.normalizeScroll(true)`
-  gated to `ScrollTrigger.isTouch === 1`. It moves scrolling onto the JS
-  thread and removes overscroll bounce; check the contact dialog and the
-  mobile menu before adopting it.
+- The intro video's drop shadow stays by default; a layout effect sets
+  `filter: none` on iOS devices before first paint. A filter on a playing
+  video is re-rendered every video frame, and on phones that ran under
+  the hole's per-frame clip raster.
+- Projects headline: native layout. `WarpStarfieldOverlay` (headline,
+  astronaut, cue) is an absolute track 200vh into the section, 125vh
+  tall, holding a sticky `h-screen` screen: the page pins it for 25vh at
+  the theater's lock and releases it at page speed, gone by 325vh where
+  the showcase arrives. That is the piecewise path (`200vh - x`, `0`,
+  `225vh - x`) the starfield used to translate every frame from a scroll
+  sample, which steps on iOS and reads as a spring with any filter on it.
+  The starfield keeps the canvas and UFO, reveals the overlay through
+  `[data-warp-word]`, `[data-warp-astronaut]` and `[data-scroll-hint]`,
+  and measures word rests relative to the canvas (the two screens
+  coincide at the lock, where the flight happens). The scroll sample
+  survives only for the star camera (`restCamY`), low-passed at 80ms on
+  iOS. A 325vh track from the section's top was rejected: it pins the
+  headline through the seed phase. The section keys both halves on a
+  live reduced-motion flip so neither keeps stale inline styles.
+- If phones still step after all this, the residual is the
+  native-scroll/JS boundary, not geometry. Evaluate
+  `ScrollTrigger.normalizeScroll(true)` on a throwaway preview branch,
+  never as a query flag in the merged tree: it is an experimental
+  page-wide input takeover (2.8s default momentum, disables CSS smooth
+  scrolling) that must be reconciled with the theater's `window.scrollTo`
+  clamp, MotionAnchor, the header hold, the mobile menu, and the contact
+  dialog. Do not add per-element lag instead.
 
 ## Mobile (below sm) adaptations
 
@@ -213,10 +256,11 @@ HTML is one DOM shape for both.
   a flip back to motion rewinds it for the hero's play cue.
 - Projects: the 225vh spacer exists to park the showcase a quarter
   viewport past the fold at the theater lock, so it is `motion-reduce:h-0`,
-  and the warp's reduced branch places the overlay at progress 1 (the seed
-  scrub's two-viewport entry read as two empty screens before the
-  headline). The headline screen hands straight to the showcase, whose
-  700vh scrub still pins one project per viewport.
+  and the overlay's track drops its `motion-safe:` offset and height to
+  sit at the section's top with zero stick (the seed scrub's two-viewport
+  entry read as two empty screens before the headline). The headline
+  screen hands straight to the showcase, whose 700vh scrub still pins one
+  project per viewport.
 - Work history: the section is `h-auto`. After the equation screen each
   `PanoramaScene` is one in-flow screen (`motion-reduce:relative
   motion-reduce:h-screen`; layers at their authored rest are the finished
