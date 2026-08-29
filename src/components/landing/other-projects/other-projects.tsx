@@ -9,6 +9,10 @@ import { scrubIndex, scrubJumpTarget } from "@/lib/scrub";
 import { ProjectShowcase } from "../project-showcase";
 import { PROJECTS } from "../projects-data";
 
+// Catch-up (seconds) for the rail scrubs; a bare `true` paints iOS Safari's sparse
+// scroll samples as steps (see the hero's SCRUB).
+const RAIL_SCRUB = 0.25;
+
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 /**
@@ -146,7 +150,7 @@ export function OtherProjectsSection() {
 						scaleX: 1,
 						scaleY: 1,
 						ease: "none",
-						scrollTrigger: { ...locked, scrub: true },
+						scrollTrigger: { ...locked, scrub: RAIL_SCRUB },
 					},
 				);
 				gsap.fromTo(
@@ -156,7 +160,7 @@ export function OtherProjectsSection() {
 						top: "100%",
 						left: "0%",
 						ease: "none",
-						scrollTrigger: { ...locked, scrub: true },
+						scrollTrigger: { ...locked, scrub: RAIL_SCRUB },
 					},
 				);
 			});
@@ -168,7 +172,7 @@ export function OtherProjectsSection() {
 						scaleX: 1,
 						scaleY: 1,
 						ease: "none",
-						scrollTrigger: { ...locked, scrub: true },
+						scrollTrigger: { ...locked, scrub: RAIL_SCRUB },
 					},
 				);
 				gsap.fromTo(
@@ -178,7 +182,7 @@ export function OtherProjectsSection() {
 						left: "100%",
 						top: "0%",
 						ease: "none",
-						scrollTrigger: { ...locked, scrub: true },
+						scrollTrigger: { ...locked, scrub: RAIL_SCRUB },
 					},
 				);
 			});

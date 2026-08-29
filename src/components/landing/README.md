@@ -139,6 +139,16 @@ do not apply; these do.
   whole first half of the hero. The setup and refresh writes stay
   synchronous: a clip referencing an empty path hides the sheet for a
   frame.
+- The same rule reaches past the hero: `AnimatedLines` defaults its scrub
+  and pin modes to 0.25s (the intro headline and every reveal built on
+  it), the projects rail scrubs use `RAIL_SCRUB`, and `WarpStarfield`
+  low-passes the `sceneScroll` sample it places the settled headline
+  with (`SCROLL_SMOOTHING`), since that overlay is DOM text moved by
+  JavaScript against a page the compositor scrolls on its own.
+- The intro video's drop-shadow filter applies only under
+  `@media (hover: hover)`. A filter on a playing video is re-rendered
+  every video frame, and on phones that ran under the hole's per-frame
+  clip raster; phones get the plain alpha video.
 - Still on the table if iPhones remain stepped: `ScrollTrigger.normalizeScroll(true)`
   gated to `ScrollTrigger.isTouch === 1`. It moves scrolling onto the JS
   thread and removes overscroll bounce; check the contact dialog and the

@@ -32,6 +32,12 @@ const TEXT_FADE_IN = 0.12;
 const WARP_ARM_DELAY = 0.3;
 /** World-units of camera drift per scene pixel; a near star moves at ~8% of scroll speed. */
 const REST_PARALLAX = 0.16;
+/**
+ * Catch-up time (seconds) for the scroll sample that places the settled overlay. The
+ * sample lands per scroll event, which iOS Safari delivers sparsely, so following it
+ * exactly moves the headline in steps against a page the compositor scrolls smoothly.
+ */
+const SCROLL_SMOOTHING = 0.25;
 /** Beat between the last word landing and the astronaut's pop. */
 const ASTRONAUT_DELAY = 0.25;
 /** Beat between the astronaut's pop and the scroll cue appearing. */
@@ -456,6 +462,8 @@ export function WarpStarfield({
 		let astronautAt: number | null = null;
 		let astronautPopped = false;
 		let hintShown = false;
+		// Low-passed scroll sample (see SCROLL_SMOOTHING); snaps once within half a pixel.
+		let scenePx = 0;
 		const step = (now: number) => {
 			if (!running) return;
 			const dt =
@@ -466,7 +474,9 @@ export function WarpStarfield({
 				Math.max(seedProgressRef.current?.() ?? 1, 0),
 				1,
 			);
-			const scenePx = Math.max(0, sceneScrollRef.current?.() ?? 0);
+			const targetPx = Math.max(0, sceneScrollRef.current?.() ?? 0);
+			scenePx += (targetPx - scenePx) * (1 - Math.exp(-dt / SCROLL_SMOOTHING));
+			if (Math.abs(targetPx - scenePx) < 0.5) scenePx = targetPx;
 			restCamY = (scenePx * REST_PARALLAX) / Math.max(view.focal, 1);
 			if (sim.warpAt !== null) sim.restCap = restCapFor(progress);
 			advance(sim, dt, view, config);

@@ -5,7 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowDown } from "lucide-react";
 import { m, type Variants } from "motion/react";
-import { useEffect, useRef } from "react";
+import { type CSSProperties, useEffect, useRef } from "react";
 import { SayHelloButton } from "@/components/landing/say-hello-button";
 import {
 	HEADLINE_REVEAL_VH,
@@ -157,12 +157,17 @@ export function IntroSection() {
 					preload="metadata"
 					aria-hidden="true"
 					tabIndex={-1}
-					className="w-full max-w-lg justify-self-center md:justify-self-end"
-					style={{
-						// drop-shadow follows the scene's alpha silhouette (box-shadow draws a
-						// rectangle); Dusk Earth, not black, keeps the shadow on the ramp.
-						filter: `drop-shadow(0 10px 12px ${rampAlpha("dusk-earth", "0.28")}) drop-shadow(0 30px 44px ${rampAlpha("dusk-earth", "0.16")})`,
-					}}
+					// The shadow only on hover-capable devices: a filter on a playing video is
+					// re-rendered every video frame, and on phones that runs under the hole's
+					// per-frame clip raster, which is where the intro stuttered.
+					className="w-full max-w-lg justify-self-center md:justify-self-end [@media(hover:hover)]:[filter:var(--scene-shadow)]"
+					style={
+						{
+							// drop-shadow follows the scene's alpha silhouette (box-shadow draws a
+							// rectangle); Dusk Earth, not black, keeps the shadow on the ramp.
+							"--scene-shadow": `drop-shadow(0 10px 12px ${rampAlpha("dusk-earth", "0.28")}) drop-shadow(0 30px 44px ${rampAlpha("dusk-earth", "0.16")})`,
+						} as CSSProperties
+					}
 				/>
 				<div
 					ref={rootRef}
