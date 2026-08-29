@@ -1,8 +1,14 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { DARK_BAR } from "@/components/bar-themes";
 import { FOCUS_OUTLINE } from "@/lib/focus-ring";
 import { headerHeld, SiteHeader, surfaceFromStack } from "./site-header";
+
+// The dialog arrives through next/dynamic; loading its chunk here keeps Vite's transform
+// time (seconds on a loaded machine) out of the open assertions' windows.
+beforeAll(async () => {
+	await import("@/components/contact-dialog");
+});
 
 const usePathname = vi.hoisted(() => vi.fn(() => "/"));
 vi.mock("next/navigation", () => ({
@@ -28,12 +34,7 @@ describe("SiteHeader", () => {
 
 		fireEvent.click(trigger);
 		expect(
-			await screen.findByRole(
-				"dialog",
-				{ name: /say hello/i },
-				// The dialog arrives via next/dynamic; parallel runs can exceed 1s.
-				{ timeout: 4000 },
-			),
+			await screen.findByRole("dialog", { name: /say hello/i }),
 		).toBeDefined();
 		expect(screen.getByLabelText("Message")).toBeDefined();
 		expect(trigger.getAttribute("aria-expanded")).toBe("true");
@@ -44,11 +45,7 @@ describe("SiteHeader", () => {
 		const trigger = screen.getByRole("button", { name: "Contact" });
 
 		fireEvent.click(trigger);
-		await screen.findByRole(
-			"dialog",
-			{ name: /say hello/i },
-			{ timeout: 4000 },
-		);
+		await screen.findByRole("dialog", { name: /say hello/i });
 
 		fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 		expect(trigger.getAttribute("aria-expanded")).toBe("false");

@@ -1,4 +1,7 @@
+import { readdirSync, readFileSync } from "node:fs";
+import path from "node:path";
 import { render, screen, waitFor } from "@testing-library/react";
+import gsap from "gsap";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { hydrateReduced } from "@/test/hydrate-reduced";
@@ -10,7 +13,28 @@ let unmount: (() => Promise<void>) | undefined;
 afterEach(async () => {
 	await unmount?.();
 	unmount = undefined;
+	vi.restoreAllMocks();
 });
+
+// The setup stub reports reduced motion (matches: false), which skips the whole GSAP
+// path; override so the timeline construction actually runs.
+const allowMotion = () => {
+	const original = window.matchMedia;
+	window.matchMedia = ((query: string) => ({
+		...original(query),
+		matches: true,
+	})) as typeof window.matchMedia;
+	return () => {
+		window.matchMedia = original;
+	};
+};
+
+const scrubOf = (timeline: ReturnType<typeof vi.spyOn>) =>
+	(
+		(timeline.mock.calls[0][0] as gsap.TimelineVars).scrollTrigger as
+			| ScrollTrigger.Vars
+			| undefined
+	)?.scrub;
 
 // "e" + combining acute (two code points) and a ZWJ emoji family: both must
 // stay in one span each or they render corrupted.
@@ -119,13 +143,7 @@ describe("AnimatedLines", () => {
 	});
 
 	it("builds the animation per line when motion is allowed", async () => {
-		// The setup stub reports reduced motion (matches: false), which skips the
-		// whole GSAP path; override so the timeline construction actually runs.
-		const original = window.matchMedia;
-		window.matchMedia = ((query: string) => ({
-			...original(query),
-			matches: true,
-		})) as typeof window.matchMedia;
+		const restore = allowMotion();
 		const effect = vi.fn<LineEffect>(() => 0);
 		try {
 			render(<AnimatedLines effect={effect}>One line</AnimatedLines>);
@@ -137,7 +155,69 @@ describe("AnimatedLines", () => {
 			expect(context.at).toBe(0);
 			expect(context.timeline).toBeDefined();
 		} finally {
-			window.matchMedia = original;
+			restore();
 		}
+	});
+
+	// Raw scroll is the baseline feel on every platform (FRA-185); a consumer that wants
+	// catch-up asks for it, and only for the device that needs it.
+	it("follows the raw scroll by default in scrub and pin modes", async () => {
+		const restore = allowMotion();
+		try {
+			const scrubMode = vi.spyOn(gsap, "timeline");
+			render(<AnimatedLines effect={noopEffect}>Scrubbed</AnimatedLines>);
+			await waitFor(() => expect(scrubMode).toHaveBeenCalledTimes(1));
+			expect(scrubOf(scrubMode)).toBe(true);
+			scrubMode.mockRestore();
+
+			const pinMode = vi.spyOn(gsap, "timeline");
+			render(
+				<AnimatedLines effect={noopEffect} mode="pin">
+					Pinned
+				</AnimatedLines>,
+			);
+			await waitFor(() => expect(pinMode).toHaveBeenCalledTimes(1));
+			expect(scrubOf(pinMode)).toBe(true);
+		} finally {
+			restore();
+		}
+	});
+
+	it("passes an explicit catch-up through", async () => {
+		const restore = allowMotion();
+		try {
+			const timeline = vi.spyOn(gsap, "timeline");
+			render(
+				<AnimatedLines effect={noopEffect} scrub={0.25}>
+					Smoothed
+				</AnimatedLines>,
+			);
+			await waitFor(() => expect(timeline).toHaveBeenCalledTimes(1));
+			expect(scrubOf(timeline)).toBe(0.25);
+		} finally {
+			restore();
+		}
+	});
+
+	it("has the intro as its only consumer opting into a catch-up", () => {
+		const sources = readdirSync("src/components", {
+			recursive: true,
+			withFileTypes: true,
+		})
+			.filter(
+				(entry) =>
+					entry.isFile() &&
+					/\.tsx?$/.test(entry.name) &&
+					!/\.(test|stories)\.tsx?$/.test(entry.name),
+			)
+			.map((entry) => path.join(entry.parentPath, entry.name));
+		const optedIn = sources.filter((file) => {
+			const source = readFileSync(file, "utf8");
+			return (
+				/\b(AnimatedLines|ScrollRevealText)\b/.test(source) &&
+				/\bscrub=/.test(source)
+			);
+		});
+		expect(optedIn).toEqual(["src/components/landing/intro/intro.tsx"]);
 	});
 });

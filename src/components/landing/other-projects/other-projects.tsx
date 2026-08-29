@@ -5,6 +5,8 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef, useState } from "react";
 import { WarpStarfield } from "@/components/landing/warp-starfield";
+import { WarpStarfieldOverlay } from "@/components/landing/warp-starfield-overlay";
+import { scrollScrub } from "@/lib/scroll-scrub";
 import { scrubIndex, scrubJumpTarget } from "@/lib/scrub";
 import { ProjectShowcase } from "../project-showcase";
 import { PROJECTS } from "../projects-data";
@@ -17,6 +19,10 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
  */
 export function OtherProjectsSection() {
 	const wrapper = useRef<HTMLElement>(null);
+	const overlay = useRef<HTMLDivElement>(null);
+	// A live reduced-motion flip remounts the starfield and its overlay together, from a
+	// pristine DOM: the starfield's effect mutates the overlay's inline styles.
+	const [motionEpoch, setMotionEpoch] = useState(0);
 	const seedProgress = useRef(0);
 	const sceneScroll = useRef(0);
 	const scrubRef = useRef<ScrollTrigger | null>(null);
@@ -72,6 +78,7 @@ export function OtherProjectsSection() {
 		// emits onTheater(false), so a flip back would re-engage the lock at progress 1.
 		const reducedQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 		const onPreferenceChange = () => {
+			setMotionEpoch((epoch) => epoch + 1);
 			if (reducedQuery.matches) {
 				theaterOver.current = true;
 				release();
@@ -135,6 +142,8 @@ export function OtherProjectsSection() {
 				start: "top top",
 				end: "bottom bottom",
 			} as const;
+			// Raw scroll everywhere but iOS, where a catch-up hides the sparse samples.
+			const railScrub = scrollScrub();
 			// The rail flips orientation with the panel layout; both scale axes are pinned
 			// explicitly so the pre-JS scale(0,0) class never leaks into the animated state.
 			const mm = gsap.matchMedia();
@@ -146,7 +155,7 @@ export function OtherProjectsSection() {
 						scaleX: 1,
 						scaleY: 1,
 						ease: "none",
-						scrollTrigger: { ...locked, scrub: true },
+						scrollTrigger: { ...locked, scrub: railScrub },
 					},
 				);
 				gsap.fromTo(
@@ -156,7 +165,7 @@ export function OtherProjectsSection() {
 						top: "100%",
 						left: "0%",
 						ease: "none",
-						scrollTrigger: { ...locked, scrub: true },
+						scrollTrigger: { ...locked, scrub: railScrub },
 					},
 				);
 			});
@@ -168,7 +177,7 @@ export function OtherProjectsSection() {
 						scaleX: 1,
 						scaleY: 1,
 						ease: "none",
-						scrollTrigger: { ...locked, scrub: true },
+						scrollTrigger: { ...locked, scrub: railScrub },
 					},
 				);
 				gsap.fromTo(
@@ -178,7 +187,7 @@ export function OtherProjectsSection() {
 						left: "100%",
 						top: "0%",
 						ease: "none",
-						scrollTrigger: { ...locked, scrub: true },
+						scrollTrigger: { ...locked, scrub: railScrub },
 					},
 				);
 			});
@@ -230,9 +239,9 @@ export function OtherProjectsSection() {
 			<h2 className="sr-only">Other Tools &amp; Projects</h2>
 			<div className="sticky top-0 h-screen overflow-hidden">
 				<WarpStarfield
+					key={motionEpoch}
 					className="absolute inset-0"
-					headline={[["Other"], ["Tools", "&"], ["Projects"]]}
-					astronautSrc="/projects/astronaut.webp"
+					overlay={overlay}
 					seedProgress={() => seedProgress.current}
 					sceneScroll={() => sceneScroll.current}
 					onTheater={(playing) => {
@@ -243,6 +252,14 @@ export function OtherProjectsSection() {
 					}}
 				/>
 			</div>
+			{/* The settled scene in document flow, over the stage and under the showcase
+			    (z-30): its own track pins it through the lock and releases it at page speed. */}
+			<WarpStarfieldOverlay
+				key={motionEpoch}
+				ref={overlay}
+				headline={[["Other"], ["Tools", "&"], ["Projects"]]}
+				astronautSrc="/projects/astronaut.webp"
+			/>
 			{/* Parks the showcase a quarter viewport past the fold at the lock, then a breath of
 			    settled sky; reduced motion has no lock, so the headline hands straight to the showcase. */}
 			<div aria-hidden="true" className="h-[225vh] motion-reduce:h-0" />

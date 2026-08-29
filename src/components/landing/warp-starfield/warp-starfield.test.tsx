@@ -1,21 +1,44 @@
 import { render } from "@testing-library/react";
+import { useRef } from "react";
 import { describe, expect, it, vi } from "vitest";
+import { WarpStarfieldOverlay } from "@/components/landing/warp-starfield-overlay";
 import { WarpStarfield } from "./warp-starfield";
+
+// The starfield and its overlay as the section mounts them: siblings sharing one ref.
+function Scene({
+	sceneScroll,
+	onComplete,
+}: {
+	sceneScroll?: () => number;
+	onComplete?: () => void;
+}) {
+	const overlay = useRef<HTMLDivElement>(null);
+	return (
+		<>
+			<WarpStarfield
+				className="size-full"
+				overlay={overlay}
+				seedProgress={() => 0}
+				sceneScroll={sceneScroll}
+				onComplete={onComplete}
+			/>
+			<WarpStarfieldOverlay
+				ref={overlay}
+				headline={[["Other"], ["Tools", "&"], ["Projects"]]}
+				astronautSrc="/projects/astronaut.webp"
+			/>
+		</>
+	);
+}
 
 // jsdom has no 2d context; the component must degrade to an inert canvas
 // with the headline text readable rather than stuck transparent.
 describe("WarpStarfield", () => {
-	it("renders a canvas and reveals the headline without a 2d context", () => {
+	it("renders a canvas and reveals the overlay's headline without a 2d context", () => {
 		const getContext = vi
 			.spyOn(HTMLCanvasElement.prototype, "getContext")
 			.mockReturnValue(null);
-		const { container } = render(
-			<WarpStarfield
-				className="size-full"
-				headline={[["Other"], ["Tools", "&"], ["Projects"]]}
-				astronautSrc="/projects/astronaut.webp"
-			/>,
-		);
+		const { container } = render(<Scene />);
 		expect(container.querySelector("canvas")).not.toBeNull();
 		expect(container.firstElementChild?.className).toBe("size-full");
 
@@ -34,7 +57,7 @@ describe("WarpStarfield", () => {
 
 		// The astronaut degrades to its resting peek pose.
 		const astronaut = container.querySelector<HTMLElement>(
-			'img[src="/projects/astronaut.webp"]',
+			"[data-warp-astronaut]",
 		);
 		expect(astronaut).not.toBeNull();
 		expect(astronaut?.style.transform).toBe("translateY(0)");
@@ -48,7 +71,7 @@ describe("WarpStarfield", () => {
 });
 
 describe("WarpStarfield under reduced motion", () => {
-	it("parks the settled overlay at rest, riding only the showcase's scroll", () => {
+	it("settles the overlay at rest and leaves its placement to the page", () => {
 		// The reduced branch needs a 2d context, a ResizeObserver and a sized canvas.
 		vi.stubGlobal(
 			"ResizeObserver",
@@ -80,21 +103,19 @@ describe("WarpStarfield under reduced motion", () => {
 			.mockReturnValue({ width: 1200, height: 800 } as DOMRect);
 		const onComplete = vi.fn();
 		const { container } = render(
-			<WarpStarfield
-				className="size-full"
-				headline={[["Other"]]}
-				seedProgress={() => 0}
-				sceneScroll={() => 100}
-				onComplete={onComplete}
-			/>,
+			<Scene sceneScroll={() => 100} onComplete={onComplete} />,
 		);
 		expect(onComplete).toHaveBeenCalledTimes(1);
-		// Seed progress 0 used to push the overlay two viewports down (1500px here);
-		// pinned at 1 it only rides the showcase's 100px of entry.
+		// The overlay's sticky track rides the showcase's scroll by itself (FRA-185):
+		// nothing writes an inline translate to any piece of it any more.
 		const hint = container.querySelector<HTMLElement>("[data-scroll-hint]");
-		expect(hint?.style.translate).toBe("-50% -100px");
+		expect(hint?.style.opacity).toBe("1");
+		expect(hint?.style.translate).toBe("");
 		const word = container.querySelector<HTMLElement>("[data-warp-word]");
 		expect(word?.style.opacity).toBe("1");
+		for (const el of container.querySelectorAll<HTMLElement>("[style]")) {
+			expect(el.style.translate).toBe("");
+		}
 		getContext.mockRestore();
 		rect.mockRestore();
 		vi.unstubAllGlobals();

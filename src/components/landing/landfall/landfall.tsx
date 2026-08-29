@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
 import { StarLayer } from "@/components/star-layer";
+import { scrollScrub } from "@/lib/scroll-scrub";
 import { LandfallVista } from "../landfall-vista";
 import { type PhaseSpec, resolvePhases } from "../scroll-phases";
 
@@ -89,7 +90,9 @@ export function LandfallSection() {
 						trigger: "[data-descent]",
 						start: "top top",
 						end: "bottom bottom",
-						scrub: true,
+						// Raw scroll everywhere but iOS, whose sparse samples stepped the earth's
+						// swell and the cloud deck (FRA-185).
+						scrub: scrollScrub(),
 						// Cloud travel is a function of rendered height; re-derive on refresh.
 						invalidateOnRefresh: true,
 					},

@@ -5,7 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowDown } from "lucide-react";
 import { m, type Variants } from "motion/react";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import { SayHelloButton } from "@/components/landing/say-hello-button";
 import {
 	HEADLINE_REVEAL_VH,
@@ -19,7 +19,9 @@ import {
 import { ScrollRevealText } from "@/components/scroll-reveal-text";
 import { useReducedMotionLive } from "@/components/use-reduced-motion-live";
 import { cta } from "@/lib/cta";
+import { isIOSDevice } from "@/lib/ios-device";
 import { rampAlpha } from "@/lib/ramp";
+import { scrollScrub } from "@/lib/scroll-scrub";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -53,9 +55,10 @@ const LAST_FRAME_BACKOFF_S = 0.05;
 const sceneSrc = (video: HTMLVideoElement) =>
 	"webkitPresentationMode" in video ? "/scene_home.mov" : "/scene_home.webm";
 
-const headlineStart = () => window.innerHeight * REVEAL_COMPLETE_VH;
-const bodyFadeStart = () =>
-	window.innerHeight * (REVEAL_COMPLETE_VH + HEADLINE_REVEAL_VH);
+// The section fills the hero's sticky `h-screen`, the same CSS viewport the hero paces
+// its scrubs by; innerHeight tracks iOS Safari's toolbar instead.
+const viewportHeight = (section: HTMLElement | null) =>
+	section?.offsetHeight || window.innerHeight;
 
 /**
  * Revealed as the hero sheet scrolls away. Pale Dune deliberately matches the mobile
@@ -64,9 +67,32 @@ const bodyFadeStart = () =>
 export function IntroSection() {
 	const hello = useContactDialogState();
 	const reducedMotion = useReducedMotionLive();
+	const sectionRef = useRef<HTMLElement>(null);
 	const rootRef = useRef<HTMLDivElement>(null);
 	const bodyRef = useRef<HTMLDivElement>(null);
 	const videoRef = useRef<HTMLVideoElement>(null);
+	// Stable identities: AnimatedLines rebuilds its trigger when start/end change.
+	const headlineStart = useCallback(
+		() => viewportHeight(sectionRef.current) * REVEAL_COMPLETE_VH,
+		[],
+	);
+	const bodyFadeStart = useCallback(
+		() =>
+			viewportHeight(sectionRef.current) *
+			(REVEAL_COMPLETE_VH + HEADLINE_REVEAL_VH),
+		[],
+	);
+	// Only reaches the effect: the server's `true` and an iOS client's number never
+	// disagree in the DOM.
+	const headlineScrub = scrollScrub();
+
+	// A filter on a playing video is re-rendered every video frame, and on iOS that ran
+	// under the hole's per-frame clip raster, where the intro stuttered. Before first
+	// paint, and it sticks: React never rewrites a style key whose value has not changed.
+	useLayoutEffect(() => {
+		const video = videoRef.current;
+		if (video && isIOSDevice()) video.style.filter = "none";
+	}, []);
 
 	// The markup names no file: anything listed there is fetched at parse time by whichever
 	// engine claims it, before this runs. Declared before the reduced-motion effect so the
@@ -137,6 +163,7 @@ export function IntroSection() {
 
 	return (
 		<section
+			ref={sectionRef}
 			aria-labelledby="intro-title"
 			data-surface="pale-dune"
 			className="flex h-full items-center bg-pale-dune"
@@ -166,6 +193,7 @@ export function IntroSection() {
 						trigger="viewport"
 						start={headlineStart}
 						end={bodyFadeStart}
+						scrub={headlineScrub}
 						className="text-balance font-bold font-display text-[clamp(2.25rem,4.5vw,3.5rem)] text-dusk-ink leading-[1.08] tracking-[-0.01em]"
 					>
 						{"Hi, I'm Gustavo"}
