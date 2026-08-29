@@ -1,8 +1,14 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import gsap from "gsap";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { IOS_SCRUB_S } from "@/lib/scroll-scrub";
 import { IntroSection } from "./intro";
+
+// The dialog arrives through next/dynamic; loading its chunk here keeps Vite's transform
+// time (seconds on a loaded machine) out of the open assertion's window.
+beforeAll(async () => {
+	await import("@/components/contact-dialog");
+});
 
 const reducedState = { value: false };
 vi.mock("@/components/use-reduced-motion-live", () => ({
@@ -197,10 +203,7 @@ describe("IntroSection", () => {
 	it("opens the say-hello dialog with the contact form", async () => {
 		render(<IntroSection />);
 		fireEvent.click(screen.getByRole("button", { name: /say hello/i }));
-		// The dialog chunk loads through next/dynamic; a parallel run can pass 1s.
-		expect(
-			await screen.findByRole("dialog", {}, { timeout: 4000 }),
-		).toBeDefined();
+		expect(await screen.findByRole("dialog")).toBeDefined();
 		expect(screen.getByLabelText("Name")).toBeDefined();
 		expect(screen.getByLabelText("Message")).toBeDefined();
 	});

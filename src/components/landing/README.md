@@ -462,9 +462,16 @@ front-to-back; files are numbered back-to-front.
 
 `vitest.setup.ts` is load-bearing: manual RTL cleanup (this RTL version
 has no vitest auto-cleanup entrypoint), a `matchMedia` polyfill (jsdom
-lacks it; ScrollTrigger needs it at import time), and an `afterAll` that
-disables ScrollTrigger only if it registered (its 250ms sync interval
-outliving jsdom crashes runs; blind `disable()` throws). Async server
+lacks it; ScrollTrigger needs it at registration), and an `afterAll` that
+disables every registered ScrollTrigger instance (its 250ms sync interval
+outliving jsdom crashes runs with "requestAnimationFrame is not defined";
+blind `disable()` throws). Two instances exist in any file that uses
+`hydrateReduced`: its `vi.resetModules()` re-registers a fresh
+gsap/ScrollTrigger, and a dynamic import in `afterAll` only ever saw that
+one, so the file's static instance leaked its interval into teardown (the
+CI-only unhandled error on FRA-185). Tests that open the lazy contact
+dialog preload `@/components/contact-dialog` in `beforeAll`: Vite's
+transform of that chunk under load blew a 4s `findByRole` more than once. Async server
 components cannot be tested in vitest; use E2E. The polyfill answers
 `matches: false`, so tests run the motion paths; to exercise a reduced
 branch mock `@/components/use-reduced-motion-live` (contact-dialog.test

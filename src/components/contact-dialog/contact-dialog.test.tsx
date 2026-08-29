@@ -41,7 +41,10 @@ describe("ContactDialog close timing", () => {
 		const { rerender } = render(ui(true));
 		expect(await screen.findByRole("dialog")).toBeTruthy();
 		rerender(ui(false));
-		await new Promise((resolve) => setTimeout(resolve, 150));
+		// The reduced path is gone in ~25ms and the motion exit holds ~300ms; sampling
+		// early keeps a loaded machine (a late timer against an elapsed-time tween)
+		// from landing after the exit.
+		await new Promise((resolve) => setTimeout(resolve, 60));
 		expect(screen.queryByRole("dialog")).not.toBeNull();
 	});
 });
