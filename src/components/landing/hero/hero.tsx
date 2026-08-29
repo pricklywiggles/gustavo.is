@@ -10,6 +10,7 @@ import { useReducedMotionLive } from "@/components/use-reduced-motion-live";
 import { useSteadyFrames } from "@/components/use-steady-frames";
 import { EASE_OUT_EXPO, SUN_CREST_SPRING } from "@/lib/motion-tokens";
 import { RAMP_HEX } from "@/lib/ramp";
+import { scrollScrub } from "@/lib/scroll-scrub";
 import {
 	PIN_VH,
 	REVEAL_DELAY_VH,
@@ -145,12 +146,6 @@ const SMOOTHING = 0.18; // Catmull-Rom-ish tangent factor for the closed curve
 // Reveal progress below which the intro video is held paused at frame 0.
 const VIDEO_CUE = 0.1;
 
-// Seconds of catch-up on every scrubbed tween. iOS Safari reports scroll positions
-// sparsely and sometimes wrongly (the touchmove bug ScrollTrigger works around); with
-// `scrub: true` each sample lands as a visible step, with a number the ticker
-// interpolates between them. Small enough to read as direct on a mouse wheel.
-const SCRUB = 0.25;
-
 export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 	const wrapperRef = useRef<HTMLDivElement>(null);
 	const sheetRef = useRef<HTMLDivElement>(null);
@@ -176,6 +171,8 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 			const mm = gsap.matchMedia();
 			mm.add("(prefers-reduced-motion: no-preference)", () => {
 				const video = revealRef.current?.querySelector("video") ?? null;
+				// Raw scroll everywhere but iOS, where a catch-up hides the sparse samples.
+				const scrub = scrollScrub();
 
 				// Re-measured on every refresh so tween distances and hole geometry never go stale.
 				// The scene's box is the CSS `h-screen` the sticky geometry is built from; on iOS
@@ -221,7 +218,7 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 							trigger: wrapperRef.current,
 							start: "top top",
 							end: () => `+=${metrics.vh}`,
-							scrub: SCRUB,
+							scrub,
 							invalidateOnRefresh: true,
 						},
 					});
@@ -235,7 +232,7 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 						trigger: wrapperRef.current,
 						start: () => `top+=${CONVERGENCE_PROGRESS * metrics.vh} top`,
 						end: () => `+=${0.9 * metrics.vh}`,
-						scrub: SCRUB,
+						scrub,
 						invalidateOnRefresh: true,
 					},
 				});
@@ -249,7 +246,7 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 						trigger: wrapperRef.current,
 						start: () => `top+=${CONVERGENCE_PROGRESS * metrics.vh} top`,
 						end: () => `+=${0.9 * metrics.vh}`,
-						scrub: SCRUB,
+						scrub,
 						invalidateOnRefresh: true,
 					},
 				});
@@ -334,7 +331,7 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 							start: () =>
 								`top+=${(PIN_VH + REVEAL_DELAY_VH) * metrics.vh} top`,
 							end: () => `+=${REVEAL_LENGTH_VH * metrics.vh}`,
-							scrub: SCRUB,
+							scrub,
 							invalidateOnRefresh: true,
 							onUpdate: (self) => {
 								syncSheet(self.progress);

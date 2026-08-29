@@ -5,13 +5,10 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef, useState } from "react";
 import { WarpStarfield } from "@/components/landing/warp-starfield";
+import { scrollScrub } from "@/lib/scroll-scrub";
 import { scrubIndex, scrubJumpTarget } from "@/lib/scrub";
 import { ProjectShowcase } from "../project-showcase";
 import { PROJECTS } from "../projects-data";
-
-// Catch-up (seconds) for the rail scrubs; a bare `true` paints iOS Safari's sparse
-// scroll samples as steps (see the hero's SCRUB).
-const RAIL_SCRUB = 0.25;
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -139,6 +136,8 @@ export function OtherProjectsSection() {
 				start: "top top",
 				end: "bottom bottom",
 			} as const;
+			// Raw scroll everywhere but iOS, where a catch-up hides the sparse samples.
+			const railScrub = scrollScrub();
 			// The rail flips orientation with the panel layout; both scale axes are pinned
 			// explicitly so the pre-JS scale(0,0) class never leaks into the animated state.
 			const mm = gsap.matchMedia();
@@ -150,7 +149,7 @@ export function OtherProjectsSection() {
 						scaleX: 1,
 						scaleY: 1,
 						ease: "none",
-						scrollTrigger: { ...locked, scrub: RAIL_SCRUB },
+						scrollTrigger: { ...locked, scrub: railScrub },
 					},
 				);
 				gsap.fromTo(
@@ -160,7 +159,7 @@ export function OtherProjectsSection() {
 						top: "100%",
 						left: "0%",
 						ease: "none",
-						scrollTrigger: { ...locked, scrub: RAIL_SCRUB },
+						scrollTrigger: { ...locked, scrub: railScrub },
 					},
 				);
 			});
@@ -172,7 +171,7 @@ export function OtherProjectsSection() {
 						scaleX: 1,
 						scaleY: 1,
 						ease: "none",
-						scrollTrigger: { ...locked, scrub: RAIL_SCRUB },
+						scrollTrigger: { ...locked, scrub: railScrub },
 					},
 				);
 				gsap.fromTo(
@@ -182,7 +181,7 @@ export function OtherProjectsSection() {
 						left: "100%",
 						top: "0%",
 						ease: "none",
-						scrollTrigger: { ...locked, scrub: RAIL_SCRUB },
+						scrollTrigger: { ...locked, scrub: railScrub },
 					},
 				);
 			});

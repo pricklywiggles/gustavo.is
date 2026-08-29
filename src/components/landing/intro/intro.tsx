@@ -5,7 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowDown } from "lucide-react";
 import { m, type Variants } from "motion/react";
-import { type CSSProperties, useEffect, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import { SayHelloButton } from "@/components/landing/say-hello-button";
 import {
 	HEADLINE_REVEAL_VH,
@@ -19,7 +19,9 @@ import {
 import { ScrollRevealText } from "@/components/scroll-reveal-text";
 import { useReducedMotionLive } from "@/components/use-reduced-motion-live";
 import { cta } from "@/lib/cta";
+import { isIOSDevice } from "@/lib/ios-device";
 import { rampAlpha } from "@/lib/ramp";
+import { scrollScrub } from "@/lib/scroll-scrub";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -69,11 +71,28 @@ export function IntroSection() {
 	const rootRef = useRef<HTMLDivElement>(null);
 	const bodyRef = useRef<HTMLDivElement>(null);
 	const videoRef = useRef<HTMLVideoElement>(null);
-	const headlineStart = () =>
-		viewportHeight(sectionRef.current) * REVEAL_COMPLETE_VH;
-	const bodyFadeStart = () =>
-		viewportHeight(sectionRef.current) *
-		(REVEAL_COMPLETE_VH + HEADLINE_REVEAL_VH);
+	// Stable identities: AnimatedLines rebuilds its trigger when start/end change.
+	const headlineStart = useCallback(
+		() => viewportHeight(sectionRef.current) * REVEAL_COMPLETE_VH,
+		[],
+	);
+	const bodyFadeStart = useCallback(
+		() =>
+			viewportHeight(sectionRef.current) *
+			(REVEAL_COMPLETE_VH + HEADLINE_REVEAL_VH),
+		[],
+	);
+	// Only reaches the effect: the server's `true` and an iOS client's number never
+	// disagree in the DOM.
+	const headlineScrub = scrollScrub();
+
+	// A filter on a playing video is re-rendered every video frame, and on iOS that ran
+	// under the hole's per-frame clip raster, where the intro stuttered. Before first
+	// paint, and it sticks: React never rewrites a style key whose value has not changed.
+	useLayoutEffect(() => {
+		const video = videoRef.current;
+		if (video && isIOSDevice()) video.style.filter = "none";
+	}, []);
 
 	// The markup names no file: anything listed there is fetched at parse time by whichever
 	// engine claims it, before this runs. Declared before the reduced-motion effect so the
@@ -157,17 +176,12 @@ export function IntroSection() {
 					preload="metadata"
 					aria-hidden="true"
 					tabIndex={-1}
-					// The shadow only on hover-capable devices: a filter on a playing video is
-					// re-rendered every video frame, and on phones that runs under the hole's
-					// per-frame clip raster, which is where the intro stuttered.
-					className="w-full max-w-lg justify-self-center md:justify-self-end [@media(hover:hover)]:[filter:var(--scene-shadow)]"
-					style={
-						{
-							// drop-shadow follows the scene's alpha silhouette (box-shadow draws a
-							// rectangle); Dusk Earth, not black, keeps the shadow on the ramp.
-							"--scene-shadow": `drop-shadow(0 10px 12px ${rampAlpha("dusk-earth", "0.28")}) drop-shadow(0 30px 44px ${rampAlpha("dusk-earth", "0.16")})`,
-						} as CSSProperties
-					}
+					className="w-full max-w-lg justify-self-center md:justify-self-end"
+					style={{
+						// drop-shadow follows the scene's alpha silhouette (box-shadow draws a
+						// rectangle); Dusk Earth, not black, keeps the shadow on the ramp.
+						filter: `drop-shadow(0 10px 12px ${rampAlpha("dusk-earth", "0.28")}) drop-shadow(0 30px 44px ${rampAlpha("dusk-earth", "0.16")})`,
+					}}
 				/>
 				<div
 					ref={rootRef}
@@ -179,6 +193,7 @@ export function IntroSection() {
 						trigger="viewport"
 						start={headlineStart}
 						end={bodyFadeStart}
+						scrub={headlineScrub}
 						className="text-balance font-bold font-display text-[clamp(2.25rem,4.5vw,3.5rem)] text-dusk-ink leading-[1.08] tracking-[-0.01em]"
 					>
 						{"Hi, I'm Gustavo"}

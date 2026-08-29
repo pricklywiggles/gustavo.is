@@ -19,9 +19,6 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 // Scroll span (% of viewport) of the reveal at speed 1 in scrub mode.
 const SCRUB_PCT = 100;
-// Default catch-up (seconds) for scrub and pin modes. A bare `true` paints every scroll
-// sample as a step, which iOS Safari's sparse and sometimes wrong reports make visible.
-const SCRUB_SMOOTHING = 0.25;
 // Pin mode scroll span (% of viewport) per line unit of the cascade.
 const PIN_PCT_PER_LINE = 70;
 // Target real-time length (seconds) per line unit at speed 1 in trigger mode.
@@ -65,8 +62,9 @@ type AnimatedLinesOwnProps = {
 	trigger?: gsap.DOMTarget | "viewport";
 	start?: StartEnd;
 	end?: StartEnd;
-	/** Scrub/pin: catch-up smoothing in seconds (GSAP's scrub number). */
-	scrub?: number;
+	/** Scrub/pin: GSAP's scrub; `true` (default) follows the raw scroll, a number adds
+	 * that many seconds of catch-up. */
+	scrub?: boolean | number;
 };
 
 export type AnimatedLinesProps = AnimatedLinesOwnProps &
@@ -242,7 +240,7 @@ function buildScrollTrigger({
 	triggerAt?: number;
 	start?: StartEnd;
 	end?: StartEnd;
-	scrub?: number;
+	scrub?: boolean | number;
 	speed: number;
 	lineCount: number;
 	lineStagger: number;
@@ -264,7 +262,7 @@ function buildScrollTrigger({
 				...base,
 				start: start ?? "top top",
 				end: end ?? `+=${pct}%`,
-				scrub: scrub ?? SCRUB_SMOOTHING,
+				scrub: scrub ?? true,
 				pin: true,
 				anticipatePin: 1,
 			};
@@ -285,7 +283,7 @@ function buildScrollTrigger({
 			const vars: ScrollTrigger.Vars = {
 				...base,
 				start: start ?? "top bottom",
-				scrub: scrub ?? SCRUB_SMOOTHING,
+				scrub: scrub ?? true,
 			};
 			if (end !== undefined) vars.end = end;
 			else if (element) vars.end = `+=${SCRUB_PCT / speed}%`;

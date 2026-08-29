@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { isIOSDevice } from "@/lib/ios-device";
 import {
 	advance,
 	focalFor,
@@ -33,11 +34,10 @@ const WARP_ARM_DELAY = 0.3;
 /** World-units of camera drift per scene pixel; a near star moves at ~8% of scroll speed. */
 const REST_PARALLAX = 0.16;
 /**
- * Catch-up time (seconds) for the scroll sample that places the settled overlay. The
- * sample lands per scroll event, which iOS Safari delivers sparsely, so following it
- * exactly moves the headline in steps against a page the compositor scrolls smoothly.
- * Short on purpose: the overlay reads as glued to the page, and a quarter second
- * (the scrub tweens' catch-up) made it trail the finger and settle like a spring.
+ * Catch-up time (seconds) for the scroll sample on iOS devices only, whose sparse scroll
+ * events would otherwise step the settled overlay against a page the compositor scrolls
+ * smoothly. Short on purpose: at the scrub tweens' quarter second the overlay trailed
+ * the finger and settled like a spring. Everywhere else the raw sample is the baseline.
  */
 const SCROLL_SMOOTHING = 0.08;
 /** Beat between the last word landing and the astronaut's pop. */
@@ -464,7 +464,8 @@ export function WarpStarfield({
 		let astronautAt: number | null = null;
 		let astronautPopped = false;
 		let hintShown = false;
-		// Low-passed scroll sample (see SCROLL_SMOOTHING); snaps once within half a pixel.
+		const smoothScroll = isIOSDevice();
+		// Scroll sample; low-passed on iOS (see SCROLL_SMOOTHING), snapping within half a pixel.
 		let scenePx = 0;
 		const step = (now: number) => {
 			if (!running) return;
@@ -477,8 +478,13 @@ export function WarpStarfield({
 				1,
 			);
 			const targetPx = Math.max(0, sceneScrollRef.current?.() ?? 0);
-			scenePx += (targetPx - scenePx) * (1 - Math.exp(-dt / SCROLL_SMOOTHING));
-			if (Math.abs(targetPx - scenePx) < 0.5) scenePx = targetPx;
+			if (smoothScroll) {
+				scenePx +=
+					(targetPx - scenePx) * (1 - Math.exp(-dt / SCROLL_SMOOTHING));
+				if (Math.abs(targetPx - scenePx) < 0.5) scenePx = targetPx;
+			} else {
+				scenePx = targetPx;
+			}
 			restCamY = (scenePx * REST_PARALLAX) / Math.max(view.focal, 1);
 			if (sim.warpAt !== null) sim.restCap = restCapFor(progress);
 			advance(sim, dt, view, config);
