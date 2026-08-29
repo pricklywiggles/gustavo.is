@@ -143,8 +143,10 @@ do not apply; these do.
   and pin modes to 0.25s (the intro headline and every reveal built on
   it), the projects rail scrubs use `RAIL_SCRUB`, and `WarpStarfield`
   low-passes the `sceneScroll` sample it places the settled headline
-  with (`SCROLL_SMOOTHING`), since that overlay is DOM text moved by
-  JavaScript against a page the compositor scrolls on its own.
+  with (`SCROLL_SMOOTHING`, 80ms), since that overlay is DOM text moved
+  by JavaScript against a page the compositor scrolls on its own. Keep
+  that one short: the overlay should read as glued to the page, and at
+  the scrubs' 0.25s it trailed the finger and settled like a spring.
 - The intro video's drop-shadow filter applies only under
   `@media (hover: hover)`. A filter on a playing video is re-rendered
   every video frame, and on phones that ran under the hole's per-frame

@@ -36,8 +36,10 @@ const REST_PARALLAX = 0.16;
  * Catch-up time (seconds) for the scroll sample that places the settled overlay. The
  * sample lands per scroll event, which iOS Safari delivers sparsely, so following it
  * exactly moves the headline in steps against a page the compositor scrolls smoothly.
+ * Short on purpose: the overlay reads as glued to the page, and a quarter second
+ * (the scrub tweens' catch-up) made it trail the finger and settle like a spring.
  */
-const SCROLL_SMOOTHING = 0.25;
+const SCROLL_SMOOTHING = 0.08;
 /** Beat between the last word landing and the astronaut's pop. */
 const ASTRONAUT_DELAY = 0.25;
 /** Beat between the astronaut's pop and the scroll cue appearing. */
