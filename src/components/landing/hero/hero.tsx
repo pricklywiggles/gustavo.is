@@ -145,6 +145,12 @@ const SMOOTHING = 0.18; // Catmull-Rom-ish tangent factor for the closed curve
 // Reveal progress below which the intro video is held paused at frame 0.
 const VIDEO_CUE = 0.1;
 
+// Seconds of catch-up on every scrubbed tween. iOS Safari reports scroll positions
+// sparsely and sometimes wrongly (the touchmove bug ScrollTrigger works around); with
+// `scrub: true` each sample lands as a visible step, with a number the ticker
+// interpolates between them. Small enough to read as direct on a mouse wheel.
+const SCRUB = 0.25;
+
 export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 	const wrapperRef = useRef<HTMLDivElement>(null);
 	const sheetRef = useRef<HTMLDivElement>(null);
@@ -172,10 +178,13 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 				const video = revealRef.current?.querySelector("video") ?? null;
 
 				// Re-measured on every refresh so tween distances and hole geometry never go stale.
+				// The scene's box is the CSS `h-screen` the sticky geometry is built from; on iOS
+				// that is the large viewport, while innerHeight is the toolbar-dependent visual
+				// height and would pace the scrubs against a different, shifting number.
 				const metrics = { vh: 0, vw: 0, cx: 0, cy: 0 };
 				const measure = () => {
-					metrics.vh = window.innerHeight;
-					metrics.vw = window.innerWidth;
+					metrics.vh = scene.offsetHeight || window.innerHeight;
+					metrics.vw = scene.clientWidth || window.innerWidth;
 					// Center the hole on the intro video while its underlay is still sticky-pinned
 					// (the rect is the revealed position); deeper, fall back to proportional coords.
 					const rect = video?.getBoundingClientRect();
@@ -194,6 +203,7 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 				measure();
 
 				let rebuildFn: (() => void) | null = null;
+				let cancelHoleWrite = () => {};
 				const onRefreshInit = () => {
 					measure();
 					rebuildFn?.();
@@ -211,7 +221,7 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 							trigger: wrapperRef.current,
 							start: "top top",
 							end: () => `+=${metrics.vh}`,
-							scrub: true,
+							scrub: SCRUB,
 							invalidateOnRefresh: true,
 						},
 					});
@@ -225,7 +235,7 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 						trigger: wrapperRef.current,
 						start: () => `top+=${CONVERGENCE_PROGRESS * metrics.vh} top`,
 						end: () => `+=${0.9 * metrics.vh}`,
-						scrub: true,
+						scrub: SCRUB,
 						invalidateOnRefresh: true,
 					},
 				});
@@ -239,7 +249,7 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 						trigger: wrapperRef.current,
 						start: () => `top+=${CONVERGENCE_PROGRESS * metrics.vh} top`,
 						end: () => `+=${0.9 * metrics.vh}`,
-						scrub: true,
+						scrub: SCRUB,
 						invalidateOnRefresh: true,
 					},
 				});
@@ -256,13 +266,10 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 					const px = new Array<number>(LOBE_COUNT);
 					const py = new Array<number>(LOBE_COUNT);
 
-					const rebuild = () => {
+					const holePath = () => {
 						const S = hole.s * metrics.vh;
 						const frame = `M0,0 H${metrics.vw} V${SHEET_VH * metrics.vh} H0 Z`;
-						if (S <= 0.5) {
-							blobPath.setAttribute("d", frame);
-							return;
-						}
+						if (S <= 0.5) return frame;
 						const cx = metrics.cx;
 						const cy = metrics.cy + hole.yOff;
 						const rot = (wobble.r * Math.PI) / 180;
@@ -286,11 +293,33 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 							const c2y = py[p2] - (py[p3] - py[i]) * SMOOTHING;
 							d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)} ${c2x.toFixed(1)} ${c2y.toFixed(1)} ${px[p2].toFixed(1)} ${py[p2].toFixed(1)}`;
 						}
-						blobPath.setAttribute("d", `${d} Z`);
+						return `${d} Z`;
 					};
 
-					rebuildFn = rebuild;
-					rebuild();
+					// Every write invalidates the clip over the whole sheet, which iOS repaints on
+					// the main thread. Four callers (scroll, staged tween, sway, breath) collapse
+					// to one write per frame, and none while the hole is closed, since the
+					// frame-only path never changes.
+					let lastPath = "";
+					let pending = false;
+					const write = () => {
+						pending = false;
+						const d = holePath();
+						if (d === lastPath) return;
+						lastPath = d;
+						blobPath.setAttribute("d", d);
+					};
+					const rebuild = () => {
+						if (pending) return;
+						pending = true;
+						gsap.ticker.add(write, true);
+					};
+					cancelHoleWrite = () => gsap.ticker.remove(write);
+
+					// Synchronous on setup and refresh: a clip that references an empty path
+					// would hide the sheet for a frame.
+					rebuildFn = write;
+					write();
 					sheet.style.clipPath = "url(#hero-hole)";
 
 					// Hidden past the reveal: the sheet's trailing edge rasterizes a hairline against
@@ -305,7 +334,7 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 							start: () =>
 								`top+=${(PIN_VH + REVEAL_DELAY_VH) * metrics.vh} top`,
 							end: () => `+=${REVEAL_LENGTH_VH * metrics.vh}`,
-							scrub: true,
+							scrub: SCRUB,
 							invalidateOnRefresh: true,
 							onUpdate: (self) => {
 								syncSheet(self.progress);
@@ -378,6 +407,7 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 
 				return () => {
 					ScrollTrigger.removeEventListener("refreshInit", onRefreshInit);
+					cancelHoleWrite();
 					// Manual style writes GSAP can't revert; a flip to reduced must not
 					// strand the sheet clipped or hidden.
 					if (sheetRef.current) {

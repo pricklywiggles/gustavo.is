@@ -110,6 +110,40 @@ Bullets name the file.
     `[data-quote-result]`) or keep the query inside a function-based
     value that GSAP evaluates later (`counterPoint`).
 
+## Hero: the sheet, the hole, and iOS Safari (FRA-185)
+
+The hero is CSS sticky, not a GSAP pin, so the pin-reverted rules above
+do not apply; these do.
+
+- Viewport height comes from the scene's `h-screen` box (`metrics.vh`),
+  and the intro measures its own section the same way. `innerHeight` on
+  iOS Safari is the toolbar-dependent visual height: small at the top of
+  the page, larger once the bar collapses, while every `vh` in the CSS is
+  the large viewport. Pacing scrubs by `innerHeight` desynced them from
+  the geometry they drive. GSAP already ignores the bar's height-only
+  resize on touch-only devices (`ignoreMobileResize` defaults to
+  `isTouch === 1`), so no refresh fires mid-gesture; the mismatch was
+  the number itself.
+- Every scrub is `scrub: SCRUB` (0.25s), never `true`. iOS Safari reports
+  scroll positions sparsely and sometimes wrongly (the touchmove bug
+  ScrollTrigger works around); with `true` each sample paints as a step,
+  with a number the ticker interpolates. Progress-driven side effects
+  (video cue, sheet visibility, the hole's y offset) keep reading the raw
+  trigger progress, which is the real scroll.
+- The hole is an SVG clip-path over the whole sheet, and each write of
+  its `d` re-rasterizes the clip on the main thread. Writes are coalesced
+  to one per frame through `gsap.ticker` and skipped when the path string
+  is unchanged, so the sway and breath tweens cost nothing while the hole
+  is closed (the frame-only path is constant). Before this the two
+  time-based tweens rewrote the clip ~120 times a second through the
+  whole first half of the hero. The setup and refresh writes stay
+  synchronous: a clip referencing an empty path hides the sheet for a
+  frame.
+- Still on the table if iPhones remain stepped: `ScrollTrigger.normalizeScroll(true)`
+  gated to `ScrollTrigger.isTouch === 1`. It moves scrolling onto the JS
+  thread and removes overscroll bounce; check the contact dialog and the
+  mobile menu before adopting it.
+
 ## Mobile (below sm) adaptations
 
 All of these are CSS-gated (custom properties consumed by static max-sm:

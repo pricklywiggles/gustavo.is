@@ -53,9 +53,10 @@ const LAST_FRAME_BACKOFF_S = 0.05;
 const sceneSrc = (video: HTMLVideoElement) =>
 	"webkitPresentationMode" in video ? "/scene_home.mov" : "/scene_home.webm";
 
-const headlineStart = () => window.innerHeight * REVEAL_COMPLETE_VH;
-const bodyFadeStart = () =>
-	window.innerHeight * (REVEAL_COMPLETE_VH + HEADLINE_REVEAL_VH);
+// The section fills the hero's sticky `h-screen`, the same CSS viewport the hero paces
+// its scrubs by; innerHeight tracks iOS Safari's toolbar instead.
+const viewportHeight = (section: HTMLElement | null) =>
+	section?.offsetHeight || window.innerHeight;
 
 /**
  * Revealed as the hero sheet scrolls away. Pale Dune deliberately matches the mobile
@@ -64,9 +65,15 @@ const bodyFadeStart = () =>
 export function IntroSection() {
 	const hello = useContactDialogState();
 	const reducedMotion = useReducedMotionLive();
+	const sectionRef = useRef<HTMLElement>(null);
 	const rootRef = useRef<HTMLDivElement>(null);
 	const bodyRef = useRef<HTMLDivElement>(null);
 	const videoRef = useRef<HTMLVideoElement>(null);
+	const headlineStart = () =>
+		viewportHeight(sectionRef.current) * REVEAL_COMPLETE_VH;
+	const bodyFadeStart = () =>
+		viewportHeight(sectionRef.current) *
+		(REVEAL_COMPLETE_VH + HEADLINE_REVEAL_VH);
 
 	// The markup names no file: anything listed there is fetched at parse time by whichever
 	// engine claims it, before this runs. Declared before the reduced-motion effect so the
@@ -137,6 +144,7 @@ export function IntroSection() {
 
 	return (
 		<section
+			ref={sectionRef}
 			aria-labelledby="intro-title"
 			data-surface="pale-dune"
 			className="flex h-full items-center bg-pale-dune"
