@@ -13,6 +13,7 @@ import {
 } from "@/components/lazy-contact-dialog";
 import { ScrollRevealText } from "@/components/scroll-reveal-text";
 import { rampColor } from "@/lib/ramp";
+import { scrollScrub } from "@/lib/scroll-scrub";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -153,7 +154,8 @@ export function LandfallVista() {
 						trigger: root.current,
 						start: "top bottom",
 						end: "bottom bottom",
-						scrub: true,
+						// Raw scroll everywhere but iOS (FRA-185).
+						scrub: scrollScrub(),
 					},
 				});
 				// Distant planes lag, foreground leads. The bank grows from natural size so its

@@ -127,10 +127,14 @@ raw scroll samples, the video's shadow). Only iOS changes.
 - Scrub: `scrollScrub()` (`src/lib/scroll-scrub.ts`) is `true` everywhere
   and 0.25s on iOS, which reports scroll positions sparsely and sometimes
   wrongly (the touchmove bug ScrollTrigger works around), so each raw
-  sample paints as a step. The hero, the intro headline, and the projects
-  rail resolve it at runtime. `AnimatedLines` defaults to `true` in scrub
-  and pin modes; the intro is its only consumer passing `scrub`, and a
-  test pins that. Work history, landfall, and vista stay on `scrub: true`.
+  sample paints as a step. The hero, the intro headline, the projects
+  rail, the landfall descent, and the vista resolve it at runtime (the
+  descent was added after the phone showed the earth's swell and the
+  cloud deck stepping; the vista rides the same stretch). `AnimatedLines`
+  defaults to `true` in scrub and pin modes; the intro is its only
+  consumer passing `scrub`, and a test pins that. Work history stays on
+  `scrub: true`: it was never reported stepping, and the gate makes the
+  catch-up a one-line, desktop-neutral change there if it ever is.
   Progress-driven side effects (video cue, sheet visibility) read the raw
   trigger progress, which is the real scroll.
 - Viewport height comes from the scene's `h-screen` box (`metrics.vh`),

@@ -1,7 +1,45 @@
 import { render } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import gsap from "gsap";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { IOS_SCRUB_S } from "@/lib/scroll-scrub";
 import { SKY_CLOUDS } from "../landfall-vista";
 import { CLOUD_SLOTS, DESCENT_PHASE, LandfallSection } from "./landfall";
+
+const iosState = { value: false };
+vi.mock("@/lib/ios-device", () => ({
+	isIOSDevice: () => iosState.value,
+}));
+
+afterEach(() => {
+	iosState.value = false;
+	vi.restoreAllMocks();
+});
+
+// The descent and the vista timelines, built under motion (the setup stub answers
+// every query false, which skips them).
+const descentScrubs = () => {
+	const original = window.matchMedia;
+	window.matchMedia = ((query: string) => ({
+		...original(query),
+		matches: query === "(prefers-reduced-motion: no-preference)",
+	})) as typeof window.matchMedia;
+	const timeline = vi.spyOn(gsap, "timeline");
+	try {
+		const { unmount } = render(<LandfallSection />);
+		unmount();
+	} finally {
+		window.matchMedia = original;
+	}
+	// The vista's headline reveal is a trigger-mode timeline with no scrub at all.
+	const scrubs = timeline.mock.calls
+		.map((call) => (call[0] as gsap.TimelineVars)?.scrollTrigger)
+		.filter((trigger): trigger is ScrollTrigger.Vars =>
+			Boolean(trigger && "scrub" in (trigger as object)),
+		)
+		.map((trigger) => trigger.scrub);
+	timeline.mockRestore();
+	return scrubs;
+};
 
 // jsdom has no IntersectionObserver, so the vista's warm-up fallback would fire the real
 // chunk import on every render and leak past environment teardown (flaky CI).
@@ -16,6 +54,18 @@ vi.mock("@/components/lazy-contact-dialog", async (importOriginal) => {
 });
 
 describe("LandfallSection", () => {
+	// FRA-185: the descent and the vista follow the raw scroll on desktop and Android;
+	// iOS devices get the catch-up that hides their sparse scroll reports.
+	it("scrubs the descent and the vista by raw scroll everywhere but iOS", () => {
+		const raw = descentScrubs();
+		expect(raw).toHaveLength(2);
+		expect(new Set(raw)).toEqual(new Set([true]));
+		iosState.value = true;
+		const ios = descentScrubs();
+		expect(ios).toHaveLength(2);
+		expect(new Set(ios)).toEqual(new Set([IOS_SCRUB_S]));
+	});
+
 	it("sizes the descent scrub from the phase map", () => {
 		// The motion-safe height class is a literal (Tailwind scans source); this pins
 		// its arithmetic so a phase change tells you which class to update.
