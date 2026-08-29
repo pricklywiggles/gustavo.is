@@ -62,7 +62,7 @@ coverage/
 *storybook.log
 storybook-static
 
-# Video source material — only the encoded .webm ships
+# Video source material: only the encoded scene_home.webm and scene_home.mov ship
 public/input.mov
 public/frames/
 

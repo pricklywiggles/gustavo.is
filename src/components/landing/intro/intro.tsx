@@ -47,6 +47,12 @@ const NOD_VARIANTS: Variants = {
 // painted stale frames on end-of-stream seeks.
 const LAST_FRAME_BACKOFF_S = 0.05;
 
+// Only WebKit renders HEVC alpha, and only WebKit puts webkitPresentationMode on video;
+// every other engine gets VP9 alpha. Firefox on macOS would also claim the HEVC file
+// (it decodes it, opaque), which is why no <source> list can make this choice.
+const sceneSrc = (video: HTMLVideoElement) =>
+	"webkitPresentationMode" in video ? "/scene_home.mov" : "/scene_home.webm";
+
 const headlineStart = () => window.innerHeight * REVEAL_COMPLETE_VH;
 const bodyFadeStart = () =>
 	window.innerHeight * (REVEAL_COMPLETE_VH + HEADLINE_REVEAL_VH);
@@ -61,6 +67,14 @@ export function IntroSection() {
 	const rootRef = useRef<HTMLDivElement>(null);
 	const bodyRef = useRef<HTMLDivElement>(null);
 	const videoRef = useRef<HTMLVideoElement>(null);
+
+	// The markup names no file: anything listed there is fetched at parse time by whichever
+	// engine claims it, before this runs. Declared before the reduced-motion effect so the
+	// source precedes its metadata wait; the guard keeps StrictMode's re-run from reloading.
+	useEffect(() => {
+		const video = videoRef.current;
+		if (video && !video.getAttribute("src")) video.src = sceneSrc(video);
+	}, []);
 
 	// Reduced motion never plays the scene, so it rests on the last frame (Gustavo at the
 	// desk, Kiwi asleep) instead of the empty room; a flip back rewinds for the hero's cue.
@@ -130,7 +144,6 @@ export function IntroSection() {
 			<div className="mx-auto grid w-full max-w-6xl items-center gap-x-14 gap-y-10 px-6 sm:px-10 md:grid-cols-2">
 				<video
 					ref={videoRef}
-					src="/scene_home.webm"
 					muted
 					playsInline
 					preload="metadata"
@@ -138,7 +151,7 @@ export function IntroSection() {
 					tabIndex={-1}
 					className="w-full max-w-lg justify-self-center md:justify-self-end"
 					style={{
-						// drop-shadow follows the webm's alpha silhouette (box-shadow draws a
+						// drop-shadow follows the scene's alpha silhouette (box-shadow draws a
 						// rectangle); Dusk Earth, not black, keeps the shadow on the ramp.
 						filter: `drop-shadow(0 10px 12px ${rampAlpha("dusk-earth", "0.28")}) drop-shadow(0 30px 44px ${rampAlpha("dusk-earth", "0.16")})`,
 					}}
