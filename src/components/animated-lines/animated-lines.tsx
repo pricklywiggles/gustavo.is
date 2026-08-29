@@ -62,8 +62,9 @@ type AnimatedLinesOwnProps = {
 	trigger?: gsap.DOMTarget | "viewport";
 	start?: StartEnd;
 	end?: StartEnd;
-	/** Scrub/pin: catch-up smoothing in seconds (GSAP's scrub number). */
-	scrub?: number;
+	/** Scrub/pin: GSAP's scrub; `true` (default) follows the raw scroll, a number adds
+	 * that many seconds of catch-up. */
+	scrub?: boolean | number;
 };
 
 export type AnimatedLinesProps = AnimatedLinesOwnProps &
@@ -239,7 +240,7 @@ function buildScrollTrigger({
 	triggerAt?: number;
 	start?: StartEnd;
 	end?: StartEnd;
-	scrub?: number;
+	scrub?: boolean | number;
 	speed: number;
 	lineCount: number;
 	lineStagger: number;

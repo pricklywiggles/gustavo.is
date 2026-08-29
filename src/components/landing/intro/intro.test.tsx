@@ -1,15 +1,60 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import gsap from "gsap";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { IOS_SCRUB_S } from "@/lib/scroll-scrub";
 import { IntroSection } from "./intro";
+
+// The dialog arrives through next/dynamic; loading its chunk here keeps Vite's transform
+// time (seconds on a loaded machine) out of the open assertion's window.
+beforeAll(async () => {
+	await import("@/components/contact-dialog");
+});
 
 const reducedState = { value: false };
 vi.mock("@/components/use-reduced-motion-live", () => ({
 	useReducedMotionLive: () => reducedState.value,
 }));
+const iosState = { value: false };
+vi.mock("@/lib/ios-device", () => ({
+	isIOSDevice: () => iosState.value,
+}));
 
 afterEach(() => {
 	reducedState.value = false;
+	iosState.value = false;
+	vi.restoreAllMocks();
 });
+
+// The setup stub answers every query false, which skips the motion-only GSAP paths.
+const allowMotion = () => {
+	const original = window.matchMedia;
+	window.matchMedia = ((query: string) => ({
+		...original(query),
+		matches: query === "(prefers-reduced-motion: no-preference)",
+	})) as typeof window.matchMedia;
+	return () => {
+		window.matchMedia = original;
+	};
+};
+
+// Exactly one build: the headline's start/end callbacks must keep their identity
+// across the intro's re-renders, or AnimatedLines rebuilds its trigger each time.
+const headlineScrub = async () => {
+	const timeline = vi.spyOn(gsap, "timeline");
+	const { unmount } = render(<IntroSection />);
+	await waitFor(() => expect(timeline).toHaveBeenCalled());
+	// Anything the effect chain still has in flight lands before the count is read.
+	await new Promise((resolve) => setTimeout(resolve, 50));
+	expect(timeline).toHaveBeenCalledTimes(1);
+	const scrub = (
+		(timeline.mock.calls[0][0] as gsap.TimelineVars).scrollTrigger as
+			| ScrollTrigger.Vars
+			| undefined
+	)?.scrub;
+	unmount();
+	timeline.mockRestore();
+	return scrub;
+};
 
 const DURATION = 5.084;
 const LAST_FRAME = DURATION - 0.05;
@@ -125,6 +170,30 @@ describe("IntroSection", () => {
 		}
 	});
 
+	// FRA-185: desktop and Android keep the shadow and the raw scroll; only iOS devices
+	// (Safari and Chrome alike) trade them for a stutter-free reveal.
+	it("keeps the scene's drop shadow off iOS devices", () => {
+		const { container, unmount } = render(<IntroSection />);
+		expect(container.querySelector("video")?.style.filter).toContain(
+			"drop-shadow",
+		);
+		unmount();
+		iosState.value = true;
+		const ios = render(<IntroSection />);
+		expect(ios.container.querySelector("video")?.style.filter).toBe("none");
+	});
+
+	it("paces the headline by raw scroll, with a catch-up only on iOS", async () => {
+		const restore = allowMotion();
+		try {
+			expect(await headlineScrub()).toBe(true);
+			iosState.value = true;
+			expect(await headlineScrub()).toBe(IOS_SCRUB_S);
+		} finally {
+			restore();
+		}
+	});
+
 	it("renders both calls to action", () => {
 		render(<IntroSection />);
 		expect(screen.getByRole("button", { name: /say hello/i })).toBeDefined();
@@ -134,10 +203,7 @@ describe("IntroSection", () => {
 	it("opens the say-hello dialog with the contact form", async () => {
 		render(<IntroSection />);
 		fireEvent.click(screen.getByRole("button", { name: /say hello/i }));
-		// The dialog chunk loads through next/dynamic; a parallel run can pass 1s.
-		expect(
-			await screen.findByRole("dialog", {}, { timeout: 4000 }),
-		).toBeDefined();
+		expect(await screen.findByRole("dialog")).toBeDefined();
 		expect(screen.getByLabelText("Name")).toBeDefined();
 		expect(screen.getByLabelText("Message")).toBeDefined();
 	});

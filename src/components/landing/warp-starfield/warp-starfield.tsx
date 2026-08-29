@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { type RefObject, useEffect, useRef } from "react";
+import { isIOSDevice } from "@/lib/ios-device";
 import {
 	advance,
 	focalFor,
@@ -32,6 +33,12 @@ const TEXT_FADE_IN = 0.12;
 const WARP_ARM_DELAY = 0.3;
 /** World-units of camera drift per scene pixel; a near star moves at ~8% of scroll speed. */
 const REST_PARALLAX = 0.16;
+/**
+ * Catch-up time (seconds) for the scroll sample that drifts the arrival field, on iOS
+ * devices only, whose sparse scroll events would otherwise step the star camera.
+ * Everywhere else the raw sample is the baseline.
+ */
+const SCROLL_SMOOTHING = 0.08;
 /** Beat between the last word landing and the astronaut's pop. */
 const ASTRONAUT_DELAY = 0.25;
 /** Beat between the astronaut's pop and the scroll cue appearing. */
@@ -71,19 +78,19 @@ type WarpStarfieldProps = {
 	 */
 	seedProgress?: () => number;
 	/**
-	 * Polled every frame: pixels scrolled into the follow-on content. Slides the settled
-	 * overlay away at scroll speed and drifts the arrival field in parallax.
+	 * Polled every frame: pixels scrolled into the follow-on content. Drifts the arrival
+	 * field in parallax.
 	 */
 	sceneScroll?: () => number;
 	/**
-	 * Headline that drops out of warp, as lines of word units; flattened order is the
-	 * stagger order. Rendered as real DOM text each word reveals on landing.
+	 * The settled scene (`WarpStarfieldOverlay`): its `[data-warp-word]` spans are the
+	 * headline the words fly into, `[data-warp-astronaut]` pops after them, and
+	 * `[data-scroll-hint]` follows. It lives in document flow, so its screen must coincide
+	 * with the canvas while the theater plays (the page is locked there).
 	 */
-	headline?: string[][];
+	overlay?: RefObject<HTMLElement | null>;
 	/** Ghost echoes per word; more steps reach further into the past, lengthening the smear. */
 	textTrailSteps?: number;
-	/** Pops out of the lower-left once the headline settles; leans in the words' empty left. */
-	astronautSrc?: string;
 	/** Fires once after the last streak and headline land; immediate under reduced motion. */
 	onComplete?: () => void;
 	/**
@@ -94,8 +101,9 @@ type WarpStarfieldProps = {
 };
 
 /**
- * The warp-speed set piece. Plays once per mount (change key to replay); the root fills
- * whatever positioned box the caller gives it.
+ * The warp-speed set piece: the canvas and the UFO. Plays once per mount (change key to
+ * replay, and remount the overlay with it: the effect mutates its inline styles); the
+ * root fills whatever positioned box the caller gives it.
  */
 export function WarpStarfield({
 	className,
@@ -103,32 +111,17 @@ export function WarpStarfield({
 	warpDuration = 8,
 	seedProgress,
 	sceneScroll,
-	headline,
+	overlay,
 	textTrailSteps = 6,
-	astronautSrc,
 	onComplete,
 	onTheater,
 }: WarpStarfieldProps) {
-	const rootRef = useRef<HTMLDivElement>(null);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const ufoRef = useRef<HTMLImageElement>(null);
-	const astronautRef = useRef<HTMLImageElement>(null);
-	const astronautBoxRef = useRef<HTMLDivElement>(null);
-	const headlineRef = useRef<HTMLDivElement>(null);
-	const hintRef = useRef<HTMLDivElement>(null);
 	const onCompleteRef = useRef(onComplete);
 	const onTheaterRef = useRef(onTheater);
 	const seedProgressRef = useRef(seedProgress);
 	const sceneScrollRef = useRef(sceneScroll);
-	// A live reduced-motion flip must re-branch from a pristine DOM: the effect mutates
-	// inline styles, so the epoch keys a full remount and re-runs the effect.
-	const [motionEpoch, setMotionEpoch] = useState(0);
-	useEffect(() => {
-		const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-		const bump = () => setMotionEpoch((epoch) => epoch + 1);
-		query.addEventListener("change", bump);
-		return () => query.removeEventListener("change", bump);
-	}, []);
 	useEffect(() => {
 		onCompleteRef.current = onComplete;
 		onTheaterRef.current = onTheater;
@@ -136,26 +129,27 @@ export function WarpStarfield({
 		sceneScrollRef.current = sceneScroll;
 	}, [onComplete, onTheater, seedProgress, sceneScroll]);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: motionEpoch keys the scene subtree, so the effect must re-run to wire the freshly remounted canvas, UFO, and hint nodes
 	useEffect(() => {
-		const root = rootRef.current;
 		const canvas = canvasRef.current;
 		const ctx = canvas?.getContext("2d");
+		const scene = overlay?.current ?? null;
 		// Inline opacity outranks the JSX opacity-0 class, so re-renders can't hide a landed word.
 		const spans = Array.from(
-			root?.querySelectorAll<HTMLElement>("[data-warp-word]") ?? [],
+			scene?.querySelectorAll<HTMLElement>("[data-warp-word]") ?? [],
 		);
+		const astronaut =
+			scene?.querySelector<HTMLElement>("[data-warp-astronaut]") ?? null;
+		const hint =
+			scene?.querySelector<HTMLElement>("[data-scroll-hint]") ?? null;
 		const showText = () => {
 			for (const el of spans) el.style.opacity = "1";
 		};
 		const popAstronaut = (instant = false) => {
-			const astronaut = astronautRef.current;
 			if (!astronaut) return;
 			if (instant) astronaut.style.transition = "none";
 			astronaut.style.transform = ASTRONAUT_REST;
 		};
 		const showHint = (instant = false) => {
-			const hint = hintRef.current;
 			if (!hint) return;
 			if (instant) hint.style.transition = "none";
 			hint.style.opacity = "1";
@@ -201,7 +195,9 @@ export function WarpStarfield({
 			wordsMeasured = false;
 		};
 
-		// Measured at warp start so the display font has loaded and rects reflect real glyphs.
+		// Measured at warp start so the display font has loaded and rects reflect real
+		// glyphs. Canvas-relative: the overlay's screen coincides with the canvas at the
+		// theater's lock, which is where the flight happens.
 		const measureWords = () => {
 			const rootRect = canvas.getBoundingClientRect();
 			words = spans.map((el, i) => {
@@ -235,9 +231,6 @@ export function WarpStarfield({
 			wordsMeasured = true;
 		};
 
-		// Screen-space shift of the settled overlay; canvas-flown words follow it too so a
-		// mid-flight scroll-back can't split them from their DOM rests.
-		let overlayShift = 0;
 		// Vertical camera drift (world units) for the arrival field.
 		let restCamY = 0;
 
@@ -246,25 +239,11 @@ export function WarpStarfield({
 			ctx.save();
 			ctx.translate(
 				view.width / 2 + word.offsetX * scale,
-				view.height / 2 + word.offsetY * scale + overlayShift,
+				view.height / 2 + word.offsetY * scale,
 			);
 			ctx.scale(scale, scale);
 			ctx.fillText(word.text, -word.width / 2, word.baselineOff);
 			ctx.restore();
-		};
-
-		// After the warp the overlay is released to the scroll: back up slides it away at
-		// scroll speed, on into the showcase carries it out the top.
-		const placeOverlay = (progress: number, scenePx: number) => {
-			if (sim.warpAt === null) return;
-			const off = Math.max(0, (1 - progress) * 2 * view.height) - scenePx;
-			if (off === overlayShift) return;
-			overlayShift = off;
-			const shift = `0 ${off}px`;
-			if (headlineRef.current) headlineRef.current.style.translate = shift;
-			if (astronautBoxRef.current)
-				astronautBoxRef.current.style.translate = shift;
-			if (hintRef.current) hintRef.current.style.translate = `-50% ${off}px`;
 		};
 
 		// The last echo's alpha stays ~0.17 of the base at any step count, so raising
@@ -431,20 +410,8 @@ export function WarpStarfield({
 			popAstronaut(true);
 			showHint(true);
 			finish();
-			// The settled overlay must still ride with the scroll or it sits fixed over the
-			// follow-on content; stars stay parked, no parallax here.
-			// Progress pinned at 1: the two-viewport seed entry read as two empty screens here.
-			const syncOverlay = () => {
-				placeOverlay(1, Math.max(0, sceneScrollRef.current?.() ?? 0));
-			};
-			syncOverlay();
-			window.addEventListener("scroll", syncOverlay, { passive: true });
-			window.addEventListener("resize", syncOverlay);
-			return () => {
-				window.removeEventListener("scroll", syncOverlay);
-				window.removeEventListener("resize", syncOverlay);
-				observer.disconnect();
-			};
+			// Stars stay parked, no parallax here; the overlay's own track rides the page.
+			return () => observer.disconnect();
 		}
 
 		let frame = 0;
@@ -456,6 +423,9 @@ export function WarpStarfield({
 		let astronautAt: number | null = null;
 		let astronautPopped = false;
 		let hintShown = false;
+		const smoothScroll = isIOSDevice();
+		// Scroll sample; low-passed on iOS (see SCROLL_SMOOTHING), snapping within half a pixel.
+		let scenePx = 0;
 		const step = (now: number) => {
 			if (!running) return;
 			const dt =
@@ -466,7 +436,14 @@ export function WarpStarfield({
 				Math.max(seedProgressRef.current?.() ?? 1, 0),
 				1,
 			);
-			const scenePx = Math.max(0, sceneScrollRef.current?.() ?? 0);
+			const targetPx = Math.max(0, sceneScrollRef.current?.() ?? 0);
+			if (smoothScroll) {
+				scenePx +=
+					(targetPx - scenePx) * (1 - Math.exp(-dt / SCROLL_SMOOTHING));
+				if (Math.abs(targetPx - scenePx) < 0.5) scenePx = targetPx;
+			} else {
+				scenePx = targetPx;
+			}
 			restCamY = (scenePx * REST_PARALLAX) / Math.max(view.focal, 1);
 			if (sim.warpAt !== null) sim.restCap = restCapFor(progress);
 			advance(sim, dt, view, config);
@@ -485,7 +462,6 @@ export function WarpStarfield({
 			}
 			if (!wordsMeasured && sim.warpAt !== null) measureWords();
 
-			placeOverlay(progress, scenePx);
 			draw();
 			placeUfo(sim.warpAt === null ? progress : 1);
 
@@ -565,10 +541,10 @@ export function WarpStarfield({
 			intersection?.disconnect();
 			observer.disconnect();
 		};
-	}, [starCount, warpDuration, textTrailSteps, motionEpoch]);
+	}, [starCount, warpDuration, textTrailSteps, overlay]);
 
 	return (
-		<div ref={rootRef} key={motionEpoch} className={className}>
+		<div className={className}>
 			<canvas ref={canvasRef} className="absolute inset-0 size-full" />
 			{/* Decorative actor; placed every frame from the sim clock. */}
 			{/* biome-ignore lint/performance/noImgElement: next/image cannot
@@ -581,78 +557,6 @@ export function WarpStarfield({
 				draggable={false}
 				className="pointer-events-none absolute top-1/2 left-1/2 w-[16vw] max-w-56 opacity-0 select-none"
 			/>
-			{astronautSrc && (
-				// Width-relative and bottom-anchored so the astronaut-to-words proportion holds
-				// at any viewport; the negative left tucks his backpack edge offscreen.
-				<div
-					ref={astronautBoxRef}
-					className="pointer-events-none absolute bottom-[10vw] left-[-1.5vw] w-[22.5vw] rotate-[16deg]"
-				>
-					{/* The drift lives on its own layer so it never fights the pop transition below. */}
-					<div className="motion-safe:animate-[float-bob_2.8s_ease-in-out_infinite_alternate]">
-						{/* biome-ignore lint/performance/noImgElement: transform-animated
-						    actor with its own transition; next/image's wrapper and
-						    optimization pipeline add nothing for it. */}
-						<img
-							ref={astronautRef}
-							src={astronautSrc}
-							alt=""
-							draggable={false}
-							className="h-auto w-full [transform:translateY(160%)] [transition:transform_800ms_cubic-bezier(0.34,1.8,0.5,1)]"
-						/>
-					</div>
-				</div>
-			)}
-			{headline && (
-				// Decorative: the section supplies the accessible heading; split spans would
-				// read as one mashed word.
-				<div
-					ref={headlineRef}
-					aria-hidden="true"
-					className="pointer-events-none absolute inset-0 flex flex-col items-end justify-end pr-[1vw] pb-[4vh] text-right font-display text-pale-dune"
-				>
-					{headline.map((line) => (
-						<div
-							key={line.join("-")}
-							className="whitespace-nowrap text-[20vw] leading-[0.85]"
-						>
-							{line.map((word) => (
-								<span
-									key={word}
-									data-warp-word
-									className="inline-block opacity-0"
-								>
-									{word}
-								</span>
-							))}
-						</div>
-					))}
-				</div>
-			)}
-			<div
-				ref={hintRef}
-				data-scroll-hint
-				className="pointer-events-none absolute bottom-[3vh] left-1/2 -translate-x-1/2 opacity-0 [transition:opacity_600ms_ease]"
-			>
-				{/* The bounce lives on a wrapper div: browsers often skip compositing CSS
-				    animations applied to the svg element itself. */}
-				<div className="motion-safe:animate-bounce">
-					<svg
-						viewBox="0 0 24 24"
-						aria-hidden="true"
-						className="size-8 text-pale-dune/70"
-					>
-						<path
-							d="m6 9 6 6 6-6"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-						/>
-					</svg>
-				</div>
-			</div>
 		</div>
 	);
 }
