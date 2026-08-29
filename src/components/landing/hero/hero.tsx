@@ -8,17 +8,21 @@ import Image from "next/image";
 import { type CSSProperties, useRef } from "react";
 import { useReducedMotionLive } from "@/components/use-reduced-motion-live";
 import { useSteadyFrames } from "@/components/use-steady-frames";
+import { isIOSDevice } from "@/lib/ios-device";
 import { EASE_OUT_EXPO, SUN_CREST_SPRING } from "@/lib/motion-tokens";
 import { RAMP_HEX } from "@/lib/ramp";
 import { scrollScrub } from "@/lib/scroll-scrub";
 import {
+	CARRIER_VH,
 	PIN_VH,
 	REVEAL_DELAY_VH,
 	REVEAL_LENGTH_VH,
+	REVEAL_TRAVEL_VH,
 	SHEET_VH,
 	TEXT_REVEAL_VH,
 	WRAPPER_VH,
 } from "../scroll-geometry";
+import { createClipWriter, holePath } from "./hero-hole";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -135,19 +139,21 @@ const SUN_ENTRANCE = { y: "155%", scale: 2 };
 // Starts while the bands still separate; the clip hides it until it crests as they land.
 const SUN_TRANSITION = { delay: 0.55, ...SUN_CREST_SPRING };
 
-// The sheet's hole: an even-odd clip-path blob of 8 polar lobes, base radii fixed, each
-// breathing on its own phase; `s` scales it in vh units.
-const LOBE_RADII = [1.0, 1.24, 0.8, 1.14, 0.88, 1.28, 0.76, 1.1];
-const LOBE_PHASES = [0, 2.1, 4.4, 1.3, 5.2, 3.0, 0.7, 5.9];
-const LOBE_COUNT = LOBE_RADII.length;
-const UNDULATION = 0.14; // per-lobe radius swing
-const SMOOTHING = 0.18; // Catmull-Rom-ish tangent factor for the closed curve
+// The hole's growth (scale in vh) across the reveal, durations as fractions of it: a
+// pinhole, a slow creep, then it swallows the screen.
+const HOLE_STAGES = [
+	{ s: 0.1, duration: 0.06, ease: "power2.out" },
+	{ s: 0.13, duration: 0.24, ease: "none" },
+	{ s: 0.5, duration: 0.4, ease: "power1.in" },
+	{ s: 2.6, duration: 0.3, ease: "power3.in" },
+];
 
 // Reveal progress below which the intro video is held paused at frame 0.
 const VIDEO_CUE = 0.1;
 
 export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 	const wrapperRef = useRef<HTMLDivElement>(null);
+	const carrierRef = useRef<HTMLDivElement>(null);
 	const sheetRef = useRef<HTMLDivElement>(null);
 	const sceneRef = useRef<HTMLDivElement>(null);
 	const characterRef = useRef<HTMLDivElement>(null);
@@ -173,6 +179,7 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 				const video = revealRef.current?.querySelector("video") ?? null;
 				// Raw scroll everywhere but iOS, where a catch-up hides the sparse samples.
 				const scrub = scrollScrub();
+				const ios = isIOSDevice();
 
 				// Re-measured on every refresh so tween distances and hole geometry never go stale.
 				// The scene's box is the CSS `h-screen` the sticky geometry is built from; on iOS
@@ -200,7 +207,7 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 				measure();
 
 				let rebuildFn: (() => void) | null = null;
-				let cancelHoleWrite = () => {};
+				let disposeWriter = () => {};
 				const onRefreshInit = () => {
 					measure();
 					rebuildFn?.();
@@ -253,99 +260,137 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 
 				// The hole grows through a staged curve as the sheet scrolls away; scrubbed, so
 				// scrolling back up reverses it.
-				if (blobRef.current && revealRef.current && sheetRef.current) {
+				if (
+					blobRef.current &&
+					revealRef.current &&
+					sheetRef.current &&
+					carrierRef.current
+				) {
 					const blobPath = blobRef.current;
 					const sheet = sheetRef.current;
+					const carrier = carrierRef.current;
 					// yOff compensates the sheet's travel so the hole stays fixed over the video.
 					const hole = { s: 0, yOff: 0 };
 					const wobble = { r: -12 };
 					const pulse = { t: 0 };
-					const px = new Array<number>(LOBE_COUNT);
-					const py = new Array<number>(LOBE_COUNT);
 
-					const holePath = () => {
-						const S = hole.s * metrics.vh;
-						const frame = `M0,0 H${metrics.vw} V${SHEET_VH * metrics.vh} H0 Z`;
-						if (S <= 0.5) return frame;
-						const cx = metrics.cx;
-						const cy = metrics.cy + hole.yOff;
-						const rot = (wobble.r * Math.PI) / 180;
-						for (let i = 0; i < LOBE_COUNT; i++) {
-							const angle = (i / LOBE_COUNT) * Math.PI * 2 + rot;
-							const r =
-								LOBE_RADII[i] *
-								(1 + UNDULATION * Math.sin(pulse.t + LOBE_PHASES[i])) *
-								S;
-							px[i] = cx + r * Math.cos(angle);
-							py[i] = cy + r * Math.sin(angle);
-						}
-						let d = `${frame} M ${px[0].toFixed(1)} ${py[0].toFixed(1)}`;
-						for (let i = 0; i < LOBE_COUNT; i++) {
-							const p0 = (i + LOBE_COUNT - 1) % LOBE_COUNT;
-							const p2 = (i + 1) % LOBE_COUNT;
-							const p3 = (i + 2) % LOBE_COUNT;
-							const c1x = px[i] + (px[p2] - px[p0]) * SMOOTHING;
-							const c1y = py[i] + (py[p2] - py[p0]) * SMOOTHING;
-							const c2x = px[p2] - (px[p3] - px[i]) * SMOOTHING;
-							const c2y = py[p2] - (py[p3] - py[i]) * SMOOTHING;
-							d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)} ${c2x.toFixed(1)} ${c2y.toFixed(1)} ${px[p2].toFixed(1)} ${py[p2].toFixed(1)}`;
-						}
-						return `${d} Z`;
-					};
-
-					// Every write invalidates the clip over the whole sheet, which iOS repaints on
-					// the main thread. Four callers (scroll, staged tween, sway, breath) collapse
-					// to one write per frame, and none while the hole is closed, since the
-					// frame-only path never changes.
-					let lastPath = "";
-					let pending = false;
-					const write = () => {
-						pending = false;
-						const d = holePath();
-						if (d === lastPath) return;
-						lastPath = d;
-						blobPath.setAttribute("d", d);
-					};
-					const rebuild = () => {
-						if (pending) return;
-						pending = true;
-						gsap.ticker.add(write, true);
-					};
-					cancelHoleWrite = () => gsap.ticker.remove(write);
-
-					// Synchronous on setup and refresh: a clip that references an empty path
-					// would hide the sheet for a frame.
-					rebuildFn = write;
-					write();
+					const writer = createClipWriter({
+						path: blobPath,
+						compute: () =>
+							holePath({
+								vw: metrics.vw,
+								vh: metrics.vh,
+								cx: metrics.cx,
+								cy: metrics.cy,
+								sheetVh: SHEET_VH,
+								s: hole.s,
+								yOff: hole.yOff,
+								rotation: wobble.r,
+								phase: pulse.t,
+							}),
+					});
+					disposeWriter = writer.dispose;
+					rebuildFn = writer.write;
+					writer.write();
 					sheet.style.clipPath = "url(#hero-hole)";
+
+					// Time-based sway and breathing so the hole's edge keeps living while scroll parks.
+					const sway = gsap.to(wobble, {
+						r: 12,
+						yoyo: true,
+						repeat: -1,
+						duration: 3,
+						ease: "sine.inOut",
+						onUpdate: writer.request,
+					});
+					const breath = gsap.to(pulse, {
+						t: Math.PI * 2,
+						repeat: -1,
+						duration: 3.6,
+						ease: "none",
+						onUpdate: writer.request,
+					});
 
 					// Hidden past the reveal: the sheet's trailing edge rasterizes a hairline against
 					// the intro. Driven off scrub progress; enter/leave callbacks never fired here.
+					// A hidden sheet gets no clip writes, and the ambient tweens sleep with it.
+					let hidden = false;
 					const syncSheet = (progress: number) => {
-						sheet.style.visibility = progress < 1 ? "visible" : "hidden";
+						const hide = progress >= 1;
+						if (hide === hidden) return;
+						hidden = hide;
+						if (hide) {
+							sway.pause();
+							breath.pause();
+							writer.hide();
+							sheet.style.visibility = "hidden";
+						} else {
+							writer.show();
+							sheet.style.visibility = "visible";
+							sway.play();
+							breath.play();
+						}
 					};
+
+					if (ios) {
+						// One clock (FRA-185): on iOS the sheet rides a sticky carrier for the whole
+						// reveal and travels by the same scrubbed timeline as the hole, so the
+						// catch-up delays both together and the hole never drifts off the video.
+						// The carrier's stick distance and the sheet's travel reproduce the native
+						// sheet's rect exactly. Set inside the context so a reduced-motion flip
+						// reverts the styles.
+						gsap.set(carrier, {
+							display: "block",
+							position: "sticky",
+							top: 0,
+							height: `${CARRIER_VH * 100}vh`,
+						});
+						gsap.set(sheet, {
+							position: "absolute",
+							top: 0,
+							left: 0,
+							right: 0,
+						});
+					}
+
+					// Elsewhere the sheet scrolls natively and the trigger spans only the hole's
+					// growth; on iOS it spans the whole travel, and progress maps back to growth.
+					const revealProgress = ios
+						? (progress: number) =>
+								gsap.utils.clamp(
+									0,
+									1,
+									(progress * REVEAL_TRAVEL_VH - REVEAL_DELAY_VH) /
+										REVEAL_LENGTH_VH,
+								)
+						: (progress: number) => progress;
 
 					const tl = gsap.timeline({
 						scrollTrigger: {
 							trigger: wrapperRef.current,
 							start: () =>
-								`top+=${(PIN_VH + REVEAL_DELAY_VH) * metrics.vh} top`,
-							end: () => `+=${REVEAL_LENGTH_VH * metrics.vh}`,
+								`top+=${(ios ? PIN_VH : PIN_VH + REVEAL_DELAY_VH) * metrics.vh} top`,
+							end: () =>
+								`+=${(ios ? REVEAL_TRAVEL_VH : REVEAL_LENGTH_VH) * metrics.vh}`,
 							scrub,
 							invalidateOnRefresh: true,
 							onUpdate: (self) => {
-								syncSheet(self.progress);
-								// Sheet travel since release: the pre-reveal delay plus the scrubbed portion.
-								hole.yOff =
-									(REVEAL_DELAY_VH + self.progress * REVEAL_LENGTH_VH) *
-									metrics.vh;
-								rebuild();
+								const progress = revealProgress(self.progress);
+								syncSheet(progress);
+								if (!ios) {
+									// The native sheet's travel since release: the pre-reveal delay
+									// plus the scrubbed portion.
+									hole.yOff =
+										(REVEAL_DELAY_VH + progress * REVEAL_LENGTH_VH) *
+										metrics.vh;
+									writer.request();
+								}
 								if (!video) return;
 								// `ended` also reports paused; unguarded, every tick would restart a
 								// finished video.
-								if (self.progress > VIDEO_CUE && video.paused && !video.ended) {
+								if (progress > VIDEO_CUE && video.paused && !video.ended) {
 									video.play().catch(() => {});
-								} else if (self.progress <= VIDEO_CUE && !video.paused) {
+								} else if (progress <= VIDEO_CUE && !video.paused) {
 									video.pause();
 								}
 							},
@@ -358,53 +403,45 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 						},
 					});
 					// onUpdate only runs once scroll moves; seed for a page loaded past the reveal.
-					syncSheet(tl.scrollTrigger?.progress ?? 0);
-					tl.to(hole, {
-						s: 0.1,
-						duration: 0.06,
-						ease: "power2.out",
-						onUpdate: rebuild,
-					})
-						.to(hole, {
-							s: 0.13,
-							duration: 0.24,
-							ease: "none",
-							onUpdate: rebuild,
-						})
-						.to(hole, {
-							s: 0.5,
-							duration: 0.4,
-							ease: "power1.in",
-							onUpdate: rebuild,
-						})
-						.to(hole, {
-							s: 2.6,
-							duration: 0.3,
-							ease: "power3.in",
-							onUpdate: rebuild,
-						});
+					syncSheet(revealProgress(tl.scrollTrigger?.progress ?? 0));
 
-					// Time-based sway and breathing so the hole's edge keeps living while scroll parks.
-					gsap.to(wobble, {
-						r: 12,
-						yoyo: true,
-						repeat: -1,
-						duration: 3,
-						ease: "sine.inOut",
-						onUpdate: rebuild,
-					});
-					gsap.to(pulse, {
-						t: Math.PI * 2,
-						repeat: -1,
-						duration: 3.6,
-						ease: "none",
-						onUpdate: rebuild,
-					});
+					if (ios) {
+						// Timeline seconds are viewport heights. The path is sheet-local, so yOff
+						// must climb by exactly the sheet's travel.
+						tl.to(
+							sheet,
+							{
+								y: () => -REVEAL_TRAVEL_VH * metrics.vh,
+								duration: REVEAL_TRAVEL_VH,
+								ease: "none",
+							},
+							0,
+						).to(
+							hole,
+							{
+								yOff: () => REVEAL_TRAVEL_VH * metrics.vh,
+								duration: REVEAL_TRAVEL_VH,
+								ease: "none",
+								onUpdate: writer.request,
+							},
+							0,
+						);
+					}
+					const growth = gsap.timeline();
+					for (const { s, duration, ease } of HOLE_STAGES) {
+						growth.to(hole, {
+							s,
+							duration: duration * REVEAL_LENGTH_VH,
+							ease,
+							onUpdate: writer.request,
+						});
+					}
+					tl.add(growth, ios ? REVEAL_DELAY_VH : 0);
 				}
 
 				return () => {
 					ScrollTrigger.removeEventListener("refreshInit", onRefreshInit);
-					cancelHoleWrite();
+					disposeWriter();
 					// Manual style writes GSAP can't revert; a flip to reduced must not
 					// strand the sheet clipped or hidden.
 					if (sheetRef.current) {
@@ -450,83 +487,34 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 					className="pointer-events-none relative z-10 h-screen motion-safe:h-(--hero-pin)"
 					style={{ "--hero-pin": `${WRAPPER_VH * 100}vh` } as CSSProperties}
 				>
-					<div
-						ref={sheetRef}
-						className="pointer-events-auto sticky top-0 h-screen motion-safe:h-(--hero-sheet)"
-						style={{ "--hero-sheet": `${SHEET_VH * 100}vh` } as CSSProperties}
-					>
+					{/* No box of its own: the sheet sticks inside the wrapper as if this were not
+					    here. On iOS the motion callback turns it into the sticky carrier the sheet
+					    rides through the reveal (one clock, FRA-185). */}
+					<div ref={carrierRef} className="contents">
 						<div
-							ref={sceneRef}
-							className="relative h-screen overflow-hidden"
-							style={{ background: COLORS.sky1 }}
+							ref={sheetRef}
+							className="pointer-events-auto sticky top-0 h-screen motion-safe:h-(--hero-sheet)"
+							style={{ "--hero-sheet": `${SHEET_VH * 100}vh` } as CSSProperties}
 						>
-							{/* Zenith base: its top edge is the viewport, so it has no entrance. */}
 							<div
-								data-parallax={PARALLAX.sky1}
-								className="absolute w-full"
-								style={{
-									top: `${SKY_TOPS.s1}%`,
-									height: "200%",
-									background: COLORS.sky1,
-								}}
-							/>
-							{/* The motion-reduce important override on every entrance m.div: the
+								ref={sceneRef}
+								className="relative h-screen overflow-hidden"
+								style={{ background: COLORS.sky1 }}
+							>
+								{/* Zenith base: its top edge is the viewport, so it has no entrance. */}
+								<div
+									data-parallax={PARALLAX.sky1}
+									className="absolute w-full"
+									style={{
+										top: `${SKY_TOPS.s1}%`,
+										height: "200%",
+										background: COLORS.sky1,
+									}}
+								/>
+								{/* The motion-reduce important override on every entrance m.div: the
 							    server HTML carries the bunched-pose inline transforms, so
 							    reduced-motion first paint must neutralize them from CSS (FRA-170). */}
-							{SKY_BANDS.map(({ parallax, top, color, bunchedTop, step }) => (
-								<div
-									key={color}
-									data-parallax={parallax}
-									className="absolute w-full"
-									style={{ top: `${top}%`, height: "200%" }}
-								>
-									<m.div
-										className="motion-reduce:transform-none! absolute inset-0"
-										style={{ background: color }}
-										initial={
-											reducedMotion ? false : { y: `${bunchedTop - top}vh` }
-										}
-										animate={{ y: play ? "0vh" : `${bunchedTop - top}vh` }}
-										transition={
-											reducedMotion ? { duration: 0 } : entranceTransition(step)
-										}
-									/>
-								</div>
-							))}
-
-							{/* Clipped to the sky: the sun can never show below the horizon while
-							    the bands are still separating. */}
-							<div
-								className="pointer-events-none absolute inset-x-0 top-0 overflow-hidden"
-								style={{ height: `${HORIZON_PCT}%` }}
-							>
-								<div
-									ref={sunRef}
-									data-parallax={PARALLAX.sun}
-									className="absolute"
-									style={{
-										width: "min(38vw, 38vh)",
-										height: "min(38vw, 38vh)",
-										right: "1%",
-										// Bottom third of the sun sits below the horizon (= wrapper bottom)
-										top: "calc(100% - min(36vw, 36vh))",
-									}}
-								>
-									<m.div
-										className="motion-reduce:transform-none! absolute inset-0 rounded-full"
-										style={{ background: COLORS.sun }}
-										initial={reducedMotion ? false : SUN_ENTRANCE}
-										animate={play ? { y: "0%", scale: 1 } : SUN_ENTRANCE}
-										transition={
-											reducedMotion ? { duration: 0 } : SUN_TRANSITION
-										}
-									/>
-								</div>
-							</div>
-
-							{/* height: 200% ensures bands never expose a bottom edge as they parallax up */}
-							{GROUND_BANDS.map(
-								({ parallax, top, color, bunchedTop, step }) => (
+								{SKY_BANDS.map(({ parallax, top, color, bunchedTop, step }) => (
 									<div
 										key={color}
 										data-parallax={parallax}
@@ -547,57 +535,113 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 											}
 										/>
 									</div>
-								),
-							)}
+								))}
 
-							{/* Feet anchored to g3's top edge via bottom positioning. */}
-							<div
-								ref={characterRef}
-								data-parallax={PARALLAX.character}
-								className="absolute left-[4%]"
-								style={{ bottom: `${100 - GROUND_TOPS.g3}%` }}
-							>
-								{/* Offset and timing identical to ground band 3's, so the sneakers
-								    stay planted on it as it slides down. */}
-								<m.div
-									className="motion-reduce:transform-none!"
-									initial={
-										reducedMotion
-											? false
-											: {
-													y: `${GROUND_BANDS[2].bunchedTop - GROUND_TOPS.g3}vh`,
-												}
-									}
-									animate={{
-										y: play
-											? "0vh"
-											: `${GROUND_BANDS[2].bunchedTop - GROUND_TOPS.g3}vh`,
-									}}
-									transition={
-										reducedMotion
-											? { duration: 0 }
-											: entranceTransition(GROUND_BANDS[2].step)
-									}
+								{/* Clipped to the sky: the sun can never show below the horizon while
+							    the bands are still separating. */}
+								<div
+									className="pointer-events-none absolute inset-x-0 top-0 overflow-hidden"
+									style={{ height: `${HORIZON_PCT}%` }}
 								>
-									<Image
-										src="/lego-hero.webp"
-										width={1024}
-										height={1536}
-										alt="Lego Gustavo looking at the horizon"
-										priority
-										sizes="(min-width: 640px) 200px, 130px"
-										className="h-65 w-32.5 object-contain object-bottom sm:h-100 sm:w-50"
-									/>
-								</m.div>
+									<div
+										ref={sunRef}
+										data-parallax={PARALLAX.sun}
+										className="absolute"
+										style={{
+											width: "min(38vw, 38vh)",
+											height: "min(38vw, 38vh)",
+											right: "1%",
+											// Bottom third of the sun sits below the horizon (= wrapper bottom)
+											top: "calc(100% - min(36vw, 36vh))",
+										}}
+									>
+										<m.div
+											className="motion-reduce:transform-none! absolute inset-0 rounded-full"
+											style={{ background: COLORS.sun }}
+											initial={reducedMotion ? false : SUN_ENTRANCE}
+											animate={play ? { y: "0%", scale: 1 } : SUN_ENTRANCE}
+											transition={
+												reducedMotion ? { duration: 0 } : SUN_TRANSITION
+											}
+										/>
+									</div>
+								</div>
+
+								{/* height: 200% ensures bands never expose a bottom edge as they parallax up */}
+								{GROUND_BANDS.map(
+									({ parallax, top, color, bunchedTop, step }) => (
+										<div
+											key={color}
+											data-parallax={parallax}
+											className="absolute w-full"
+											style={{ top: `${top}%`, height: "200%" }}
+										>
+											<m.div
+												className="motion-reduce:transform-none! absolute inset-0"
+												style={{ background: color }}
+												initial={
+													reducedMotion ? false : { y: `${bunchedTop - top}vh` }
+												}
+												animate={{ y: play ? "0vh" : `${bunchedTop - top}vh` }}
+												transition={
+													reducedMotion
+														? { duration: 0 }
+														: entranceTransition(step)
+												}
+											/>
+										</div>
+									),
+								)}
+
+								{/* Feet anchored to g3's top edge via bottom positioning. */}
+								<div
+									ref={characterRef}
+									data-parallax={PARALLAX.character}
+									className="absolute left-[4%]"
+									style={{ bottom: `${100 - GROUND_TOPS.g3}%` }}
+								>
+									{/* Offset and timing identical to ground band 3's, so the sneakers
+								    stay planted on it as it slides down. */}
+									<m.div
+										className="motion-reduce:transform-none!"
+										initial={
+											reducedMotion
+												? false
+												: {
+														y: `${GROUND_BANDS[2].bunchedTop - GROUND_TOPS.g3}vh`,
+													}
+										}
+										animate={{
+											y: play
+												? "0vh"
+												: `${GROUND_BANDS[2].bunchedTop - GROUND_TOPS.g3}vh`,
+										}}
+										transition={
+											reducedMotion
+												? { duration: 0 }
+												: entranceTransition(GROUND_BANDS[2].step)
+										}
+									>
+										<Image
+											src="/lego-hero.webp"
+											width={1024}
+											height={1536}
+											alt="Lego Gustavo looking at the horizon"
+											priority
+											sizes="(min-width: 640px) 200px, 130px"
+											className="h-65 w-32.5 object-contain object-bottom sm:h-100 sm:w-50"
+										/>
+									</m.div>
+								</div>
 							</div>
+							<div
+								className="motion-reduce:hidden"
+								style={{
+									height: `${(SHEET_VH - 1) * 100}vh`,
+									background: COLORS.ground4,
+								}}
+							/>
 						</div>
-						<div
-							className="motion-reduce:hidden"
-							style={{
-								height: `${(SHEET_VH - 1) * 100}vh`,
-								background: COLORS.ground4,
-							}}
-						/>
 					</div>
 				</div>
 

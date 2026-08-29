@@ -2,6 +2,16 @@ import { render } from "@testing-library/react";
 import gsap from "gsap";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { IOS_SCRUB_S } from "@/lib/scroll-scrub";
+import {
+	CARRIER_VH,
+	PIN_VH,
+	REVEAL_COMPLETE_VH,
+	REVEAL_DELAY_VH,
+	REVEAL_LENGTH_VH,
+	REVEAL_TRAVEL_VH,
+	SHEET_VH,
+	WRAPPER_VH,
+} from "../scroll-geometry";
 import { ParallaxHero } from "./hero";
 
 const iosState = { value: false };
@@ -72,6 +82,82 @@ describe("ParallaxHero", () => {
 		expect(posed.length).toBeGreaterThan(0);
 		for (const el of posed) {
 			expect(el.className).toContain("motion-reduce:transform-none!");
+		}
+	});
+
+	// The hole's timeline, with the sheet and carrier it drives; jsdom's viewport is
+	// 768px tall, which the hero reads as `metrics.vh`.
+	const holeTimeline = () => {
+		const timeline = vi.spyOn(gsap, "timeline");
+		const { container, unmount } = render(
+			<ParallaxHero reveal={<div data-reveal>intro</div>} />,
+		);
+		const sheet = container.querySelector<HTMLElement>('[class*="hero-sheet"]');
+		if (!sheet?.parentElement) throw new Error("no sheet");
+		const carrier = sheet.parentElement;
+		const trigger = timeline.mock.calls
+			.map((call) => (call[0] as gsap.TimelineVars)?.scrollTrigger)
+			.find(Boolean) as ScrollTrigger.Vars;
+		const range = {
+			start: (trigger.start as () => string)(),
+			end: (trigger.end as () => string)(),
+		};
+		timeline.mockRestore();
+		return { sheet, carrier, range, unmount };
+	};
+	const VH = 768;
+
+	it("keeps the iOS carrier's geometry tied to the reveal", () => {
+		// The carrier sticks for exactly the reveal, and once the sheet has travelled,
+		// its remainder below the viewport is exactly the carrier's box.
+		expect(WRAPPER_VH - CARRIER_VH).toBeCloseTo(REVEAL_COMPLETE_VH, 10);
+		expect(SHEET_VH - REVEAL_TRAVEL_VH).toBeCloseTo(CARRIER_VH, 10);
+		expect(CARRIER_VH * 100).toBeCloseTo(106.667, 2);
+	});
+
+	it("leaves the native sticky sheet in place off iOS", () => {
+		const restore = allowMotion();
+		try {
+			const { sheet, carrier, range, unmount } = holeTimeline();
+			expect(carrier.className).toBe("contents");
+			expect(carrier.style.position).toBe("");
+			expect(sheet.className).toContain("sticky");
+			expect(sheet.style.position).toBe("");
+			expect(sheet.style.transform).toBe("");
+			// The trigger spans only the hole's growth.
+			expect(range).toEqual({
+				start: `top+=${(PIN_VH + REVEAL_DELAY_VH) * VH} top`,
+				end: `+=${REVEAL_LENGTH_VH * VH}`,
+			});
+			unmount();
+		} finally {
+			restore();
+		}
+	});
+
+	it("rides the sheet on a sticky carrier through the whole reveal on iOS", () => {
+		const restore = allowMotion();
+		iosState.value = true;
+		try {
+			const { sheet, carrier, range, unmount } = holeTimeline();
+			expect(carrier.style.display).toBe("block");
+			expect(carrier.style.position).toBe("sticky");
+			expect(carrier.style.top).toBe("0px");
+			expect(parseFloat(carrier.style.height)).toBeCloseTo(CARRIER_VH * 100, 6);
+			expect(carrier.style.height.endsWith("vh")).toBe(true);
+			expect(sheet.style.position).toBe("absolute");
+			// One clock: the trigger spans the sheet's whole travel from its release.
+			expect(range).toEqual({
+				start: `top+=${PIN_VH * VH} top`,
+				end: `+=${REVEAL_TRAVEL_VH * VH}`,
+			});
+			// The context revert leaves no carrier styles behind for a reduced flip.
+			unmount();
+			expect(carrier.style.position).toBe("");
+			expect(carrier.style.display).toBe("");
+			expect(sheet.style.position).toBe("");
+		} finally {
+			restore();
 		}
 	});
 
