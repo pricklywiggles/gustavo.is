@@ -71,8 +71,18 @@ export type SpeedEntry = {
 	meanRatio: number | null;
 	/** Mean times the ease's peak-rate factor. */
 	peakRatio: number | null;
+	/** Span in hard phone flicks and in seconds at browsing and skimming speed. */
+	flicks: number;
+	secondsBrowse: number;
+	secondsSkim: number;
 	note?: string;
 };
+
+/** A hard iOS flick travels about its release velocity over three (5% decay per frame): 2,700px. */
+export const HARD_FLICK_PX = 2700;
+/** Ordinary browsing and skimming scroll speeds, CSS px per second. */
+export const BROWSE_PX_PER_S = 1500;
+export const SKIM_PX_PER_S = 3000;
 
 /** Peak rate of each ease over its mean rate (GSAP: power1 is quadratic, power2 cubic). */
 const EASE_PEAK: Record<string, number> = {
@@ -98,9 +108,10 @@ export function easePeakFactor(ease: string): number {
 	return factor;
 }
 
-type Row = Omit<SpeedEntry, "meanRatio" | "peakRatio">;
+type Rated = Omit<SpeedEntry, "flicks" | "secondsBrowse" | "secondsSkim">;
+type Row = Omit<Rated, "meanRatio" | "peakRatio">;
 
-function entry(row: Row): SpeedEntry {
+function entry(row: Row): Rated {
 	const mean = row.travelVh === null ? null : row.travelVh / row.spanVh;
 	return {
 		...row,
@@ -109,8 +120,8 @@ function entry(row: Row): SpeedEntry {
 	};
 }
 
-function heroRows(viewport: Viewport): SpeedEntry[] {
-	const rows: SpeedEntry[] = [];
+function heroRows(viewport: Viewport): Rated[] {
+	const rows: Rated[] = [];
 	for (const [name, factor] of Object.entries(HERO_PARALLAX)) {
 		rows.push(
 			entry({
@@ -190,7 +201,7 @@ function sunRows(
 	phase: ReturnType<typeof storyPhases>,
 	isLast: boolean,
 	viewport: Viewport,
-): SpeedEntry[] {
+): Rated[] {
 	const sun = config.sun;
 	if (!sun) return [];
 	const stageW = stageWidthPx(viewport);
@@ -249,9 +260,9 @@ function sunRows(
 	];
 }
 
-function workHistoryRows(viewport: Viewport): SpeedEntry[] {
+function workHistoryRows(viewport: Viewport): Rated[] {
 	const phase = storyPhases(CHAPTERS);
-	const rows: SpeedEntry[] = [];
+	const rows: Rated[] = [];
 	CHAPTERS.forEach((chapter, i) => {
 		const config = chapter.panorama;
 		const isLast = i === CHAPTERS.length - 1;
@@ -398,9 +409,9 @@ function workHistoryRows(viewport: Viewport): SpeedEntry[] {
 	return rows;
 }
 
-function landfallRows(viewport: Viewport): SpeedEntry[] {
+function landfallRows(viewport: Viewport): Rated[] {
 	const { at, len, total } = DESCENT_PHASE;
-	const rows: SpeedEntry[] = [];
+	const rows: Rated[] = [];
 	for (const layer of STAR_LAYERS) {
 		rows.push(
 			entry({
@@ -468,11 +479,11 @@ function landfallRows(viewport: Viewport): SpeedEntry[] {
 	return rows;
 }
 
-function vistaRows(viewport: Viewport): SpeedEntry[] {
+function vistaRows(viewport: Viewport): Rated[] {
 	const base = { section: "vista" as const, phase: "entry", ease: "none" };
 	// The vista scrubs over its own height, about one viewport.
 	const spanVh = 1;
-	const rows: SpeedEntry[] = [];
+	const rows: Rated[] = [];
 	for (const [name, travel] of Object.entries(VISTA_TRAVEL)) {
 		rows.push(
 			entry({
@@ -518,7 +529,7 @@ function vistaRows(viewport: Viewport): SpeedEntry[] {
 	return rows;
 }
 
-function projectsRows(): SpeedEntry[] {
+function projectsRows(): Rated[] {
 	return [
 		entry({
 			section: "projects",
@@ -543,6 +554,16 @@ function projectsRows(): SpeedEntry[] {
 	];
 }
 
+/** A span in gestures and seconds: what a reader's hand does with it. */
+export function gesture(spanVh: number, viewport: Viewport) {
+	const px = spanVh * viewport.h;
+	return {
+		flicks: px / HARD_FLICK_PX,
+		secondsBrowse: px / BROWSE_PX_PER_S,
+		secondsSkim: px / SKIM_PX_PER_S,
+	};
+}
+
 /** Every scrubbed tween at one viewport, fastest peak first. */
 export function speedMap(viewport: Viewport): SpeedEntry[] {
 	const rows = [
@@ -552,7 +573,21 @@ export function speedMap(viewport: Viewport): SpeedEntry[] {
 		...vistaRows(viewport),
 		...projectsRows(),
 	];
-	return rows.sort((a, b) => (b.peakRatio ?? -1) - (a.peakRatio ?? -1));
+	return rows
+		.map((row) => ({ ...row, ...gesture(row.spanVh, viewport) }))
+		.sort((a, b) => (b.peakRatio ?? -1) - (a.peakRatio ?? -1));
+}
+
+/**
+ * Each city's build, the beat a reader must see: it has to outlast one hard flick, or
+ * a swipe from the quote lands past the skyline (Seattle did, at 2.6 viewports).
+ */
+export function buildSpans(viewport: Viewport) {
+	const phase = storyPhases(CHAPTERS);
+	return CHAPTERS.map((chapter, i) => {
+		const spanVh = phase.len[`panorama-in@${i}`];
+		return { chapter: chapter.id, spanVh, ...gesture(spanVh, viewport) };
+	});
 }
 
 /** Rows whose class carries a cap and that exceed it. */

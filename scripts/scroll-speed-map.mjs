@@ -8,8 +8,13 @@
 import { register } from "node:module";
 
 register("./ts-resolve-hook.mjs", import.meta.url);
-const { BUDGET_VIEWPORTS, budgetViolations, exitWindows, speedMap } =
-	await import("../src/components/landing/scroll-speed-map.ts");
+const {
+	BUDGET_VIEWPORTS,
+	budgetViolations,
+	buildSpans,
+	exitWindows,
+	speedMap,
+} = await import("../src/components/landing/scroll-speed-map.ts");
 
 const json = process.argv.includes("--json");
 const all = process.argv.includes("--all");
@@ -24,7 +29,7 @@ for (const [name, viewport] of Object.entries(BUDGET_VIEWPORTS)) {
 	if (json) continue;
 	console.log(`\n== ${name} ${viewport.w}x${viewport.h} ==`);
 	console.log(
-		`${pad("section", 13)}${pad("phase", 30)}${pad("target", 52)}${pad("class", 10)}${pad("travel", 8)}${pad("span", 7)}${pad("mean", 7)}${pad("peak", 7)}ease`,
+		`${pad("section", 13)}${pad("phase", 30)}${pad("target", 52)}${pad("class", 10)}${pad("travel", 8)}${pad("span", 7)}${pad("flicks", 8)}${pad("s@1.5k", 8)}${pad("s@3k", 7)}${pad("mean", 7)}${pad("peak", 7)}ease`,
 	);
 	let folded = 0;
 	for (const row of rows) {
@@ -33,7 +38,7 @@ for (const [name, viewport] of Object.entries(BUDGET_VIEWPORTS)) {
 			continue;
 		}
 		console.log(
-			`${pad(row.section, 13)}${pad(row.phase, 30)}${pad(row.target, 52)}${pad(row.class, 10)}${pad(fmt(row.travelVh), 8)}${pad(fmt(row.spanVh), 7)}${pad(fmt(row.meanRatio), 7)}${pad(fmt(row.peakRatio), 7)}${row.ease}${row.note ? `  (${row.note})` : ""}`,
+			`${pad(row.section, 13)}${pad(row.phase, 30)}${pad(row.target, 52)}${pad(row.class, 10)}${pad(fmt(row.travelVh), 8)}${pad(fmt(row.spanVh), 7)}${pad(fmt(row.flicks), 8)}${pad(row.secondsBrowse.toFixed(1), 8)}${pad(row.secondsSkim.toFixed(1), 7)}${pad(fmt(row.meanRatio), 7)}${pad(fmt(row.peakRatio), 7)}${row.ease}${row.note ? `  (${row.note})` : ""}`,
 		);
 	}
 	if (folded)
@@ -50,6 +55,13 @@ if (json) {
 		JSON.stringify({ ...output, exitWindows: exitWindows() }, null, 1),
 	);
 } else {
+	console.log(
+		"\ncity builds on the phone (hard flicks, seconds browsing / skimming):",
+	);
+	for (const b of buildSpans(BUDGET_VIEWPORTS.phone))
+		console.log(
+			`  ${b.chapter}: ${fmt(b.spanVh)} vh, ${fmt(b.flicks)} flicks, ${b.secondsBrowse.toFixed(1)}s / ${b.secondsSkim.toFixed(1)}s`,
+		);
 	console.log("\nexit windows (last layer's end vs SCENE_OUT_VH):");
 	for (const w of exitWindows())
 		console.log(`  ${w.chapter}: ${fmt(w.endVh)} / ${fmt(w.lenVh)}`);

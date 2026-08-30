@@ -3,6 +3,7 @@ import { PANORAMA_DIMENSIONS } from "./panorama-dimensions";
 import {
 	BUDGET_VIEWPORTS,
 	budgetViolations,
+	buildSpans,
 	exitWindows,
 	PACING_BUDGET,
 	speedMap,
@@ -28,6 +29,13 @@ describe("scroll speed map (FRA-187)", () => {
 				`${row.phase} ${row.target}: ${row.meanRatio?.toFixed(2)}x mean, ${row.peakRatio?.toFixed(2)}x peak`,
 		);
 		expect(offenders).toEqual([]);
+	});
+
+	// A hard phone flick is about 2,700px; a city that fits inside one is skipped whole.
+	it("gives every city's build more than one hard flick on the phone", () => {
+		for (const build of buildSpans(BUDGET_VIEWPORTS.phone)) {
+			expect(build.flicks, build.chapter).toBeGreaterThanOrEqual(1);
+		}
 	});
 
 	it("ends every chapter's exit inside SCENE_OUT_VH", () => {

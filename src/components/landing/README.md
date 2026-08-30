@@ -343,7 +343,10 @@ viewport (2.6x).
   measured headless in 2026-08; our per-beat spans sit inside or above
   that band. The year scrubs are still scenes, so they are the fatigue
   risk rather than the motion: `SCRUB_VH_PER_YEAR` 0.4 keeps the 13-year
-  San Francisco scrub near 5 viewports.
+  San Francisco scrub near 5 viewports. The map prints every row's span
+  in hard flicks and in seconds at 1,500 and 3,000 px/s (`gesture()`),
+  and the test holds every city's build (`buildSpans()`) at one flick or
+  more on the phone.
 - Rules: pacing changes go into spans (`len`), poses (`from`) and slot
   offsets, never layer positions (template matching). Every changed `len`
   changes the section's pin length (invariant 1), the landfall height
