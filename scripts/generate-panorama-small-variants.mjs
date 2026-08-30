@@ -6,19 +6,8 @@
  * then update `srcWidths` in blog-panorama-data.ts if the printed table changed.
  */
 import { readdirSync, statSync } from "node:fs";
-import { createRequire } from "node:module";
 import { join } from "node:path";
-
-// sharp is a transitive dependency (Next's image pipeline): resolve it out of the pnpm
-// store instead of adding a root dep for a dev-only script.
-const require = createRequire(import.meta.url);
-const sharpDir = readdirSync("node_modules/.pnpm").find((d) =>
-	/^sharp@/.test(d),
-);
-if (!sharpDir) throw new Error("sharp not found in the pnpm store");
-const sharp = require(
-	join(process.cwd(), "node_modules/.pnpm", sharpDir, "node_modules/sharp"),
-);
+import { sharp } from "./sharp.mjs";
 
 const DIR = "public/los-angeles-panorama-small";
 const MIN_NATIVE = 1200;

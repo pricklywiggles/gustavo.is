@@ -239,6 +239,41 @@ mount, so there is nothing to hydrate or refresh on a viewport flip.
   tuned. Retune phones by editing mobileBox only; a test guards the
   max-sm: prefixes.
 
+## Panorama assets: canvas scale and masters (FRA-186)
+
+Each city's layers are exported from one canvas and positioned as
+percentages of it, so a set's resolution is the canvas resolution.
+Seattle and San Francisco were authored on a 2688x1792 canvas. Los
+Angeles was authored on 8064x5376 (its `aspect` is written at the 2688
+scale, the same ratio), three times the size per side, and shipped at that
+size: 704 MiB decoded for the one set, against 104 (Seattle) and 82
+(SF). iOS Safari killed the page under fast repeated scrolling
+("A problem repeatedly occurred", a jetsam kill, never a console error).
+The extra pixels carried no detail: shrinking every LA layer to a third
+and scaling it back reproduces the original within about 1 dB, so the
+art is a 3x upscale of 2688-class work.
+
+- Runtime sets under `public/<city>-panorama` must be at 2688-canvas
+  scale. LA's 8064 masters are kept locally in
+  `assets/panorama-masters/los-angeles` (gitignored; the originals are in
+  git history at `c62fecf` under `public/los-angeles-panorama`) and the
+  runtime set is generated from them:
+  `node scripts/scale-panorama-set.mjs assets/panorama-masters/los-angeles public/los-angeles-panorama 1/3`.
+  Same filenames, same crop extents, aspect ratio kept as closely as
+  integer pixels allow (the script picks the rounding pair with the least
+  ratio drift). Re-running is a no-op while outputs are newer than masters.
+- Geometry contract after a regeneration: the desktop rect probe
+  (`?chapter=2`, 1440x900, rects of every `[data-pano-layer]` at parked
+  scroll fractions) must match the previous set to 0.01px for every
+  layer, except that narrow sprites may drift by the integer-rounding
+  floor (under 0.2px on the 165px-wide towers and the haze strip) and
+  the ambient clouds read differently between runs because their sway
+  runs on a wall clock.
+- Do not add `srcset` variants expecting phone savings: with a correct
+  stage-relative `sizes`, a 3x phone (stage 1266 CSS px) selects the
+  largest candidate for every full-width layer. Density on phones is a
+  deliberate iOS-gated trade if ever needed, not a responsive-images win.
+
 ## Reduced motion (the static edition)
 
 `prefers-reduced-motion: reduce` gets a designed still page, not a disabled
