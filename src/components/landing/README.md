@@ -254,8 +254,10 @@ and scaling it back reproduces the original within about 1 dB, so the
 art is a 3x upscale of 2688-class work.
 
 - Runtime sets under `public/<city>-panorama` must be at 2688-canvas
-  scale. LA's 8064 masters live in `assets/panorama-masters/los-angeles`
-  (not served) and the runtime set is generated from them:
+  scale. LA's 8064 masters are kept locally in
+  `assets/panorama-masters/los-angeles` (gitignored; the originals are in
+  git history at `c62fecf` under `public/los-angeles-panorama`) and the
+  runtime set is generated from them:
   `node scripts/scale-panorama-set.mjs assets/panorama-masters/los-angeles public/los-angeles-panorama 1/3`.
   Same filenames, same crop extents, aspect ratio kept as closely as
   integer pixels allow (the script picks the rounding pair with the least
