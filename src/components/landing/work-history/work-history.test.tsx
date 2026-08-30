@@ -47,7 +47,7 @@ describe("WorkHistorySection", () => {
 		}
 	});
 
-	// FRA-188: each chapter's ambience sleeps off stage; the trigger spans its window.
+	// FRA-188: ambience sleeps while its chapter is off stage.
 	it("spans each ambience trigger over its chapter's stage window", () => {
 		const original = window.matchMedia;
 		window.matchMedia = ((query: string) => ({
@@ -114,7 +114,6 @@ describe("WorkHistorySection", () => {
 		opensDuring("line3", "rule");
 	});
 
-	// FRA-188: the ambience windows tile the story with no gap or overlap.
 	it("bounds each ambience window from its cascade to its exit, abutting", () => {
 		const phase = storyPhases(CHAPTERS);
 		for (const i of [0, 1]) {

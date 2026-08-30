@@ -667,10 +667,8 @@ export function WorkHistorySection() {
 								(cascadeAt + vessel.cueStep * pano.stepVh + pano.durVh),
 					});
 					cleanups.push(vessels.cleanup);
-					// The scrubbed master cannot stop clock-driven tweens, so a window trigger
-					// does. Boundary callbacks, never onToggle: a one-frame skip across the window
-					// fires enter then leave with no toggle and must still end paused; onRefresh
-					// re-syncs after a refresh replays the vessel cue for a load mid-chapter.
+					// Never onToggle: a one-frame skip fires enter then leave, no toggle, sail must
+					// end paused. onRefresh: a mid-chapter load's refresh replays the vessel cue.
 					const onStage = stageWindow(phase, i, story.length);
 					const syncAmbience = (self: ScrollTrigger) => {
 						if (self.isActive) {

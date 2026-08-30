@@ -30,10 +30,7 @@ export function cascadeLength(config: PanoramaConfig): number {
 	return config.lastStep * config.stepVh + config.durVh;
 }
 
-/**
- * The span a chapter's ambience is on stage: its cascade's start to the end of its
- * scene-out, or of outro-dusk for the last chapter (the veil is opaque by then).
- */
+/** A chapter's ambience's on-stage span; the last ends with outro-dusk (veil opaque). */
 export function stageWindow(
 	phase: PhaseMap,
 	i: number,

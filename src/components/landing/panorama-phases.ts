@@ -395,8 +395,7 @@ export function buildSunset(
 /**
  * Drift on the sway wrappers, entrances on the images inside: two owners, no shared
  * properties. Period scales with width for equal perceived speed; phase seeds desync.
- * Born paused at their seed pose; the chapter's stage window (work-history.tsx) wakes
- * them, and resume plays each tween from its paused playhead so the phase holds.
+ * Born paused at their seeds; the stage window (work-history.tsx) resumes them in place.
  */
 export function attachCloudSway(
 	stage: HTMLElement,
