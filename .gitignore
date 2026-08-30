@@ -78,3 +78,6 @@ src/fonts/Kitora-Bold.otf
 # Trial faces for the dev font lab stay local: demo licenses do not cover
 # redistribution, and production never loads them.
 src/fonts/try/
+
+# Panorama masters: local only, regenerate runtime sets with scripts/scale-panorama-set.mjs
+assets/panorama-masters/
