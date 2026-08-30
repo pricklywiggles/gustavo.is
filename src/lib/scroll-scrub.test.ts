@@ -10,8 +10,7 @@ afterEach(() => {
 	iosState.value = false;
 });
 
-// FRA-185: raw scroll on desktop and Android; iOS devices get the catch-up that hides
-// their sparse scroll reports.
+// FRA-185: raw scroll everywhere but iOS; the catch-up hides its sparse scroll reports.
 describe("scrollScrub", () => {
 	it("keeps the raw scroll sample off iOS", () => {
 		expect(scrollScrub()).toBe(true);

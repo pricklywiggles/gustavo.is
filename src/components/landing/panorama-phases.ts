@@ -110,7 +110,7 @@ export function buildYearCues(
 /**
  * Post-landing breath: foreground rises, background sinks, sea level holds as the pivot.
  * Animated on `y`, which composes with the entrance yPercent and the vessels' xPercent.
- * `viewportHeight` is the section's CSS viewport (its h-screen box), never innerHeight.
+ * `viewportHeight`: the section's h-screen box, never innerHeight (iOS toolbar).
  */
 export function buildParallaxShift(
 	tl: gsap.core.Timeline,

@@ -22,8 +22,7 @@ describe("scroll speed map (FRA-187)", () => {
 		}
 	});
 
-	// FRA-190: buildSceneExit unwinds every parallax layer's breath, vessels included,
-	// and the map only rated the posed layers.
+	// FRA-190: buildSceneExit unwinds vessel breath too; the map rated only the posed layers.
 	it.each(
 		viewports,
 	)("unwinds every drift vessel's breath in the scene exit at %s", (_name, viewport) => {

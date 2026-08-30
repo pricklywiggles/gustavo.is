@@ -5,9 +5,8 @@ import { CLOUD_SLOTS, DESCENT_PHASE } from "../landfall-geometry";
 import { SKY_CLOUDS } from "../landfall-vista";
 import { LandfallSection } from "./landfall";
 
-// scrollScrub() owns the raw-scroll-or-iOS-catch-up choice (scroll-scrub.test.ts); a
-// sentinel proves both timelines take it, in one render, since each motion render of
-// this section costs a few hundred ms in jsdom and seconds under a loaded suite.
+// scrollScrub() owns the raw-scroll-or-iOS choice (scroll-scrub.test.ts); one render
+// here, each motion render of this section costs seconds under a loaded suite.
 const { SCRUB_SENTINEL } = vi.hoisted(() => ({ SCRUB_SENTINEL: 0.123 }));
 vi.mock("@/lib/scroll-scrub", () => ({
 	scrollScrub: () => SCRUB_SENTINEL,
@@ -17,8 +16,7 @@ afterEach(() => {
 	vi.restoreAllMocks();
 });
 
-// The descent and the vista timelines' scrubs, built under motion (the setup stub
-// answers every query false, which skips them).
+// The descent's and the vista's scrubs; the setup stub answers false, skipping motion.
 const descentScrubs = () => {
 	const original = window.matchMedia;
 	window.matchMedia = ((query: string) => ({
@@ -56,8 +54,6 @@ vi.mock("@/components/lazy-contact-dialog", async (importOriginal) => {
 });
 
 describe("LandfallSection", () => {
-	// FRA-185: the descent and the vista follow the raw scroll on desktop and Android;
-	// iOS devices get the catch-up that hides their sparse scroll reports.
 	it("scrubs the descent and the vista through scrollScrub()", () => {
 		expect(descentScrubs()).toEqual([SCRUB_SENTINEL, SCRUB_SENTINEL]);
 	});

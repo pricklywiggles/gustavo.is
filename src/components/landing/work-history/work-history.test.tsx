@@ -10,8 +10,7 @@ afterEach(() => {
 });
 
 describe("WorkHistorySection", () => {
-	// FRA-190: the pin is phase.total times the section's own h-screen box, the CSS
-	// viewport its layers are sized in; innerHeight tracks iOS's toolbar instead.
+	// FRA-190: the layers are sized in the section's box; innerHeight tracks the iOS toolbar.
 	it("measures the pin against the section's box, never innerHeight", () => {
 		const original = window.matchMedia;
 		window.matchMedia = ((query: string) => ({

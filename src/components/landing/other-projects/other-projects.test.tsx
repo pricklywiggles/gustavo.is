@@ -185,9 +185,7 @@ describe("OtherProjectsSection", () => {
 	});
 
 	it("sizes the showcase scrub from the per-project span", () => {
-		// The height class is a literal (Tailwind scans source); this pins it to the
-		// geometry the speed map reads, so the two move together: one viewport per
-		// project plus the sticky stage's own.
+		// Tailwind scans source, so the height is a literal; +1 is the sticky stage's viewport.
 		expect((projectsScrubVh() + 1) * 100).toBe(700);
 		vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
 		const { container } = render(<OtherProjectsSection />);

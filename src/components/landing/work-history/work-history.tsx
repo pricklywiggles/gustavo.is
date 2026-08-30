@@ -387,8 +387,7 @@ export function WorkHistorySection() {
 		const el = rootRef.current;
 		return el ? el.getBoundingClientRect().top + window.scrollY : 0;
 	}, []);
-	// The section's own h-screen box is the CSS viewport the layers and the speed map use;
-	// innerHeight on iOS is the toolbar-dependent visual height (the hero measures the same way).
+	// The h-screen box is the layers' CSS viewport; innerHeight on iOS tracks the toolbar.
 	const sectionHeight = useCallback(
 		() => rootRef.current?.offsetHeight || window.innerHeight,
 		[],
