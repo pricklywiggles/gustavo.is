@@ -189,8 +189,14 @@ describe("OtherProjectsSection", () => {
 		expect((projectsScrubVh() + 1) * 100).toBe(700);
 		vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
 		const { container } = render(<OtherProjectsSection />);
-		expect(
-			container.querySelector("[data-projects-scrub]")?.className,
-		).toContain(`h-[${(projectsScrubVh() + 1) * 100}vh]`);
+		const scrub = container.querySelector("[data-projects-scrub]");
+		expect(scrub?.className).toContain(
+			`h-[${(projectsScrubVh() + 1) * 100}vh]`,
+		);
+		// The span is the box minus one viewport only while the scrub runs its full height.
+		const spans = ScrollTrigger.getAll()
+			.filter((trigger) => trigger.trigger === scrub)
+			.map((trigger) => [trigger.vars.start, trigger.vars.end]);
+		expect(spans).toContainEqual(["top top", "bottom bottom"]);
 	});
 });

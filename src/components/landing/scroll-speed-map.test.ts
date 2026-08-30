@@ -9,6 +9,7 @@ import {
 	PACING_BUDGET,
 	speedMap,
 } from "./scroll-speed-map";
+import { EXIT_SETTLE_VH } from "./story-phases";
 import { CHAPTERS } from "./work-history-data";
 
 const viewports = Object.entries(BUDGET_VIEWPORTS);
@@ -41,6 +42,9 @@ describe("scroll speed map (FRA-187)", () => {
 				expect(row?.meanRatio, target).toBeLessThanOrEqual(
 					PACING_BUDGET.large.mean,
 				);
+				// Drift layers get the settle floor and buildSceneExit's ease, not a stretch.
+				expect(row?.spanVh, target).toBe(EXIT_SETTLE_VH);
+				expect(row?.ease, target).toBe("power1.in");
 			}
 		});
 		expect(vessels).toBe(3);

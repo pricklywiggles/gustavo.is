@@ -672,7 +672,7 @@ const LA_PANORAMA: PanoramaConfig = {
 	],
 };
 
-// The 2006-2009 Slide era's four products share one spreadsheet window, equally spaced.
+// slide.com: a whole year per product after the photo app's two; one 20M figure spans the tenure.
 export const CHAPTERS: CityChapter[] = [
 	{
 		id: "seattle",
