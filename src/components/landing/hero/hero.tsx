@@ -14,29 +14,23 @@ import { RAMP_HEX } from "@/lib/ramp";
 import { scrollScrub } from "@/lib/scroll-scrub";
 import {
 	CARRIER_VH,
+	CHARACTER_SHRINK_SCALE,
+	CONVERGENCE_PROGRESS,
+	CONVERGENCE_SPAN_VH,
+	HERO_PARALLAX,
+	HOLE_STAGES,
 	PIN_VH,
 	REVEAL_DELAY_VH,
 	REVEAL_LENGTH_VH,
 	REVEAL_TRAVEL_VH,
 	SHEET_VH,
+	SUN_CONVERGENCE_SCALE,
 	TEXT_REVEAL_VH,
 	WRAPPER_VH,
 } from "../scroll-geometry";
 import { createClipWriter, holePath } from "./hero-hole";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
-
-const PARALLAX = {
-	sky1: 0.02,
-	sky2: 0.05,
-	sky3: 0.08,
-	sun: 0.06,
-	ground1: 0.15,
-	ground2: 0.25,
-	ground3: 0.35,
-	ground4: 0.45,
-	character: 0.35, // matches ground3 so character stands on that band
-};
 
 // The tokens' exact sRGB twins (the palette was derived from this hero); hex because the
 // entrance and GSAP tweens slide plain-style backgrounds around.
@@ -70,25 +64,19 @@ const GROUND_TOPS = {
 	g4: 83.4,
 };
 
-// Scroll progress at which the ground bands have collapsed to the horizon:
-// (g4 top - horizon) / ground4 factor = 23.4 / 45, about 0.52.
-const CONVERGENCE_PROGRESS = 0.55;
-
-const SHRINK_SCALE = 0.1;
-
 // The entrance separates bands from a bunched pose (`bunchedTop`) to their tops, closest
 // edges leading (`step`); g1 never moves, it IS the line the scene grows from. Entrance
 // transforms live on INNER elements, GSAP scroll tweens on OUTER layers, never sharing one.
 const SKY_BANDS = [
 	{
-		parallax: PARALLAX.sky2,
+		parallax: HERO_PARALLAX.sky2,
 		top: SKY_TOPS.s2,
 		color: COLORS.sky2,
 		bunchedTop: 31,
 		step: 1,
 	},
 	{
-		parallax: PARALLAX.sky3,
+		parallax: HERO_PARALLAX.sky3,
 		top: SKY_TOPS.s3,
 		color: COLORS.sky3,
 		bunchedTop: 35,
@@ -98,28 +86,28 @@ const SKY_BANDS = [
 
 const GROUND_BANDS = [
 	{
-		parallax: PARALLAX.ground1,
+		parallax: HERO_PARALLAX.ground1,
 		top: GROUND_TOPS.g1,
 		color: COLORS.ground1,
 		bunchedTop: 60, // the horizon anchor: zero travel
 		step: 0,
 	},
 	{
-		parallax: PARALLAX.ground2,
+		parallax: HERO_PARALLAX.ground2,
 		top: GROUND_TOPS.g2,
 		color: COLORS.ground2,
 		bunchedTop: 62,
 		step: 0,
 	},
 	{
-		parallax: PARALLAX.ground3,
+		parallax: HERO_PARALLAX.ground3,
 		top: GROUND_TOPS.g3,
 		color: COLORS.ground3,
 		bunchedTop: 64,
 		step: 1,
 	},
 	{
-		parallax: PARALLAX.ground4,
+		parallax: HERO_PARALLAX.ground4,
 		top: GROUND_TOPS.g4,
 		color: COLORS.ground4,
 		bunchedTop: 66,
@@ -138,15 +126,6 @@ const entranceTransition = (step: number) => ({
 const SUN_ENTRANCE = { y: "155%", scale: 2 };
 // Starts while the bands still separate; the clip hides it until it crests as they land.
 const SUN_TRANSITION = { delay: 0.55, ...SUN_CREST_SPRING };
-
-// The hole's growth (scale in vh) across the reveal, durations as fractions of it: a
-// pinhole, a slow creep, then it swallows the screen.
-const HOLE_STAGES = [
-	{ s: 0.1, duration: 0.06, ease: "power2.out" },
-	{ s: 0.13, duration: 0.24, ease: "none" },
-	{ s: 0.5, duration: 0.4, ease: "power1.in" },
-	{ s: 2.6, duration: 0.3, ease: "power3.in" },
-];
 
 // Reveal progress below which the intro video is held paused at frame 0.
 const VIDEO_CUE = 0.1;
@@ -233,12 +212,12 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 
 				gsap.set(sunRef.current, { transformOrigin: "center center" });
 				gsap.to(sunRef.current, {
-					scale: 1.3,
+					scale: SUN_CONVERGENCE_SCALE,
 					ease: "none",
 					scrollTrigger: {
 						trigger: wrapperRef.current,
 						start: () => `top+=${CONVERGENCE_PROGRESS * metrics.vh} top`,
-						end: () => `+=${0.9 * metrics.vh}`,
+						end: () => `+=${CONVERGENCE_SPAN_VH * metrics.vh}`,
 						scrub,
 						invalidateOnRefresh: true,
 					},
@@ -247,12 +226,12 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 				// transformOrigin keeps feet on the ground and left edge fixed as scale drops.
 				gsap.set(characterRef.current, { transformOrigin: "bottom left" });
 				gsap.to(characterRef.current, {
-					scale: SHRINK_SCALE,
+					scale: CHARACTER_SHRINK_SCALE,
 					ease: "none",
 					scrollTrigger: {
 						trigger: wrapperRef.current,
 						start: () => `top+=${CONVERGENCE_PROGRESS * metrics.vh} top`,
-						end: () => `+=${0.9 * metrics.vh}`,
+						end: () => `+=${CONVERGENCE_SPAN_VH * metrics.vh}`,
 						scrub,
 						invalidateOnRefresh: true,
 					},
@@ -503,7 +482,7 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 							>
 								{/* Zenith base: its top edge is the viewport, so it has no entrance. */}
 								<div
-									data-parallax={PARALLAX.sky1}
+									data-parallax={HERO_PARALLAX.sky1}
 									className="absolute w-full"
 									style={{
 										top: `${SKY_TOPS.s1}%`,
@@ -545,7 +524,7 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 								>
 									<div
 										ref={sunRef}
-										data-parallax={PARALLAX.sun}
+										data-parallax={HERO_PARALLAX.sun}
 										className="absolute"
 										style={{
 											width: "min(38vw, 38vh)",
@@ -596,7 +575,7 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 								{/* Feet anchored to g3's top edge via bottom positioning. */}
 								<div
 									ref={characterRef}
-									data-parallax={PARALLAX.character}
+									data-parallax={HERO_PARALLAX.character}
 									className="absolute left-[4%]"
 									style={{ bottom: `${100 - GROUND_TOPS.g3}%` }}
 								>

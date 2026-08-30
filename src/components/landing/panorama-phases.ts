@@ -1,5 +1,12 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import {
+	bandClearanceScale,
+	curtainRisePx,
+	exitDurationVh,
+	exitOrder,
+} from "@/components/landing/panorama-geometry";
+import { EXIT_SETTLE_VH } from "@/components/landing/story-phases";
 import type {
 	PanoramaConfig,
 	VesselConfig,
@@ -8,17 +15,13 @@ import type {
 /**
  * Timeline builders for one city panorama. Scroll-driven phases write into a master
  * timeline whose seconds are viewport-heights; time-based ambience runs on its own clock.
+ * Geometry that the speed map audits lives in panorama-geometry.ts.
  */
 
 export function panoramaLayers(stage: HTMLElement): HTMLElement[] {
 	return gsap.utils.toArray<HTMLElement>(
 		stage.querySelectorAll("[data-pano-layer]"),
 	);
-}
-
-/** Scroll length of the full cascade, in viewport-heights. */
-export function cascadeLength(config: PanoramaConfig): number {
-	return config.lastStep * config.stepVh + config.durVh;
 }
 
 /** Hide every layer at its entrance offsets; vessels park off-screen. */
@@ -104,30 +107,6 @@ export function buildYearCues(
 	});
 }
 
-// Band target: a viewport fraction floored at enough rows for the stint bar. A 3:2
-// viewport reproduces the authored shift exactly; only shorter/wider ones amplify.
-const BAND_VH_FRACTION = 0.125;
-const BAND_MIN_PX = 112;
-
-/**
- * Amplifies the rising parallax so the band clears its target on short/wide viewports.
- * Solve bandTop = (vh - H)/2 + H*(1 + shift) = vh - target for shift; the ratio scales
- * the whole foreground group so relative depths (and the ferry's weld) survive.
- */
-function foregroundParallaxScale(
-	stage: HTMLElement,
-	config: PanoramaConfig,
-): number {
-	const authored = config.layers.find((l) => l.fill)?.parallax;
-	if (!authored) return 1;
-	const H = stage.offsetHeight;
-	const vh = window.innerHeight;
-	if (H <= 0 || vh <= 0) return 1;
-	const target = Math.max(BAND_MIN_PX, vh * BAND_VH_FRACTION);
-	const needed = (vh - target - (vh - H) / 2) / H - 1;
-	return Math.max(1, needed / authored);
-}
-
 /**
  * Post-landing breath: foreground rises, background sinks, sea level holds as the pivot.
  * Animated on `y`, which composes with the entrance yPercent and the vessels' xPercent.
@@ -148,7 +127,11 @@ export function buildParallaxShift(
 				y: () => {
 					const scale =
 						shift < 0 && !config.horizonLocked
-							? foregroundParallaxScale(stage, config)
+							? bandClearanceScale(
+									config,
+									stage.offsetHeight,
+									window.innerHeight,
+								)
 							: 1;
 					return stage.offsetHeight * shift * scale;
 				},
@@ -175,24 +158,10 @@ export function buildSurfaceReveal(
 	if (!config.horizonLocked) return;
 	const surface = stage.querySelector("[data-pano-surface]");
 	if (!surface) return;
-	const fillLayer = config.layers.find((l) => l.fill);
-	const restingTopPct = fillLayer
-		? parseFloat(String(fillLayer.style.top))
-		: 100;
-	const risenTopPct = restingTopPct + (fillLayer?.parallax ?? 0) * 100;
-	const curtainCeilingPct = risenTopPct + 0.4;
 	tl.to(
 		surface,
 		{
-			y: () => {
-				const H = stage.offsetHeight;
-				const vh = window.innerHeight;
-				const stageTop = (vh - H) / 2;
-				const target = Math.max(BAND_MIN_PX, vh * BAND_VH_FRACTION);
-				const maxBand = vh - (stageTop + (curtainCeilingPct / 100) * H);
-				const band = Math.min(target, Math.max(0, maxBand));
-				return vh - band - (stageTop + H);
-			},
+			y: () => curtainRisePx(config, stage.offsetHeight, window.innerHeight),
 			duration: len,
 			ease: "power1.inOut",
 			force3D: true,
@@ -201,7 +170,11 @@ export function buildSurfaceReveal(
 	);
 }
 
-/** The cascade in reverse, last-in-first-out; scrubbed, so scrolling back re-assembles. */
+/**
+ * The cascade in reverse, last-in-first-out; scrubbed, so scrolling back re-assembles.
+ * Each layer's duration is budget-derived (FRA-187): the settle floor, stretched so tall
+ * sprites like the towers never outrun the scroll.
+ */
 export function buildSceneExit(
 	tl: gsap.core.Timeline,
 	at: number,
@@ -209,13 +182,11 @@ export function buildSceneExit(
 	stage: HTMLElement,
 	config: PanoramaConfig,
 ) {
-	const settle = 0.3;
-	const spread = Math.max(len - settle, 0.01);
+	const spread = Math.max(len - EXIT_SETTLE_VH, 0.01);
 	panoramaLayers(stage).forEach((el, i) => {
-		const { step, from, origin, drift, parallax } = config.layers[i];
-		const order =
-			step !== undefined ? (config.lastStep - step) / config.lastStep : 0;
-		const exitAt = at + order * spread;
+		const layer = config.layers[i];
+		const { from, origin, drift, parallax } = layer;
+		const exitAt = at + exitOrder(config, layer) * spread;
 		// Vessels keep their sail-owned x; y: 0 unwinds the parallax shift alongside.
 		const vars: gsap.TweenVars = drift
 			? { autoAlpha: 0 }
@@ -223,7 +194,12 @@ export function buildSceneExit(
 		if (parallax) vars.y = 0;
 		tl.to(
 			el,
-			{ ...vars, duration: settle, ease: "power1.in", force3D: true },
+			{
+				...vars,
+				duration: exitDurationVh(config, layer),
+				ease: "power1.in",
+				force3D: true,
+			},
 			exitAt,
 		);
 	});
@@ -237,7 +213,7 @@ export function buildSceneExit(
 	}
 	const sun = stage.querySelector("[data-pano-sun]");
 	if (sun && config.sun) {
-		tl.to(sun, { autoAlpha: 0, duration: settle, ease: "none" }, at);
+		tl.to(sun, { autoAlpha: 0, duration: EXIT_SETTLE_VH, ease: "none" }, at);
 	}
 }
 

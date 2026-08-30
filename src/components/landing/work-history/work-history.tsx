@@ -23,14 +23,13 @@ import {
 	buildSunset,
 	buildSurfaceReveal,
 	buildYearCues,
-	cascadeLength,
 	setLayersBeforeEntrance,
 } from "@/components/landing/panorama-phases";
 import { PanoramaScene } from "@/components/landing/panorama-scene";
 import {
-	type PhaseSpec,
-	resolvePhases,
-} from "@/components/landing/scroll-phases";
+	SCRUB_VH_PER_YEAR,
+	storyPhases,
+} from "@/components/landing/story-phases";
 import {
 	CHAPTERS,
 	type CityChapter,
@@ -49,64 +48,6 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 // Line 1 of the quote leads in while the section is still scrolling into view.
 const LINE1_LEAD_VH = 0.5;
-const SCRUB_VH_PER_YEAR = 0.5;
-// The two chapter-transition beats overlap so the departure reads as one gesture.
-const HUD_OUT_VH = 0.5;
-const SCENE_OUT_VH = 1.2;
-
-export function storyPhases(story: CityChapter[]) {
-	const specs: PhaseSpec[] = [
-		// Anchored, not sequential: no equation beat waits on the previous one.
-		{ id: "line1", len: 0.5 },
-		{ id: "line2", len: 0.5, with: "line1", offset: 0 },
-		{ id: "rule", len: 0.3, with: "line1", offset: 0.35 },
-		{ id: "line3", len: 0.5, with: "rule", offset: 0.2 },
-		{ id: "ink", len: 0.25 },
-		{ id: "hold", len: 0.3 },
-	];
-	story.forEach((chapter, i) => {
-		const pano = chapter.panorama;
-		specs.push({ id: `panorama-in@${i}`, len: cascadeLength(pano) });
-		if (i === 0) {
-			specs.push({ id: "quote-exit", len: 0.5, with: "panorama-in@0" });
-			// Far slower than the operands' exit: the word hangs before the rush at the viewer.
-			specs.push({ id: "result-exit", len: 1.4, with: "panorama-in@0" });
-		}
-		// Starts while the last cascade layer is still landing: the cascade's own overlap rhythm.
-		specs.push({
-			id: `parallax@${i}`,
-			len: 0.5,
-			with: `panorama-in@${i}`,
-			offset: pano.lastStep * pano.stepVh + pano.durVh / 2,
-		});
-		specs.push({ id: `year-in@${i}`, len: 0.45 });
-		specs.push({ id: `year-dock@${i}`, len: 0.6 });
-		specs.push({
-			id: `hud-in@${i}`,
-			len: 0.55,
-			with: `year-dock@${i}`,
-			offset: 0.3,
-		});
-		specs.push({
-			id: `scrub@${i}`,
-			len: (chapter.span[1] - chapter.span[0]) * SCRUB_VH_PER_YEAR,
-		});
-		if (i < story.length - 1) {
-			specs.push({ id: `hud-out@${i}`, len: HUD_OUT_VH });
-			specs.push({
-				id: `scene-out@${i}`,
-				len: SCENE_OUT_VH,
-				with: `hud-out@${i}`,
-				offset: 0.25,
-			});
-		} else {
-			specs.push({ id: "outro-close", len: 0.7 });
-			specs.push({ id: "outro-dusk", len: 2.4 });
-			specs.push({ id: "tail", len: 0.4 });
-		}
-	});
-	return resolvePhases(specs);
-}
 
 // Near full-bleed: the year is the whole frame when a city opens.
 const YEAR_HERO_WIDTH = 0.85;

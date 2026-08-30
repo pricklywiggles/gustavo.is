@@ -5,6 +5,12 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { domMax, LazyMotion } from "motion/react";
 import { useEffect, useRef } from "react";
+import {
+	VISTA_CLOUD_PLANES,
+	VISTA_HORIZON_SCALE,
+	VISTA_SUN_TRAVEL,
+	VISTA_TRAVEL,
+} from "@/components/landing/landfall-geometry";
 import { SayHelloButton } from "@/components/landing/say-hello-button";
 import {
 	ContactDialog,
@@ -31,17 +37,6 @@ const LANDFALL_MORPH_ID = "landfall-hello-morph";
  * measured start past the scrollable range. Module scope keeps the identity stable. */
 const nearPageEnd = () =>
 	ScrollTrigger.maxScroll(window) - window.innerHeight * 0.45;
-
-/** "high" reads nearest and travels most, but every plane stays below the cliff's 14vh so
- * no sky layer outruns the rock; `to` doubles as the CSS rest pose. */
-const CLOUD_PLANES = {
-	low: { from: "2vh", to: "-2.5vh" },
-	mid: { from: "3.5vh", to: "-5vh" },
-	high: { from: "5vh", to: "-7vh" },
-} as const;
-
-/** The sun is the most distant object: the smallest travel of all. */
-const SUN_TRAVEL = { from: "1.5vh", to: "-1vh" } as const;
 
 /** Rendered back to front; sway timings are distinct and mixed-direction on purpose.
  * Every mobileBox class must carry the max-sm: prefix (Tailwind only generates classes it
@@ -162,27 +157,36 @@ export function LandfallVista() {
 				// side edges never pull into view; bottom origin keeps bases on the horizon.
 				entryTl.fromTo(
 					"[data-vista-horizon]",
-					{ y: "-6vh", scale: 1, transformOrigin: "50% 100%" },
-					{ y: "0vh", scale: 1.3 },
+					{
+						y: `${VISTA_TRAVEL.horizon.from}vh`,
+						scale: 1,
+						transformOrigin: "50% 100%",
+					},
+					{ y: `${VISTA_TRAVEL.horizon.to}vh`, scale: VISTA_HORIZON_SCALE },
 					0,
 				);
-				entryTl.fromTo("[data-vista-sea]", { y: "-3.5vh" }, { y: "0vh" }, 0);
 				entryTl.fromTo(
 					"[data-vista-sun]",
-					{ y: SUN_TRAVEL.from },
-					{ y: SUN_TRAVEL.to },
+					{ y: `${VISTA_SUN_TRAVEL.from}vh` },
+					{ y: `${VISTA_SUN_TRAVEL.to}vh` },
 					0,
 				);
-				for (const [plane, travel] of Object.entries(CLOUD_PLANES)) {
+				for (const [plane, travel] of Object.entries(VISTA_CLOUD_PLANES)) {
 					entryTl.fromTo(
 						`[data-vista-cloud="${plane}"]`,
-						{ y: travel.from },
-						{ y: travel.to },
+						{ y: `${travel.from}vh` },
+						{ y: `${travel.to}vh` },
 						0,
 					);
 				}
-				entryTl.fromTo("[data-vista-cliff]", { y: "14vh" }, { y: "0vh" }, 0);
-				entryTl.fromTo("[data-vista-ground]", { y: "20vh" }, { y: "0vh" }, 0);
+				for (const plane of ["sea", "cliff", "ground"] as const) {
+					entryTl.fromTo(
+						`[data-vista-${plane}]`,
+						{ y: `${VISTA_TRAVEL[plane].from}vh` },
+						{ y: `${VISTA_TRAVEL[plane].to}vh` },
+						0,
+					);
+				}
 				// Opacity only and one-way: a visibility toggle would drop the CTA from the
 				// tab order, and a reversing reveal can hide a focused button.
 				gsap.fromTo(
@@ -231,7 +235,7 @@ export function LandfallVista() {
 					data-vista-sun
 					className="absolute top-[10%] left-[62%] size-[clamp(70px,9vw,130px)] rounded-full bg-noon-sun"
 					style={{
-						transform: `translateY(${SUN_TRAVEL.to})`,
+						transform: `translateY(${VISTA_SUN_TRAVEL.to}vh)`,
 						boxShadow:
 							"0 0 6vh 2vh color-mix(in oklab, var(--color-noon-sun) 55%, transparent)",
 					}}
@@ -322,7 +326,7 @@ export function LandfallVista() {
 						data-vista-cloud={cloud.plane}
 						className={`absolute ${cloud.box} ${cloud.mobileBox}`}
 						style={{
-							transform: `translateY(${CLOUD_PLANES[cloud.plane].to})`,
+							transform: `translateY(${VISTA_CLOUD_PLANES[cloud.plane].to}vh)`,
 						}}
 					>
 						{/* biome-ignore lint/performance/noImgElement: transform-animated scene actor; next/image adds nothing here */}

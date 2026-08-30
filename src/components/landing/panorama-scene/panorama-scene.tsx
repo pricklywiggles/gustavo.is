@@ -1,6 +1,11 @@
 "use client";
 
 import { type CSSProperties, memo, type Ref } from "react";
+import {
+	PANO_W_VH,
+	PANO_W_VW,
+	stageAspect,
+} from "@/components/landing/panorama-geometry";
 import type {
 	MobilePlacement,
 	PanoramaConfig,
@@ -11,16 +16,8 @@ import type {
  * CSS-gated (custom properties behind max-sm: classes): no JS observes the breakpoint.
  */
 
-/** Width over height of the stage, for converting width-% into height-%. */
-function stageAspect(config: PanoramaConfig): number {
-	const [w, h] = config.aspect.split("/").map((n) => Number.parseFloat(n));
-	return w > 0 && h > 0 ? w / h : 1.5;
-}
-
-// One numeric source for the cover-fit width: every derived expression is generated from
-// these two numbers, so they cannot drift apart.
-const PANO_W_VW = 100;
-const PANO_W_VH = 150;
+// The cover-fit width; panorama-geometry owns the two numbers so the pacing math and
+// the CSS cannot drift apart.
 const PANO_W = `max(${PANO_W_VW}vw, ${PANO_W_VH}vh)`;
 // Additive-only calc (pre-halved values) fits the oldest calc() grammar browsers support.
 const PANO_LEFT_CENTERED = `calc(50% - max(${PANO_W_VW / 2}vw, ${PANO_W_VH / 2}vh))`;
