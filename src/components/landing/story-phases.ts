@@ -1,4 +1,4 @@
-import { type PhaseSpec, resolvePhases } from "./scroll-phases";
+import { type PhaseMap, type PhaseSpec, resolvePhases } from "./scroll-phases";
 import type { CityChapter, PanoramaConfig } from "./work-history-data";
 
 /**
@@ -28,6 +28,22 @@ export const PACING_BUDGET = {
 /** Scroll length of the full cascade, in viewport-heights. */
 export function cascadeLength(config: PanoramaConfig): number {
 	return config.lastStep * config.stepVh + config.durVh;
+}
+
+/**
+ * The span a chapter's ambience is on stage: its cascade's start to the end of its
+ * scene-out, or of outro-dusk for the last chapter (the veil is opaque by then).
+ */
+export function stageWindow(
+	phase: PhaseMap,
+	i: number,
+	chapters: number,
+): { start: number; end: number } {
+	const exit = i < chapters - 1 ? `scene-out@${i}` : "outro-dusk";
+	return {
+		start: phase.at[`panorama-in@${i}`],
+		end: phase.at[exit] + phase.len[exit],
+	};
 }
 
 export function storyPhases(story: CityChapter[]) {

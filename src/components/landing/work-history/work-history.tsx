@@ -28,6 +28,7 @@ import {
 import { PanoramaScene } from "@/components/landing/panorama-scene";
 import {
 	SCRUB_VH_PER_YEAR,
+	stageWindow,
 	storyPhases,
 } from "@/components/landing/story-phases";
 import {
@@ -656,8 +657,8 @@ export function WorkHistorySection() {
 						);
 					}
 
-					attachCloudSway(stage, pano);
-					const vesselCleanup = attachVessels({
+					const sway = attachCloudSway(stage, pano);
+					const vessels = attachVessels({
 						stage,
 						config: pano,
 						cueScrollY: (vessel) => () =>
@@ -665,7 +666,31 @@ export function WorkHistorySection() {
 							sectionHeight() *
 								(cascadeAt + vessel.cueStep * pano.stepVh + pano.durVh),
 					});
-					if (vesselCleanup) cleanups.push(vesselCleanup);
+					cleanups.push(vessels.cleanup);
+					// The scrubbed master cannot stop clock-driven tweens, so a window trigger
+					// does. Boundary callbacks, never onToggle: a one-frame skip across the window
+					// fires enter then leave with no toggle and must still end paused; onRefresh
+					// re-syncs after a refresh replays the vessel cue for a load mid-chapter.
+					const onStage = stageWindow(phase, i, story.length);
+					const syncAmbience = (self: ScrollTrigger) => {
+						if (self.isActive) {
+							sway.resume();
+							vessels.resume();
+						} else {
+							sway.pause();
+							vessels.pause();
+						}
+					};
+					ScrollTrigger.create({
+						id: `ambience@${i}`,
+						start: () => sectionTop() + sectionHeight() * onStage.start,
+						end: () => sectionTop() + sectionHeight() * onStage.end,
+						onEnter: syncAmbience,
+						onEnterBack: syncAmbience,
+						onLeave: syncAmbience,
+						onLeaveBack: syncAmbience,
+						onRefresh: syncAmbience,
+					});
 				});
 
 				// The scrubs own the readouts now, so chapter 0's HUD arrives at its opening total.

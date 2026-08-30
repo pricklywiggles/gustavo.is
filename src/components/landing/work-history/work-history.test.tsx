@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { spyEmptyTimelines } from "@/test/empty-timelines";
-import { storyPhases } from "../story-phases";
+import { stageWindow, storyPhases } from "../story-phases";
 import { CHAPTERS } from "../work-history-data";
 import { WorkHistorySection } from "./work-history";
 
@@ -46,6 +47,44 @@ describe("WorkHistorySection", () => {
 		}
 	});
 
+	// FRA-188: each chapter's ambience sleeps off stage; the trigger spans its window.
+	it("spans each ambience trigger over its chapter's stage window", () => {
+		const original = window.matchMedia;
+		window.matchMedia = ((query: string) => ({
+			...original(query),
+			matches: query === "(prefers-reduced-motion: no-preference)",
+		})) as typeof window.matchMedia;
+		spyEmptyTimelines();
+		const heightDescriptor = Object.getOwnPropertyDescriptor(
+			HTMLElement.prototype,
+			"offsetHeight",
+		);
+		Object.defineProperty(HTMLElement.prototype, "offsetHeight", {
+			configurable: true,
+			get: () => 1000,
+		});
+		let unmount = () => {};
+		try {
+			({ unmount } = render(<WorkHistorySection />));
+			const trigger = ScrollTrigger.getById("ambience@0");
+			if (!trigger) throw new Error("no ambience trigger");
+			const phase = storyPhases(CHAPTERS);
+			const onStage = stageWindow(phase, 0, CHAPTERS.length);
+			expect((trigger.vars.start as () => number)()).toBe(1000 * onStage.start);
+			expect((trigger.vars.end as () => number)()).toBe(1000 * onStage.end);
+		} finally {
+			unmount();
+			if (heightDescriptor) {
+				Object.defineProperty(
+					HTMLElement.prototype,
+					"offsetHeight",
+					heightDescriptor,
+				);
+			}
+			window.matchMedia = original;
+		}
+	});
+
 	it("renders the equation terms and the rule, with no attribution", () => {
 		const { container } = render(<WorkHistorySection />);
 		const quote = container.querySelector("blockquote");
@@ -73,6 +112,23 @@ describe("WorkHistorySection", () => {
 		};
 		opensDuring("rule", "line1");
 		opensDuring("line3", "rule");
+	});
+
+	// FRA-188: the ambience windows tile the story with no gap or overlap.
+	it("bounds each ambience window from its cascade to its exit, abutting", () => {
+		const phase = storyPhases(CHAPTERS);
+		for (const i of [0, 1]) {
+			const { start, end } = stageWindow(phase, i, CHAPTERS.length);
+			expect(start).toBe(phase.at[`panorama-in@${i}`]);
+			expect(end).toBe(
+				phase.at[`scene-out@${i}`] + phase.len[`scene-out@${i}`],
+			);
+			// Exactly: resolvePhases starts the next cascade at this exit's end.
+			expect(end).toBe(phase.at[`panorama-in@${i + 1}`]);
+		}
+		const last = stageWindow(phase, CHAPTERS.length - 1, CHAPTERS.length);
+		expect(last.start).toBe(phase.at[`panorama-in@${CHAPTERS.length - 1}`]);
+		expect(last.end).toBe(phase.at["outro-dusk"] + phase.len["outro-dusk"]);
 	});
 
 	it("renders every chapter's panorama layers in z-order", () => {
