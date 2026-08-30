@@ -4,6 +4,7 @@ import { AnimatePresence, domAnimation, LazyMotion, m } from "motion/react";
 import { useEffect, useRef } from "react";
 import { CurtainLink } from "@/components/curtain-link";
 import { BELOW_MD, useMediaQuery } from "@/components/use-media-query";
+import { useMounted } from "@/components/use-mounted";
 import { useReducedMotionLive } from "@/components/use-reduced-motion-live";
 import { cta } from "@/lib/cta";
 import type { Project } from "../projects-data";
@@ -25,6 +26,125 @@ function LinkArrow() {
 	);
 }
 
+const headingClass =
+	"font-display text-[clamp(1.75rem,2.6vw,2.5rem)] text-pale-dune";
+
+/**
+ * One project's panel body. `measure` renders a height-only copy: the same boxes with
+ * no heading, no image, and nothing focusable, for the tallest-project cell below.
+ */
+function ProjectPanel({
+	project,
+	measure = false,
+}: {
+	project: Project;
+	measure?: boolean;
+}) {
+	return (
+		<>
+			<div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+				{measure ? (
+					<p className={headingClass}>{project.name}</p>
+				) : (
+					<h3 className={headingClass}>{project.name}</h3>
+				)}
+				{project.tech && (
+					<span className="rounded-full border border-pale-dune/25 px-3 py-1 text-[0.8125rem] text-pale-dune/75">
+						{project.tech}
+					</span>
+				)}
+			</div>
+
+			{/* Shaped to the asset's own ratio so it fills edge-to-edge; the height
+			    cap keeps any ratio inside the locked panel. */}
+			<div
+				className="relative mt-6 w-full overflow-hidden rounded-xl border border-pale-dune/15 bg-white/[0.03]"
+				style={{
+					aspectRatio: project.imageRatio ?? 1.6,
+					maxWidth: `min(100%, ${40 * (project.imageRatio ?? 1.6)}vh)`,
+				}}
+			>
+				{/* Glyph and screenshot are absolute and add no height, so a measure copy
+				    skips them: six eager image loads would buy nothing. */}
+				{!measure && (
+					<div className="absolute inset-0 grid place-items-center">
+						<span
+							aria-hidden="true"
+							className="font-display text-[clamp(4rem,8vw,7rem)] text-pale-dune/10"
+						>
+							{project.name[0]}
+						</span>
+					</div>
+				)}
+				{!measure && project.image && (
+					// biome-ignore lint/performance/noImgElement: runtime-swapped screenshot with onError degradation to the standby frame; next/image adds nothing here
+					<img
+						src={project.image}
+						alt={`Screenshot of ${project.name}`}
+						className="absolute inset-0 size-full bg-dusk-ink object-contain"
+						style={
+							project.imageBg ? { backgroundColor: project.imageBg } : undefined
+						}
+						onError={(event) => {
+							event.currentTarget.style.display = "none";
+						}}
+					/>
+				)}
+			</div>
+
+			<p className="mt-5 max-w-[58ch] text-base leading-[1.65] text-pale-dune/85">
+				{project.description}
+			</p>
+
+			{project.links.length > 0 && (
+				<div className="mt-6 flex flex-wrap gap-3">
+					{project.links.map((link, li) => {
+						const style = `${cta({ variant: li === 0 ? "solid" : "outline", tone: "dark" })} ${
+							li === 0
+								? "bg-pale-dune text-dusk-ink hover:bg-noon-sun"
+								: "border-pale-dune/40 text-pale-dune hover:bg-pale-dune/10"
+						}`;
+						if (measure) {
+							return (
+								<span key={link.label} className={style}>
+									{link.label}
+									<LinkArrow />
+								</span>
+							);
+						}
+						// The retrospectives open behind CurtainLink's blinds.
+						if (link.url?.startsWith("/")) {
+							return (
+								<CurtainLink key={link.label} href={link.url} className={style}>
+									{link.label}
+									<LinkArrow />
+								</CurtainLink>
+							);
+						}
+						return link.url ? (
+							<a
+								key={link.label}
+								href={link.url}
+								target="_blank"
+								rel="noopener noreferrer"
+								className={style}
+							>
+								{link.label}
+								<LinkArrow />
+							</a>
+						) : (
+							<button key={link.label} type="button" disabled className={style}>
+								{link.label}
+								<LinkArrow />
+							</button>
+						);
+					})}
+				</div>
+			)}
+		</>
+	);
+}
+
 /**
  * Purely presentational: the section drives selection from scroll and the rail via the
  * [data-rail-fill] / [data-rail-tip] hooks (the work-history HUD convention).
@@ -40,6 +160,7 @@ export function ProjectShowcase({
 	onSelect?: (index: number) => void;
 }) {
 	const reduced = useReducedMotionLive();
+	const mounted = useMounted();
 	const active = projects[activeIndex] ?? projects[0];
 
 	// Layout-specific transition: a vertical rise beside the manifest on desktop, a
@@ -104,11 +225,12 @@ export function ProjectShowcase({
 				</ul>
 			</div>
 
-			<div className="min-w-0 flex-1 md:min-h-[min(32rem,85vh)]">
+			<div className="grid min-w-0 flex-1 items-start md:min-h-[min(32rem,85vh)]">
 				<LazyMotion features={domAnimation}>
 					<AnimatePresence mode="wait" initial={false} custom={direction}>
 						<m.article
 							key={active.name}
+							className="col-start-1 row-start-1"
 							custom={direction}
 							variants={variants}
 							initial="enter"
@@ -119,105 +241,26 @@ export function ProjectShowcase({
 								ease: [0.19, 1, 0.22, 1],
 							}}
 						>
-							<div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-								<h3 className="font-display text-[clamp(1.75rem,2.6vw,2.5rem)] text-pale-dune">
-									{active.name}
-								</h3>
-								{active.tech && (
-									<span className="rounded-full border border-pale-dune/25 px-3 py-1 text-[0.8125rem] text-pale-dune/75">
-										{active.tech}
-									</span>
-								)}
-							</div>
-
-							{/* Shaped to the asset's own ratio so it fills edge-to-edge; the height
-							    cap keeps any ratio inside the locked panel. */}
-							<div
-								className="relative mt-6 w-full overflow-hidden rounded-xl border border-pale-dune/15 bg-white/[0.03]"
-								style={{
-									aspectRatio: active.imageRatio ?? 1.6,
-									maxWidth: `min(100%, ${40 * (active.imageRatio ?? 1.6)}vh)`,
-								}}
-							>
-								<div className="absolute inset-0 grid place-items-center">
-									<span
-										aria-hidden="true"
-										className="font-display text-[clamp(4rem,8vw,7rem)] text-pale-dune/10"
-									>
-										{active.name[0]}
-									</span>
-								</div>
-								{active.image && (
-									// biome-ignore lint/performance/noImgElement: runtime-swapped screenshot with onError degradation to the standby frame; next/image adds nothing here
-									<img
-										src={active.image}
-										alt={`Screenshot of ${active.name}`}
-										className="absolute inset-0 size-full bg-dusk-ink object-contain"
-										style={
-											active.imageBg
-												? { backgroundColor: active.imageBg }
-												: undefined
-										}
-										onError={(event) => {
-											event.currentTarget.style.display = "none";
-										}}
-									/>
-								)}
-							</div>
-
-							<p className="mt-5 max-w-[58ch] text-base leading-[1.65] text-pale-dune/85">
-								{active.description}
-							</p>
-
-							{active.links.length > 0 && (
-								<div className="mt-6 flex flex-wrap gap-3">
-									{active.links.map((link, li) => {
-										const style = `${cta({ variant: li === 0 ? "solid" : "outline", tone: "dark" })} ${
-											li === 0
-												? "bg-pale-dune text-dusk-ink hover:bg-noon-sun"
-												: "border-pale-dune/40 text-pale-dune hover:bg-pale-dune/10"
-										}`;
-										// The retrospectives open behind CurtainLink's blinds.
-										if (link.url?.startsWith("/")) {
-											return (
-												<CurtainLink
-													key={link.label}
-													href={link.url}
-													className={style}
-												>
-													{link.label}
-													<LinkArrow />
-												</CurtainLink>
-											);
-										}
-										return link.url ? (
-											<a
-												key={link.label}
-												href={link.url}
-												target="_blank"
-												rel="noopener noreferrer"
-												className={style}
-											>
-												{link.label}
-												<LinkArrow />
-											</a>
-										) : (
-											<button
-												key={link.label}
-												type="button"
-												disabled
-												className={style}
-											>
-												{link.label}
-												<LinkArrow />
-											</button>
-										);
-									})}
-								</div>
-							)}
+							<ProjectPanel project={active} />
 						</m.article>
 					</AnimatePresence>
 				</LazyMotion>
+				{/* Client-only so the server HTML carries each description once (invariant 13); the
+				    invisible stack sizes the cell to the tallest project so switches never jump.
+				    md:hidden by measurement: at 844x390 the tallest cell would push every heading
+				    above the fold (landing README, "Projects showcase panel"). */}
+				{mounted &&
+					projects.map((project) => (
+						<div
+							key={project.name}
+							data-project-measure
+							aria-hidden="true"
+							inert
+							className="invisible col-start-1 row-start-1 md:hidden"
+						>
+							<ProjectPanel project={project} measure />
+						</div>
+					))}
 			</div>
 		</div>
 	);

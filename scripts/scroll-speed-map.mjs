@@ -13,6 +13,7 @@ const {
 	budgetViolations,
 	buildSpans,
 	exitWindows,
+	showcaseSpan,
 	speedMap,
 } = await import("../src/components/landing/scroll-speed-map.ts");
 
@@ -52,7 +53,15 @@ for (const [name, viewport] of Object.entries(BUDGET_VIEWPORTS)) {
 }
 if (json) {
 	console.log(
-		JSON.stringify({ ...output, exitWindows: exitWindows() }, null, 1),
+		JSON.stringify(
+			{
+				...output,
+				exitWindows: exitWindows(),
+				showcase: showcaseSpan(BUDGET_VIEWPORTS.phone),
+			},
+			null,
+			1,
+		),
 	);
 } else {
 	console.log(
@@ -62,6 +71,10 @@ if (json) {
 		console.log(
 			`  ${b.chapter}: ${fmt(b.spanVh)} vh, ${fmt(b.flicks)} flicks, ${b.secondsBrowse.toFixed(1)}s / ${b.secondsSkim.toFixed(1)}s`,
 		);
+	const s = showcaseSpan(BUDGET_VIEWPORTS.phone);
+	console.log(
+		`\nprojects showcase on the phone, per project: ${fmt(s.spanVh)} vh, ${fmt(s.flicks)} flicks, ${s.secondsBrowse.toFixed(1)}s / ${s.secondsSkim.toFixed(1)}s`,
+	);
 	console.log("\nexit windows (last layer's end vs SCENE_OUT_VH):");
 	for (const w of exitWindows())
 		console.log(`  ${w.chapter}: ${fmt(w.endVh)} / ${fmt(w.lenVh)}`);

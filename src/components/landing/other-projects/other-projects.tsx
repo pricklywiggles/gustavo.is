@@ -15,7 +15,8 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 /**
  * The warp opener plus the locked showcase over one sticky starfield stage; completing
- * the seed scrub locks the page while the theater plays, then 100vh of scrub per project.
+ * the seed scrub locks the page while the theater plays, then PROJECT_SCRUB_VH_PER_PROJECT
+ * viewports of scrub per project.
  */
 export function OtherProjectsSection() {
 	const wrapper = useRef<HTMLElement>(null);
@@ -263,7 +264,12 @@ export function OtherProjectsSection() {
 			{/* Parks the showcase a quarter viewport past the fold at the lock, then a breath of
 			    settled sky; reduced motion has no lock, so the headline hands straight to the showcase. */}
 			<div aria-hidden="true" className="h-[225vh] motion-reduce:h-0" />
-			<div data-projects-scrub className="relative h-[700vh]">
+			{/* Motion height stays (projectsScrubVh() + 1) * 100vh; the still edition keeps
+			    one viewport per project (FRA-189). A test pins both literals. */}
+			<div
+				data-projects-scrub
+				className="relative h-[1300vh] motion-reduce:h-[700vh]"
+			>
 				{/* z-30 stays above the landfall stage crossfading in over this section's
 				    tail (landing README, invariant 11). */}
 				<div
