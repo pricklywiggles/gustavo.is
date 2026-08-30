@@ -28,7 +28,10 @@ import {
 	stageWidthPx,
 	type Viewport,
 } from "./panorama-geometry";
-import { projectsScrubVh } from "./projects-geometry";
+import {
+	PROJECT_SCRUB_VH_PER_PROJECT,
+	projectsScrubVh,
+} from "./projects-geometry";
 import {
 	CHARACTER_SHRINK_SCALE,
 	CONVERGENCE_SPAN_VH,
@@ -565,7 +568,7 @@ function projectsRows(): Rated[] {
 			travelVh: null,
 			spanVh: projectsScrubVh(),
 			ease: "none",
-			note: "index progression, one viewport per project; the rail fills its own box",
+			note: "index progression, two viewports per project; the rail fills its own box",
 		}),
 	];
 }
@@ -604,6 +607,12 @@ export function buildSpans(viewport: Viewport) {
 		const spanVh = phase.len[`panorama-in@${i}`];
 		return { chapter: chapter.id, spanVh, ...gesture(spanVh, viewport) };
 	});
+}
+
+/** One project's beat: the reader must be able to land on each one from a flick. */
+export function showcaseSpan(viewport: Viewport) {
+	const spanVh = PROJECT_SCRUB_VH_PER_PROJECT;
+	return { spanVh, ...gesture(spanVh, viewport) };
 }
 
 /** Rows whose class carries a cap and that exceed it. */

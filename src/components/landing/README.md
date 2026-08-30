@@ -109,9 +109,14 @@ Bullets name the file.
     landfall section pulls itself up 200vh so its stage pins while the
     projects stage is still pinned, dissolves its sky over the canvas
     during the `fade` phase, and holds while the showcase (z-30, painted
-    above the incoming stage) alone rides off. Change the projects
-    section's spacers and you must re-derive the -mt and the fade/hold
-    phase lengths together (see LandfallSection's overlap contract).
+    above the incoming stage) alone rides off. The contract anchors on
+    the projects section's BOTTOM edge: the sticky stage and the
+    showcase (the scrub is the section's last child) both release
+    exactly 100vh before it, so neither the scrub's length nor the
+    spacer enters the -mt/fade/hold arithmetic (FRA-189 grew the scrub
+    700vh to 1300vh and nothing moved). Only content added after the
+    scrub, or a change to the trailing 100vh ride-off, forces
+    re-deriving them together (see LandfallSection's overlap contract).
 12. Load-time entrances (the hero's band/sun choreography) must not start
     until frames render steadily: animation clocks run on real time, and
     the post-hydration task storm (GSAP timeline builds, first
@@ -262,6 +267,28 @@ mount, so there is nothing to hydrate or refresh on a viewport flip.
   tuned. Retune phones by editing mobileBox only; a test guards the
   max-sm: prefixes.
 
+## Projects showcase panel (FRA-189)
+
+Below md the showcase panel is a grid cell: the live article and six
+client-only measuring copies (`[data-project-measure]`, one per project,
+mounted behind `useMounted()` so the server HTML carries each
+description exactly once, invariant 13) stack on `col-start-1
+row-start-1`. The cell takes the tallest project's height at the current
+width, the sticky wrapper's `items-center` centers that constant block,
+and the content top-aligns inside it, so a project switch moves nothing.
+The copies carry the real description because on a phone it is the
+dominant height term (at 390 wide, Hone's panel is 378px against Ship
+it's 526px, and the image boxes converge anyway: the `40 * ratio vh`
+width cap makes every box 40vh tall once it binds). They render no
+heading, no `img` (screenshot and standby glyph are absolute and add no
+height), and nothing focusable, just spans in the same `cta()` classes;
+each copy matched its live panel's height to 0.01px from 1440x900 down
+to 360x780. The stack is `md:hidden` by measurement: at 844x390 the
+tallest cell is 416px against a 390px viewport, which would push every
+project's heading 13px above the fold, so md and up keeps today's
+per-project heights, where the `min(32rem,85vh)` floor absorbs most of
+the variation.
+
 ## Panorama assets: canvas scale and masters (FRA-186)
 
 Each city's layers are exported from one canvas and positioned as
@@ -355,6 +382,22 @@ viewport (2.6x).
   in hard flicks and in seconds at 1,500 and 3,000 px/s (`gesture()`),
   and the test holds every city's build (`buildSpans()`) at one flick or
   more on the phone.
+- The projects showcase: `PROJECT_SCRUB_VH_PER_PROJECT`
+  (`projects-geometry.ts`) gives each project 2 viewports, a must-see
+  beat (0.63 hard flicks on the phone, was 0.31: a hard flick now
+  advances at most two indices and skips at most one project). The
+  scrub box is the literal `h-[1300vh] motion-reduce:h-[700vh]` in
+  `other-projects.tsx`; `other-projects.test.tsx` pins both literals to
+  the constant, and `showcaseSpan()` reports the beat in the map, the
+  runner (`--json` carries it under `showcase`), and the budget test.
+  Changing the constant means changing the literal, that test, the
+  MotionAnchor fractions and the `no-preference` probe height
+  (16.25vh), never the landfall contract (invariant 11); the still
+  edition stays at one viewport per project by decision. A resize
+  preserves the scrub anchor's normalized progress, so the same project
+  stays on screen; a reduced-motion flip preserves the pixel offset,
+  so dropping the 225vh spacer can land on a different project, today
+  as before.
 - Rules: pacing changes go into spans (`len`), poses (`from`) and slot
   offsets, never layer positions (template matching). Every changed `len`
   changes the section's pin length (invariant 1), the landfall height
@@ -388,8 +431,11 @@ HTML is one DOM shape for both.
   and the overlay's track drops its `motion-safe:` offset and height to
   sit at the section's top with zero stick (the seed scrub's two-viewport
   entry read as two empty screens before the headline). The headline
-  screen hands straight to the showcase, whose 700vh scrub still pins one
-  project per viewport.
+  screen hands straight to the showcase, which keeps the 700vh scrub
+  (`motion-reduce:h-[700vh]`), one project per viewport, by decision: a
+  still layout has no flick to survive, and the shorter page is kept for
+  reduced-motion readers. The motion edition's 1300vh scrub pins each
+  project for `PROJECT_SCRUB_VH_PER_PROJECT` viewports instead.
 - Work history: the section is `h-auto`. After the equation screen each
   `PanoramaScene` is one in-flow screen (`motion-reduce:relative
   motion-reduce:h-screen`; layers at their authored rest are the finished
@@ -454,8 +500,8 @@ screen and the vista at its bottom (2px tuck); `[role="dialog"]` detached
 within a couple of frames after Escape; the still still on screen after a
 mid-still viewport resize; the landfall CTA heading at the same viewport y
 across a flip to motion and back. Run the `no-preference` control too:
-track 4.4vh, descent 11.5vh, ledgers and still `display: none`, rulers
-tall.
+track 4.4vh, descent 11.5vh, the projects section 16.25vh, ledgers and
+still `display: none`, rulers tall.
 
 ## The users counter
 
