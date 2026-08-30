@@ -110,6 +110,7 @@ export function buildYearCues(
 /**
  * Post-landing breath: foreground rises, background sinks, sea level holds as the pivot.
  * Animated on `y`, which composes with the entrance yPercent and the vessels' xPercent.
+ * `viewportHeight` is the section's CSS viewport (its h-screen box), never innerHeight.
  */
 export function buildParallaxShift(
 	tl: gsap.core.Timeline,
@@ -117,6 +118,7 @@ export function buildParallaxShift(
 	len: number,
 	stage: HTMLElement,
 	config: PanoramaConfig,
+	viewportHeight: () => number,
 ) {
 	panoramaLayers(stage).forEach((el, i) => {
 		const shift = config.layers[i].parallax;
@@ -127,11 +129,7 @@ export function buildParallaxShift(
 				y: () => {
 					const scale =
 						shift < 0 && !config.horizonLocked
-							? bandClearanceScale(
-									config,
-									stage.offsetHeight,
-									window.innerHeight,
-								)
+							? bandClearanceScale(config, stage.offsetHeight, viewportHeight())
 							: 1;
 					return stage.offsetHeight * shift * scale;
 				},
@@ -154,6 +152,7 @@ export function buildSurfaceReveal(
 	len: number,
 	stage: HTMLElement,
 	config: PanoramaConfig,
+	viewportHeight: () => number,
 ) {
 	if (!config.horizonLocked) return;
 	const surface = stage.querySelector("[data-pano-surface]");
@@ -161,7 +160,7 @@ export function buildSurfaceReveal(
 	tl.to(
 		surface,
 		{
-			y: () => curtainRisePx(config, stage.offsetHeight, window.innerHeight),
+			y: () => curtainRisePx(config, stage.offsetHeight, viewportHeight()),
 			duration: len,
 			ease: "power1.inOut",
 			force3D: true,

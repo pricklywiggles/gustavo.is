@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { employmentHistory } from "@/lib/career";
 import {
 	CHAPTERS,
 	carriedUsersBefore,
@@ -16,11 +17,12 @@ describe("stintIndexAt", () => {
 		expect(stintIndexAt(seattle, 1900)).toBe(0);
 	});
 
-	it("switches exactly on a sub-year boundary", () => {
-		// The four Slide products split 2006-2009 into equal quarters.
+	it("switches exactly on a stint's first year", () => {
+		// Six slide.com products, one per whole year after the photo app's two.
+		expect(sanFrancisco[1].product).toBe("Top Friends");
 		expect(sanFrancisco[2].product).toBe("SuperPoke");
-		expect(stintIndexAt(sanFrancisco, 2006.7)).toBe(1);
-		expect(stintIndexAt(sanFrancisco, 2006.75)).toBe(2);
+		expect(stintIndexAt(sanFrancisco, 2007.99)).toBe(1);
+		expect(stintIndexAt(sanFrancisco, 2008)).toBe(2);
 	});
 
 	it("holds the previous stint across a gap between jobs", () => {
@@ -104,5 +106,32 @@ describe("CHAPTERS invariants", () => {
 				);
 			}
 		}
+	});
+});
+
+describe("slide.com years (FRA-190)", () => {
+	it("gives each product a whole year after the photo app's two", () => {
+		const slide = sanFrancisco
+			.filter((stint) => stint.company === "slide.com")
+			.map((stint) => [stint.product, stint.years]);
+		expect(slide).toEqual([
+			["Slide Photo Sharing App", [2005, 2007]],
+			["Top Friends", [2007, 2008]],
+			["SuperPoke", [2008, 2009]],
+			["FunWall", [2009, 2010]],
+			["SuperPoke Pets", [2010, 2011]],
+			["Superpocus", [2011, 2012]],
+		]);
+	});
+
+	it("merges into three dated roles for the JSON-LD", () => {
+		const slide = employmentHistory(CHAPTERS).find(
+			(employment) => employment.company === "slide.com",
+		);
+		expect(slide?.roles).toEqual([
+			{ title: "Software Design Engineer in Test", start: 2005, end: 2007 },
+			{ title: "Director of Quality Assurance", start: 2007, end: 2011 },
+			{ title: "Product Manager", start: 2011, end: 2012 },
+		]);
 	});
 });

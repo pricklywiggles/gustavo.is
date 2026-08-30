@@ -387,19 +387,25 @@ export function WorkHistorySection() {
 		const el = rootRef.current;
 		return el ? el.getBoundingClientRect().top + window.scrollY : 0;
 	}, []);
+	// The section's own h-screen box is the CSS viewport the layers and the speed map use;
+	// innerHeight on iOS is the toolbar-dependent visual height (the hero measures the same way).
+	const sectionHeight = useCallback(
+		() => rootRef.current?.offsetHeight || window.innerHeight,
+		[],
+	);
 	// AnimatedLines rebuilds its trigger when start/end change identity, so these must only
 	// change with the phase map. Ends are each term's own phase end: the reveals overlap.
 	const cue = useMemo(() => {
-		const at = (vh: number) => () => sectionTop() + window.innerHeight * vh;
+		const at = (vh: number) => () => sectionTop() + sectionHeight() * vh;
 		return {
-			line1Start: () => sectionTop() - window.innerHeight * LINE1_LEAD_VH,
+			line1Start: () => sectionTop() - sectionHeight() * LINE1_LEAD_VH,
 			line1End: at(phase.at.line1 + phase.len.line1),
 			line2Start: at(phase.at.line2),
 			line2End: at(phase.at.line2 + phase.len.line2),
 			line3Start: at(phase.at.line3),
 			line3End: at(phase.at.line3 + phase.len.line3),
 		};
-	}, [sectionTop, phase]);
+	}, [sectionTop, sectionHeight, phase]);
 
 	// matchMedia leaves the section unpinned at its rendered static state under reduced motion.
 	useGSAP(
@@ -425,7 +431,7 @@ export function WorkHistorySection() {
 					scrollTrigger: {
 						trigger: section,
 						start: "top top",
-						end: () => `+=${window.innerHeight * phase.total}`,
+						end: () => `+=${sectionHeight() * phase.total}`,
 						scrub: true,
 						pin: true,
 						anticipatePin: 1,
@@ -518,6 +524,7 @@ export function WorkHistorySection() {
 						phase.len[`parallax@${i}`],
 						stage,
 						pano,
+						sectionHeight,
 					);
 					buildSurfaceReveal(
 						tl,
@@ -525,6 +532,7 @@ export function WorkHistorySection() {
 						phase.len[`parallax@${i}`],
 						stage,
 						pano,
+						sectionHeight,
 					);
 					buildSunset(
 						tl,
@@ -655,7 +663,7 @@ export function WorkHistorySection() {
 						config: pano,
 						cueScrollY: (vessel) => () =>
 							sectionTop() +
-							window.innerHeight *
+							sectionHeight() *
 								(cascadeAt + vessel.cueStep * pano.stepVh + pano.durVh),
 					});
 					if (vesselCleanup) cleanups.push(vesselCleanup);

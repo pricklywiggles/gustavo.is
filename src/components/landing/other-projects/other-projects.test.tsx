@@ -3,6 +3,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { IOS_SCRUB_S } from "@/lib/scroll-scrub";
+import { projectsScrubVh } from "../projects-geometry";
 import { OtherProjectsSection } from "./other-projects";
 
 const iosState = { value: false };
@@ -181,5 +182,17 @@ describe("OtherProjectsSection", () => {
 		expect(new Set(raw)).toEqual(new Set([true]));
 		iosState.value = true;
 		expect(new Set(railScrubs())).toEqual(new Set([IOS_SCRUB_S]));
+	});
+
+	it("sizes the showcase scrub from the per-project span", () => {
+		// The height class is a literal (Tailwind scans source); this pins it to the
+		// geometry the speed map reads, so the two move together: one viewport per
+		// project plus the sticky stage's own.
+		expect((projectsScrubVh() + 1) * 100).toBe(700);
+		vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
+		const { container } = render(<OtherProjectsSection />);
+		expect(
+			container.querySelector("[data-projects-scrub]")?.className,
+		).toContain(`h-[${(projectsScrubVh() + 1) * 100}vh]`);
 	});
 });

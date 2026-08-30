@@ -51,6 +51,9 @@ Bullets name the file.
   `landfall-vista.tsx`, and the speed map.
 - `scroll-speed-map.ts`: every scrubbed tween's travel over span at the
   budget viewports; see the pacing section below.
+- `projects-geometry.ts`: the showcase's per-project scrub span, shared by
+  the speed map and the test that pins `other-projects.tsx`'s height
+  literal to it.
 - `panorama-scene.tsx`: presentational renderer. Conventions:
   `[data-pano-layer]` in config order, `[data-pano-sway]` wrappers for
   ambient clouds, `[data-pano-surface]` curtain, `[data-pano-sun-track]`
@@ -68,7 +71,9 @@ Bullets name the file.
 ## Invariants (break these and it silently falls apart)
 
 1. Timeline seconds are viewport-heights. Phase offsets read as scroll
-   distances; the pin length is `phase.total * innerHeight`.
+   distances; the pin length is `phase.total` times the section's own
+   `h-screen` box (CSS 100vh, the unit the layers and the speed map use),
+   never `innerHeight`.
 2. Function-based tween values re-measure during ScrollTrigger refresh
    WHILE PINS ARE REVERTED. Measure against the section or stage rect,
    never the viewport, or elements fly thousands of pixels on refresh.
@@ -160,7 +165,10 @@ raw scroll samples, the video's shadow). Only iOS changes.
   the geometry they drive. GSAP already ignores the bar's height-only
   resize on touch-only devices (`ignoreMobileResize` defaults to
   `isTouch === 1`), so no refresh fires mid-gesture; the mismatch was
-  the number itself.
+  the number itself. Work history joined them in FRA-190: `sectionHeight()`
+  in `work-history.tsx` feeds the pin length, the quote cues, the vessel
+  cues, and the band-clearance and curtain builders, so on iOS its ratios
+  match the map.
 - One clock on iOS. Off iOS the sheet scrolls natively after its 1vh
   stick and the hole's timeline (133.333vh to 233.333vh) assigns
   `hole.yOff` from raw progress; both are the raw scroll, so they agree.
@@ -592,4 +600,10 @@ transform of that chunk under load blew a 4s `findByRole` more than once. Async 
 components cannot be tested in vitest; use E2E. The polyfill answers
 `matches: false`, so tests run the motion paths; to exercise a reduced
 branch mock `@/components/use-reduced-motion-live` (contact-dialog.test
-does), or hydrate through `src/test/hydrate-reduced.tsx`.
+does), or hydrate through `src/test/hydrate-reduced.tsx`. Tests that force
+the motion path only to read a timeline's vars (the work-history pin, the
+landfall scrubs) spy `gsap.timeline` through `src/test/empty-timelines.ts`:
+a section's full build and its revert are thousands of jsdom style writes
+(work history: 5s, over the 5s default timeout), and the landfall scrub
+test renders once against a `scrollScrub()` sentinel for the same reason
+(its double render hit 7s under a loaded suite).

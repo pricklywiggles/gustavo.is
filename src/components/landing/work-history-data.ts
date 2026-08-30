@@ -738,7 +738,7 @@ export const CHAPTERS: CityChapter[] = [
 				role: "Software Design Engineer in Test",
 				product: "Slide Photo Sharing App",
 				productLogo: "/logos/slide-client.webp",
-				years: [2005, 2006],
+				years: [2005, 2007],
 				usersReached: 20_000_000,
 			},
 			{
@@ -747,7 +747,7 @@ export const CHAPTERS: CityChapter[] = [
 				role: "Director of Quality Assurance",
 				product: "Top Friends",
 				productLogo: "/logos/top-friends.webp",
-				years: [2006, 2006.75],
+				years: [2007, 2008],
 			},
 			{
 				company: "slide.com",
@@ -755,7 +755,7 @@ export const CHAPTERS: CityChapter[] = [
 				role: "Director of Quality Assurance",
 				product: "SuperPoke",
 				productLogo: "/logos/superpoke.webp",
-				years: [2006.75, 2007.5],
+				years: [2008, 2009],
 			},
 			{
 				company: "slide.com",
@@ -763,7 +763,7 @@ export const CHAPTERS: CityChapter[] = [
 				role: "Director of Quality Assurance",
 				product: "FunWall",
 				productLogo: "/logos/funwall.webp",
-				years: [2007.5, 2008.25],
+				years: [2009, 2010],
 			},
 			{
 				company: "slide.com",
@@ -771,7 +771,7 @@ export const CHAPTERS: CityChapter[] = [
 				role: "Director of Quality Assurance",
 				product: "SuperPoke Pets",
 				productLogo: "/logos/superpoke-pets.webp",
-				years: [2008.25, 2009],
+				years: [2010, 2011],
 			},
 			{
 				company: "slide.com",
@@ -779,7 +779,7 @@ export const CHAPTERS: CityChapter[] = [
 				role: "Product Manager",
 				product: "Superpocus",
 				productLogo: "/logos/superpocus.webp",
-				years: [2009, 2012],
+				years: [2011, 2012],
 			},
 			{
 				company: "Jawbone",
