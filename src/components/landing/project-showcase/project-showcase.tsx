@@ -29,10 +29,7 @@ function LinkArrow() {
 const headingClass =
 	"font-display text-[clamp(1.75rem,2.6vw,2.5rem)] text-pale-dune";
 
-/**
- * One project's panel body. `measure` renders a height-only copy: the same boxes with
- * no heading, no image, and nothing focusable, for the tallest-project cell below.
- */
+/** `measure` renders a height-only copy: no heading, no image, nothing focusable. */
 function ProjectPanel({
 	project,
 	measure = false,
@@ -64,8 +61,7 @@ function ProjectPanel({
 					maxWidth: `min(100%, ${40 * (project.imageRatio ?? 1.6)}vh)`,
 				}}
 			>
-				{/* Glyph and screenshot are absolute and add no height, so a measure copy
-				    skips them: six eager image loads would buy nothing. */}
+				{/* Glyph and screenshot are absolute and add no height; measure copies skip the eager loads. */}
 				{!measure && (
 					<div className="absolute inset-0 grid place-items-center">
 						<span
@@ -245,10 +241,8 @@ export function ProjectShowcase({
 						</m.article>
 					</AnimatePresence>
 				</LazyMotion>
-				{/* Client-only so the server HTML carries each description once (invariant 13); the
-				    invisible stack sizes the cell to the tallest project so switches never jump.
-				    md:hidden by measurement: at 844x390 the tallest cell would push every heading
-				    above the fold (landing README, "Projects showcase panel"). */}
+				{/* Client-only so the server HTML carries each description once (invariant 13); the tallest
+				    copy sizes the cell so switches never jump. md:hidden since 844x390 overflows the fold. */}
 				{mounted &&
 					projects.map((project) => (
 						<div

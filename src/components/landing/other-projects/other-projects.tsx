@@ -264,8 +264,8 @@ export function OtherProjectsSection() {
 			{/* Parks the showcase a quarter viewport past the fold at the lock, then a breath of
 			    settled sky; reduced motion has no lock, so the headline hands straight to the showcase. */}
 			<div aria-hidden="true" className="h-[225vh] motion-reduce:h-0" />
-			{/* Motion height stays (projectsScrubVh() + 1) * 100vh; the still edition keeps
-			    one viewport per project (FRA-189). A test pins both literals. */}
+			{/* Motion height is (projectsScrubVh() + 1) * 100vh; the still edition keeps one
+			    viewport per project (FRA-189). */}
 			<div
 				data-projects-scrub
 				className="relative h-[1300vh] motion-reduce:h-[700vh]"

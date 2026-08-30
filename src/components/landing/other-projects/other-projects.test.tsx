@@ -186,7 +186,7 @@ describe("OtherProjectsSection", () => {
 	});
 
 	it("sizes the showcase scrub from the per-project span", () => {
-		// A retune of the beat is a deliberate edit here first (FRA-189).
+		// Pins the beat so a retune is a deliberate edit (FRA-189).
 		expect(projectsScrubVh()).toBe(12);
 		// Tailwind scans source, so the height is a literal; +1 is the sticky stage's viewport.
 		expect((projectsScrubVh() + 1) * 100).toBe(1300);

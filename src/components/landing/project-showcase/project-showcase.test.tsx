@@ -52,7 +52,7 @@ describe("ProjectShowcase", () => {
 			expect(copy.hasAttribute("inert")).toBe(true);
 			expect(copy.className).toContain("invisible");
 			expect(copy.className).toContain("col-start-1 row-start-1");
-			// The stack only applies below md; md+ keeps its min-h floor (FRA-189).
+			// md and up keeps the min-h floor instead of the stack (FRA-189).
 			expect(copy.className).toContain("md:hidden");
 			expect(copy.querySelector("img, a, button, h3")).toBeNull();
 		}
