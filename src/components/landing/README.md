@@ -7,7 +7,7 @@ them after any change here.
 
 ## What this section is
 
-One pinned, scrubbed GSAP master timeline (~41 viewport-heights) playing:
+One pinned, scrubbed GSAP master timeline (~38 viewport-heights) playing:
 the "Play + Purpose = Work" equation (right-aligned terms, a drawn rule,
 then the result taking the ink drift), then three city chapters (Seattle,
 San Francisco, Los Angeles), each with a layer-cascade panorama build,
@@ -335,6 +335,15 @@ viewport (2.6x).
   a 0.6 entrance). Every city now steps at 0.3 with 0.9 entrances (the
   towers pop in 0.5), so the builds run 3.9, 5.0 and 4.8 viewports and
   the tower rise sits at 0.9x to 1.9x mean instead of 1.3x to 2.7x.
+- Two yardsticks behind those spans, since no published rule exists. A
+  hard phone flick travels about 2,700px (release velocity over three, at
+  iOS's 5% per-frame decay), so a beat that must be seen needs 3 or more
+  phone viewports; a departure may sit under that. Apple's product pages
+  give a pinned scene 1.5 to 3 viewports (median 2, one 8.5 sequence),
+  measured headless in 2026-08; our per-beat spans sit inside or above
+  that band. The year scrubs are still scenes, so they are the fatigue
+  risk rather than the motion: `SCRUB_VH_PER_YEAR` 0.4 keeps the 13-year
+  San Francisco scrub near 5 viewports.
 - Rules: pacing changes go into spans (`len`), poses (`from`) and slot
   offsets, never layer positions (template matching). Every changed `len`
   changes the section's pin length (invariant 1), the landfall height

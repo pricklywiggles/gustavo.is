@@ -6,7 +6,9 @@ import type { CityChapter, PanoramaConfig } from "./work-history-data";
  * audit them (scripts/scroll-speed-map.mjs). Seconds are viewport-heights (README inv. 1).
  */
 
-export const SCRUB_VH_PER_YEAR = 0.5;
+// 0.4 keeps San Francisco's 13-year scrub (a still scene) near 5 viewports; at 0.5 it
+// was the longest beat on the page after the builds.
+export const SCRUB_VH_PER_YEAR = 0.4;
 // The two chapter-transition beats overlap so the departure reads as one gesture.
 export const HUD_OUT_VH = 0.5;
 export const SCENE_OUT_VH = 1.8;
