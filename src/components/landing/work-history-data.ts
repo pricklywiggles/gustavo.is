@@ -196,8 +196,8 @@ const FERRY_WIDTH_PCT = 31.5;
 const SEATTLE_PANORAMA: PanoramaConfig = {
 	aspect: "2688 / 1792",
 	mobileFocusX: 0.3,
-	durVh: 0.6,
-	stepVh: 0.2,
+	durVh: 0.9,
+	stepVh: 0.3,
 	lastStep: 10,
 	vessels: [
 		{
@@ -338,15 +338,15 @@ const SF_BOAT_WIDTH_PCT = 12.6;
 const TOWER_RISE = {
 	from: { yPercent: 100 },
 	ease: "back.out(1.7)",
-	dur: 0.35,
+	dur: 0.5,
 	parallax: 0.012,
 };
 
 const SAN_FRANCISCO_PANORAMA: PanoramaConfig = {
 	aspect: "2688 / 1792",
 	mobileFocusX: 0.38,
-	durVh: 0.6,
-	stepVh: 0.2,
+	durVh: 0.9,
+	stepVh: 0.3,
 	lastStep: 13.8,
 	horizonLocked: true,
 	vessels: [
@@ -525,8 +525,8 @@ const SAN_FRANCISCO_PANORAMA: PanoramaConfig = {
 const LA_PANORAMA: PanoramaConfig = {
 	aspect: "2688 / 1792",
 	mobileFocusX: 0.38,
-	durVh: 0.6,
-	stepVh: 0.2,
+	durVh: 0.9,
+	stepVh: 0.3,
 	lastStep: 13,
 	horizonLocked: true,
 	// endLeft matches left on purpose: the center drops straight down. duskEndTop derives

@@ -7,7 +7,7 @@ them after any change here.
 
 ## What this section is
 
-One pinned, scrubbed GSAP master timeline (~36 viewport-heights) playing:
+One pinned, scrubbed GSAP master timeline (~41 viewport-heights) playing:
 the "Play + Purpose = Work" equation (right-aligned terms, a drawn rule,
 then the result taking the ink drift), then three city chapters (Seattle,
 San Francisco, Los Angeles), each with a layer-cascade panorama build,
@@ -316,20 +316,25 @@ viewport (2.6x).
   and 2.0x peak; small elements (ambient clouds, stars, the suns, vista
   planes) at most 1.5x mean and 3.0x peak. Classes: a panorama layer is
   `small` when `ambient`, else `large`. Uncapped and reported: the cascade
-  entrances (the towers' `TOWER_RISE` pop at 1.3x to 2.7x mean is authored
-  and left for the owner to judge) and the hero hole's reveal curve (stage
+  entrances (the towers' `TOWER_RISE` pop is authored; its pace is the
+  cascade's, below) and the hero hole's reveal curve (stage
   4 at 7x mean, 28x peak; if it ever needs taming, stages 3 and 4 at
   0.35 each with `power1.in` on stage 4 keeps `REVEAL_LENGTH_VH` at 1 and
   the iOS one-clock sheet at 1.0x).
 - The retune: `buildSceneExit` gives each layer its own duration,
-  `exitDurationVh()`: the `EXIT_SETTLE_VH` floor (0.6, was a fixed 0.3)
+  `exitDurationVh()`: the `EXIT_SETTLE_VH` floor (0.9, was a fixed 0.3)
   stretched so the layer's exit travel (pose plus the breath's unwind)
   never exceeds its class cap at either budget viewport.
-  The stagger stays 0.9 (`SCENE_OUT_VH` 1.5 minus the floor); the last
-  layer ends exactly at 1.5 (`exitWindows()`). The clouds phase grew from
+  The stagger stays 0.9 (`SCENE_OUT_VH` 1.8 minus the floor); the last
+  layer ends exactly at 1.8 (`exitWindows()`). The clouds phase grew from
   1.75 to 2.5 viewports with slots respaced (0, 0.15, 0.45, 0.6, 0.8,
   0.95), the descent to 10.5 viewports (`motion-safe:h-[1150vh]`). Cloud
   ratios are now 0.46x to 0.94x on desktop, still rising slot by slot.
+- The cascades: a phone flick from the quote covers about 3 viewports,
+  and Seattle's whole build used to fit inside one (10 steps of 0.2 plus
+  a 0.6 entrance). Every city now steps at 0.3 with 0.9 entrances (the
+  towers pop in 0.5), so the builds run 3.9, 5.0 and 4.8 viewports and
+  the tower rise sits at 0.9x to 1.9x mean instead of 1.3x to 2.7x.
 - Rules: pacing changes go into spans (`len`), poses (`from`) and slot
   offsets, never layer positions (template matching). Every changed `len`
   changes the section's pin length (invariant 1), the landfall height

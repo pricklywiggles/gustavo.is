@@ -9,9 +9,9 @@ import type { CityChapter, PanoramaConfig } from "./work-history-data";
 export const SCRUB_VH_PER_YEAR = 0.5;
 // The two chapter-transition beats overlap so the departure reads as one gesture.
 export const HUD_OUT_VH = 0.5;
-export const SCENE_OUT_VH = 1.5;
+export const SCENE_OUT_VH = 1.8;
 /** Floor for one layer's exit; layers whose travel would outrun the budget get longer. */
-export const EXIT_SETTLE_VH = 0.6;
+export const EXIT_SETTLE_VH = 0.9;
 
 /**
  * Perceived speed caps as multiples of scroll speed (travel / span). Large: bands, city
