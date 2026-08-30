@@ -523,7 +523,7 @@ const SAN_FRANCISCO_PANORAMA: PanoramaConfig = {
 // Los Angeles is template-matched like San Francisco: never round or "tidy" the numbers.
 // Sea level is near-city's top (57.59): it holds, haze and street-view rise, the rest sinks.
 const LA_PANORAMA: PanoramaConfig = {
-	aspect: "8064 / 5376",
+	aspect: "2688 / 1792",
 	mobileFocusX: 0.38,
 	durVh: 0.6,
 	stepVh: 0.2,

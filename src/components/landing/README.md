@@ -244,8 +244,8 @@ mount, so there is nothing to hydrate or refresh on a viewport flip.
 Each city's layers are exported from one canvas and positioned as
 percentages of it, so a set's resolution is the canvas resolution.
 Seattle and San Francisco were authored on a 2688x1792 canvas. Los
-Angeles was authored on 8064x5376 (`aspect` in work-history-data.ts
-keeps that ratio), three times the size per side, and shipped at that
+Angeles was authored on 8064x5376 (its `aspect` is written at the 2688
+scale, the same ratio), three times the size per side, and shipped at that
 size: 704 MiB decoded for the one set, against 104 (Seattle) and 82
 (SF). iOS Safari killed the page under fast repeated scrolling
 ("A problem repeatedly occurred", a jetsam kill, never a console error).
