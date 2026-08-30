@@ -6,62 +6,19 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
 import { StarLayer } from "@/components/star-layer";
 import { scrollScrub } from "@/lib/scroll-scrub";
+import {
+	CLOUD_CLEARANCE_VH,
+	CLOUD_SLOTS,
+	DESCENT_PHASE,
+	EARTH_RISE_ENTRY_FRACTION,
+	EARTH_RISE_VH,
+	EARTH_SWELL_SCALE,
+	STAR_LAYERS,
+	STATION_TRAVEL,
+} from "../landfall-geometry";
 import { LandfallVista } from "../landfall-vista";
-import { type PhaseSpec, resolvePhases } from "../scroll-phases";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
-
-/**
- * The descent scrub. Timeline seconds are viewport-heights; the 200vh pull-up plus the
- * fade and hold lengths are the handoff contract with other-projects.tsx (README inv. 11).
- */
-const PHASES: PhaseSpec[] = [
-	/** Crossfade over the pinned projects canvas; both skies motionless. */
-	{ id: "fade", len: 1 },
-	/** Pinned sky while the showcase panel exits above the stage. */
-	{ id: "hold", len: 1 },
-	/** Stars alone; the station crosses the frame. */
-	{ id: "drift", len: 1.75 },
-	/** The atmosphere's glow crests the bottom edge, then the limb itself. */
-	{ id: "limb", len: 1.75 },
-	/** Into the glow: deep blue floods up, stars wash out. */
-	{ id: "entry", len: 1.5 },
-	/** Daylight: deep blue crossfades to day sky, the sun blooms. */
-	{ id: "day", len: 1.25 },
-	/** The cloud deck streams past, overlapping the daylight turn. */
-	{ id: "clouds", len: 1.75, with: "day", offset: 0.5 },
-	/** Clean sky breather before the vista scrolls in. */
-	{ id: "settle", len: 0.5 },
-];
-export const DESCENT_PHASE = resolvePhases(PHASES);
-
-/** Deeper layers travel less; travel spans the full pin so the parallax never stops
- * while stars are visible (they fade during entry). */
-const STAR_LAYERS = [
-	{ name: "far", seed: 11, count: 90, min: 0.5, max: 1.0, travel: -22 },
-	{ name: "mid", seed: 23, count: 60, min: 0.7, max: 1.4, travel: -48 },
-	{ name: "near", seed: 47, count: 34, min: 0.9, max: 2.0, travel: -85 },
-] as const;
-
-/**
- * Cirrus leads, cumulus follow. Every slot ends exactly at the settle boundary, so a
- * later `at` means a faster cloud; travel derives from rendered height at run time.
- */
-export const CLOUD_SLOTS = [
-	{ src: "cloud9-high", w: 1463, h: 203, left: "8%", width: "44vw", at: 0 },
-	{
-		src: "cloud10-high",
-		w: 1436,
-		h: 141,
-		left: "55%",
-		width: "42vw",
-		at: 0.15,
-	},
-	{ src: "cloud4", w: 1613, h: 382, left: "2%", width: "38vw", at: 0.65 },
-	{ src: "cloud2", w: 1587, h: 699, left: "52%", width: "45vw", at: 0.8 },
-	{ src: "cloud6", w: 1442, h: 514, left: "62%", width: "40vw", at: 1.05 },
-	{ src: "cloud3", w: 1632, h: 745, left: "-8%", width: "55vw", at: 1.2 },
-] as const;
 
 /** The limb's glow, shared by the scrubbed earth and the reduced-motion still. */
 const EARTH_RIM_GLOW = [
@@ -120,10 +77,14 @@ export function LandfallSection() {
 				// The start pose (top 24% + 80vh) keeps the station below the fold until its crossing.
 				tl.fromTo(
 					"[data-descent-station]",
-					{ y: "80vh", x: "4vw", rotate: -7 },
 					{
-						y: "-80vh",
-						x: "-3vw",
+						y: `${STATION_TRAVEL.y[0]}vh`,
+						x: `${STATION_TRAVEL.x[0]}vw`,
+						rotate: -7,
+					},
+					{
+						y: `${STATION_TRAVEL.y[1]}vh`,
+						x: `${STATION_TRAVEL.x[1]}vw`,
 						rotate: 4,
 						duration: at.entry - at.drift,
 					},
@@ -135,15 +96,15 @@ export function LandfallSection() {
 					"[data-descent-earth]",
 					{ y: "0vh" },
 					{
-						y: "-56vh",
-						duration: len.limb + len.entry * 0.6,
+						y: `${-EARTH_RISE_VH}vh`,
+						duration: len.limb + len.entry * EARTH_RISE_ENTRY_FRACTION,
 						ease: "power1.out",
 					},
 					at.limb,
 				);
 				tl.to(
 					"[data-descent-earth]",
-					{ scale: 1.9, duration: len.entry },
+					{ scale: EARTH_SWELL_SCALE, duration: len.entry },
 					at.entry,
 				);
 
@@ -180,7 +141,7 @@ export function LandfallSection() {
 								const heightVh = el
 									? (el.offsetHeight / window.innerHeight) * 100
 									: 50;
-								return `-${105 + heightVh}vh`;
+								return `-${CLOUD_CLEARANCE_VH + heightVh}vh`;
 							},
 							duration: at.settle - start,
 						},
@@ -218,7 +179,7 @@ export function LandfallSection() {
 				data-descent
 				data-surface="dusk-ink"
 				data-motion-anchor="scrub"
-				className="relative h-auto motion-safe:h-[1075vh]"
+				className="relative h-auto motion-safe:h-[1150vh]"
 			>
 				{/* motion-safe:opacity-0 mirrors the GSAP matchMedia condition: no pre-hydration
 				    flash on motion loads; reduced motion keeps the static frame visible. */}

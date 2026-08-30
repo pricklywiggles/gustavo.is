@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { storyPhases } from "../story-phases";
 import { CHAPTERS } from "../work-history-data";
-import { storyPhases, WorkHistorySection } from "./work-history";
+import { WorkHistorySection } from "./work-history";
 
 describe("WorkHistorySection", () => {
 	it("renders the equation terms and the rule, with no attribution", () => {

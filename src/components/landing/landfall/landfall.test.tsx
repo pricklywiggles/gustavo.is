@@ -2,8 +2,9 @@ import { render } from "@testing-library/react";
 import gsap from "gsap";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { IOS_SCRUB_S } from "@/lib/scroll-scrub";
+import { CLOUD_SLOTS, DESCENT_PHASE } from "../landfall-geometry";
 import { SKY_CLOUDS } from "../landfall-vista";
-import { CLOUD_SLOTS, DESCENT_PHASE, LandfallSection } from "./landfall";
+import { LandfallSection } from "./landfall";
 
 const iosState = { value: false };
 vi.mock("@/lib/ios-device", () => ({
@@ -69,10 +70,10 @@ describe("LandfallSection", () => {
 	it("sizes the descent scrub from the phase map", () => {
 		// The motion-safe height class is a literal (Tailwind scans source); this pins
 		// its arithmetic so a phase change tells you which class to update.
-		expect((DESCENT_PHASE.total + 1) * 100).toBe(1075);
+		expect((DESCENT_PHASE.total + 1) * 100).toBe(1150);
 		const { container } = render(<LandfallSection />);
 		expect(container.querySelector("[data-descent]")?.className).toContain(
-			"motion-safe:h-[1075vh]",
+			"motion-safe:h-[1150vh]",
 		);
 		// The overlap contract: fade + hold cover the 200vh pull-up over the
 		// projects section's tail (stage release + showcase exit windows).
@@ -132,7 +133,7 @@ describe("LandfallSection", () => {
 		// the descent size to its content, with the stage in flow.
 		expect(still?.getAttribute("data-motion-anchor")).toBeNull();
 		expect(descent?.className).toContain("h-auto");
-		expect(descent?.className).toContain("motion-safe:h-[1075vh]");
+		expect(descent?.className).toContain("motion-safe:h-[1150vh]");
 		// relative, never static: static drops the stage as containing block and the
 		// station, earth and clouds resolve against the two-screen descent, unclipped.
 		expect(stage?.className).toContain("motion-reduce:relative");
