@@ -155,6 +155,10 @@ describe("attachVessels", () => {
 			// One-frame skip past the chapter: cue onEnter, then the window's leave.
 			controls.pause();
 			expect(sail.paused()).toBe(true);
+			// Scroll-back below the cue rescinds cast-off: resume must not replay the sail.
+			cues[0].vars.onLeaveBack?.(cues[0]);
+			controls.resume();
+			expect(sail.paused()).toBe(true);
 		} finally {
 			controls.cleanup();
 			for (const cue of cues) cue.kill();

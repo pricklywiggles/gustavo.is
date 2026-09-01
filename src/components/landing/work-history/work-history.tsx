@@ -667,8 +667,9 @@ export function WorkHistorySection() {
 								(cascadeAt + vessel.cueStep * pano.stepVh + pano.durVh),
 					});
 					cleanups.push(vessels.cleanup);
-					// Never onToggle: a one-frame skip fires enter then leave, no toggle, sail must
-					// end paused. onRefresh: a mid-chapter load's refresh replays the vessel cue.
+					// Never onToggle: a one-frame skip fires enter then leave, no toggle, and the
+					// cues update first (creation order), so the sail still ends paused.
+					// onRefresh: a mid-chapter load's refresh replays the vessel cue.
 					const onStage = stageWindow(phase, i, story.length);
 					const syncAmbience = (self: ScrollTrigger) => {
 						if (self.isActive) {
