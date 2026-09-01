@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { spyEmptyTimelines, type TimelineCall } from "@/test/empty-timelines";
@@ -20,6 +21,7 @@ describe("WorkHistorySection", () => {
 		})) as typeof window.matchMedia;
 		const calls: TimelineCall[] = [];
 		const timeline = spyEmptyTimelines(calls);
+		const set = vi.spyOn(gsap, "set");
 		try {
 			const { container, unmount } = render(<WorkHistorySection />);
 			const section = container.querySelector<HTMLElement>("section#work");
@@ -43,20 +45,30 @@ describe("WorkHistorySection", () => {
 			box = 800;
 			expect(end()).toBe(`+=${800 * total}`);
 			// FRA-192: a 3D-promoted year layer pixelates in desktop Safari (raster reused
-			// at dock size under the hero's ~11x upscale); every year tween must stay 2D.
-			const yearCalls = calls.filter((c) =>
-				(c.args[0] as HTMLElement | undefined)?.hasAttribute?.(
+			// at dock size under the hero's ~11x upscale); per chapter, the year's set,
+			// year-in, and dock must all stay 2D.
+			const isYear = (target: unknown) =>
+				(target as HTMLElement | undefined)?.hasAttribute?.(
 					"data-hud-year-value",
-				),
+				) === true;
+			const flat = (vars: unknown) =>
+				(vars as { force3D?: boolean } | undefined)?.force3D;
+			const yearSets = set.mock.calls.filter((c) => isYear(c[0]));
+			expect(yearSets).toHaveLength(CHAPTERS.length);
+			for (const c of yearSets) expect(flat(c[1])).toBe(false);
+			const yearFromTos = calls.filter(
+				(c) => c.method === "fromTo" && isYear(c.args[0]),
 			);
-			expect(yearCalls.length).toBeGreaterThanOrEqual(2);
-			for (const c of yearCalls) {
-				for (const vars of c.args.slice(1)) {
-					if (typeof vars === "object" && vars !== null && "scale" in vars) {
-						expect((vars as { force3D?: boolean }).force3D).toBe(false);
-					}
-				}
+			expect(yearFromTos).toHaveLength(CHAPTERS.length);
+			for (const c of yearFromTos) {
+				expect(flat(c.args[1])).toBe(false);
+				expect(flat(c.args[2])).toBe(false);
 			}
+			const yearTos = calls.filter(
+				(c) => c.method === "to" && isYear(c.args[0]),
+			);
+			expect(yearTos).toHaveLength(CHAPTERS.length);
+			for (const c of yearTos) expect(flat(c.args[1])).toBe(false);
 			unmount();
 		} finally {
 			window.matchMedia = original;
