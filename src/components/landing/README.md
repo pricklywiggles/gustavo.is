@@ -71,6 +71,10 @@ Bullets name the file.
   never round or "tidy" them (see recipe below).
 - `work-history-hud.tsx`: instruments (year + role, ruler, stint bar,
   counter). Purely presentational; GSAP drives via `data-hud-*` hooks.
+  The year's cue tweens carry `force3D: false`: desktop Safari reuses a
+  promoted layer's raster at layout size, so the hero's ~11x upscale of
+  the dock-sized digits reads pixelated under a 3D transform (FRA-192;
+  a test pins the flag).
 - `city-ledger.tsx`: the reduced-motion reading of a chapter (companies,
   positions, products, years) rendered under each static panorama;
   `display:none` under motion. See the reduced-motion section.
@@ -582,6 +586,24 @@ front-to-back; files are numbered back-to-front.
   once cast off), 3 mid-Los Angeles, and 0 in the projects section and
   the footer. `ScrollTrigger.getById("ambience@1").isActive` must
   agree.
+- Subpixel seam scan (FRA-193): screenshot the page at a matrix of odd
+  viewport sizes (373x701 through 1920x1079) and about 24 scroll steps,
+  compute per-row luminance means in a canvas, and flag any row brighter
+  than both neighbors by more than 26. Zero findings expected in
+  chromium and webkit; a hit that stays at the same absolute y across
+  1023/1024/1025 viewport heights and softens at dpr 2 is bitmap
+  artwork, not a rounding seam. Section siblings are gapless by flow,
+  the landfall overlap covers its boundary, and globals.css paints the
+  `#work` pin spacer pale-dune so a fractional pin offset cannot show a
+  body-colored hairline.
+- Probing a production build (`next start`): its CSP carries
+  `upgrade-insecure-requests`, which Playwright webkit honors even on
+  localhost, upgrading every subresource to https against the http
+  server: nothing hydrates, pins never build, and probes silently
+  measure a static page. Strip the `content-security-policy` header on
+  the document via route interception, and gate on
+  `document.querySelectorAll(".pin-spacer").length` before trusting any
+  reading.
 - Probing anything below the projects section: the warp theater locks the
   page the first time its seed scrub completes, and its sim clock only
   runs while its stage is on screen, so repeated jump-past attempts can
