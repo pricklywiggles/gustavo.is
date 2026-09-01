@@ -490,6 +490,7 @@ export function attachVessels({
 		const cue = cueScrollY(vessel);
 		// The cue owns cast-off; the stage window only suspends a sail already under way.
 		let castOff = false;
+		let reveal: gsap.core.Tween | null = null;
 
 		const sail = gsap
 			.timeline({ paused: true })
@@ -512,7 +513,8 @@ export function attachVessels({
 			end: () => cue() + 1,
 			onEnter: () => {
 				castOff = true;
-				gsap.to(el, {
+				reveal?.kill();
+				reveal = gsap.to(el, {
 					autoAlpha: 1,
 					duration: 0.6,
 					ease: "none",
@@ -522,6 +524,8 @@ export function attachVessels({
 			},
 			onLeaveBack: () => {
 				castOff = false;
+				reveal?.kill();
+				reveal = null;
 				gsap.to(el, {
 					autoAlpha: 0,
 					duration: 0.5,
@@ -542,17 +546,34 @@ export function attachVessels({
 		return {
 			sail,
 			isCastOff: () => castOff,
+			// The 0.6s reveal is clock-driven too: a one-frame skip past the chapter would
+			// otherwise keep fading a frozen boat back in over the next chapter's opening.
+			pauseReveal: () => {
+				if (reveal?.isActive()) {
+					reveal.pause();
+					gsap.set(el, { autoAlpha: 0 });
+				}
+			},
+			resumeReveal: () => {
+				if (reveal?.paused()) reveal.play();
+			},
 			cleanup: () =>
 				ScrollTrigger.removeEventListener("refresh", remeasureStart),
 		};
 	});
 	return {
 		pause: () => {
-			for (const { sail } of vessels) sail.pause();
+			for (const { sail, pauseReveal } of vessels) {
+				sail.pause();
+				pauseReveal();
+			}
 		},
 		resume: () => {
-			for (const { sail, isCastOff } of vessels) {
-				if (isCastOff()) sail.play();
+			for (const { sail, isCastOff, resumeReveal } of vessels) {
+				if (isCastOff()) {
+					sail.play();
+					resumeReveal();
+				}
 			}
 		},
 		cleanup: () => {

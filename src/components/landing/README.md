@@ -42,9 +42,11 @@ Bullets name the file.
   while its chapter is on stage: `work-history.tsx` opens one
   `ambience@i` ScrollTrigger per chapter over `stageWindow()`
   (story-phases.ts: the cascade's start to the end of `scene-out@i`,
-  the dusk's end for the last chapter) and pauses the sway tweens and
-  the vessels' sails outside it, resuming them in place. Sway tweens
-  are born paused; a vessel resumes only once its cue has cast it off.
+  the dusk's end for the last chapter) and pauses the sway tweens, the
+  vessels' sails, and any in-flight cast-off reveal outside it (a
+  skipped-over reveal would fade a frozen boat back in), resuming them
+  in place. Sway tweens are born paused; a vessel resumes only once its
+  cue has cast it off.
 - `panorama-geometry.ts`: the layer math from config alone (stage size,
   rendered boxes, band-clearance amplifier, curtain rise, entrance and
   exit travel, budget-derived exit durations). The builders measure the

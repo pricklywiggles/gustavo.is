@@ -152,9 +152,19 @@ describe("attachVessels", () => {
 			controls.resume();
 			expect(sail.paused()).toBe(false);
 			expect(sail.progress()).toBe(progress);
-			// One-frame skip past the chapter: cue onEnter, then the window's leave.
+			// One-frame skip past the chapter: cue onEnter, then the window's leave. The
+			// cue's 0.6s reveal must not keep fading the frozen boat back in: the window
+			// re-hides it and leaves nothing active on the layer.
 			controls.pause();
 			expect(sail.paused()).toBe(true);
+			const vesselEl = sail.getChildren()[0].targets()[0] as Element;
+			expect(Number(gsap.getProperty(vesselEl, "opacity"))).toBe(0);
+			expect(gsap.getProperty(vesselEl, "visibility")).toBe("hidden");
+			expect(gsap.getTweensOf(vesselEl).some((t) => t.isActive())).toBe(false);
+			// Back on stage mid-cast-off: the reveal resumes with the sail.
+			controls.resume();
+			expect(gsap.getTweensOf(vesselEl).some((t) => t.isActive())).toBe(true);
+			controls.pause();
 			// Scroll-back below the cue rescinds cast-off: resume must not replay the sail.
 			cues[0].vars.onLeaveBack?.(cues[0]);
 			controls.resume();
