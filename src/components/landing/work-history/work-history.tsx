@@ -28,6 +28,7 @@ import {
 import { PanoramaScene } from "@/components/landing/panorama-scene";
 import {
 	SCRUB_VH_PER_YEAR,
+	stageWindow,
 	storyPhases,
 } from "@/components/landing/story-phases";
 import {
@@ -656,8 +657,8 @@ export function WorkHistorySection() {
 						);
 					}
 
-					attachCloudSway(stage, pano);
-					const vesselCleanup = attachVessels({
+					const sway = attachCloudSway(stage, pano);
+					const vessels = attachVessels({
 						stage,
 						config: pano,
 						cueScrollY: (vessel) => () =>
@@ -665,7 +666,31 @@ export function WorkHistorySection() {
 							sectionHeight() *
 								(cascadeAt + vessel.cueStep * pano.stepVh + pano.durVh),
 					});
-					if (vesselCleanup) cleanups.push(vesselCleanup);
+					cleanups.push(vessels.cleanup);
+					// Never onToggle: a one-frame skip fires enter then leave, no toggle, and the
+					// sail still ends paused (forward skips update cues first, creation order;
+					// backward skips end on the cue's own rewind, since GSAP updates in reverse
+					// order going up). onRefresh: a mid-chapter load's refresh replays the cue.
+					const onStage = stageWindow(phase, i, story.length);
+					const syncAmbience = (self: ScrollTrigger) => {
+						if (self.isActive) {
+							sway.resume();
+							vessels.resume();
+						} else {
+							sway.pause();
+							vessels.pause();
+						}
+					};
+					ScrollTrigger.create({
+						id: `ambience@${i}`,
+						start: () => sectionTop() + sectionHeight() * onStage.start,
+						end: () => sectionTop() + sectionHeight() * onStage.end,
+						onEnter: syncAmbience,
+						onEnterBack: syncAmbience,
+						onLeave: syncAmbience,
+						onLeaveBack: syncAmbience,
+						onRefresh: syncAmbience,
+					});
 				});
 
 				// The scrubs own the readouts now, so chapter 0's HUD arrives at its opening total.

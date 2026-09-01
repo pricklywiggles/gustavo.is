@@ -1,7 +1,15 @@
 import gsap from "gsap";
-import { describe, expect, it } from "vitest";
-import { buildYearCues, vesselSailStartPct } from "./panorama-phases";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { describe, expect, it, vi } from "vitest";
+import {
+	attachCloudSway,
+	attachVessels,
+	buildYearCues,
+	vesselSailStartPct,
+} from "./panorama-phases";
 import { CHAPTERS } from "./work-history-data";
+
+gsap.registerPlugin(ScrollTrigger);
 
 // 390x844 portrait: stage 1266 wide. Centered puts its left edge at -438;
 // Seattle's 0.3 focus shifts it to -253 (clamped calc), SF's 0.38 to -286.
@@ -67,5 +75,111 @@ describe("buildYearCues", () => {
 		const starts = tl.getChildren().map((t) => t.startTime());
 		expect(starts).toEqual([15, 15]);
 		tl.kill();
+	});
+});
+
+describe("attachCloudSway", () => {
+	it("creates each sway paused at its seed; resume and pause keep the phase", () => {
+		const seattle = CHAPTERS[0].panorama;
+		const stage = document.createElement("div");
+		for (const _ of seattle.layers.filter((l) => l.ambient)) {
+			const el = document.createElement("div");
+			el.setAttribute("data-pano-sway", "");
+			stage.append(el);
+		}
+		const controls = attachCloudSway(stage, seattle);
+		const tweens = [...stage.querySelectorAll("[data-pano-sway]")].flatMap(
+			(el) => gsap.getTweensOf(el),
+		);
+		try {
+			expect(tweens.length).toBeGreaterThan(0);
+			tweens.forEach((tween, i) => {
+				expect(tween.paused()).toBe(true);
+				expect(tween.progress()).toBeCloseTo((0.17 + i * 0.37) % 1, 10);
+			});
+			const seeds = tweens.map((tween) => tween.progress());
+			controls.resume();
+			tweens.forEach((tween, i) => {
+				expect(tween.paused()).toBe(false);
+				expect(tween.progress()).toBeCloseTo(seeds[i], 10);
+			});
+			controls.pause();
+			tweens.forEach((tween, i) => {
+				expect(tween.paused()).toBe(true);
+				expect(tween.progress()).toBeCloseTo(seeds[i], 10);
+			});
+		} finally {
+			for (const tween of tweens) tween.kill();
+		}
+	});
+});
+
+describe("attachVessels", () => {
+	it("resumes only cast-off sails; a cue enter then window leave ends paused", () => {
+		const seattle = CHAPTERS[0].panorama;
+		const stage = document.createElement("div");
+		for (const _ of seattle.layers) {
+			const el = document.createElement("div");
+			el.setAttribute("data-pano-layer", "");
+			stage.append(el);
+		}
+		const sails: gsap.core.Timeline[] = [];
+		const spy = vi.spyOn(gsap, "timeline").mockImplementation((vars) => {
+			const tl = new gsap.core.Timeline(vars);
+			sails.push(tl);
+			return tl;
+		});
+		const baseline = ScrollTrigger.getAll().length;
+		const controls = attachVessels({
+			stage,
+			config: seattle,
+			cueScrollY: () => () => 5000,
+		});
+		spy.mockRestore();
+		const cues = ScrollTrigger.getAll().slice(baseline);
+		try {
+			expect(sails).toHaveLength(1);
+			const sail = sails[0];
+			expect(sail.paused()).toBe(true);
+			// The window opens at the cascade, before the cue: no early sailing.
+			controls.resume();
+			expect(sail.paused()).toBe(true);
+			cues[0].vars.onEnter?.(cues[0]);
+			expect(sail.paused()).toBe(false);
+			const vesselEl = sail.getChildren()[0].targets()[0] as Element;
+			const reveal = gsap
+				.getTweensOf(vesselEl)
+				.find((t) => (t.vars as { autoAlpha?: number }).autoAlpha === 1);
+			expect(reveal).toBeDefined();
+			controls.pause();
+			expect(sail.paused()).toBe(true);
+			const progress = sail.progress();
+			controls.resume();
+			expect(sail.paused()).toBe(false);
+			expect(sail.progress()).toBe(progress);
+			// One-frame skip past the chapter: cue onEnter, then the window's leave. The
+			// cue's 0.6s reveal must not keep fading the frozen boat back in: the window
+			// re-hides it and leaves nothing active on the layer.
+			controls.pause();
+			expect(sail.paused()).toBe(true);
+			expect(Number(gsap.getProperty(vesselEl, "opacity"))).toBe(0);
+			expect(gsap.getProperty(vesselEl, "visibility")).toBe("hidden");
+			expect(reveal?.paused()).toBe(true);
+			// Back on stage mid-cast-off: the reveal resumes with the sail.
+			controls.resume();
+			expect(reveal?.paused()).toBe(false);
+			controls.pause();
+			// Scroll-back below the cue rescinds cast-off: resume must not replay the sail.
+			cues[0].vars.onLeaveBack?.(cues[0]);
+			controls.resume();
+			expect(sail.paused()).toBe(true);
+		} finally {
+			controls.cleanup();
+			for (const cue of cues) cue.kill();
+			for (const sail of sails) sail.kill();
+			for (const el of stage.querySelectorAll("[data-pano-layer]")) {
+				for (const tween of gsap.getTweensOf(el)) tween.kill();
+			}
+		}
 	});
 });

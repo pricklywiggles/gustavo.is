@@ -38,7 +38,15 @@ Bullets name the file.
 - `panorama-phases.ts`: all timeline builders (cascade, year cues,
   parallax, curtain, scene exit, outro close, dusk, sunset, cloud sway,
   vessels). Scroll-driven work writes into the master timeline;
-  time-based ambience (sway, vessels) runs on its own clock.
+  time-based ambience (sway, vessels) runs on its own clock, and only
+  while its chapter is on stage: `work-history.tsx` opens one
+  `ambience@i` ScrollTrigger per chapter over `stageWindow()`
+  (story-phases.ts: the cascade's start to the end of `scene-out@i`,
+  the dusk's end for the last chapter) and pauses the sway tweens, the
+  vessels' sails, and any in-flight cast-off reveal outside it (a
+  skipped-over reveal would fade a frozen boat back in), resuming them
+  in place. Sway tweens are born paused; a vessel resumes only once its
+  cue has cast it off.
 - `panorama-geometry.ts`: the layer math from config alone (stage size,
   rendered boxes, band-clearance amplifier, curtain rise, entrance and
   exit travel, budget-derived exit durations). The builders measure the
@@ -172,8 +180,8 @@ raw scroll samples, the video's shadow). Only iOS changes.
   `isTouch === 1`), so no refresh fires mid-gesture; the mismatch was
   the number itself. Work history joined them in FRA-190: `sectionHeight()`
   in `work-history.tsx` feeds the pin length, the quote cues, the vessel
-  cues, and the band-clearance and curtain builders, so on iOS its ratios
-  match the map.
+  cues, the band-clearance and curtain builders, and the `ambience@i`
+  stage windows (FRA-188), so on iOS its ratios match the map.
 - One clock on iOS. Off iOS the sheet scrolls natively after its 1vh
   stick and the hole's timeline (133.333vh to 233.333vh) assigns
   `hole.yOff` from raw progress; both are the raw scroll, so they agree.
@@ -198,7 +206,8 @@ raw scroll samples, the video's shadow). Only iOS changes.
   collapse to one write per frame; none while the path is unchanged (the
   closed hole's frame-only path is constant), none while the sheet is
   hidden past the reveal (the sway and breath tweens pause with it and
-  resume with one synchronous write), none after disposal. Disposal is a
+  resume with one synchronous write; the work history's chapters pause
+  their ambience the same way, FRA-188), none after disposal. Disposal is a
   flag: `gsap.ticker.add(fn, true)` returns a wrapper that
   `ticker.remove(fn)` never matches. Setup and refresh writes stay
   synchronous: a clip referencing an empty path hides the sheet for a
@@ -563,6 +572,16 @@ front-to-back; files are numbered back-to-front.
   server serves stale code after edits: kill it, `rm -rf .next`, restart.
 - Numbers beat screenshots: assert monotonicity/geometry from rects
   (e.g. the sun-crown sweep, sea-level pinning) rather than eyeballing.
+- Ambience on-stage probe (FRA-188), targeted at the ambience elements
+  so the vessel cue's 0.6s fade and unrelated tweens stay out of the
+  count: `[...document.querySelectorAll("[data-pano-sway],
+  [data-pano-layer]")].flatMap((el) => gsap.getTweensOf(el,
+  true)).filter((t) => t.isActive() && "xPercent" in t.vars).length`.
+  Expect 0 at the page top, about 5 mid-Seattle (4 sway plus the
+  ferry's sail), about 4 mid-San Francisco (2 sway plus up to 2 sails
+  once cast off), 3 mid-Los Angeles, and 0 in the projects section and
+  the footer. `ScrollTrigger.getById("ambience@1").isActive` must
+  agree.
 - Probing anything below the projects section: the warp theater locks the
   page the first time its seed scrub completes, and its sim clock only
   runs while its stage is on screen, so repeated jump-past attempts can
