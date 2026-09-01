@@ -3,6 +3,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { IOS_SCRUB_S } from "@/lib/scroll-scrub";
+import { projectsScrubVh } from "../projects-geometry";
 import { OtherProjectsSection } from "./other-projects";
 
 const iosState = { value: false };
@@ -181,5 +182,21 @@ describe("OtherProjectsSection", () => {
 		expect(new Set(raw)).toEqual(new Set([true]));
 		iosState.value = true;
 		expect(new Set(railScrubs())).toEqual(new Set([IOS_SCRUB_S]));
+	});
+
+	it("sizes the showcase scrub from the per-project span", () => {
+		// Tailwind scans source, so the height is a literal; +1 is the sticky stage's viewport.
+		expect((projectsScrubVh() + 1) * 100).toBe(700);
+		vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
+		const { container } = render(<OtherProjectsSection />);
+		const scrub = container.querySelector("[data-projects-scrub]");
+		expect(scrub?.className).toContain(
+			`h-[${(projectsScrubVh() + 1) * 100}vh]`,
+		);
+		// The span is the box minus one viewport only while the scrub runs its full height.
+		const spans = ScrollTrigger.getAll()
+			.filter((trigger) => trigger.trigger === scrub)
+			.map((trigger) => [trigger.vars.start, trigger.vars.end]);
+		expect(spans).toContainEqual(["top top", "bottom bottom"]);
 	});
 });

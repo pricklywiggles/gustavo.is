@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { PANORAMA_DIMENSIONS } from "./panorama-dimensions";
+import { projectsScrubVh } from "./projects-geometry";
 import {
 	BUDGET_VIEWPORTS,
 	budgetViolations,
@@ -8,6 +9,7 @@ import {
 	PACING_BUDGET,
 	speedMap,
 } from "./scroll-speed-map";
+import { EXIT_SETTLE_VH } from "./story-phases";
 import { CHAPTERS } from "./work-history-data";
 
 const viewports = Object.entries(BUDGET_VIEWPORTS);
@@ -19,6 +21,41 @@ describe("scroll speed map (FRA-187)", () => {
 				expect(PANORAMA_DIMENSIONS[layer.src], layer.src).toBeDefined();
 			}
 		}
+	});
+
+	// FRA-190: buildSceneExit unwinds vessel breath too; the map rated only the posed layers.
+	it.each(
+		viewports,
+	)("unwinds every drift vessel's breath in the scene exit at %s", (_name, viewport) => {
+		const rows = speedMap(viewport);
+		let vessels = 0;
+		CHAPTERS.slice(0, -1).forEach((chapter, i) => {
+			for (const layer of chapter.panorama.layers) {
+				if (!layer.drift || !layer.parallax) continue;
+				vessels++;
+				const target = `${chapter.id}/${layer.src.split("/").pop()}`;
+				const row = rows.find(
+					(row) => row.phase === `scene-out@${i}` && row.target === target,
+				);
+				expect(row, target).toBeDefined();
+				expect(row?.travelVh, target).toBeGreaterThan(0);
+				expect(row?.meanRatio, target).toBeLessThanOrEqual(
+					PACING_BUDGET.large.mean,
+				);
+				// Drift layers get the settle floor and buildSceneExit's ease, not a stretch.
+				expect(row?.spanVh, target).toBe(EXIT_SETTLE_VH);
+				expect(row?.ease, target).toBe("power1.in");
+			}
+		});
+		expect(vessels).toBe(3);
+	});
+
+	it("spans the projects showcase by its per-project scrub, not its box", () => {
+		const showcase = speedMap(BUDGET_VIEWPORTS.desktop).find(
+			(row) => row.section === "projects" && row.phase === "showcase",
+		);
+		expect(showcase?.spanVh).toBe(projectsScrubVh());
+		expect(showcase?.travelVh).toBeNull();
 	});
 
 	it.each(

@@ -1,30 +1,29 @@
 import { render } from "@testing-library/react";
-import gsap from "gsap";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { IOS_SCRUB_S } from "@/lib/scroll-scrub";
+import { spyEmptyTimelines } from "@/test/empty-timelines";
 import { CLOUD_SLOTS, DESCENT_PHASE } from "../landfall-geometry";
 import { SKY_CLOUDS } from "../landfall-vista";
 import { LandfallSection } from "./landfall";
 
-const iosState = { value: false };
-vi.mock("@/lib/ios-device", () => ({
-	isIOSDevice: () => iosState.value,
+// scrollScrub() owns the raw-scroll-or-iOS choice (scroll-scrub.test.ts); one render
+// here, each motion render of this section costs seconds under a loaded suite.
+const { SCRUB_SENTINEL } = vi.hoisted(() => ({ SCRUB_SENTINEL: 0.123 }));
+vi.mock("@/lib/scroll-scrub", () => ({
+	scrollScrub: () => SCRUB_SENTINEL,
 }));
 
 afterEach(() => {
-	iosState.value = false;
 	vi.restoreAllMocks();
 });
 
-// The descent and the vista timelines, built under motion (the setup stub answers
-// every query false, which skips them).
+// The descent's and the vista's scrubs; the setup stub answers false, skipping motion.
 const descentScrubs = () => {
 	const original = window.matchMedia;
 	window.matchMedia = ((query: string) => ({
 		...original(query),
 		matches: query === "(prefers-reduced-motion: no-preference)",
 	})) as typeof window.matchMedia;
-	const timeline = vi.spyOn(gsap, "timeline");
+	const timeline = spyEmptyTimelines();
 	try {
 		const { unmount } = render(<LandfallSection />);
 		unmount();
@@ -55,16 +54,8 @@ vi.mock("@/components/lazy-contact-dialog", async (importOriginal) => {
 });
 
 describe("LandfallSection", () => {
-	// FRA-185: the descent and the vista follow the raw scroll on desktop and Android;
-	// iOS devices get the catch-up that hides their sparse scroll reports.
-	it("scrubs the descent and the vista by raw scroll everywhere but iOS", () => {
-		const raw = descentScrubs();
-		expect(raw).toHaveLength(2);
-		expect(new Set(raw)).toEqual(new Set([true]));
-		iosState.value = true;
-		const ios = descentScrubs();
-		expect(ios).toHaveLength(2);
-		expect(new Set(ios)).toEqual(new Set([IOS_SCRUB_S]));
+	it("scrubs the descent and the vista through scrollScrub()", () => {
+		expect(descentScrubs()).toEqual([SCRUB_SENTINEL, SCRUB_SENTINEL]);
 	});
 
 	it("sizes the descent scrub from the phase map", () => {
