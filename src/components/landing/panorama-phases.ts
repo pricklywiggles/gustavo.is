@@ -549,7 +549,8 @@ export function attachVessels({
 			// The 0.6s reveal is clock-driven too: a one-frame skip past the chapter would
 			// otherwise keep fading a frozen boat back in over the next chapter's opening.
 			pauseReveal: () => {
-				if (reveal?.isActive()) {
+				// progress, not isActive: a reveal created this frame has not ticked yet.
+				if (reveal && !reveal.paused() && reveal.progress() < 1) {
 					reveal.pause();
 					gsap.set(el, { autoAlpha: 0 });
 				}

@@ -146,6 +146,11 @@ describe("attachVessels", () => {
 			expect(sail.paused()).toBe(true);
 			cues[0].vars.onEnter?.(cues[0]);
 			expect(sail.paused()).toBe(false);
+			const vesselEl = sail.getChildren()[0].targets()[0] as Element;
+			const reveal = gsap
+				.getTweensOf(vesselEl)
+				.find((t) => (t.vars as { autoAlpha?: number }).autoAlpha === 1);
+			expect(reveal).toBeDefined();
 			controls.pause();
 			expect(sail.paused()).toBe(true);
 			const progress = sail.progress();
@@ -157,13 +162,12 @@ describe("attachVessels", () => {
 			// re-hides it and leaves nothing active on the layer.
 			controls.pause();
 			expect(sail.paused()).toBe(true);
-			const vesselEl = sail.getChildren()[0].targets()[0] as Element;
 			expect(Number(gsap.getProperty(vesselEl, "opacity"))).toBe(0);
 			expect(gsap.getProperty(vesselEl, "visibility")).toBe("hidden");
-			expect(gsap.getTweensOf(vesselEl).some((t) => t.isActive())).toBe(false);
+			expect(reveal?.paused()).toBe(true);
 			// Back on stage mid-cast-off: the reveal resumes with the sail.
 			controls.resume();
-			expect(gsap.getTweensOf(vesselEl).some((t) => t.isActive())).toBe(true);
+			expect(reveal?.paused()).toBe(false);
 			controls.pause();
 			// Scroll-back below the cue rescinds cast-off: resume must not replay the sail.
 			cues[0].vars.onLeaveBack?.(cues[0]);
