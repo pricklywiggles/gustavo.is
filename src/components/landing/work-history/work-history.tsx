@@ -668,8 +668,9 @@ export function WorkHistorySection() {
 					});
 					cleanups.push(vessels.cleanup);
 					// Never onToggle: a one-frame skip fires enter then leave, no toggle, and the
-					// cues update first (creation order), so the sail still ends paused.
-					// onRefresh: a mid-chapter load's refresh replays the vessel cue.
+					// sail still ends paused (forward skips update cues first, creation order;
+					// backward skips end on the cue's own rewind, since GSAP updates in reverse
+					// order going up). onRefresh: a mid-chapter load's refresh replays the cue.
 					const onStage = stageWindow(phase, i, story.length);
 					const syncAmbience = (self: ScrollTrigger) => {
 						if (self.isActive) {

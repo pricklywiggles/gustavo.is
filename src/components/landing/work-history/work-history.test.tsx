@@ -116,7 +116,7 @@ describe("WorkHistorySection", () => {
 
 	it("bounds each ambience window from its cascade to its exit, abutting", () => {
 		const phase = storyPhases(CHAPTERS);
-		for (const i of [0, 1]) {
+		for (let i = 0; i < CHAPTERS.length - 1; i++) {
 			const { start, end } = stageWindow(phase, i, CHAPTERS.length);
 			expect(start).toBe(phase.at[`panorama-in@${i}`]);
 			expect(end).toBe(
