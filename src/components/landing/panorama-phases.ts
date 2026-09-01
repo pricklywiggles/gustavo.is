@@ -12,6 +12,8 @@ import type {
 	VesselConfig,
 } from "@/components/landing/work-history-data";
 
+export type AmbienceControls = { pause: () => void; resume: () => void };
+
 /**
  * Timeline builders for one city panorama. Scroll-driven phases write into a master
  * timeline whose seconds are viewport-heights; time-based ambience runs on its own clock.
@@ -393,16 +395,20 @@ export function buildSunset(
 /**
  * Drift on the sway wrappers, entrances on the images inside: two owners, no shared
  * properties. Period scales with width for equal perceived speed; phase seeds desync.
+ * Born paused at their seeds; the stage window (work-history.tsx) resumes them in place.
  */
-export function attachCloudSway(stage: HTMLElement, config: PanoramaConfig) {
+export function attachCloudSway(
+	stage: HTMLElement,
+	config: PanoramaConfig,
+): AmbienceControls {
 	const sways = gsap.utils.toArray<HTMLElement>(
 		stage.querySelectorAll("[data-pano-sway]"),
 	);
 	const ambientLayers = config.layers.filter((l) => l.ambient);
-	sways.forEach((el, i) => {
+	const tweens = sways.map((el, i) => {
 		const widthPct = parseFloat(String(ambientLayers[i]?.style.width));
 		const xAmp = widthPct > 40 ? 3 : 4.5;
-		gsap
+		return gsap
 			.fromTo(
 				el,
 				{ xPercent: -xAmp, scale: 0.95 },
@@ -414,10 +420,19 @@ export function attachCloudSway(stage: HTMLElement, config: PanoramaConfig) {
 					yoyo: true,
 					repeat: -1,
 					force3D: true,
+					paused: true,
 				},
 			)
 			.progress((0.17 + i * 0.37) % 1);
 	});
+	return {
+		pause: () => {
+			for (const tween of tweens) tween.pause();
+		},
+		resume: () => {
+			for (const tween of tweens) tween.play();
+		},
+	};
 }
 
 /**
@@ -456,6 +471,7 @@ function vesselSailStart(stage: HTMLElement, vessel: VesselConfig): number {
 /**
  * Casts off once the cue layer lands, then sails on real time. Visibility lives outside
  * the sail: scroll-back fades the boat mid-glide, and only once hidden does it rewind.
+ * The chapter's stage window pauses sails off stage and resumes them in place.
  */
 export function attachVessels({
 	stage,
@@ -466,12 +482,15 @@ export function attachVessels({
 	config: PanoramaConfig;
 	/** Absolute document scroll position of a vessel's cast-off cue. */
 	cueScrollY: (vessel: VesselConfig) => () => number;
-}): (() => void) | undefined {
-	const cleanups = (config.vessels ?? []).map((vessel) => {
+}): AmbienceControls & { cleanup: () => void } {
+	const vessels = (config.vessels ?? []).flatMap((vessel) => {
 		const layerIndex = config.layers.findIndex((l) => l.src === vessel.src);
 		const el = panoramaLayers(stage)[layerIndex];
-		if (!el) return undefined;
+		if (!el) return [];
 		const cue = cueScrollY(vessel);
+		// The cue owns cast-off; the stage window only suspends a sail already under way.
+		let castOff = false;
+		let reveal: gsap.core.Tween | null = null;
 
 		const sail = gsap
 			.timeline({ paused: true })
@@ -493,7 +512,9 @@ export function attachVessels({
 			start: cue,
 			end: () => cue() + 1,
 			onEnter: () => {
-				gsap.to(el, {
+				castOff = true;
+				reveal?.kill();
+				reveal = gsap.to(el, {
 					autoAlpha: 1,
 					duration: 0.6,
 					ease: "none",
@@ -502,6 +523,9 @@ export function attachVessels({
 				sail.play();
 			},
 			onLeaveBack: () => {
+				castOff = false;
+				reveal?.kill();
+				reveal = null;
 				gsap.to(el, {
 					autoAlpha: 0,
 					duration: 0.5,
@@ -519,9 +543,42 @@ export function attachVessels({
 			}
 		};
 		ScrollTrigger.addEventListener("refresh", remeasureStart);
-		return () => ScrollTrigger.removeEventListener("refresh", remeasureStart);
+		return {
+			sail,
+			isCastOff: () => castOff,
+			// The 0.6s reveal is clock-driven too: a one-frame skip past the chapter would
+			// otherwise keep fading a frozen boat back in over the next chapter's opening.
+			pauseReveal: () => {
+				// progress, not isActive: a reveal created this frame has not ticked yet.
+				if (reveal && !reveal.paused() && reveal.progress() < 1) {
+					reveal.pause();
+					gsap.set(el, { autoAlpha: 0 });
+				}
+			},
+			resumeReveal: () => {
+				if (reveal?.paused()) reveal.play();
+			},
+			cleanup: () =>
+				ScrollTrigger.removeEventListener("refresh", remeasureStart),
+		};
 	});
-	return () => {
-		for (const cleanup of cleanups) cleanup?.();
+	return {
+		pause: () => {
+			for (const { sail, pauseReveal } of vessels) {
+				sail.pause();
+				pauseReveal();
+			}
+		},
+		resume: () => {
+			for (const { sail, isCastOff, resumeReveal } of vessels) {
+				if (isCastOff()) {
+					sail.play();
+					resumeReveal();
+				}
+			}
+		},
+		cleanup: () => {
+			for (const { cleanup } of vessels) cleanup();
+		},
 	};
 }
