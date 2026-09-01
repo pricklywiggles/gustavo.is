@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { spyEmptyTimelines } from "@/test/empty-timelines";
+import { spyEmptyTimelines, type TimelineCall } from "@/test/empty-timelines";
 import { stageWindow, storyPhases } from "../story-phases";
 import { CHAPTERS } from "../work-history-data";
 import { WorkHistorySection } from "./work-history";
@@ -18,7 +18,8 @@ describe("WorkHistorySection", () => {
 			...original(query),
 			matches: query === "(prefers-reduced-motion: no-preference)",
 		})) as typeof window.matchMedia;
-		const timeline = spyEmptyTimelines();
+		const calls: TimelineCall[] = [];
+		const timeline = spyEmptyTimelines(calls);
 		try {
 			const { container, unmount } = render(<WorkHistorySection />);
 			const section = container.querySelector<HTMLElement>("section#work");
@@ -41,6 +42,21 @@ describe("WorkHistorySection", () => {
 			expect(end()).toBe(`+=${1000 * total}`);
 			box = 800;
 			expect(end()).toBe(`+=${800 * total}`);
+			// FRA-192: a 3D-promoted year layer pixelates in desktop Safari (raster reused
+			// at dock size under the hero's ~11x upscale); every year tween must stay 2D.
+			const yearCalls = calls.filter((c) =>
+				(c.args[0] as HTMLElement | undefined)?.hasAttribute?.(
+					"data-hud-year-value",
+				),
+			);
+			expect(yearCalls.length).toBeGreaterThanOrEqual(2);
+			for (const c of yearCalls) {
+				for (const vars of c.args.slice(1)) {
+					if (typeof vars === "object" && vars !== null && "scale" in vars) {
+						expect((vars as { force3D?: boolean }).force3D).toBe(false);
+					}
+				}
+			}
 			unmount();
 		} finally {
 			window.matchMedia = original;

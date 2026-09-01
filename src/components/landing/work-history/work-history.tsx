@@ -232,10 +232,12 @@ function buildHudEntrance(
 		return host.top + host.height / 2 - (rect.top + rect.height / 2);
 	};
 
-	gsap.set(yearValue, { transformOrigin: "50% 50%" });
+	// force3D false: desktop Safari reuses a composited layer's raster at layout size,
+	// so the hero's ~11x upscale of the dock-sized digits reads pixelated (FRA-192).
+	gsap.set(yearValue, { transformOrigin: "50% 50%", force3D: false });
 	tl.fromTo(
 		yearValue,
-		{ autoAlpha: 0, x: heroX, y: heroY, scale: heroScale },
+		{ autoAlpha: 0, x: heroX, y: heroY, scale: heroScale, force3D: false },
 		{
 			autoAlpha: 1,
 			x: heroX,
@@ -243,6 +245,7 @@ function buildHudEntrance(
 			scale: heroScale,
 			duration: cue.yearInLen,
 			ease: "power1.out",
+			force3D: false,
 		},
 		cue.yearInAt,
 	).to(
@@ -253,6 +256,7 @@ function buildHudEntrance(
 			scale: 1,
 			duration: cue.yearDockLen,
 			ease: "power3.inOut",
+			force3D: false,
 		},
 		cue.yearDockAt,
 	);
