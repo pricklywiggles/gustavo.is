@@ -1,10 +1,51 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { spyEmptyTimelines } from "@/test/empty-timelines";
 import { storyPhases } from "../story-phases";
 import { CHAPTERS } from "../work-history-data";
 import { WorkHistorySection } from "./work-history";
 
+afterEach(() => {
+	vi.restoreAllMocks();
+});
+
 describe("WorkHistorySection", () => {
+	// FRA-190: the layers are sized in the section's box; innerHeight tracks the iOS toolbar.
+	it("measures the pin against the section's box, never innerHeight", () => {
+		const original = window.matchMedia;
+		window.matchMedia = ((query: string) => ({
+			...original(query),
+			matches: query === "(prefers-reduced-motion: no-preference)",
+		})) as typeof window.matchMedia;
+		const timeline = spyEmptyTimelines();
+		try {
+			const { container, unmount } = render(<WorkHistorySection />);
+			const section = container.querySelector<HTMLElement>("section#work");
+			if (!section) throw new Error("no section");
+			let box = 1000;
+			Object.defineProperty(section, "offsetHeight", {
+				configurable: true,
+				get: () => box,
+			});
+			const trigger = timeline.mock.calls
+				.map(
+					(call) =>
+						(call[0] as gsap.TimelineVars | undefined)?.scrollTrigger as
+							| ScrollTrigger.Vars
+							| undefined,
+				)
+				.find((vars) => vars?.pin === true);
+			const end = trigger?.end as () => string;
+			const { total } = storyPhases(CHAPTERS);
+			expect(end()).toBe(`+=${1000 * total}`);
+			box = 800;
+			expect(end()).toBe(`+=${800 * total}`);
+			unmount();
+		} finally {
+			window.matchMedia = original;
+		}
+	});
+
 	it("renders the equation terms and the rule, with no attribution", () => {
 		const { container } = render(<WorkHistorySection />);
 		const quote = container.querySelector("blockquote");

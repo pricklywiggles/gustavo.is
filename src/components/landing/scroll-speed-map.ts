@@ -28,6 +28,7 @@ import {
 	stageWidthPx,
 	type Viewport,
 } from "./panorama-geometry";
+import { projectsScrubVh } from "./projects-geometry";
 import {
 	CHARACTER_SHRINK_SCALE,
 	CONVERGENCE_SPAN_VH,
@@ -346,6 +347,21 @@ function workHistoryRows(viewport: Viewport): Rated[] {
 						ease: "power1.inOut",
 					}),
 				);
+				// Vessels have no pose to retrace; buildSceneExit still unwinds their breath.
+				if (layer.drift && !isLast) {
+					rows.push(
+						entry({
+							section: "work-history",
+							phase: `scene-out@${i}`,
+							target: name,
+							class: layerClass(layer),
+							travelVh: shiftVh,
+							spanVh: exitDurationVh(config, layer),
+							ease: "power1.in",
+							note: `starts ${(exitOrder(config, layer) * spread).toFixed(2)} in; unwind only, the sail-in runs on a wall clock`,
+						}),
+					);
+				}
 				if (isLast) {
 					rows.push(
 						entry({
@@ -546,10 +562,10 @@ function projectsRows(): Rated[] {
 			phase: "showcase",
 			target: "rail and tip",
 			class: "info",
-			travelVh: 7,
-			spanVh: 7,
+			travelVh: null,
+			spanVh: projectsScrubVh(),
 			ease: "none",
-			note: "one viewport per project, 1:1 with progress",
+			note: "index progression, one viewport per project; the rail fills its own box",
 		}),
 	];
 }
