@@ -178,8 +178,8 @@ raw scroll samples, the video's shadow). Only iOS changes.
   `isTouch === 1`), so no refresh fires mid-gesture; the mismatch was
   the number itself. Work history joined them in FRA-190: `sectionHeight()`
   in `work-history.tsx` feeds the pin length, the quote cues, the vessel
-  cues, and the band-clearance and curtain builders, so on iOS its ratios
-  match the map.
+  cues, the band-clearance and curtain builders, and the `ambience@i`
+  stage windows (FRA-188), so on iOS its ratios match the map.
 - One clock on iOS. Off iOS the sheet scrolls natively after its 1vh
   stick and the hole's timeline (133.333vh to 233.333vh) assigns
   `hole.yOff` from raw progress; both are the raw scroll, so they agree.
