@@ -3,6 +3,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { IOS_SCRUB_S } from "@/lib/scroll-scrub";
+import { PROJECTS } from "../projects-data";
 import { projectsScrubVh } from "../projects-geometry";
 import { OtherProjectsSection } from "./other-projects";
 
@@ -185,13 +186,19 @@ describe("OtherProjectsSection", () => {
 	});
 
 	it("sizes the showcase scrub from the per-project span", () => {
+		// Pins the beat so a retune is a deliberate edit (FRA-189).
+		expect(projectsScrubVh()).toBe(12);
 		// Tailwind scans source, so the height is a literal; +1 is the sticky stage's viewport.
-		expect((projectsScrubVh() + 1) * 100).toBe(700);
+		expect((projectsScrubVh() + 1) * 100).toBe(1300);
 		vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
 		const { container } = render(<OtherProjectsSection />);
 		const scrub = container.querySelector("[data-projects-scrub]");
 		expect(scrub?.className).toContain(
 			`h-[${(projectsScrubVh() + 1) * 100}vh]`,
+		);
+		// The still edition keeps one viewport per project by decision (FRA-189).
+		expect(scrub?.className).toContain(
+			`motion-reduce:h-[${(PROJECTS.length + 1) * 100}vh]`,
 		);
 		// The span is the box minus one viewport only while the scrub runs its full height.
 		const spans = ScrollTrigger.getAll()

@@ -7,6 +7,7 @@ import {
 	buildSpans,
 	exitWindows,
 	PACING_BUDGET,
+	showcaseSpan,
 	speedMap,
 } from "./scroll-speed-map";
 import { EXIT_SETTLE_VH } from "./story-phases";
@@ -56,6 +57,17 @@ describe("scroll speed map (FRA-187)", () => {
 		);
 		expect(showcase?.spanVh).toBe(projectsScrubVh());
 		expect(showcase?.travelVh).toBeNull();
+	});
+
+	// ~3.2 viewports per hard phone flick makes a 2-viewport beat ~0.6 flicks (FRA-189).
+	it("paces each showcase project as a must-see beat on the phone", () => {
+		const beat = showcaseSpan(BUDGET_VIEWPORTS.phone);
+		expect(beat.spanVh).toBeGreaterThanOrEqual(2);
+		expect(beat.flicks).toBeGreaterThanOrEqual(0.6);
+		const showcase = speedMap(BUDGET_VIEWPORTS.phone).find(
+			(row) => row.section === "projects" && row.phase === "showcase",
+		);
+		expect(showcase?.spanVh).toBe(projectsScrubVh());
 	});
 
 	it.each(
