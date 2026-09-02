@@ -124,8 +124,12 @@ const entranceTransition = (step: number) => ({
 // y is 155% of the sun's height: at scale 2 the disc doubles around its center, so a
 // plain 100% offset would already poke above the horizon.
 const SUN_ENTRANCE = { y: "155%", scale: 2 };
-// Starts while the bands still separate; the clip hides it until it crests as they land.
-const SUN_TRANSITION = { delay: 0.55, ...SUN_CREST_SPRING };
+// Rises on the ground's first beat, so the disc crests while the bands are still
+// fanning out instead of after they land; the clip hides it below the horizon until then.
+const SUN_TRANSITION = {
+	delay: entranceTransition(0).delay,
+	...SUN_CREST_SPRING,
+};
 
 // Reveal progress below which the intro video is held paused at frame 0.
 const VIDEO_CUE = 0.1;
