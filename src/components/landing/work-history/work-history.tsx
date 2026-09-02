@@ -170,6 +170,7 @@ function untransformedRect(el: HTMLElement): DOMRect {
 }
 
 type ChapterCues = {
+	startYear: number;
 	yearInAt: number;
 	yearInLen: number;
 	yearDockAt: number;
@@ -219,20 +220,36 @@ function buildHudEntrance(
 		}
 		return measured;
 	};
-	// The year is laid out at hero size (37vw, always at least the 85 percent target)
-	// and only ever scaled DOWN: Safari rasters text at layout size and never
-	// re-rasters under a transform upscale (FRA-192). Scaling about the top-right
-	// anchor makes the dock state a plain scale with no translation.
+	// The year is laid out at hero size (37vw) and only ever scaled DOWN: Safari
+	// rasters text at layout size and never re-rasters under a transform upscale
+	// (FRA-192). Scaling about the top-right anchor makes the dock a plain scale.
+	// The hero always shows the chapter's START year, but the readout's width varies
+	// per year, so freeze the start year's width in em, re-capturing only while the
+	// readout displays the start year (read from data-year: textContent is the
+	// reel's whole digit run); a refresh mid-scrub then cannot bake another year's
+	// width into the hero placement.
+	let startWidthEm = 0;
+	const heroWidth = () => {
+		const { rect } = measure();
+		const font = Number.parseFloat(getComputedStyle(yearValue).fontSize);
+		if (font <= 0) return 0;
+		if (
+			startWidthEm === 0 ||
+			yearValue.dataset.year === String(cue.startYear)
+		) {
+			startWidthEm = rect.width / font;
+		}
+		return startWidthEm * font;
+	};
 	const heroScale = () => {
-		const { rect, host } = measure();
-		return rect.width > 0
-			? Math.min(1, (host.width * YEAR_HERO_WIDTH) / rect.width)
-			: 1;
+		const { host } = measure();
+		const w = heroWidth();
+		return w > 0 ? Math.min(1, (host.width * YEAR_HERO_WIDTH) / w) : 1;
 	};
 	const heroX = () => {
 		const { rect, host } = measure();
 		const s = heroScale();
-		return host.left + host.width / 2 - (rect.right - (rect.width * s) / 2);
+		return host.left + host.width / 2 - (rect.right - (heroWidth() * s) / 2);
 	};
 	const heroY = () => {
 		const { rect, host } = measure();
@@ -568,6 +585,7 @@ export function WorkHistorySection() {
 						pano,
 					);
 					buildHudEntrance(hud, section, tl, {
+						startYear: chapter.span[0],
 						yearInAt: phase.at[`year-in@${i}`],
 						yearInLen: phase.len[`year-in@${i}`],
 						yearDockAt: phase.at[`year-dock@${i}`],

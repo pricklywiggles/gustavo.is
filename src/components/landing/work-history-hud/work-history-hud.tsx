@@ -120,13 +120,18 @@ export const WorkHistoryHud = memo(function WorkHistoryHud({
 				>
 					{/* The year is LAID OUT at hero size and scaled DOWN to dock: Safari rasters
 					    text at layout size and never re-rasters under a transform upscale, so a
-					    dock-sized layout blurred the hero (FRA-192). 37vw makes four tabular
-					    digits (about 2.3 font-sizes wide) clear the 85 percent hero target; the
-					    1em slot keeps the role caption in place; motion-safe:opacity-0 hides
-					    the giant pre-build layout until GSAP's fade owns visibility. */}
-					<div className="relative h-[1em] font-bold font-legend text-[clamp(2.25rem,3.4vw,3.25rem)] text-dusk-ink leading-none">
+					    dock-sized layout blurred the hero (FRA-192). 37vw keeps every start
+					    year at or under scale 1 (widths vary per digits; start-year scales run
+					    about 0.88 to 0.99). The 1.3em slot equals the number's old in-flow
+					    height (1em glyphs plus 0.3em of digit and mask padding), keeping the
+					    role caption where it was; motion-safe:opacity-0 hides the giant
+					    pre-build layout until GSAP's fade owns visibility. */}
+					<div className="relative h-[1.3em] font-bold font-legend text-[clamp(2.25rem,3.4vw,3.25rem)] text-dusk-ink leading-none">
+						{/* data-year mirrors the displayed value for the GSAP hero math: the
+						    readout's textContent is the reel's whole digit run, unreadable. */}
 						<div
 							data-hud-year-value
+							data-year={year}
 							className="absolute top-0 right-0 w-max origin-top-right text-[37vw] leading-none motion-safe:opacity-0"
 						>
 							<AnimatedNumber format={{ useGrouping: false }}>

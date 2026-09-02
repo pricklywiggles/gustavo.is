@@ -68,6 +68,35 @@ describe("WorkHistorySection", () => {
 			);
 			expect(yearTos).toHaveLength(CHAPTERS.length);
 			for (const c of yearTos) expect(flat(c.args[1])).toBe(false);
+			// FRA-192 geometry: the hero and dock are measurement-driven functions, the
+			// year lays out at hero size (scale-down only), and the slot matches the
+			// number's old in-flow height.
+			for (const c of yearFromTos) {
+				const to = c.args[2] as { x?: unknown; y?: unknown; scale?: unknown };
+				expect(typeof to.x).toBe("function");
+				expect(typeof to.y).toBe("function");
+				expect(typeof to.scale).toBe("function");
+			}
+			for (const c of yearTos) {
+				expect(typeof (c.args[1] as { scale?: unknown }).scale).toBe(
+					"function",
+				);
+			}
+			const yearEl = container.querySelector("[data-hud-year-value]");
+			for (const cls of [
+				"absolute",
+				"right-0",
+				"w-max",
+				"origin-top-right",
+				"text-[37vw]",
+			]) {
+				expect(yearEl?.className).toContain(cls);
+			}
+			expect(yearEl?.parentElement?.className).toContain("h-[1.3em]");
+			// The hero math's start-year guard reads the displayed value from data-year.
+			expect(yearEl?.getAttribute("data-year")).toBe(
+				String(CHAPTERS[0].span[0]),
+			);
 			unmount();
 		} finally {
 			window.matchMedia = original;
