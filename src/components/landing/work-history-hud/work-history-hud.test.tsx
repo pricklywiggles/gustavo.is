@@ -55,8 +55,7 @@ describe("WorkHistoryHud counter homes", () => {
 	});
 });
 
-// FRA-194: the product mark left the bar for the panorama's center, both marks pop
-// from their centers, and the bar keeps one larger company mark with no divider.
+// FRA-194: readers were not looking at the bar, so the product mark took the center.
 describe("WorkHistoryHud marks", () => {
 	const first = CHAPTERS[0].stints[0];
 

@@ -109,7 +109,7 @@ export type PanoramaConfig = {
 	sun?: SunConfig;
 };
 
-/** A logo under public/ with its intrinsic size, so a shrink-to-fit img has its ratio before load. */
+/** Path under public/ and intrinsic pixels; the HUD img needs the ratio before load. */
 export type LogoArt = { src: string; width: number; height: number };
 
 export type Stint = {
@@ -676,7 +676,6 @@ const LA_PANORAMA: PanoramaConfig = {
 	],
 };
 
-// Intrinsic pixel sizes of the company marks; only the ratio matters.
 const MICROSOFT_LOGO: LogoArt = {
 	src: "/logos/microsoft.svg",
 	width: 1000,

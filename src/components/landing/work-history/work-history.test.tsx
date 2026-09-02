@@ -120,8 +120,7 @@ describe("WorkHistorySection", () => {
 			expect(
 				calls.filter((c) => isOdometer(c.args[0]) && c.method !== "set"),
 			).toHaveLength(0);
-			// FRA-194: the centered product mark arrives on product-in by translate and
-			// alpha on its container, never a scale over the Motion child; no divider.
+			// FRA-194: never a GSAP scale over a Motion child (the FRA-192 reel crawl).
 			const isProduct = has("data-hud-product");
 			const productFromTos = calls.filter(
 				(c) => c.method === "fromTo" && isProduct(c.args[0]),
@@ -274,7 +273,6 @@ describe("WorkHistorySection", () => {
 		// text is the only place the company and product are stated.
 		expect(screen.getByAltText("Microsoft")).toBeDefined();
 		expect(screen.getByAltText("Word")).toBeDefined();
-		// FRA-194: the product mark is one centered layer per chapter, out of the bar.
 		const section = container.querySelector("section#work");
 		if (!section) throw new Error("no section");
 		const huds = [...section.children].filter((el) =>
@@ -352,8 +350,7 @@ describe("WorkHistorySection", () => {
 			expect(at[`year-swap@${i}`]).toBe(end(`year-dock@${i}`));
 			expect(end(`year-swap@${i}`)).toBeLessThanOrEqual(at[`scrub@${i}`]);
 			expect(at[`scrub@${i}`]).toBe(end(`hud-in@${i}`));
-			// FRA-194: the product mark waits for the year to clear the center and is
-			// in place before the scrub, inside hud-in, so nothing downstream moves.
+			// FRA-194: after the year clears the center, inside hud-in so the scrub stays put.
 			expect(len[`product-in@${i}`]).toBe(0.2);
 			expect(at[`product-in@${i}`]).toBe(end(`year-dock@${i}`));
 			expect(end(`product-in@${i}`)).toBeLessThanOrEqual(at[`scrub@${i}`]);

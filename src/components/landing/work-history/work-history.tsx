@@ -344,7 +344,7 @@ function buildHudEntrance(
 			hudIn + hudLen * 0.15,
 		);
 	}
-	// Translate and alpha on the Motion child's container, never a scale (FRA-192).
+	// Never a scale here: the mark inside is Motion's pop (FRA-192).
 	if (product) {
 		tl.fromTo(
 			product,

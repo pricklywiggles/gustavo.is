@@ -54,11 +54,9 @@ const FADE: Variants = {
 	exit: { opacity: 0, transition: { duration: 0.15, ease: "easeIn" } },
 };
 
-// A fixed slot bounds logos from 6.5:1 wordmarks to 1:1 glyphs and keeps the counter from
-// shifting on stint change; below sm it fits the 375px floor.
+// Fixed slot: marks run 6.5:1 to 1:1, the counter must not shift; w-40 fits 375px phones.
 const COMPANY_BOX = "flex h-13.75 w-40 shrink-0 items-center sm:w-50";
-// Same fixed height so both boxes line up: the content is font-derived, so without it
-// the bar's alignment drifts with the legend face. Hidden below sm (top-left dl).
+// Same height as the mark slot: font-derived content would drift with the legend face.
 const COUNTER_BOX =
 	"ml-auto hidden h-13.75 shrink-0 flex-col justify-center text-right sm:flex";
 
@@ -161,12 +159,8 @@ export const WorkHistoryHud = memo(function WorkHistoryHud({
 					</p>
 				</div>
 
-				{/* The product mark holds the center of the panorama, where the reader is
-				    looking. Laid out at final size and only ever scaled down by the pop's
-				    start state (Safari rasters at layout size); the default origin is the
-				    box center, which object-contain makes the art's center. GSAP reveals the
-				    container on product-in, after the year has left the center; keyed on
-				    the art so carried marks never re-pop. */}
+				{/* Where the reader looks. Sized at rest (Safari rasters at layout size) and
+				    keyed on the art so carried marks never re-pop. */}
 				<div
 					data-hud-product
 					className="absolute inset-0 flex items-center justify-center"
@@ -231,10 +225,8 @@ export const WorkHistoryHud = memo(function WorkHistoryHud({
 				{/* The right padding is asymmetric on purpose: it clears the ruler. */}
 				<div data-hud-bar className="absolute inset-x-0 bottom-0">
 					<div className="mx-auto flex max-w-6xl items-center gap-4 py-[clamp(0.75rem,1.6vh,1.25rem)] pr-16 pl-6 sm:gap-7 sm:pl-10">
-						{/* The mark hugs the bar's left padding as a shrink-to-fit image: the
-						    intrinsic size gives its ratio before load, so the default origin is
-						    the art's center and a cold swap never mounts at zero width. Keyed on
-						    the art: carried marks never re-pop. */}
+						{/* width/height give the ratio before load, so a cold swap never pops from
+						    zero width; keyed on the art so carried marks never re-pop. */}
 						<div data-hud-slot className={COMPANY_BOX}>
 							<AnimatePresence mode="wait" initial={false}>
 								{stint.companyLogo ? (
