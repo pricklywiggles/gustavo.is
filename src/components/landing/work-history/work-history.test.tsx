@@ -1,7 +1,9 @@
 import { render, screen } from "@testing-library/react";
+import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { spyEmptyTimelines } from "@/test/empty-timelines";
+import { RAMP_HEX } from "@/lib/ramp";
+import { spyEmptyTimelines, type TimelineCall } from "@/test/empty-timelines";
 import { stageWindow, storyPhases } from "../story-phases";
 import { CHAPTERS } from "../work-history-data";
 import { WorkHistorySection } from "./work-history";
@@ -18,7 +20,9 @@ describe("WorkHistorySection", () => {
 			...original(query),
 			matches: query === "(prefers-reduced-motion: no-preference)",
 		})) as typeof window.matchMedia;
-		const timeline = spyEmptyTimelines();
+		const calls: TimelineCall[] = [];
+		const timeline = spyEmptyTimelines(calls);
+		const set = vi.spyOn(gsap, "set");
 		try {
 			const { container, unmount } = render(<WorkHistorySection />);
 			const section = container.querySelector<HTMLElement>("section#work");
@@ -41,6 +45,104 @@ describe("WorkHistorySection", () => {
 			expect(end()).toBe(`+=${1000 * total}`);
 			box = 800;
 			expect(end()).toBe(`+=${800 * total}`);
+			// FRA-192: the hero copy is a static string (scale-down only, 2D per chapter);
+			// the odometer never gets a transform and only ever an opacity change, so it
+			// stays the year's one accessible copy while the string is aria-hidden.
+			const has = (attr: string) => (target: unknown) =>
+				(target as HTMLElement | undefined)?.hasAttribute?.(attr) === true;
+			const isHero = has("data-hud-year-hero");
+			const isOdometer = has("data-hud-year-value");
+			const vars = (v: unknown) => (v ?? {}) as Record<string, unknown>;
+			// The string's origin is CSS (origin-top-right); GSAP never set()s it.
+			expect(set.mock.calls.some((c) => isHero(c[0]))).toBe(false);
+			const odometerSets = set.mock.calls.filter((c) => isOdometer(c[0]));
+			expect(odometerSets).toHaveLength(CHAPTERS.length);
+			// gsap.set normalizes its vars in place (duration, immediateRender), so
+			// assert the keys that matter rather than the whole object.
+			for (const c of odometerSets) {
+				expect(vars(c[1]).opacity).toBe(0);
+				for (const key of ["autoAlpha", "visibility", "x", "y", "scale"]) {
+					expect(vars(c[1])).not.toHaveProperty(key);
+				}
+			}
+			const heroFromTos = calls.filter(
+				(c) => c.method === "fromTo" && isHero(c.args[0]),
+			);
+			expect(heroFromTos).toHaveLength(CHAPTERS.length);
+			for (const c of heroFromTos) {
+				const to = vars(c.args[2]);
+				expect(to.force3D).toBe(false);
+				for (const key of ["x", "y", "scale"]) {
+					expect(typeof to[key]).toBe("function");
+				}
+			}
+			// Per chapter: one dock tween (function-valued pose) and one color tween.
+			const heroTos = calls.filter(
+				(c) => c.method === "to" && isHero(c.args[0]),
+			);
+			expect(heroTos).toHaveLength(CHAPTERS.length * 2);
+			const docks = heroTos.filter((c) => "scale" in vars(c.args[1]));
+			expect(docks).toHaveLength(CHAPTERS.length);
+			for (const c of docks) {
+				const v = vars(c.args[1]);
+				expect(v.force3D).toBe(false);
+				for (const key of ["x", "y", "scale"]) {
+					expect(typeof v[key]).toBe("function");
+				}
+			}
+			// The swap contract: color to ink across year-swap, then both hard sets at its
+			// end, hero first; the odometer's only timeline writes are those sets.
+			const { at, len } = storyPhases(CHAPTERS);
+			const swapEnd = (i: number) =>
+				at[`year-swap@${i}`] + len[`year-swap@${i}`];
+			const colors = heroTos.filter((c) => "color" in vars(c.args[1]));
+			expect(colors).toHaveLength(CHAPTERS.length);
+			colors.forEach((c, i) => {
+				expect(vars(c.args[1]).color).toBe(RAMP_HEX["dusk-ink"]);
+				expect(vars(c.args[1]).ease).toBe("none");
+				expect(c.args[2]).toBe(at[`year-swap@${i}`]);
+			});
+			const heroHides = calls.filter(
+				(c) => c.method === "set" && isHero(c.args[0]),
+			);
+			const odometerShows = calls.filter(
+				(c) => c.method === "set" && isOdometer(c.args[0]),
+			);
+			expect(heroHides).toHaveLength(CHAPTERS.length);
+			expect(odometerShows).toHaveLength(CHAPTERS.length);
+			heroHides.forEach((c, i) => {
+				expect(vars(c.args[1])).toEqual({ autoAlpha: 0 });
+				expect(c.args[2]).toBe(swapEnd(i));
+				expect(vars(odometerShows[i].args[1])).toEqual({ opacity: 1 });
+				expect(odometerShows[i].args[2]).toBe(swapEnd(i));
+				expect(calls.indexOf(c)).toBeLessThan(calls.indexOf(odometerShows[i]));
+			});
+			expect(
+				calls.filter((c) => isOdometer(c.args[0]) && c.method !== "set"),
+			).toHaveLength(0);
+			const heroEl = container.querySelector("[data-hud-year-hero]");
+			expect(heroEl?.getAttribute("aria-hidden")).toBe("true");
+			expect(heroEl?.textContent).toBe(String(CHAPTERS[0].span[0]));
+			for (const cls of [
+				"absolute",
+				"right-0",
+				"w-max",
+				"origin-top-right",
+				"text-[37vw]",
+				"text-white",
+				"tabular-nums",
+				"[font-kerning:none]",
+				"motion-safe:opacity-0",
+			]) {
+				expect(heroEl?.className).toContain(cls);
+			}
+			const odometerEl = container.querySelector("[data-hud-year-value]");
+			expect(odometerEl?.className ?? "").not.toContain("opacity");
+			// The dock pose anchors on the AnimateNumber root, not on library markup.
+			expect(
+				odometerEl?.querySelector("[data-hud-year-number]"),
+			).not.toBeNull();
+			expect(odometerEl?.parentElement?.className).not.toMatch(/\bh-\[/);
 			unmount();
 		} finally {
 			window.matchMedia = original;
@@ -195,5 +297,19 @@ describe("WorkHistorySection", () => {
 	it("keeps the #work anchor the intro's See my work link points at", () => {
 		const { container } = render(<WorkHistorySection />);
 		expect(container.querySelector("section#work")).not.toBeNull();
+	});
+
+	// FRA-192: the swap is anchored to the dock's end and hides inside hud-in's
+	// tail, so the scrub keeps starting where hud-in ends, exactly as before it.
+	it("anchors the year swap to the dock's end without moving the scrub", () => {
+		const { at, len } = storyPhases(CHAPTERS);
+		const end = (id: string) => at[id] + len[id];
+		for (let i = 0; i < CHAPTERS.length; i++) {
+			expect(len[`year-dock@${i}`]).toBe(0.6);
+			expect(len[`year-swap@${i}`]).toBe(0.2);
+			expect(at[`year-swap@${i}`]).toBe(end(`year-dock@${i}`));
+			expect(end(`year-swap@${i}`)).toBeLessThanOrEqual(at[`scrub@${i}`]);
+			expect(at[`scrub@${i}`]).toBe(end(`hud-in@${i}`));
+		}
 	});
 });

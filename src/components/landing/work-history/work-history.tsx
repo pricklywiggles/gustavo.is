@@ -44,6 +44,7 @@ import {
 } from "@/components/landing/work-history-hud";
 import { ScrollRevealText } from "@/components/scroll-reveal-text";
 import { RAMP_HEX } from "@/lib/ramp";
+import { dockPose, heroPose } from "./year-pose";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -174,6 +175,8 @@ type ChapterCues = {
 	yearInLen: number;
 	yearDockAt: number;
 	yearDockLen: number;
+	yearSwapAt: number;
+	yearSwapLen: number;
 	hudInAt: number;
 	hudInLen: number;
 };
@@ -187,7 +190,8 @@ function buildHudEntrance(
 	cue: ChapterCues,
 ) {
 	const q = <T extends HTMLElement>(sel: string) => root.querySelector<T>(sel);
-	const yearValue = q("[data-hud-year-value]");
+	const hero = q("[data-hud-year-hero]");
+	const odometer = q("[data-hud-year-value]");
 	const role = q("[data-hud-role]");
 	const counter = q("[data-hud-counter]");
 	const marker = q("[data-hud-marker]");
@@ -199,19 +203,24 @@ function buildHudEntrance(
 	const barItems = gsap.utils.toArray<HTMLElement>(
 		root.querySelectorAll("[data-hud-bar] [data-hud-slot]"),
 	);
-	if (!yearValue) return;
+	if (!hero || !odometer) return;
 
 	// Measured against the section, never the viewport: these run during ScrollTrigger
 	// refresh, while pins are reverted. The section is viewport-sized, so its center is
 	// the screen center once the pin re-engages.
-	// One measurement shared across a refresh pass's six start/end evaluations: each
+	// One measurement shared across a refresh pass's start/end evaluations: each
 	// untransformedRect is a write-read-write reflow, so uncached they thrash layout.
-	let measured: { rect: DOMRect; host: DOMRect } | null = null;
+	let measured: { rect: DOMRect; host: DOMRect; number: DOMRect } | null = null;
 	const measure = () => {
 		if (!measured) {
 			measured = {
-				rect: untransformedRect(yearValue),
+				rect: untransformedRect(hero),
 				host: section.getBoundingClientRect(),
+				// The AnimateNumber root owns the docked glyph box; the wrapper stands in
+				// until the library has rendered.
+				number: (
+					odometer.querySelector("[data-hud-year-number]") ?? odometer
+				).getBoundingClientRect(),
 			};
 			queueMicrotask(() => {
 				measured = null;
@@ -219,22 +228,36 @@ function buildHudEntrance(
 		}
 		return measured;
 	};
-	const heroScale = () => {
+	// The hero copy is a static string laid out at hero size (37vw) and only ever
+	// scaled DOWN: Safari rasters text at layout size and never re-rasters under a
+	// transform upscale (FRA-192). The odometer stays untransformed: its reels
+	// compute travel from transform-inclusive rects, so any ancestor scale breaks
+	// the spin. The string docks onto the odometer's glyph box, and a scrub-safe
+	// set() swaps them while both sit still.
+	const heroAt = () => {
 		const { rect, host } = measure();
-		return rect.width > 0 ? (host.width * YEAR_HERO_WIDTH) / rect.width : 1;
+		return heroPose(rect, host, YEAR_HERO_WIDTH);
 	};
-	const heroX = () => {
-		const { rect, host } = measure();
-		return host.left + host.width / 2 - (rect.left + rect.width / 2);
+	const dockAt = () => {
+		const { rect, number } = measure();
+		return dockPose(
+			rect,
+			number,
+			Number.parseFloat(getComputedStyle(hero).fontSize),
+			Number.parseFloat(getComputedStyle(odometer).fontSize),
+		);
 	};
-	const heroY = () => {
-		const { rect, host } = measure();
-		return host.top + host.height / 2 - (rect.top + rect.height / 2);
-	};
+	const heroX = () => heroAt().x;
+	const heroY = () => heroAt().y;
+	const heroScale = () => heroAt().scale;
 
-	gsap.set(yearValue, { transformOrigin: "50% 50%" });
+	// Opacity only, never autoAlpha: the odometer is the year's one accessible copy,
+	// and server output keeps it visible for the no-JS reader.
+	gsap.set(odometer, { opacity: 0 });
+	const swapEnd = cue.yearSwapAt + cue.yearSwapLen;
+	// force3D false keeps a 1235px-wide text layer per chapter off the compositor.
 	tl.fromTo(
-		yearValue,
+		hero,
 		{ autoAlpha: 0, x: heroX, y: heroY, scale: heroScale },
 		{
 			autoAlpha: 1,
@@ -243,19 +266,31 @@ function buildHudEntrance(
 			scale: heroScale,
 			duration: cue.yearInLen,
 			ease: "power1.out",
+			force3D: false,
 		},
 		cue.yearInAt,
-	).to(
-		yearValue,
-		{
-			x: 0,
-			y: 0,
-			scale: 1,
-			duration: cue.yearDockLen,
-			ease: "power3.inOut",
-		},
-		cue.yearDockAt,
-	);
+	)
+		.to(
+			hero,
+			{
+				x: () => dockAt().x,
+				y: () => dockAt().y,
+				scale: () => dockAt().scale,
+				duration: cue.yearDockLen,
+				ease: "power3.inOut",
+				force3D: false,
+			},
+			cue.yearDockAt,
+		)
+		// White while large for legibility over the panorama, ink once docked; the
+		// color settles before the swap so both copies match to the pixel.
+		.to(
+			hero,
+			{ color: INK_HEX, duration: cue.yearSwapLen, ease: "none" },
+			cue.yearSwapAt,
+		)
+		.set(hero, { autoAlpha: 0 }, swapEnd)
+		.set(odometer, { opacity: 1 }, swapEnd);
 
 	const hudIn = cue.hudInAt;
 	const hudLen = cue.hudInLen;
@@ -553,6 +588,8 @@ export function WorkHistorySection() {
 						yearInLen: phase.len[`year-in@${i}`],
 						yearDockAt: phase.at[`year-dock@${i}`],
 						yearDockLen: phase.len[`year-dock@${i}`],
+						yearSwapAt: phase.at[`year-swap@${i}`],
+						yearSwapLen: phase.len[`year-swap@${i}`],
 						hudInAt: phase.at[`hud-in@${i}`],
 						hudInLen: phase.len[`hud-in@${i}`],
 					});

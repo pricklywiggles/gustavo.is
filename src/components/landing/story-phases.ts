@@ -9,6 +9,8 @@ import type { CityChapter, PanoramaConfig } from "./work-history-data";
 // 0.4 keeps San Francisco's 13-year scrub (a still scene) near 5 viewports; at 0.5 it
 // was the longest beat on the page after the builds.
 export const SCRUB_VH_PER_YEAR = 0.4;
+// Shared by the dock and the swap anchored to its end, so the two cannot drift apart.
+const YEAR_DOCK_VH = 0.6;
 // The two chapter-transition beats overlap so the departure reads as one gesture.
 export const HUD_OUT_VH = 0.5;
 export const SCENE_OUT_VH = 1.8;
@@ -69,7 +71,15 @@ export function storyPhases(story: CityChapter[]) {
 			offset: pano.lastStep * pano.stepVh + pano.durVh / 2,
 		});
 		specs.push({ id: `year-in@${i}`, len: 0.45 });
-		specs.push({ id: `year-dock@${i}`, len: 0.6 });
+		specs.push({ id: `year-dock@${i}`, len: YEAR_DOCK_VH });
+		// The hero string hands off to the odometer while both sit still: after the
+		// dock, inside hud-in's tail, so the scrub and every later phase stay put.
+		specs.push({
+			id: `year-swap@${i}`,
+			len: 0.2,
+			with: `year-dock@${i}`,
+			offset: YEAR_DOCK_VH,
+		});
 		specs.push({
 			id: `hud-in@${i}`,
 			len: 0.55,
