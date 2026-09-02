@@ -44,9 +44,8 @@ describe("WorkHistorySection", () => {
 			expect(end()).toBe(`+=${1000 * total}`);
 			box = 800;
 			expect(end()).toBe(`+=${800 * total}`);
-			// FRA-192: a 3D-promoted year layer pixelates in desktop Safari (raster reused
-			// at dock size under the hero's ~11x upscale); per chapter, the year's set,
-			// year-in, and dock must all stay 2D.
+			// FRA-192 hygiene: promotion would put three hero-size masked digit surfaces on
+			// dedicated GPU layers; per chapter, the year's set, year-in, and dock stay 2D.
 			const isYear = (target: unknown) =>
 				(target as HTMLElement | undefined)?.hasAttribute?.(
 					"data-hud-year-value",

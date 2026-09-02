@@ -120,10 +120,11 @@ export const WorkHistoryHud = memo(function WorkHistoryHud({
 				>
 					{/* The year is LAID OUT at hero size and scaled DOWN to dock: Safari rasters
 					    text at layout size and never re-rasters under a transform upscale, so a
-					    dock-sized layout blurred the hero (FRA-192). The dock slot keeps its
-					    clamp height so the role caption never moves; motion-safe:opacity-0
-					    hides the giant pre-build layout until GSAP's fade owns visibility. */}
-					<div className="relative h-[clamp(2.25rem,3.4vw,3.25rem)] font-bold font-legend text-[clamp(2.25rem,3.4vw,3.25rem)] text-dusk-ink leading-none">
+					    dock-sized layout blurred the hero (FRA-192). 37vw makes four tabular
+					    digits (about 2.3 font-sizes wide) clear the 85 percent hero target; the
+					    1em slot keeps the role caption in place; motion-safe:opacity-0 hides
+					    the giant pre-build layout until GSAP's fade owns visibility. */}
+					<div className="relative h-[1em] font-bold font-legend text-[clamp(2.25rem,3.4vw,3.25rem)] text-dusk-ink leading-none">
 						<div
 							data-hud-year-value
 							className="absolute top-0 right-0 w-max origin-top-right text-[37vw] leading-none motion-safe:opacity-0"
