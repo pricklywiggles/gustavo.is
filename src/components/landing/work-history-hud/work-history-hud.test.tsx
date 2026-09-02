@@ -54,3 +54,59 @@ describe("WorkHistoryHud counter homes", () => {
 		expect(odometers(container)).toEqual({ bar: true, mobile: false });
 	});
 });
+
+// FRA-194: the product mark left the bar for the panorama's center, both marks pop
+// from their centers, and the bar keeps one larger company mark with no divider.
+describe("WorkHistoryHud marks", () => {
+	const first = CHAPTERS[0].stints[0];
+
+	it("centers the product mark outside the bar, after the year in reading order", async () => {
+		const container = await renderHudAt(false);
+		const product = container.querySelector("[data-hud-product]");
+		if (!product) throw new Error("no product layer");
+		expect(product.querySelector("img")?.getAttribute("alt")).toBe(
+			first.product,
+		);
+		expect(
+			container.querySelectorAll(`img[alt="${first.product}"]`),
+		).toHaveLength(1);
+		expect(
+			container.querySelector("[data-hud-bar] [data-hud-product]"),
+		).toBeNull();
+		expect(container.querySelector("[data-hud-divider]")).toBeNull();
+		// The img alt is the product's accessible name under motion.
+		expect(product.hasAttribute("aria-hidden")).toBe(false);
+		const year = container.querySelector("[data-hud-year]");
+		if (!year) throw new Error("no year");
+		expect(
+			year.compareDocumentPosition(product) & Node.DOCUMENT_POSITION_FOLLOWING,
+		).toBeTruthy();
+	});
+
+	it("pops both marks from the box center", async () => {
+		const container = await renderHudAt(false);
+		const marks = container.querySelectorAll<HTMLImageElement>(
+			"[data-hud-product] img, [data-hud-bar] img",
+		);
+		expect(marks).toHaveLength(2);
+		for (const mark of marks) {
+			expect(mark.style.transformOrigin).toBe("");
+			expect(mark.className).not.toMatch(/\bobject-(left|right)\b/);
+		}
+	});
+
+	it("sizes the company mark from its intrinsic ratio inside the larger slot", async () => {
+		const container = await renderHudAt(false);
+		const slot = container.querySelector("[data-hud-bar] [data-hud-slot]");
+		for (const cls of ["h-13.75", "w-40", "sm:w-50"]) {
+			expect(slot?.className).toContain(cls);
+		}
+		const mark = slot?.querySelector("img");
+		expect(mark?.getAttribute("alt")).toBe(first.company);
+		expect(Number(mark?.getAttribute("width"))).toBeGreaterThan(0);
+		expect(Number(mark?.getAttribute("height"))).toBeGreaterThan(0);
+		for (const cls of ["h-full", "w-auto", "max-w-full"]) {
+			expect(mark?.className).toContain(cls);
+		}
+	});
+});

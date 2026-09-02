@@ -54,15 +54,13 @@ const FADE: Variants = {
 	exit: { opacity: 0, transition: { duration: 0.15, ease: "easeIn" } },
 };
 
-// A fixed box equalizes logos from 6.5:1 wordmarks to 1:1 glyphs and keeps downstream
-// elements from shifting on stint change; below sm the boxes fit the 375px floor.
-const COMPANY_BOX = "h-11 w-32 shrink-0 sm:w-40";
-// Same fixed-box treatment; a name-only fallback covers stints whose art doesn't exist.
-const PRODUCT_BOX = "h-11 w-28 shrink-0 sm:w-36";
-// Same fixed height so all three boxes line up: the content is font-derived, so without
-// it the bar's alignment drifts with the legend face. Hidden below sm (top-left dl).
+// A fixed slot bounds logos from 6.5:1 wordmarks to 1:1 glyphs and keeps the counter from
+// shifting on stint change; below sm it fits the 375px floor.
+const COMPANY_BOX = "flex h-13.75 w-40 shrink-0 items-center sm:w-50";
+// Same fixed height so both boxes line up: the content is font-derived, so without it
+// the bar's alignment drifts with the legend face. Hidden below sm (top-left dl).
 const COUNTER_BOX =
-	"ml-auto hidden h-11 shrink-0 flex-col justify-center text-right sm:flex";
+	"ml-auto hidden h-13.75 shrink-0 flex-col justify-center text-right sm:flex";
 
 // The ~200 identical ticks otherwise rebuild on every readout push into the HUD.
 const RulerTicks = memo(function RulerTicks({ count }: { count: number }) {
@@ -163,6 +161,46 @@ export const WorkHistoryHud = memo(function WorkHistoryHud({
 					</p>
 				</div>
 
+				{/* The product mark holds the center of the panorama, where the reader is
+				    looking. Laid out at final size and only ever scaled down by the pop's
+				    start state (Safari rasters at layout size); the default origin is the
+				    box center, which object-contain makes the art's center. GSAP reveals the
+				    container on product-in, after the year has left the center; keyed on
+				    the art so carried marks never re-pop. */}
+				<div
+					data-hud-product
+					className="absolute inset-0 flex items-center justify-center"
+				>
+					<div className="h-[clamp(4rem,20vh,12rem)] w-[min(72vw,34rem)]">
+						<AnimatePresence mode="wait" initial={false}>
+							{stint.productLogo ? (
+								// biome-ignore lint/performance/noImgElement: fixed-box scene sprite; next/image adds nothing here
+								<m.img
+									key={stint.productLogo}
+									src={stint.productLogo}
+									alt={stint.product}
+									className="h-full w-full object-contain"
+									variants={pop}
+									initial="initial"
+									animate="enter"
+									exit="exit"
+								/>
+							) : (
+								<m.span
+									key={stint.product}
+									className="flex h-full items-center justify-center text-center font-bold font-display text-[clamp(1.75rem,4vw,3.5rem)] text-white leading-none"
+									variants={pop}
+									initial="initial"
+									animate="enter"
+									exit="exit"
+								>
+									{stint.product}
+								</m.span>
+							)}
+						</AnimatePresence>
+					</div>
+				</div>
+
 				{/* The bar's fixed boxes overflow a phone, so below sm the counter becomes its
 				    own top-left instrument; GSAP arrives it with the role caption. */}
 				<dl data-hud-counter className="absolute top-8 left-6 sm:hidden">
@@ -193,18 +231,21 @@ export const WorkHistoryHud = memo(function WorkHistoryHud({
 				{/* The right padding is asymmetric on purpose: it clears the ruler. */}
 				<div data-hud-bar className="absolute inset-x-0 bottom-0">
 					<div className="mx-auto flex max-w-6xl items-center gap-4 py-[clamp(0.75rem,1.6vh,1.25rem)] pr-16 pl-6 sm:gap-7 sm:pl-10">
-						{/* Both marks hug the divider and the pop's origin sits on that edge, so
-						    overshoot grows outward. Keys are the art: carried marks never re-pop. */}
+						{/* The mark hugs the bar's left padding as a shrink-to-fit image: the
+						    intrinsic size gives its ratio before load, so the default origin is
+						    the art's center and a cold swap never mounts at zero width. Keyed on
+						    the art: carried marks never re-pop. */}
 						<div data-hud-slot className={COMPANY_BOX}>
 							<AnimatePresence mode="wait" initial={false}>
 								{stint.companyLogo ? (
 									// biome-ignore lint/performance/noImgElement: fixed-box scene sprite; next/image adds nothing here
 									<m.img
-										key={stint.companyLogo}
-										src={stint.companyLogo}
+										key={stint.companyLogo.src}
+										src={stint.companyLogo.src}
+										width={stint.companyLogo.width}
+										height={stint.companyLogo.height}
 										alt={stint.company}
-										className="h-full w-full object-contain object-right"
-										style={{ transformOrigin: "100% 50%" }}
+										className="h-full w-auto max-w-full object-contain"
 										variants={pop}
 										initial="initial"
 										animate="enter"
@@ -213,52 +254,13 @@ export const WorkHistoryHud = memo(function WorkHistoryHud({
 								) : (
 									<m.span
 										key={stint.company}
-										className="flex h-full items-center justify-end font-semibold text-dusk-ink text-lg"
-										style={{ transformOrigin: "100% 50%" }}
+										className="flex h-full items-center font-semibold text-dusk-ink text-lg"
 										variants={pop}
 										initial="initial"
 										animate="enter"
 										exit="exit"
 									>
 										{stint.company}
-									</m.span>
-								)}
-							</AnimatePresence>
-						</div>
-
-						{/* Grows upward on arrival, so the company reads as bracketing the product. */}
-						<div
-							data-hud-divider
-							aria-hidden="true"
-							className="h-11 w-1 shrink-0 origin-bottom rounded-full bg-dusk-earth/50"
-						/>
-
-						<div data-hud-slot className={PRODUCT_BOX}>
-							<AnimatePresence mode="wait" initial={false}>
-								{stint.productLogo ? (
-									// biome-ignore lint/performance/noImgElement: fixed-box scene sprite; next/image adds nothing here
-									<m.img
-										key={stint.productLogo}
-										src={stint.productLogo}
-										alt={stint.product}
-										className="h-full w-full object-contain object-left"
-										style={{ transformOrigin: "0% 50%" }}
-										variants={pop}
-										initial="initial"
-										animate="enter"
-										exit="exit"
-									/>
-								) : (
-									<m.span
-										key={stint.product}
-										className="flex h-full items-center font-semibold text-dusk-ink text-lg"
-										style={{ transformOrigin: "0% 50%" }}
-										variants={pop}
-										initial="initial"
-										animate="enter"
-										exit="exit"
-									>
-										{stint.product}
 									</m.span>
 								)}
 							</AnimatePresence>

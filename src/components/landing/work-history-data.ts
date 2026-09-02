@@ -109,12 +109,16 @@ export type PanoramaConfig = {
 	sun?: SunConfig;
 };
 
+/** A logo under public/ with its intrinsic size, so a shrink-to-fit img has its ratio before load. */
+export type LogoArt = { src: string; width: number; height: number };
+
 export type Stint = {
 	company: string;
-	/** Path under public/, omitted while the asset doesn't exist yet. */
-	companyLogo?: string;
+	/** Omitted while the asset doesn't exist yet. */
+	companyLogo?: LogoArt;
 	role: string;
 	product: string;
+	/** Path under public/, omitted while the asset doesn't exist yet. */
 	productLogo?: string;
 	/** [start, end) in fractional years. */
 	years: [number, number];
@@ -672,6 +676,38 @@ const LA_PANORAMA: PanoramaConfig = {
 	],
 };
 
+// Intrinsic pixel sizes of the company marks; only the ratio matters.
+const MICROSOFT_LOGO: LogoArt = {
+	src: "/logos/microsoft.svg",
+	width: 1000,
+	height: 166,
+};
+const SLIDE_LOGO: LogoArt = {
+	src: "/logos/slide.com.webp",
+	width: 1383,
+	height: 527,
+};
+const JAWBONE_LOGO: LogoArt = {
+	src: "/logos/jawbone.svg",
+	width: 345,
+	height: 53,
+};
+const JAWBONE_HEALTH_LOGO: LogoArt = {
+	src: "/logos/jawbone-health.png",
+	width: 600,
+	height: 186,
+};
+const PONDER_LOGO: LogoArt = {
+	src: "/logos/ponder-logo.svg",
+	width: 1040,
+	height: 1040,
+};
+const TARTLE_LOGO: LogoArt = {
+	src: "/logos/tartle.svg",
+	width: 200,
+	height: 40,
+};
+
 // slide.com: a whole year per product after the photo app's two; one 20M figure spans the tenure.
 export const CHAPTERS: CityChapter[] = [
 	{
@@ -682,7 +718,7 @@ export const CHAPTERS: CityChapter[] = [
 		stints: [
 			{
 				company: "Microsoft",
-				companyLogo: "/logos/microsoft.svg",
+				companyLogo: MICROSOFT_LOGO,
 				role: "Software Design Engineer",
 				product: "Word",
 				productLogo: "/logos/word.webp",
@@ -691,7 +727,7 @@ export const CHAPTERS: CityChapter[] = [
 			},
 			{
 				company: "Microsoft",
-				companyLogo: "/logos/microsoft.svg",
+				companyLogo: MICROSOFT_LOGO,
 				role: "Software Design Engineer",
 				product: "Office",
 				productLogo: "/logos/office.svg",
@@ -702,7 +738,7 @@ export const CHAPTERS: CityChapter[] = [
 			},
 			{
 				company: "Microsoft",
-				companyLogo: "/logos/microsoft.svg",
+				companyLogo: MICROSOFT_LOGO,
 				role: "Software Design Engineer in Test",
 				product: "Natural Language Group",
 				productLogo: "/logos/nlg-logo.webp",
@@ -710,7 +746,7 @@ export const CHAPTERS: CityChapter[] = [
 			},
 			{
 				company: "Microsoft",
-				companyLogo: "/logos/microsoft.svg",
+				companyLogo: MICROSOFT_LOGO,
 				role: "Software Design Engineer in Test",
 				product: "Natural UI",
 				productLogo: "/logos/nui-logo.webp",
@@ -718,7 +754,7 @@ export const CHAPTERS: CityChapter[] = [
 			},
 			{
 				company: "Microsoft",
-				companyLogo: "/logos/microsoft.svg",
+				companyLogo: MICROSOFT_LOGO,
 				role: "Software Design Engineer in Test",
 				product: "VSTO",
 				productLogo: "/logos/vsto.webp",
@@ -734,7 +770,7 @@ export const CHAPTERS: CityChapter[] = [
 		stints: [
 			{
 				company: "slide.com",
-				companyLogo: "/logos/slide.com.webp",
+				companyLogo: SLIDE_LOGO,
 				role: "Software Design Engineer in Test",
 				product: "Slide Photo Sharing App",
 				productLogo: "/logos/slide-client.webp",
@@ -743,7 +779,7 @@ export const CHAPTERS: CityChapter[] = [
 			},
 			{
 				company: "slide.com",
-				companyLogo: "/logos/slide.com.webp",
+				companyLogo: SLIDE_LOGO,
 				role: "Director of Quality Assurance",
 				product: "Top Friends",
 				productLogo: "/logos/top-friends.webp",
@@ -751,7 +787,7 @@ export const CHAPTERS: CityChapter[] = [
 			},
 			{
 				company: "slide.com",
-				companyLogo: "/logos/slide.com.webp",
+				companyLogo: SLIDE_LOGO,
 				role: "Director of Quality Assurance",
 				product: "SuperPoke",
 				productLogo: "/logos/superpoke.webp",
@@ -759,7 +795,7 @@ export const CHAPTERS: CityChapter[] = [
 			},
 			{
 				company: "slide.com",
-				companyLogo: "/logos/slide.com.webp",
+				companyLogo: SLIDE_LOGO,
 				role: "Director of Quality Assurance",
 				product: "FunWall",
 				productLogo: "/logos/funwall.webp",
@@ -767,7 +803,7 @@ export const CHAPTERS: CityChapter[] = [
 			},
 			{
 				company: "slide.com",
-				companyLogo: "/logos/slide.com.webp",
+				companyLogo: SLIDE_LOGO,
 				role: "Director of Quality Assurance",
 				product: "SuperPoke Pets",
 				productLogo: "/logos/superpoke-pets.webp",
@@ -775,7 +811,7 @@ export const CHAPTERS: CityChapter[] = [
 			},
 			{
 				company: "slide.com",
-				companyLogo: "/logos/slide.com.webp",
+				companyLogo: SLIDE_LOGO,
 				role: "Product Manager",
 				product: "Superpocus",
 				productLogo: "/logos/superpocus.webp",
@@ -783,7 +819,7 @@ export const CHAPTERS: CityChapter[] = [
 			},
 			{
 				company: "Jawbone",
-				companyLogo: "/logos/jawbone.svg",
+				companyLogo: JAWBONE_LOGO,
 				role: "Product Manager",
 				product: "UP Fitness App",
 				productLogo: "/logos/up.webp",
@@ -792,7 +828,7 @@ export const CHAPTERS: CityChapter[] = [
 			},
 			{
 				company: "Jawbone",
-				companyLogo: "/logos/jawbone.svg",
+				companyLogo: JAWBONE_LOGO,
 				role: "Sr. Engineering Program Manager",
 				product: "UP24",
 				productLogo: "/logos/up24.webp",
@@ -801,7 +837,7 @@ export const CHAPTERS: CityChapter[] = [
 			},
 			{
 				company: "Jawbone",
-				companyLogo: "/logos/jawbone.svg",
+				companyLogo: JAWBONE_LOGO,
 				role: "Sr. Engineering Program Manager",
 				product: "UP 2",
 				productLogo: "/logos/up2.webp",
@@ -810,7 +846,7 @@ export const CHAPTERS: CityChapter[] = [
 			},
 			{
 				company: "Jawbone",
-				companyLogo: "/logos/jawbone.svg",
+				companyLogo: JAWBONE_LOGO,
 				role: "Sr. Engineering Program Manager",
 				product: "UP 3",
 				productLogo: "/logos/up3.webp",
@@ -828,7 +864,7 @@ export const CHAPTERS: CityChapter[] = [
 			// Worked remotely from LA, so it opens this chapter though the company stayed in SF.
 			{
 				company: "Jawbone Health Hub",
-				companyLogo: "/logos/jawbone-health.png",
+				companyLogo: JAWBONE_HEALTH_LOGO,
 				role: "Sr. Engineering Program Manager",
 				product: "Jawbone Health",
 				productLogo: "/logos/jawbone-health.png",
@@ -837,7 +873,7 @@ export const CHAPTERS: CityChapter[] = [
 			},
 			{
 				company: "Meaning",
-				companyLogo: "/logos/ponder-logo.svg",
+				companyLogo: PONDER_LOGO,
 				role: "Software Design Engineer / CTO",
 				product: "Ponder team collaboration",
 				productLogo: "/logos/ponder-teams.webp",
@@ -846,7 +882,7 @@ export const CHAPTERS: CityChapter[] = [
 			},
 			{
 				company: "Meaning",
-				companyLogo: "/logos/ponder-logo.svg",
+				companyLogo: PONDER_LOGO,
 				role: "Software Design Engineer / CTO",
 				product: "Ponder blogging platform",
 				productLogo: "/logos/ponder-blogs.webp",
@@ -855,7 +891,7 @@ export const CHAPTERS: CityChapter[] = [
 			},
 			{
 				company: "Tartle",
-				companyLogo: "/logos/tartle.svg",
+				companyLogo: TARTLE_LOGO,
 				role: "Staff Software Design Engineer",
 				product: "Tartle Marketplace",
 				productLogo: "/logos/marketplace.webp",
@@ -864,7 +900,7 @@ export const CHAPTERS: CityChapter[] = [
 			},
 			{
 				company: "Tartle",
-				companyLogo: "/logos/tartle.svg",
+				companyLogo: TARTLE_LOGO,
 				role: "Staff Software Design Engineer",
 				product: "Datavault",
 				productLogo: "/logos/datavault.webp",
@@ -873,7 +909,7 @@ export const CHAPTERS: CityChapter[] = [
 			},
 			{
 				company: "Tartle",
-				companyLogo: "/logos/tartle.svg",
+				companyLogo: TARTLE_LOGO,
 				role: "Staff Software Engineer",
 				product: "Mirror AI Health Coach",
 				productLogo: "/logos/mirror.webp",

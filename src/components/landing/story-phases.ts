@@ -11,6 +11,8 @@ import type { CityChapter, PanoramaConfig } from "./work-history-data";
 export const SCRUB_VH_PER_YEAR = 0.4;
 // Shared by the dock and the swap anchored to its end, so the two cannot drift apart.
 const YEAR_DOCK_VH = 0.6;
+// The centered product mark's reveal; it ties the swap's end and finishes inside hud-in.
+export const PRODUCT_IN_VH = 0.2;
 // The two chapter-transition beats overlap so the departure reads as one gesture.
 export const HUD_OUT_VH = 0.5;
 export const SCENE_OUT_VH = 1.8;
@@ -77,6 +79,13 @@ export function storyPhases(story: CityChapter[]) {
 		specs.push({
 			id: `year-swap@${i}`,
 			len: 0.2,
+			with: `year-dock@${i}`,
+			offset: YEAR_DOCK_VH,
+		});
+		// The mark arrives once the year has left the center, forward and in reverse.
+		specs.push({
+			id: `product-in@${i}`,
+			len: PRODUCT_IN_VH,
 			with: `year-dock@${i}`,
 			offset: YEAR_DOCK_VH,
 		});
