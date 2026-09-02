@@ -82,6 +82,17 @@ describe("WorkHistoryHud marks", () => {
 		).toBeTruthy();
 	});
 
+	it("frosts a plate in the band's surface color behind the product mark", async () => {
+		const container = await renderHudAt(false);
+		const mark = container.querySelector("[data-hud-product] img");
+		const plate = mark?.closest(".backdrop-blur-md");
+		if (!plate) throw new Error("no plate");
+		expect(plate.closest("[data-hud-product]")).not.toBeNull();
+		for (const cls of ["bg-pale-dune/60", "rounded-[2.5rem]", "ring-1"]) {
+			expect(plate.classList.contains(cls)).toBe(true);
+		}
+	});
+
 	it("pops both marks from the box center", async () => {
 		const container = await renderHudAt(false);
 		const marks = container.querySelectorAll<HTMLImageElement>(

@@ -99,7 +99,11 @@ Bullets name the file.
   readers never looked at the bar), after the year block in DOM order so
   the reading order stays year, then product, and laid out at its rest
   size (`h-[clamp(4rem,20vh,12rem)]`) for the same Safari raster reason.
-  GSAP reveals the layer with autoAlpha and `y` across `product-in@i`,
+  It sits on a frosted plate in the band's surface color (`bg-pale-dune/60`
+  over `backdrop-blur-md`, `rounded-[2.5rem]`, padding that tracks viewport
+  height from sm): the marks span every palette, and the plate keeps each
+  from clashing with or vanishing into its city while the art still reads
+  through. GSAP reveals the layer with autoAlpha and `y` across `product-in@i`,
   which starts at the dock's end so the year holds the center until it
   leaves, and never with a scale: the img inside is Motion's spring pop
   (keyed on the art, so a mark carried across stints never re-pops), and

@@ -56,6 +56,11 @@ const FADE: Variants = {
 
 // Fixed slot: marks run 6.5:1 to 1:1, the counter must not shift; w-40 fits 375px phones.
 const COMPANY_BOX = "flex h-13.75 w-40 shrink-0 items-center sm:w-50";
+// Glass, not a card: translucent surface color over a backdrop blur, so the city still
+// reads through, with a hairline ring and a top highlight for the pane's edge. From sm
+// the padding tracks viewport height like the mark box, so a landscape phone keeps it.
+const PRODUCT_PLATE =
+	"rounded-[2.5rem] bg-pale-dune/60 p-6 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.55)] ring-1 ring-white/40 backdrop-blur-md sm:p-[clamp(1.5rem,4.5vh,2.5rem)]";
 // Same height as the mark slot: font-derived content would drift with the legend face.
 const COUNTER_BOX =
 	"ml-auto hidden h-13.75 shrink-0 flex-col justify-center text-right sm:flex";
@@ -165,33 +170,37 @@ export const WorkHistoryHud = memo(function WorkHistoryHud({
 					data-hud-product
 					className="absolute inset-0 flex items-center justify-center"
 				>
-					<div className="h-[clamp(4rem,20vh,12rem)] w-[min(72vw,34rem)]">
-						<AnimatePresence mode="wait" initial={false}>
-							{stint.productLogo ? (
-								// biome-ignore lint/performance/noImgElement: fixed-box scene sprite; next/image adds nothing here
-								<m.img
-									key={stint.productLogo}
-									src={stint.productLogo}
-									alt={stint.product}
-									className="h-full w-full object-contain"
-									variants={pop}
-									initial="initial"
-									animate="enter"
-									exit="exit"
-								/>
-							) : (
-								<m.span
-									key={stint.product}
-									className="flex h-full items-center justify-center text-center font-bold font-display text-[clamp(1.75rem,4vw,3.5rem)] text-white leading-none"
-									variants={pop}
-									initial="initial"
-									animate="enter"
-									exit="exit"
-								>
-									{stint.product}
-								</m.span>
-							)}
-						</AnimatePresence>
+					{/* The marks span every palette; a frosted plate in the band's surface color
+					    keeps each one from clashing with or vanishing into its city. */}
+					<div className={PRODUCT_PLATE}>
+						<div className="h-[clamp(4rem,20vh,12rem)] w-[min(72vw,34rem)]">
+							<AnimatePresence mode="wait" initial={false}>
+								{stint.productLogo ? (
+									// biome-ignore lint/performance/noImgElement: fixed-box scene sprite; next/image adds nothing here
+									<m.img
+										key={stint.productLogo}
+										src={stint.productLogo}
+										alt={stint.product}
+										className="h-full w-full object-contain"
+										variants={pop}
+										initial="initial"
+										animate="enter"
+										exit="exit"
+									/>
+								) : (
+									<m.span
+										key={stint.product}
+										className="flex h-full items-center justify-center text-center font-bold font-display text-[clamp(1.75rem,4vw,3.5rem)] text-white leading-none"
+										variants={pop}
+										initial="initial"
+										animate="enter"
+										exit="exit"
+									>
+										{stint.product}
+									</m.span>
+								)}
+							</AnimatePresence>
+						</div>
 					</div>
 				</div>
 
