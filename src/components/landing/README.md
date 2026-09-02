@@ -71,6 +71,25 @@ Bullets name the file.
   never round or "tidy" them (see recipe below).
 - `work-history-hud.tsx`: instruments (year + role, ruler, stint bar,
   counter). Purely presentational; GSAP drives via `data-hud-*` hooks.
+  The year is two copies (FRA-192). `[data-hud-year-hero]` is a static
+  string of the chapter's start year, laid out at 37vw (absolute
+  top-right, `w-max`, kerning off, tabular digits) and only ever scaled
+  DOWN: desktop Safari rasters text at layout size and never re-rasters
+  under a transform upscale, whatever the layer arrangement, so a
+  dock-sized layout scaled up blurred the hero (proven by real-Safari
+  experiments after mask and promotion toggles changed nothing).
+  `[data-hud-year-value]` wraps the AnimateNumber odometer, in normal
+  flow at the slot's clamp size and NEVER transformed: its reels compute
+  travel from transform-inclusive rects and apply it as local `y`, so
+  under any ancestor scale they crawl a fraction of the way (the first
+  rework shipped that bug). `year-pose.ts` lands the string on the
+  odometer's glyph box (scale `dockFont / heroFont`, the 1em line box
+  centered in the 1.3em AnimateNumber box, right edges equal); the
+  string is white while large and tweens to ink across `year-swap`,
+  then a scrub-safe timeline `set()` hides it and shows the odometer
+  (opacity only, so the odometer stays the one accessible year). The
+  string's tweens carry `force3D: false` as hygiene; tests pin the
+  shape and the phase order.
 - `city-ledger.tsx`: the reduced-motion reading of a chapter (companies,
   positions, products, years) rendered under each static panorama;
   `display:none` under motion. See the reduced-motion section.
@@ -141,7 +160,10 @@ Bullets name the file.
     re-render) therefore finds no `[data-reel]` or `.split-char` yet:
     target the line instead (the `Work` ink drift tweens
     `[data-quote-result]`) or keep the query inside a function-based
-    value that GSAP evaluates later (`counterPoint`).
+    value that GSAP evaluates later (`counterPoint`). The year is the
+    one exception to "exactly once": its hero string is a second,
+    `aria-hidden` copy hidden by CSS until GSAP owns it, so the
+    accessible tree and the no-JS page still carry the odometer alone.
 
 ## iOS scroll smoothness: the hero's one clock and the projects overlay (FRA-185)
 
@@ -530,7 +552,11 @@ still `display: none`, rulers tall.
 - The year DOES use `AnimatedNumber` (AnimateNumber wrapper): unit ticks
   are its sweet spot. The wrapper computes `trend` from the last
   committed value because the library mutates a ref during render and
-  StrictMode's double-render zeroes its direction.
+  StrictMode's double-render zeroes its direction. Never put it (or any
+  Motion-animated node) under a GSAP scale: AnimateNumber's reels
+  measure their travel with `getBoundingClientRect`, so a scaled
+  ancestor shrinks every roll by the scale factor (FRA-192's first
+  rework). The hero year is a static string for exactly this reason.
 - Totals are cumulative across cities: `carriedUsersBefore()` sums prior
   chapters' finals; changing any `usersReached` updates hand-offs and
   the finale automatically (unit tests pin 0 / 200M / 223M).
@@ -582,6 +608,45 @@ front-to-back; files are numbered back-to-front.
   once cast off), 3 mid-Los Angeles, and 0 in the projects section and
   the footer. `ScrollTrigger.getById("ambience@1").isActive` must
   agree.
+- Subpixel seam scan (FRA-193): screenshot the page at a matrix of odd
+  viewport sizes (373x701 through 1920x1079) and about 24 scroll steps,
+  compute per-row luminance means in a canvas, and flag any row brighter
+  than both neighbors by more than 26. Zero findings expected in
+  chromium and webkit; a hit that stays at the same absolute y across
+  1023/1024/1025 viewport heights and softens at dpr 2 is bitmap
+  artwork, not a rounding seam. Section siblings are gapless by flow,
+  the landfall overlap covers its boundary, and globals.css paints the
+  `#work` pin spacer pale-dune so a fractional pin offset cannot show a
+  body-colored hairline.
+- Year swap and spin (FRA-192): geometry alone proved nothing here, the
+  reels broke while every settled rect was exact. Scan the scroll in
+  0.02-viewport steps for the first offset where `[data-hud-year-value]`
+  reads opacity 1 and `[data-hud-year-hero]` opacity 0, screenshot the
+  year corner at the offset just before and just after, and pixel-diff
+  the crops (expect only anti-aliasing noise, no shifted edges). Then
+  step through the scrub and, right after the odometer's `aria-label`
+  changes, sample the reel digits' `getBoundingClientRect().y` twice
+  120ms apart: they must MOVE (a stuck or 9-percent crawl means an
+  ancestor is scaled), then settle within about a second at one digit
+  pitch of 1.15em. Finish with a fast reverse and a jump back to the
+  hero: the string returns white at 85 percent of the width, the
+  odometer at opacity 0.
+- Scroll offsets while pinned: once the pin engages, `#work` is
+  `position: fixed`, so `getBoundingClientRect().top + scrollY` on it
+  returns the CURRENT scroll position, and every "absolute" offset a
+  probe computes from it becomes relative to wherever the page already
+  is (beats look compressed, rewinds never rewind, and the same
+  nonsense reproduces on any build). Anchor on the in-flow pin spacer
+  (`work.closest(".pin-spacer")`) instead, and drive reversals with
+  wheel events at least once: they are what a reader does.
+- Probing a production build (`next start`): its CSP carries
+  `upgrade-insecure-requests`, which Playwright webkit honors even on
+  localhost, upgrading every subresource to https against the http
+  server: nothing hydrates, pins never build, and probes silently
+  measure a static page. Strip the `content-security-policy` header on
+  the document via route interception, and gate on
+  `document.querySelectorAll(".pin-spacer").length` before trusting any
+  reading.
 - Probing anything below the projects section: the warp theater locks the
   page the first time its seed scrub completes, and its sim clock only
   runs while its stage is on screen, so repeated jump-past attempts can

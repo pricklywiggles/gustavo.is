@@ -118,12 +118,28 @@ export const WorkHistoryHud = memo(function WorkHistoryHud({
 					data-hud-year
 					className="absolute top-8 right-12 max-w-64 text-right"
 				>
-					{/* inline-block hugs the digits: the dock tween measures this element's center. */}
-					<div className="font-bold font-legend text-[clamp(2.25rem,3.4vw,3.25rem)] text-dusk-ink leading-none">
-						<div data-hud-year-value className="inline-block">
-							<AnimatedNumber format={{ useGrouping: false }}>
+					{/* Two copies of the year (FRA-192). The hero copy is a static string laid
+					    out at 37vw and only ever scaled DOWN (Safari rasters text at layout
+					    size). The odometer stays untransformed in flow: its reels compute
+					    travel from transform-inclusive rects, so any ancestor scale breaks the
+					    spin. GSAP docks the string onto the odometer's glyph box and swaps
+					    them; the string is white while large for legibility, ink by the swap.
+					    Kerning off and tabular digits match the odometer's isolated digits. */}
+					<div className="relative font-bold font-legend text-[clamp(2.25rem,3.4vw,3.25rem)] text-dusk-ink leading-none">
+						<div data-hud-year-value>
+							<AnimatedNumber
+								data-hud-year-number
+								format={{ useGrouping: false }}
+							>
 								{year}
 							</AnimatedNumber>
+						</div>
+						<div
+							data-hud-year-hero
+							aria-hidden="true"
+							className="absolute top-0 right-0 w-max origin-top-right text-[37vw] text-white leading-none tabular-nums [font-kerning:none] motion-safe:opacity-0"
+						>
+							{span[0]}
 						</div>
 					</div>
 					{/* Keyed on the value so a title carrying across consecutive stints never
