@@ -12,8 +12,9 @@ the "Play + Purpose = Work" equation (right-aligned terms, a drawn rule,
 then the result taking the ink drift), then three city chapters (Seattle,
 San Francisco, Los Angeles), each with a layer-cascade panorama build,
 a parallax breath
-that opens a HUD band, a year hero that docks top-right, instrument
-entrances, and a time scrub driving year/stint/users readouts; chapters
+that opens a HUD band, a year hero that docks top-right, the product
+mark rising into the center it leaves, instrument entrances, and a time
+scrub driving year/stint/users readouts; chapters
 are joined by HUD-out/scene-out transitions, and the story ends with a
 dusk outro (band closes, sun sets, depth-staggered dim to dusk-ink).
 `?chapter=N` previews a single city through the identical code path.
@@ -31,8 +32,11 @@ Bullets name the file.
   holds the playhead.
 - `story-phases.ts`: `storyPhases()` builds the phase list (ids
   namespaced per chapter, e.g. `scrub@1`) and owns the pacing knobs:
-  `SCRUB_VH_PER_YEAR`, `HUD_OUT_VH`, `SCENE_OUT_VH`, `EXIT_SETTLE_VH`,
-  and `PACING_BUDGET`. DOM-free so the speed map can import it.
+  `SCRUB_VH_PER_YEAR`, `PRODUCT_IN_VH` (0.2, anchored to the dock's end
+  like `year-swap`; at most 0.25, so it ends inside `hud-in` and moves
+  neither the scrub nor `total`), `HUD_OUT_VH`, `SCENE_OUT_VH`,
+  `EXIT_SETTLE_VH`, and `PACING_BUDGET`. DOM-free so the speed map can
+  import it.
 - `scroll-phases.ts`: `resolvePhases()`, sequential cursor plus
   `with`/`offset` anchoring. Reordering the story is reordering the list.
 - `panorama-phases.ts`: all timeline builders (cascade, year cues,
@@ -69,8 +73,9 @@ Bullets name the file.
 - `work-history-data.ts`: ALL per-city config and career data. Layer
   positions are template-matched from the author's reference screenshots;
   never round or "tidy" them (see recipe below).
-- `work-history-hud.tsx`: instruments (year + role, ruler, stint bar,
-  counter). Purely presentational; GSAP drives via `data-hud-*` hooks.
+- `work-history-hud.tsx`: instruments (year + role, the centered product
+  mark, ruler, company bar, counter). Purely presentational; GSAP drives
+  via `data-hud-*` hooks.
   The year is two copies (FRA-192). `[data-hud-year-hero]` is a static
   string of the chapter's start year, laid out at 37vw (absolute
   top-right, `w-max`, kerning off, tabular digits) and only ever scaled
@@ -90,6 +95,25 @@ Bullets name the file.
   (opacity only, so the odometer stays the one accessible year). The
   string's tweens carry `force3D: false` as hygiene; tests pin the
   shape and the phase order.
+  The product mark is the centered `[data-hud-product]` layer (FRA-194:
+  readers never looked at the bar), after the year block in DOM order so
+  the reading order stays year, then product, and laid out at its rest
+  size (`h-[clamp(4rem,20vh,12rem)]`) for the same Safari raster reason.
+  GSAP reveals the layer with autoAlpha and `y` across `product-in@i`,
+  which starts at the dock's end so the year holds the center until it
+  leaves, and never with a scale: the img inside is Motion's spring pop
+  (keyed on the art, so a mark carried across stints never re-pops), and
+  a scaled ancestor compounds it (the counter section's rule; the
+  work-history test pins the vars). Both marks pop from their box
+  center; the edge origins, `object-left`/`object-right`, and the bar's
+  divider went with the move. The bar keeps one slot, `h-13.75 w-40
+  sm:w-50` (a quarter larger; the counter box matches its height),
+  holding a shrink-to-fit img (`h-full w-auto max-w-full object-contain`)
+  whose `width`/`height` attributes come from `Stint.companyLogo`, now a
+  `LogoArt` (`src` plus intrinsic pixels) in work-history-data.ts: with
+  the ratio known before load, a cold swap pops at its final width
+  instead of growing from zero. `productLogo` stays a bare path; its box
+  is fixed on both axes.
 - `city-ledger.tsx`: the reduced-motion reading of a chapter (companies,
   positions, products, years) rendered under each static panorama;
   `display:none` under motion. See the reduced-motion section.
@@ -287,8 +311,8 @@ mount, so there is nothing to hydrate or refresh on a viewport flip.
   arc derives its swell-dive pairing from the desktop size).
 - Vessels: sail-in entry points derive from the stage's real left edge
   (`vesselSailStartPct`), never from an assumed centered stage.
-- Users counter: the bar's logo boxes shrink below sm (SE 375px floor)
-  and the bar's counter slot hides; a compact `data-hud-counter`
+- Users counter: the bar's company box narrows below sm (`w-40`, the
+  SE 375px floor) and its counter slot hides; a compact `data-hud-counter`
   instrument takes the top-left corner, sharing the role caption's
   entrance tween and exiting with the whole HUD. Both counter shells
   stay mounted as stable GSAP targets; only the active one mounts the
