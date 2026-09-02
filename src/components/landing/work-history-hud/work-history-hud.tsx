@@ -118,9 +118,16 @@ export const WorkHistoryHud = memo(function WorkHistoryHud({
 					data-hud-year
 					className="absolute top-8 right-12 max-w-64 text-right"
 				>
-					{/* inline-block hugs the digits: the dock tween measures this element's center. */}
-					<div className="font-bold font-legend text-[clamp(2.25rem,3.4vw,3.25rem)] text-dusk-ink leading-none">
-						<div data-hud-year-value className="inline-block">
+					{/* The year is LAID OUT at hero size and scaled DOWN to dock: Safari rasters
+					    text at layout size and never re-rasters under a transform upscale, so a
+					    dock-sized layout blurred the hero (FRA-192). The dock slot keeps its
+					    clamp height so the role caption never moves; motion-safe:opacity-0
+					    hides the giant pre-build layout until GSAP's fade owns visibility. */}
+					<div className="relative h-[clamp(2.25rem,3.4vw,3.25rem)] font-bold font-legend text-[clamp(2.25rem,3.4vw,3.25rem)] text-dusk-ink leading-none">
+						<div
+							data-hud-year-value
+							className="absolute top-0 right-0 w-max origin-top-right text-[37vw] leading-none motion-safe:opacity-0"
+						>
 							<AnimatedNumber format={{ useGrouping: false }}>
 								{year}
 							</AnimatedNumber>

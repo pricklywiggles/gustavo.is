@@ -71,10 +71,15 @@ Bullets name the file.
   never round or "tidy" them (see recipe below).
 - `work-history-hud.tsx`: instruments (year + role, ruler, stint bar,
   counter). Purely presentational; GSAP drives via `data-hud-*` hooks.
-  The year's cue tweens carry `force3D: false`: desktop Safari reuses a
-  promoted layer's raster at layout size, so the hero's ~11x upscale of
-  the dock-sized digits reads pixelated under a 3D transform (FRA-192;
-  a test pins the flag).
+  The year is LAID OUT at hero size (37vw, absolute top-right in a
+  clamp-height dock slot) and only ever scaled DOWN (hero about 0.98,
+  dock `dockFont / heroFont`): desktop Safari rasters text at layout
+  size and never re-rasters under a transform upscale, whatever the
+  layer arrangement, so the old dock-sized layout blurred the hero
+  (FRA-192; proven by real-Safari experiments after mask and promotion
+  toggles changed nothing). The cue tweens also carry `force3D: false`
+  as hygiene; a test pins the flag. AnimateNumber's reel widths are
+  em-based, so they track the hero font.
 - `city-ledger.tsx`: the reduced-motion reading of a chapter (companies,
   positions, products, years) rendered under each static panorama;
   `display:none` under motion. See the reduced-motion section.

@@ -219,22 +219,37 @@ function buildHudEntrance(
 		}
 		return measured;
 	};
+	// The year is laid out at hero size (37vw, always at least the 85 percent target)
+	// and only ever scaled DOWN: Safari rasters text at layout size and never
+	// re-rasters under a transform upscale (FRA-192). Scaling about the top-right
+	// anchor makes the dock state a plain scale with no translation.
 	const heroScale = () => {
 		const { rect, host } = measure();
-		return rect.width > 0 ? (host.width * YEAR_HERO_WIDTH) / rect.width : 1;
+		return rect.width > 0
+			? Math.min(1, (host.width * YEAR_HERO_WIDTH) / rect.width)
+			: 1;
 	};
 	const heroX = () => {
 		const { rect, host } = measure();
-		return host.left + host.width / 2 - (rect.left + rect.width / 2);
+		const s = heroScale();
+		return host.left + host.width / 2 - (rect.right - (rect.width * s) / 2);
 	};
 	const heroY = () => {
 		const { rect, host } = measure();
-		return host.top + host.height / 2 - (rect.top + rect.height / 2);
+		const s = heroScale();
+		return host.top + host.height / 2 - (rect.top + (rect.height * s) / 2);
+	};
+	// The docked glyphs must render at the slot's clamp size exactly.
+	const dockScale = () => {
+		const slot = yearValue.parentElement;
+		if (!slot) return 1;
+		const heroFont = Number.parseFloat(getComputedStyle(yearValue).fontSize);
+		const dockFont = Number.parseFloat(getComputedStyle(slot).fontSize);
+		return heroFont > 0 ? dockFont / heroFont : 1;
 	};
 
-	// force3D false: desktop Safari reuses a composited layer's raster at layout size,
-	// so the hero's ~11x upscale of the dock-sized digits reads pixelated (FRA-192).
-	gsap.set(yearValue, { transformOrigin: "50% 50%", force3D: false });
+	// force3D false stays as hygiene: a promoted layer pins the raster Safari chose.
+	gsap.set(yearValue, { transformOrigin: "100% 0%", force3D: false });
 	tl.fromTo(
 		yearValue,
 		{ autoAlpha: 0, x: heroX, y: heroY, scale: heroScale, force3D: false },
@@ -253,7 +268,7 @@ function buildHudEntrance(
 		{
 			x: 0,
 			y: 0,
-			scale: 1,
+			scale: dockScale,
 			duration: cue.yearDockLen,
 			ease: "power3.inOut",
 			force3D: false,
