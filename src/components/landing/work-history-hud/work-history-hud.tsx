@@ -118,25 +118,28 @@ export const WorkHistoryHud = memo(function WorkHistoryHud({
 					data-hud-year
 					className="absolute top-8 right-12 max-w-64 text-right"
 				>
-					{/* The year is LAID OUT at hero size and scaled DOWN to dock: Safari rasters
-					    text at layout size and never re-rasters under a transform upscale, so a
-					    dock-sized layout blurred the hero (FRA-192). 37vw keeps every start
-					    year at or under scale 1 (widths vary per digits; start-year scales run
-					    about 0.88 to 0.99). The 1.3em slot equals the number's old in-flow
-					    height (1em glyphs plus 0.3em of digit and mask padding), keeping the
-					    role caption where it was; motion-safe:opacity-0 hides the giant
-					    pre-build layout until GSAP's fade owns visibility. */}
-					<div className="relative h-[1.3em] font-bold font-legend text-[clamp(2.25rem,3.4vw,3.25rem)] text-dusk-ink leading-none">
-						{/* data-year mirrors the displayed value for the GSAP hero math: the
-						    readout's textContent is the reel's whole digit run, unreadable. */}
-						<div
-							data-hud-year-value
-							data-year={year}
-							className="absolute top-0 right-0 w-max origin-top-right text-[37vw] leading-none motion-safe:opacity-0"
-						>
-							<AnimatedNumber format={{ useGrouping: false }}>
+					{/* Two copies of the year (FRA-192). The hero copy is a static string laid
+					    out at 37vw and only ever scaled DOWN (Safari rasters text at layout
+					    size). The odometer stays untransformed in flow: its reels compute
+					    travel from transform-inclusive rects, so any ancestor scale breaks the
+					    spin. GSAP docks the string onto the odometer's glyph box and swaps
+					    them; the string is white while large for legibility, ink by the swap.
+					    Kerning off and tabular digits match the odometer's isolated digits. */}
+					<div className="relative font-bold font-legend text-[clamp(2.25rem,3.4vw,3.25rem)] text-dusk-ink leading-none">
+						<div data-hud-year-value>
+							<AnimatedNumber
+								data-hud-year-number
+								format={{ useGrouping: false }}
+							>
 								{year}
 							</AnimatedNumber>
+						</div>
+						<div
+							data-hud-year-hero
+							aria-hidden="true"
+							className="absolute top-0 right-0 w-max origin-top-right text-[37vw] text-white leading-none tabular-nums [font-kerning:none] motion-safe:opacity-0"
+						>
+							{span[0]}
 						</div>
 					</div>
 					{/* Keyed on the value so a title carrying across consecutive stints never
