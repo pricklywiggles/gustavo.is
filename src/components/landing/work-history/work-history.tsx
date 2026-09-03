@@ -385,6 +385,26 @@ export function WorkHistorySection() {
 	);
 
 	// Full value so reduced motion and SSR read right; the scrubs reset it at build.
+	// Stable objects: WorkHistoryHud is memoized, so a fresh pose per render would re-render
+	// every chapter's HUD on each readout push.
+	const atRest = useMemo(
+		() =>
+			story.map((chapter, i) => ({
+				past: {
+					year: chapter.span[1],
+					stintIndex: chapter.stints.length - 1,
+					usersTotal:
+						carried[i] + cumulativeUsersAt(chapter.stints, chapter.span[1]),
+				},
+				future: {
+					year: chapter.span[0],
+					stintIndex: 0,
+					usersTotal: carried[i],
+				},
+			})),
+		[story, carried],
+	);
+
 	const [chapterIndex, setChapterIndex] = useState(0);
 	const [usersTotal, setUsersTotal] = useState(
 		() => carried[0] + cumulativeUsersAt(story[0].stints, story[0].span[1]),
@@ -799,22 +819,27 @@ export function WorkHistorySection() {
 				</Fragment>
 			))}
 			{/* Each chapter owns its HUD DOM so GSAP choreographs lifetimes without fighting
-			    React; inactive chapters get quiet props so hidden instruments never roll. */}
-			{story.map((chapter, i) => (
-				// Hidden, never unmounted: GSAP owns these nodes (invariant 6).
-				<div
-					key={`hud-${chapter.id}`}
-					className="motion-reduce:hidden"
-					ref={hudRefFns[i]}
-				>
-					<WorkHistoryHud
-						span={chapter.span}
-						year={chapterIndex === i ? year : chapter.span[0]}
-						stint={chapter.stints[chapterIndex === i ? stintIndex : 0]}
-						usersTotal={chapterIndex === i ? usersTotal : carried[i]}
-					/>
-				</div>
-			))}
+			    React; inactive chapters get constant props so hidden instruments never roll. */}
+			{story.map((chapter, i) => {
+				// Reversing fades a finished chapter's HUD in before its scrub re-engages (FRA-195).
+				const rest = i < chapterIndex ? atRest[i].past : atRest[i].future;
+				const live = chapterIndex === i;
+				return (
+					// Hidden, never unmounted: GSAP owns these nodes (invariant 6).
+					<div
+						key={`hud-${chapter.id}`}
+						className="motion-reduce:hidden"
+						ref={hudRefFns[i]}
+					>
+						<WorkHistoryHud
+							span={chapter.span}
+							year={live ? year : rest.year}
+							stint={chapter.stints[live ? stintIndex : rest.stintIndex]}
+							usersTotal={live ? usersTotal : rest.usersTotal}
+						/>
+					</div>
+				);
+			})}
 		</section>
 	);
 }

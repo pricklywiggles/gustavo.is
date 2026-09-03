@@ -1,11 +1,15 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { RAMP_HEX } from "@/lib/ramp";
 import { spyEmptyTimelines, type TimelineCall } from "@/test/empty-timelines";
 import { stageWindow, storyPhases } from "../story-phases";
-import { CHAPTERS } from "../work-history-data";
+import {
+	CHAPTERS,
+	carriedUsersBefore,
+	cumulativeUsersAt,
+} from "../work-history-data";
 import { WorkHistorySection } from "./work-history";
 
 afterEach(() => {
@@ -343,6 +347,60 @@ describe("WorkHistorySection", () => {
 			expect(at[`product-in@${i}`]).toBe(end(`year-dock@${i}`));
 			expect(end(`product-in@${i}`)).toBeLessThanOrEqual(at[`scrub@${i}`]);
 			expect(end(`product-in@${i}`)).toBeLessThanOrEqual(end(`hud-in@${i}`));
+		}
+	});
+
+	// FRA-195: reversing fades a finished chapter's HUD back in before its scrub re-engages.
+	it("rests a finished chapter on its last stint while a later chapter scrubs", () => {
+		const original = window.matchMedia;
+		window.matchMedia = ((query: string) => ({
+			...original(query),
+			matches: query === "(prefers-reduced-motion: no-preference)",
+		})) as typeof window.matchMedia;
+		const actGlobal = globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean };
+		const previousActFlag = actGlobal.IS_REACT_ACT_ENVIRONMENT;
+		const calls: TimelineCall[] = [];
+		spyEmptyTimelines(calls);
+		try {
+			// RTL only flags the act environment inside its own render.
+			actGlobal.IS_REACT_ACT_ENVIRONMENT = true;
+			const { container, unmount } = render(<WorkHistorySection />);
+			const scrubs = calls.filter(
+				(call) =>
+					call.method === "to" &&
+					typeof (call.args[0] as { year?: unknown })?.year === "number" &&
+					typeof (call.args[1] as { onUpdate?: unknown })?.onUpdate ===
+						"function",
+			);
+			expect(scrubs).toHaveLength(CHAPTERS.length);
+			const clock = scrubs[1].args[0] as { year: number };
+			const vars = scrubs[1].args[1] as { onUpdate: () => void };
+			act(() => {
+				clock.year = CHAPTERS[1].span[0] + 1;
+				vars.onUpdate();
+			});
+			const section = container.querySelector("section#work");
+			if (!section) throw new Error("no section");
+			const huds = [...section.children].filter((el) =>
+				el.querySelector("[data-hud-year]"),
+			);
+			// The product mark sits behind AnimatePresence mode="wait", which never settles in jsdom.
+			const totalOf = (hud: Element) =>
+				[...hud.querySelectorAll("[data-hud-bar] .sr-only")].at(-1)
+					?.textContent;
+			const seattle = CHAPTERS[0];
+			const finished =
+				carriedUsersBefore(CHAPTERS, 0) +
+				cumulativeUsersAt(seattle.stints, seattle.span[1]);
+			expect(finished).toBeGreaterThan(0);
+			expect(totalOf(huds[0])).toBe(finished.toLocaleString("en-US"));
+			expect(totalOf(huds[2])).toBe(
+				carriedUsersBefore(CHAPTERS, 2).toLocaleString("en-US"),
+			);
+			unmount();
+		} finally {
+			actGlobal.IS_REACT_ACT_ENVIRONMENT = previousActFlag;
+			window.matchMedia = original;
 		}
 	});
 });
