@@ -114,7 +114,7 @@ Personal site (about, two `/remembering` retrospectives, a blog) with a contact 
 - Read reduced motion through `useReducedMotionLive` (`src/components/use-reduced-motion-live.ts`), never Motion's `useReducedMotion`, which is true on a reduced client's first render and would branch SSR-visible DOM.
 - Gate iOS-only fixes on `isIOSDevice()` (`src/lib/ios-device.ts`), never a media query, and never trade desktop or Android behavior for an iOS fix. Chrome on iOS shares Safari's engine and the same code path.
 - Instrumentation lives in `src/`: Next loads one `instrumentation-client.ts` and `src/` wins, so a root copy is dead and BotID then rejects every visitor.
-- CI and Vercel both need `MOTION_TOKEN` or the Motion+ install 401s; Vercel additionally needs `ENABLE_EXPERIMENTAL_COREPACK=1` or it falls back to an old pnpm that rejects the pnpm 11 workspace file.
+- CI and Vercel both need `MOTION_TOKEN` (or the Motion+ install 401s) and `FONTS_KEY` (or `scripts/fonts.mjs` cannot decrypt the licensed faces and the build stops); Vercel additionally needs `ENABLE_EXPERIMENTAL_COREPACK=1` or it falls back to an old pnpm that rejects the pnpm 11 workspace file.
 - CI gates every PR on `biome check`, `tsc --noEmit`, `vitest run` and a production build. Async Server Components are not vitest-testable, so verify those with the build plus browser checks.
 
 Detail for every pin, the wiring, and the notes carried forward from earlier docs: docs/stack-notes.md. Read it before changing configuration or adding a tool.

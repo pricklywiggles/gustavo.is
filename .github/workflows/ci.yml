@@ -33,6 +33,9 @@ jobs:
         env:
           MOTION_TOKEN: ${{ secrets.MOTION_TOKEN }}
       - run: pnpm install --frozen-lockfile
+      - run: pnpm run fonts
+        env:
+          FONTS_KEY: ${{ secrets.FONTS_KEY }}
       # tsc needs the gitignored .source and next-env.d.ts.
       - run: pnpm exec fumadocs-mdx
       - run: pnpm exec next typegen
@@ -57,4 +60,7 @@ jobs:
         env:
           MOTION_TOKEN: ${{ secrets.MOTION_TOKEN }}
       - run: pnpm install --frozen-lockfile
+      - run: pnpm run fonts
+        env:
+          FONTS_KEY: ${{ secrets.FONTS_KEY }}
       - run: pnpm build

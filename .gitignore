@@ -68,9 +68,11 @@ public/frames/
 
 # Untracked folders
 /tmp
-# Licensed font master: the site serves the subset WOFF2; distributing the
-# full OTF is what most font licenses forbid.
-src/fonts/Kitora-Bold.otf
+# Licensed faces: tracked only as src/fonts/fonts.tar.enc, decrypted by
+# scripts/fonts.mjs before dev and build. In the clear they would be the
+# redistribution both foundry EULAs forbid.
+src/fonts/*.woff2
+src/fonts/*.otf
 
 # ship-it worktrees live under .claude but must never be committed
 .claude/worktrees/
