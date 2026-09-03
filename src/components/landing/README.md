@@ -92,9 +92,9 @@ Bullets name the file.
   centered in the 1.3em AnimateNumber box, right edges equal); the
   string is white while large and tweens to ink across `year-swap`,
   then a scrub-safe timeline `set()` hides it and shows the odometer
-  (opacity only, so the odometer stays the one accessible year). The
-  string's tweens carry `force3D: false` as hygiene; tests pin the
-  shape and the phase order.
+  (opacity only, so the odometer's visually hidden text stays the one
+  accessible year). The string's tweens carry `force3D: false` as
+  hygiene; tests pin the shape and the phase order.
   The product mark is the centered `[data-hud-product]` layer (FRA-194:
   readers never looked at the bar), after the year block in DOM order so
   the reading order stays year, then product, and laid out at its rest
@@ -189,9 +189,12 @@ Bullets name the file.
     target the line instead (the `Work` ink drift tweens
     `[data-quote-result]`) or keep the query inside a function-based
     value that GSAP evaluates later (`counterPoint`). The year is the
-    one exception to "exactly once": its hero string is a second,
-    `aria-hidden` copy hidden by CSS until GSAP owns it, so the
-    accessible tree and the no-JS page still carry the odometer alone.
+    one exception to "exactly once". `AnimatedNumber` renders the
+    Motion+ markup `aria-hidden` (the library labels a role-less span,
+    which ARIA prohibits and screen readers drop) beside a visually
+    hidden text copy, and the hero string is a further `aria-hidden`
+    copy hidden by CSS until GSAP owns it, so the accessible tree
+    carries the year exactly once and the no-JS page shows it once.
 
 ## iOS scroll smoothness: the hero's one clock and the projects overlay (FRA-185)
 
