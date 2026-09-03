@@ -385,7 +385,8 @@ export function WorkHistorySection() {
 	);
 
 	// Full value so reduced motion and SSR read right; the scrubs reset it at build.
-	// Both poses are constant per chapter, so an inactive HUD's props never change identity.
+	// Stable objects: WorkHistoryHud is memoized, so a fresh pose per render would re-render
+	// every chapter's HUD on each readout push.
 	const atRest = useMemo(
 		() =>
 			story.map((chapter, i) => ({
@@ -820,8 +821,7 @@ export function WorkHistorySection() {
 			{/* Each chapter owns its HUD DOM so GSAP choreographs lifetimes without fighting
 			    React; inactive chapters get constant props so hidden instruments never roll. */}
 			{story.map((chapter, i) => {
-				// A finished chapter rests on its last stint: reversing into one fades its HUD
-				// back in before the scrub re-engages, and span[0] showed the first (FRA-195).
+				// Reversing fades a finished chapter's HUD in before its scrub re-engages (FRA-195).
 				const rest = i < chapterIndex ? atRest[i].past : atRest[i].future;
 				const live = chapterIndex === i;
 				return (

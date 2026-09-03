@@ -362,7 +362,7 @@ describe("WorkHistorySection", () => {
 		const calls: TimelineCall[] = [];
 		spyEmptyTimelines(calls);
 		try {
-			// RTL only flags the act environment inside its own render; this drives a tween callback.
+			// RTL only flags the act environment inside its own render.
 			actGlobal.IS_REACT_ACT_ENVIRONMENT = true;
 			const { container, unmount } = render(<WorkHistorySection />);
 			const scrubs = calls.filter(
@@ -373,10 +373,6 @@ describe("WorkHistorySection", () => {
 						"function",
 			);
 			expect(scrubs).toHaveLength(CHAPTERS.length);
-			console.log(
-				"CLOCK STARTS:",
-				JSON.stringify(scrubs.map((c) => (c.args[0] as { year: number }).year)),
-			);
 			const clock = scrubs[1].args[0] as { year: number };
 			const vars = scrubs[1].args[1] as { onUpdate: () => void };
 			act(() => {
@@ -388,8 +384,7 @@ describe("WorkHistorySection", () => {
 			const huds = [...section.children].filter((el) =>
 				el.querySelector("[data-hud-year]"),
 			);
-			// The product mark sits behind AnimatePresence mode="wait", which never settles in
-			// jsdom; the counter renders its value straight, and 0 is the symptom readers saw.
+			// The product mark sits behind AnimatePresence mode="wait", which never settles in jsdom.
 			const totalOf = (hud: Element) =>
 				[...hud.querySelectorAll("[data-hud-bar] .sr-only")].at(-1)
 					?.textContent;
