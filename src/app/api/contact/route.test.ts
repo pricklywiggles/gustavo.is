@@ -1,6 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { POST } from "./route";
 
+// Off Vercel, checkBotId() has no request context and logs a misconfiguration warning per call.
+const botId = vi.hoisted(() => ({ verdict: { isBot: false } }));
+vi.mock("botid/server", () => ({
+	checkBotId: async () => botId.verdict,
+}));
+
 function jsonRequest(body: unknown) {
 	return new Request("http://localhost/api/contact", {
 		method: "POST",
@@ -12,6 +18,7 @@ function jsonRequest(body: unknown) {
 describe("POST /api/contact", () => {
 	afterEach(() => {
 		vi.unstubAllEnvs();
+		botId.verdict = { isBot: false };
 	});
 
 	it("rejects a submission missing required fields", async () => {
@@ -32,6 +39,15 @@ describe("POST /api/contact", () => {
 		);
 		expect(response.status).toBe(200);
 		expect(await response.json()).toEqual({ ok: true });
+	});
+
+	it("returns 403 when BotID flags the request", async () => {
+		botId.verdict = { isBot: true };
+		const response = await POST(
+			jsonRequest({ name: "Ada", email: "ada@example.com", message: "Hello" }),
+		);
+		expect(response.status).toBe(403);
+		expect(await response.json()).toEqual({ error: "Request blocked" });
 	});
 
 	it("returns 500 when RESEND_API_KEY is not configured", async () => {
