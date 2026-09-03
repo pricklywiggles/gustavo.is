@@ -3,11 +3,6 @@ import { useState } from "react";
 import { AnimatedButton } from "@/components/animated-button";
 import { cta } from "@/lib/cta";
 
-/**
- * System rule (DESIGN.md): any button whose content changes with state uses
- * AnimatedButton so the box springs to the new size instead of snapping.
- * Shipped in the contact form's send/cancel pair.
- */
 const meta = {
 	title: "Buttons/Animated button",
 	component: AnimatedButton,

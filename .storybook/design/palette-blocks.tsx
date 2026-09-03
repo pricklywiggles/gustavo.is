@@ -9,7 +9,6 @@ import {
 
 const lightness = (slug: RampToken) => Number(RAMP_OKLCH[slug].split(" ")[0]);
 
-/** Ink that reads on the swatch itself, so labels never sit on their own colour. */
 const inkOn = (slug: RampToken) =>
 	lightness(slug) > 0.62 ? rampColor("dusk-ink") : rampColor("first-light");
 
@@ -19,23 +18,13 @@ const entry = (slug: RampToken) => {
 	return found;
 };
 
-/* Styles ----------------------------------------------------------------- */
-
 /**
- * This page styles itself rather than reaching for Tailwind. Tailwind's source detection
- * skips hidden directories, so no utility written under `.storybook/` is ever generated
- * unless `src/` happens to use the identical class, and adding `.storybook/` to `@source`
- * would push documentation-only utilities into the shipped site CSS. Colours still come
- * from the live tokens, so the page tracks the ramp either way.
- *
- * Storybook's docs theme paints colour, font, and margin onto the elements it renders,
- * unlayered. These rules beat it on specificity (a class inside a class); the two places
- * that style elements this file does not own take `!important` instead.
+ * Inline: Tailwind skips hidden dirs, and `@source .storybook/` would leak doc-only
+ * utilities into the site CSS. Specificity and `!important` beat Storybook's docs theme.
  */
 export function PaletteStyles() {
 	return (
 		<style>{`
-			/* The prose keeps Storybook's layout and speaks in the system's two voices. */
 			.sbdocs-content :is(p, li, td, th, blockquote) {
 				font-family: var(--font-sans) !important;
 			}
@@ -48,7 +37,6 @@ export function PaletteStyles() {
 			.pal-strip, .pal-grid, .pal-matrix-scroll { margin: 1.5rem 0 !important; }
 			.pal-rule, .pal-note { margin: 0 0 1rem !important; max-width: 78ch; }
 
-			/* Ramp strip */
 			.pal-strip .pal-track {
 				display: flex;
 				height: 8rem;
@@ -85,7 +73,6 @@ export function PaletteStyles() {
 				color: var(--color-canyon-brown);
 			}
 
-			/* Swatch cards */
 			.pal-grid {
 				display: grid;
 				grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -146,7 +133,6 @@ export function PaletteStyles() {
 				flex-direction: column;
 			}
 
-			/* Copyable value rows */
 			.pal-val {
 				display: flex;
 				width: 100%;
@@ -178,7 +164,6 @@ export function PaletteStyles() {
 				color: var(--color-dusk-ink);
 			}
 
-			/* Contrast matrix */
 			.pal-matrix-scroll { overflow-x: auto; padding-bottom: 0.5rem; }
 			.pal-matrix { border-collapse: separate; border-spacing: 4px; }
 			/* Storybook stripes docs tables; the stripe shows through the header column. */
@@ -212,7 +197,6 @@ export function PaletteStyles() {
 			}
 			.pal-matrix .pal-self { color: var(--color-canyon-brown); }
 
-			/* Prose furniture */
 			.pal-dot {
 				display: inline-block;
 				width: 0.75rem;
@@ -242,8 +226,7 @@ export function PaletteStyles() {
 				line-height: 1.6;
 				color: var(--color-pale-dune);
 			}
-			/* MDX wraps the children it hands a component in a paragraph of its own, so the
-			   visible text is never the element this file put a class on. */
+			/* MDX wraps children in a paragraph, so the class never sits on the visible text. */
 			.pal-rule .pal-rule-body :is(p, strong) {
 				margin: 0 !important;
 				font-size: 1rem !important;
@@ -266,8 +249,7 @@ export function PaletteStyles() {
 				line-height: 1.6 !important;
 				color: var(--color-dusk-ink) !important;
 			}
-			/* Storybook's light code chip fights both card grounds. This is the site's own
-			   inline-code recipe (globals.css, .blog-prose): Pale Dune on Dusk Ink, 12.09:1. */
+			/* Storybook's code chip fights both grounds; mirrors .blog-prose in globals.css. */
 			.pal-rule code, .pal-note code {
 				border: 0 !important;
 				border-radius: var(--radius-sm) !important;
@@ -279,7 +261,6 @@ export function PaletteStyles() {
 				color: var(--color-pale-dune) !important;
 			}
 
-			/* Copy toast */
 			.pal-toast {
 				position: fixed;
 				bottom: 1.75rem;
@@ -315,8 +296,6 @@ export function PaletteStyles() {
 	);
 }
 
-/* Copy ------------------------------------------------------------------- */
-
 let announce: ((value: string) => void) | undefined;
 
 function useCopy() {
@@ -326,7 +305,6 @@ function useCopy() {
 	}, []);
 }
 
-/** One toast for the whole page; the ramp strip mounts it. */
 function Toast() {
 	const [copied, setCopied] = useState<string>();
 
@@ -354,9 +332,6 @@ function Toast() {
 	);
 }
 
-/* The ramp strip --------------------------------------------------------- */
-
-/** Every warm token by lightness, palest first. Click a step to copy its hex. */
 export function RampStrip() {
 	const copy = useCopy();
 	const warm = PALETTE.filter((t) => t.group !== "cool").sort(
@@ -392,8 +367,6 @@ export function RampStrip() {
 	);
 }
 
-/* Swatch cards ----------------------------------------------------------- */
-
 function Value({ label, value }: { label: string; value: string }) {
 	const copy = useCopy();
 	return (
@@ -409,7 +382,6 @@ function Value({ label, value }: { label: string; value: string }) {
 	);
 }
 
-/** The cards for one DESIGN.md colour subsection. */
 export function Swatches({ group }: { group: TokenGroup }) {
 	return (
 		<div className="pal-grid">
@@ -439,8 +411,6 @@ export function Swatches({ group }: { group: TokenGroup }) {
 	);
 }
 
-/* Contrast --------------------------------------------------------------- */
-
 function luminance(hex: string) {
 	const n = Number.parseInt(hex.slice(1), 16);
 	const channel = (byte: number) => {
@@ -464,10 +434,7 @@ export function contrast(ink: RampToken, surface: RampToken) {
 const grade = (r: number) =>
 	r >= 7 ? "AAA" : r >= 4.5 ? "AA" : r >= 3 ? "AA large" : "fail";
 
-/**
- * Every ink against every ground, each cell painted in the pairing it describes, so a
- * number you cannot read is the finding.
- */
+/** Each cell is painted in the pairing it measures: a number you cannot read is the finding. */
 export function ContrastMatrix() {
 	return (
 		<div className="pal-matrix-scroll">
@@ -520,14 +487,11 @@ export function ContrastMatrix() {
 	);
 }
 
-/* Prose furniture -------------------------------------------------------- */
-
-/** A swatch sized to the line, for naming a token inside a markdown table. */
 export function Dot({ token }: { token: RampToken }) {
 	return <span className="pal-dot" style={{ background: rampColor(token) }} />;
 }
 
-/** One of DESIGN.md's named rules, quoted verbatim enough to be checkable against it. */
+/** Body quotes DESIGN.md verbatim, so the page stays checkable against it. */
 export function Rule({
 	title,
 	children,
@@ -543,7 +507,6 @@ export function Rule({
 	);
 }
 
-/** An aside that qualifies the section it sits in. */
 export function Note({ children }: { children: ReactNode }) {
 	return <div className="pal-note">{children}</div>;
 }

@@ -30,7 +30,6 @@ const HOME_MENU_LINK: MenuLink = { ...HOME_LINK, Icon: House };
 const CONTACT_MENU_LINK: MenuLink = { ...CONTACT_LINK, Icon: Mail };
 const SOCIAL_MENU_LINKS: MenuLink[] = [...SOCIAL_LINKS];
 
-// The landing skips Home; the contact page drops the redundant Contact entry.
 const LANDING_MENU_LINKS: MenuLink[] = [
 	BLOG_MENU_LINK,
 	CONTACT_MENU_LINK,
@@ -53,10 +52,7 @@ export type BloomOrigin = { x: number; y: number };
 // Roughly the hamburger's center in a top bar; used only before the host has measured.
 const BLOOM_FALLBACK = "calc(100% - 38px) 32px";
 
-/**
- * Origin arrives as AnimatePresence `custom`: exit props freeze at the removal render,
- * and the host re-measures the toggle at close time, so custom is the fresh channel.
- */
+/** Origin rides AnimatePresence `custom`: exit props freeze at the removal render. */
 const circleAt = (origin: BloomOrigin | null, radius: string) =>
 	`circle(${radius} at ${origin ? `${origin.x}px ${origin.y}px` : BLOOM_FALLBACK})`;
 
@@ -112,7 +108,6 @@ export function MobileMenu({
 	onClose: () => void;
 	/** Measured center of the page toggle, viewport px; host keeps it fresh. */
 	origin?: BloomOrigin | null;
-	/** Fires when the exit bloom has fully contracted. */
 	onExitComplete?: () => void;
 }) {
 	const overlayRef = useRef<HTMLDivElement>(null);
@@ -127,13 +122,11 @@ export function MobileMenu({
 				? CONTACT_MENU_LINKS
 				: INNER_MENU_LINKS;
 
-	// Latest close handler behind a stable identity: re-running the effect mid-open would
-	// rebuild the focus trap, stealing focus back to the first link.
+	// Stable identity: re-running the effect mid-open would rebuild the trap and steal focus.
 	const onCloseRef = useRef(onClose);
 	onCloseRef.current = onClose;
 
-	// True from open until the exit bloom completes; a trap released at close start would
-	// let Shift+Tab escape into controls behind the still-visible modal.
+	// Held to the exit bloom's end: a trap released at close start lets Shift+Tab escape.
 	const [present, setPresent] = useState(false);
 	useEffect(() => {
 		if (open) setPresent(true);
@@ -141,8 +134,7 @@ export function MobileMenu({
 
 	useEffect(() => {
 		if (!present) return;
-		// The overlay is md:hidden: an open landing at or above the breakpoint would be
-		// an invisible menu holding the gesture block.
+		// The overlay is md:hidden: an open menu at the breakpoint is invisible and holds gestures.
 		const mdQuery = window.matchMedia("(min-width: 768px)");
 		if (mdQuery.matches) {
 			onCloseRef.current();
@@ -157,7 +149,6 @@ export function MobileMenu({
 			);
 		focusables()[0]?.focus({ preventScroll: true });
 
-		// Held through the exit bloom like the trap: the contracting sheet covers the page.
 		if (overlayRef.current)
 			releaseInert.current = inertOutside(overlayRef.current);
 
@@ -180,7 +171,6 @@ export function MobileMenu({
 			}
 		};
 
-		// A resize across the breakpoint while open leaves the same invisible menu behind.
 		const onMdChange = (e: MediaQueryListEvent) => {
 			if (e.matches) onCloseRef.current();
 		};
@@ -195,10 +185,8 @@ export function MobileMenu({
 		};
 	}, [present]);
 
-	// Restore focus only after the exit bloom (the control is covered at close start) and
-	// only to a live opener not measured offscreen: navigation can unmount it, scrolling
-	// can strand it, and a zero-size rect carries no layout info (a harmless no-op focus).
-	// preventScroll: pulling the toggle into view would move the page mid-bloom.
+	// Restored after the exit bloom, since the control is covered at close start; a zero-size
+	// rect carries no layout info. preventScroll: pulling the toggle into view moves the page.
 	const handleExitComplete = () => {
 		// focus() inside an inert subtree is a silent no-op.
 		releaseInert.current?.();
@@ -359,10 +347,7 @@ function HeartFooter() {
 	);
 }
 
-/**
- * Later rects paint over earlier ones, so each extends to the bottom. `from` bunches the
- * edges near the bottom; `to` fans them out at the hero's 2/3 ratio (30/44/66/100).
- */
+/** Each rect runs to the bottom under the next; `to` fans at the hero's ratio (30/44/66/100). */
 const GROUND_BANDS = [
 	{ fill: rampColor("dune-tan"), from: 760, to: 560 },
 	{ fill: rampColor("desert-clay"), from: 772, to: 590 },
@@ -372,10 +357,7 @@ const GROUND_BANDS = [
 
 const BANDS_DELAY = 0.45; // bloom duration: the fan starts when the bloom lands
 
-/**
- * The hero's horizon miniaturized: bands fan upward like a dolly-zoom, then the sun
- * springs up. Same scene family as the hero, so the menu reads as the same world.
- */
+/** The hero's horizon miniaturized, so the menu reads as the same world. */
 function MenuHorizonGraphic() {
 	const reducedMotion = useReducedMotionLive();
 	return (
@@ -421,8 +403,6 @@ function MenuHorizonGraphic() {
 						reducedMotion
 							? { duration: 0 }
 							: {
-									// Bottom band leads; each travels farther in the same
-									// time, so speeds differ (parallax).
 									delay: BANDS_DELAY + (GROUND_BANDS.length - 1 - i) * 0.06,
 									duration: 0.85,
 									ease: EASE_OUT_EXPO,

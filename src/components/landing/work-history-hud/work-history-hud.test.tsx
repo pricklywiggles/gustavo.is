@@ -3,8 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { BELOW_SM } from "../use-below-sm";
 import { CHAPTERS } from "../work-history-data";
 
-// use-below-sm caches its MediaQueryList at first use, so each side of the
-// breakpoint needs a fresh module graph with the stub already in place.
+// use-below-sm caches its MediaQueryList at first use, so each side needs a fresh module graph.
 const renderHudAt = async (belowSm: boolean) => {
 	vi.resetModules();
 	vi.stubGlobal("matchMedia", (query: string) => ({

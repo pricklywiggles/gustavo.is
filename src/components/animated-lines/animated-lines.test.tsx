@@ -16,8 +16,6 @@ afterEach(async () => {
 	vi.restoreAllMocks();
 });
 
-// The setup stub reports reduced motion (matches: false), which skips the whole GSAP
-// path; override so the timeline construction actually runs.
 const allowMotion = () => {
 	const original = window.matchMedia;
 	window.matchMedia = ((query: string) => ({
@@ -36,8 +34,7 @@ const scrubOf = (timeline: ReturnType<typeof vi.spyOn>) =>
 			| undefined
 	)?.scrub;
 
-// "e" + combining acute (two code points) and a ZWJ emoji family: both must
-// stay in one span each or they render corrupted.
+// Two multi-code-point graphemes: "e" + combining acute, and a ZWJ emoji family.
 const ACCENTED = "cafe\u0301";
 const FAMILY = "\u{1F468}\u200D\u{1F469}\u200D\u{1F467}";
 
@@ -76,8 +73,7 @@ describe("AnimatedLines", () => {
 		expect(chars).toEqual(["c", "a", "f", "e\u0301", FAMILY]);
 	});
 
-	// NBSP-glued pairs must land in ONE nowrap span: split apart, the halves become
-	// separate inline-blocks that carry their own break opportunities and wrap anyway.
+	// Split apart, the halves become inline-blocks with their own break opportunities.
 	it("keeps a non-breaking space inside its word span", () => {
 		const { container } = render(
 			<AnimatedLines effect={noopEffect}>{"a\u00A0b c"}</AnimatedLines>,
@@ -159,8 +155,7 @@ describe("AnimatedLines", () => {
 		}
 	});
 
-	// Raw scroll is the baseline feel on every platform (FRA-185); a consumer that wants
-	// catch-up asks for it, and only for the device that needs it.
+	// FRA-185: raw scroll is the baseline everywhere; a consumer opts into catch-up per device.
 	it("follows the raw scroll by default in scrub and pin modes", async () => {
 		const restore = allowMotion();
 		try {

@@ -1,12 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { ContactForm } from "@/components/contact-form";
 
-/**
- * The reusable form behind /contact and the header dialog, one story per
- * tone. Client-side zod validation works here (submit empty to see the
- * field errors); a real submit hits /api/contact, which Storybook does not
- * serve, so it lands on the server-error state.
- */
+/** Storybook does not serve /api/contact, so a real submit lands on the server-error state. */
 const meta = {
 	title: "Components/Contact form",
 	component: ContactForm,

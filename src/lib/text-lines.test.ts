@@ -1,8 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { groupIntoLines } from "./text-lines";
 
-// jsdom has no layout, so build lightweight stand-ins with the two fields the
-// grouping reads.
+// jsdom has no layout, so these stand-ins carry the two fields the grouping reads.
 function char(offsetTop: number, offsetHeight = 20): HTMLElement {
 	return { offsetTop, offsetHeight } as unknown as HTMLElement;
 }

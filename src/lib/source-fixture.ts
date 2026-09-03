@@ -1,8 +1,4 @@
-/**
- * Stand-in for the generated `.source/server` module in tests: the real one imports
- * MDX with query strings vitest cannot parse. Mock it with
- * `vi.mock("../../.source/server", async () => ({ blog: (await import("./source-fixture")).BLOG_FIXTURE }))`.
- */
+/** Stand-in for `.source/server` in tests: its MDX query-string imports break vitest. */
 type Frontmatter = {
 	title: string;
 	slug: string;

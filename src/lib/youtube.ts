@@ -1,9 +1,6 @@
 const ID_PATTERN = /^[\w-]{11}$/;
 
-/**
- * Throws on anything it cannot parse so a bad URL fails the static build
- * loudly instead of shipping a dead card.
- */
+/** Throws on an unparseable URL: a bad card should fail the build, not ship dead. */
 export function youtubeVideoId(url: string): string {
 	const parsed = new URL(url);
 	const host = parsed.hostname.replace(/^(www|m)\./, "");
@@ -35,16 +32,12 @@ export function youtubeThumbnailUrl(
 	return `https://i.ytimg.com/vi/${videoId}/${quality}.jpg`;
 }
 
-/**
- * Best-effort oEmbed title lookup at build time. Never throws: the build
- * must not depend on YouTube being reachable.
- */
+/** Never throws: the build must not depend on YouTube being reachable. */
 export async function fetchYoutubeTitle(url: string): Promise<string | null> {
 	try {
 		const endpoint = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
 		const res = await fetch(endpoint, {
-			// force-cache keeps the build's fetch on the static path; the
-			// result is baked into the prerendered page anyway.
+			// force-cache keeps the page on the static path; the result is prerendered anyway.
 			cache: "force-cache",
 			signal: AbortSignal.timeout(4000),
 		});

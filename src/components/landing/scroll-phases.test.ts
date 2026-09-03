@@ -21,8 +21,7 @@ describe("resolvePhases", () => {
 		]);
 		expect(map.at.exit).toBe(0);
 		expect(map.at.shift).toBe(1.8);
-		// The tail starts after the furthest end so far: shift's 2.3, not
-		// build's 2.0 and not exit's 0.5.
+		// The tail starts after the furthest end so far: shift's 2.3, not build's 2.0.
 		expect(map.at.tail).toBeCloseTo(2.3);
 		expect(map.total).toBeCloseTo(2.7);
 	});

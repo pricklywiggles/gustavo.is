@@ -1,18 +1,12 @@
 import type { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 
-/**
- * The murals are 1600x2556, so an 800px-wide tile is exactly 1278px tall and the
- * loop travels that height. Change one without the other and the seam tears.
- */
+/** Murals are 1600x2556: an 800px tile is 1278px tall. Change one and the seam tears. */
 const TILE_WIDTH = "800px";
 const TILE_HEIGHT = "1278px";
 const TILT = "-13deg";
 
-/**
- * Carried over from the sunset Ponder site. The plane is deliberately oversized
- * so the tilt never exposes an edge; the caller sizes and clips it.
- */
+/** The plane is oversized so the tilt never exposes an edge; the caller sizes and clips it. */
 export function ScrollingMural({
 	src,
 	className,

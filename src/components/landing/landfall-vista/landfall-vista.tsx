@@ -25,22 +25,15 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const CANYON_BROWN = rampColor("canyon-brown");
 
-/**
- * The daytime Pacific vista the descent lands on, in normal flow so it scrolls in under
- * the settled sky stage; the footer lives inside the bluff, ending at document bottom.
- */
-
 /** Sharing the intro's morph id would morph the dialog from the wrong corner. */
 const LANDFALL_MORPH_ID = "landfall-hello-morph";
 
-/** Element-based starts are unreliable here: the ground's entry offset can push the
- * measured start past the scrollable range. Module scope keeps the identity stable. */
+/** Element starts are unreliable here: the ground's entry offset pushes them past max scroll. */
 const nearPageEnd = () =>
 	ScrollTrigger.maxScroll(window) - window.innerHeight * 0.45;
 
-/** Rendered back to front; sway timings are distinct and mixed-direction on purpose.
- * Every mobileBox class must carry the max-sm: prefix (Tailwind only generates classes it
- * can see; a test guards it). Exported for that guard only. */
+/** Sway timings are deliberately distinct and mixed-direction; entries render back to front.
+ * mobileBox classes need the max-sm: prefix for Tailwind; exported only for the test pinning it. */
 export const SKY_CLOUDS = [
 	{
 		src: "cloud4",
@@ -108,8 +101,7 @@ export function LandfallVista() {
 	const root = useRef<HTMLDivElement>(null);
 	const hello = useContactDialogState();
 
-	// The shimmer planes are two 150vmax compositor surfaces: animate them only near the
-	// viewport. The same observer warms the dialog chunk; the CTA sits just below.
+	// Two 150vmax compositor surfaces: animate only near the viewport, and warm the CTA's dialog.
 	useEffect(() => {
 		const block = root.current?.querySelector<HTMLElement>(
 			"[data-vista-shimmer]",
@@ -135,14 +127,13 @@ export function LandfallVista() {
 		return () => observer.disconnect();
 	}, []);
 
-	// Every CSS rest pose (inline style.transform; Tailwind's individual properties would
-	// COMPOSE with GSAP's) equals its tween's end value, so reduced motion renders settled.
+	// Each CSS rest pose equals its tween's end value, so reduced motion renders settled.
+	// Inline style.transform: Tailwind's individual properties would compose with GSAP's.
 	useGSAP(
 		() => {
 			const mm = gsap.matchMedia();
 			mm.add("(prefers-reduced-motion: no-preference)", () => {
-				// One timeline, one ScrollTrigger: seven triggers over the same range can
-				// resolve fractionally different edges on refresh, desyncing the planes.
+				// One trigger: seven would resolve different edges on refresh and desync.
 				const entryTl = gsap.timeline({
 					defaults: { ease: "none", duration: 1 },
 					scrollTrigger: {
@@ -153,8 +144,7 @@ export function LandfallVista() {
 						scrub: scrollScrub(),
 					},
 				});
-				// Distant planes lag, foreground leads. The bank grows from natural size so its
-				// side edges never pull into view; bottom origin keeps bases on the horizon.
+				// Natural size, bottom origin: no side edges pull in, bases stay on the horizon.
 				entryTl.fromTo(
 					"[data-vista-horizon]",
 					{
@@ -187,8 +177,8 @@ export function LandfallVista() {
 						0,
 					);
 				}
-				// Opacity only and one-way: a visibility toggle would drop the CTA from the
-				// tab order, and a reversing reveal can hide a focused button.
+				// Opacity only: a visibility toggle would drop the CTA from the tab order.
+				// One-way: a reversing reveal can hide a focused button.
 				gsap.fromTo(
 					"[data-vista-fade]",
 					{ opacity: 0 },
@@ -212,9 +202,8 @@ export function LandfallVista() {
 	);
 
 	return (
-		// No clipping: the planes settle above their layout spots and must overflow the sky
-		// block's top edge; the section clips instead. The 2px tuck stops a subpixel seam.
-		// data-surface umbrellas the whole vista; the ground's dusk-ink wins beneath.
+		// No clip here: the planes overflow this block's top edge; the section clips instead.
+		// The 2px tuck stops a subpixel seam (FRA-193).
 		<div
 			ref={root}
 			data-surface="day-sky"
@@ -272,7 +261,7 @@ export function LandfallVista() {
 							}}
 						/>
 						<div
-							className="absolute top-1/2 left-1/2 size-[150vmax] motion-safe:animate-[shimmer-spin_8.1s_linear_infinite_reverse]"
+							className="absolute top-1/2 left-1/2 size-[150vmax] motion-safe:animate-[shimmer-spin_5.1s_linear_infinite_reverse]"
 							style={{
 								transform: "translate(-50%, -50%)",
 								animationPlayState: "paused",

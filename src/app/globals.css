@@ -2,8 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* No dark mode by design (One Ramp Rule): dark: scopes to a .dark class nothing ever
-   applies, so shadcn copy-ins' dark: classes stay inert. */
+/* No dark mode (One Ramp Rule): .dark is never applied, so copy-ins' dark: classes stay inert. */
 @custom-variant dark (&:is(.dark *));
 @plugin "@tailwindcss/typography";
 
@@ -23,16 +22,14 @@
 	--color-dusk-ink: oklch(0.2781 0.0296 256.85);
 	--color-warning-ember: oklch(0.577 0.245 27.325);
 
-	/* The cool branch (landfall only): the descent from space through daytime atmosphere
-	   to the Pacific. Every other surface stays on the warm ramp. */
+	/* The One Ramp's only exception: landfall's descent from space to the Pacific. */
 	--color-stratos: oklch(0.36 0.09 258);
 	--color-zenith-blue: oklch(0.52 0.13 250);
 	--color-day-sky: oklch(0.8 0.075 235);
 	--color-open-sea: oklch(0.55 0.105 232);
 	--color-deep-sea: oklch(0.4 0.095 240);
 
-	/* The Pressed vocabulary (DESIGN.md Elevation). Values are the ones the
-	   set pieces already shipped with; change them only by re-vetting those. */
+	/* Pressed vocabulary (DESIGN.md Elevation): shipped set pieces are calibrated to these. */
 	--shadow-pressed:
 		inset 0 2px 2px rgb(0 0 0 / 0.4), 0 2px 0 rgb(255 255 255 / 0.4);
 	--shadow-pressed-soft:
@@ -47,28 +44,22 @@
 	--z-index-dev: 100;
 }
 
-/* `static` lands all three roles in :root even when one has no utility yet: the dev-only
-   font lab repoints them inline on <html>, which outranks these defaults. */
+/* `static` emits all three in :root unused; the dev font lab repoints them inline on <html>. */
 @theme static {
-	/* Body copy, section bodies, everything unremarkable. */
 	--font-sans: var(--font-wotfard);
-	/* Every large set piece: the landing equation and section titles alike. */
 	--font-display: var(--font-kitora);
-	/* Instrument text: panorama roles, the year, the counter and its label. */
+	/* Same face as display today; a separate role so instrument text can diverge. */
 	--font-legend: var(--font-kitora);
 }
 
 @layer base {
-	/* Kitora's 0.366em word space visibly drifts at display sizes; pull back to ~0.27em.
-	   Calibrated for Kitora: re-measure if the display face changes. */
+	/* Kitora's 0.366em word space drifts at display sizes; retune if the display face changes. */
 	.font-display {
 		word-spacing: -0.1em;
 	}
 
-	/* Kitora draws "=" as a single bar: the operator is typed as a hyphen and this stacks
-	   a second copy of the glyph (screen readers get "=" via accessibleText). Em offsets
-	   are tuned to the hyphen's ink position; the lift is `top` because GSAP owns every
-	   .split-char's transform. Kitora-specific: re-tune in the lab before a face swap. */
+	/* Kitora draws "=" as one bar: typed as a hyphen, stacked (AT gets it via accessibleText).
+	   The lift is `top`, not transform: GSAP owns every .split-char transform. */
 	.kitora-equals .split-char:last-child {
 		position: relative;
 		top: -0.18em;
@@ -105,7 +96,7 @@
 html,
 body {
 	max-width: 100vw;
-	/* clip, not hidden: hidden creates a scroll container and breaks position:sticky (the hero's pin) */
+	/* clip, not hidden: hidden creates a scroll container and breaks the hero's sticky pin */
 	overflow-x: clip;
 	min-height: 100%;
 }
@@ -115,8 +106,7 @@ body {
 	flex-direction: column;
 }
 
-/* The shadcn semantic layer mapped onto the ramp. Only tokens with a consumer survive;
-   re-add from the preset when a copy-in needs one, mapped to a ramp color, never a gray. */
+/* shadcn's semantic layer, pruned to used tokens; re-add mapped to the ramp, never a gray. */
 :root {
 	--primary: var(--color-dusk-earth);
 	--primary-foreground: var(--color-first-light);
@@ -142,15 +132,13 @@ body {
 	html {
 		@apply font-sans;
 	}
-	/* GSAP's pin spacer is an unstyled div over the body's first-light; paint it the
-	   pinned section's surface so a fractional pin offset can never open a body-colored
-	   hairline at the section's edges (FRA-193). */
+	/* GSAP's pin spacer is unstyled; a fractional pin offset opens a hairline seam (FRA-193). */
 	.pin-spacer:has(> #work) {
 		background: var(--color-pale-dune);
 	}
 }
 
-/* Weightless idle drift; vw amplitude so the float scales with the actor. */
+/* vw amplitude so the float scales with the actor. */
 @keyframes float-bob {
 	from {
 		transform: translateY(-0.4vw);
@@ -169,7 +157,7 @@ body {
 	}
 }
 
-/* The off-center hotspots orbit, so each highlight hole brightens and dims on its own. */
+/* Off-center hotspots, so each highlight hole brightens on its own. */
 @keyframes shimmer-spin {
 	from {
 		transform: translate(-50%, -50%) rotate(0deg);
@@ -179,8 +167,7 @@ body {
 	}
 }
 
-/* Travel is exactly one rendered tile, so the loop is seamless
-   (scrolling-mural.tsx owns the numbers). */
+/* One tile of travel makes the loop seamless; scrolling-mural.tsx owns the numbers. */
 @keyframes mural-scroll {
 	from {
 		transform: rotate(var(--mural-tilt)) translateY(0);
@@ -196,16 +183,14 @@ body {
 	background: var(--color-dusk-earth);
 }
 
-/* `prose` remapped onto the dark-earth ladder (contrast-checked on Dusk Earth); left
-   unlayered so these always beat the plugin's layered utilities without !important. */
+/* Unlayered on purpose: these beat the typography plugin's layered utilities without !important. */
 .blog-prose {
 	--tw-prose-body: var(--color-pale-dune);
 	--tw-prose-headings: var(--color-pale-dune);
 	--tw-prose-lead: color-mix(in oklab, var(--color-pale-dune) 85%, transparent);
 	--tw-prose-links: var(--color-noon-sun);
 	--tw-prose-bold: var(--color-pale-dune);
-	/* Counters read as text (4.5:1 floor), bullets as glyphs (3:1 floor):
-	   Noon Sun holds 5.08:1 and Dune Tan 3.77:1 on Dusk Earth. */
+	/* Counters are text (4.5:1), bullets are glyphs (3:1): Noon Sun 5.08:1, Dune Tan 3.77:1. */
 	--tw-prose-counters: var(--color-noon-sun);
 	--tw-prose-bullets: var(--color-dune-tan);
 	--tw-prose-hr: color-mix(in oklab, var(--color-pale-dune) 25%, transparent);
@@ -232,8 +217,7 @@ body {
 	);
 }
 
-/* Kitora headings (Two Voices Rule). The h2's Noon Sun period echoes the index's
-   "Blog."; the alt-text syntax keeps it out of the accessibility tree. */
+/* The h2's period echoes the index's "Blog."; the `/ ""` alt text keeps it out of the a11y tree. */
 .blog-prose h2,
 .blog-prose h3,
 .blog-prose h4 {
@@ -246,15 +230,12 @@ body {
 	color: var(--color-noon-sun);
 }
 
-/* The site's one text-link recipe (textLink() in src/lib/link.ts applies it): hue and
-   weight carry the link role with no underline. Unlayered so the typography plugin's
-   underline never resurfaces. */
+/* textLink() in src/lib/link.ts applies this; unlayered so the plugin's underline stays gone. */
 .site-link {
 	border-radius: var(--radius-sm);
 	font-weight: 500;
 	text-decoration-line: none;
-	/* Always-on transparent outline: outline-style can't animate, outline-color can, so
-	   the swipe's edge fades with its fill instead of snapping off. */
+	/* Transparent outline always on: outline-style can't animate, outline-color can. */
 	outline: 4px solid transparent;
 	outline-offset: 0;
 	transition:
@@ -268,7 +249,7 @@ body {
 .site-link-dark:hover {
 	color: var(--color-sand-haze);
 }
-/* Highlighter swipe: the same-color outline extends the fill past the text box so no ring line shows. */
+/* Outline matches the fill so the swipe extends past the text box with no ring line. */
 .site-link-dark:focus-visible {
 	outline-color: var(--color-noon-sun);
 	background: var(--color-noon-sun);
@@ -277,7 +258,7 @@ body {
 .site-link-light {
 	color: var(--color-dusk-earth);
 }
-/* Hover borrows the nav pills' amber fill; focus is declared after it so the swipe wins when both apply. */
+/* Focus is declared after hover so the focus swipe wins when both apply. */
 .site-link-light:hover {
 	outline-color: var(--color-amber-mirage);
 	background: var(--color-amber-mirage);
@@ -324,8 +305,7 @@ body {
 	content: none;
 }
 
-/* Wide-table scrolling lives in blog-mdx-components' wrapper div:
-   display block on the table itself would strip its AT semantics. */
+/* Tables scroll via blog-mdx-components' wrapper: display:block on a table kills AT semantics. */
 
 .blog-prose img:not(:where([class~="not-prose"], [class~="not-prose"] *)),
 .blog-prose video:not(:where([class~="not-prose"], [class~="not-prose"] *)) {

@@ -16,17 +16,12 @@ import { useEffect, useRef } from "react";
 import { useMounted } from "@/components/use-mounted";
 import { useReducedMotionLive } from "@/components/use-reduced-motion-live";
 
-/**
- * A digit-reel readout for scrub values striding thousands of units per frame. Do not
- * swap in AnimateNumber: it sweeps the long way whenever a middle digit decreases while
- * the value rises. One springed value drives every reel under a screen-speed cap, and
- * every reel resynchronizes and lands exactly when the value slows.
- */
+// Never AnimateNumber here: a middle digit falling while the value rises sweeps the long way.
 
 // 0-9 plus a wrapping 0: position 10 is pixel-identical to 0, so 9 -> 0 is seamless.
 const REEL_GLYPHS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
 
-// Two revolutions per second reads as a live spin; faster is frame-aliased flicker.
+// 20 rows is 2 revolutions per second; faster aliases against the frame rate.
 const MAX_ROWS_PER_SECOND = 20;
 
 const VALUE_SPRING = { stiffness: 170, damping: 28 };
@@ -35,10 +30,7 @@ function mod10(n: number): number {
 	return ((n % 10) + 10) % 10;
 }
 
-/**
- * Reel position in glyph rows: the whole digit plus a carry that rolls this reel during
- * the final integer unit below it, so 1999 -> 2000 cascades all four reels together.
- */
+/** Reel position in glyph rows: digit plus a carry, so 1999 -> 2000 cascades all four. */
 export function reelPosition(value: number, place: number): number {
 	const v = Math.max(0, value);
 	const digit = Math.floor(v / place) % 10;
@@ -46,10 +38,7 @@ export function reelPosition(value: number, place: number): number {
 	return digit + carry;
 }
 
-/**
- * One frame of a speed-limited reel: distance is measured around the wheel in the travel
- * direction, so a far-behind reel spins at the cap and one within reach locks on.
- */
+/** One frame of a speed-limited reel; distance runs around the wheel in the travel direction. */
 export function advanceReel(
 	display: number,
 	target: number,
@@ -58,15 +47,13 @@ export function advanceReel(
 ): number {
 	let distance =
 		direction === 1 ? mod10(target - display) : mod10(display - target);
-	// Float jitter can put the target an epsilon "behind" the display, which
-	// directional distance reads as a lap of 10-minus-epsilon; snap instead.
+	// Float jitter puts the target an epsilon behind, which reads as a near-full lap.
 	if (distance > 10 - 1e-4) distance = 0;
 	const step = Math.min(distance, Math.max(0, maxStep));
 	return mod10(display + direction * step);
 }
 
-// Motion's AnimateNumber edge treatment (their Mask), so the reels and the year readout
-// wear the same clothes. Technique: https://expensive.toys/blog/blur-vignette
+// AnimateNumber's mask, so the year and the counter match: expensive.toys/blog/blur-vignette
 const MASK_HEIGHT = "0.15em";
 const MASK_WIDTH = "0.5em";
 const CORNER = "#000 0, transparent 71%";
@@ -131,7 +118,6 @@ type Token =
 	| { kind: "digit"; place: number }
 	| { kind: "separator"; char: string; key: string };
 
-/** Digit places and separators for the target, left to right. */
 function tokenize(text: string): Token[] {
 	const tokens: Token[] = [];
 	let digitsSeen = 0;
@@ -164,8 +150,7 @@ export function OdometerNumber({
 	const reducedMotion = useReducedMotionLive();
 	const mounted = useMounted();
 
-	// One MotionValue per place, living across digit-count changes. The plain factory,
-	// not the hook: reels come and go with the digit count, and hook counts must not.
+	// motionValue(), not the hook: reels come and go with the digit count, hook counts can't.
 	const reels = useRef(new Map<number, MotionValue<number>>());
 	const direction = useRef<1 | -1>(1);
 	const getReel = (place: number): MotionValue<number> => {

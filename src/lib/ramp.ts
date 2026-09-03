@@ -1,9 +1,6 @@
-/**
- * The palette for places CSS custom properties can't reach; design-tokens.test.ts keeps
- * RAMP_OKLCH in verbatim sync with globals.css and verifies each RAMP_HEX projection.
- */
+/** The palette where CSS custom properties can't reach; design-tokens.test.ts guards the sync. */
 
-/** oklch() components per token, verbatim from globals.css. */
+/** Verbatim from globals.css. */
 export const RAMP_OKLCH = {
 	"first-light": "0.9912 0.0069 88.64",
 	"sand-haze": "0.9567 0.0333 88.06",
@@ -27,21 +24,16 @@ export const RAMP_OKLCH = {
 
 export type RampToken = keyof typeof RAMP_OKLCH;
 
-/** The token as a CSS color string, e.g. rampColor("dusk-earth"). */
 export function rampColor(token: RampToken): string {
 	return `oklch(${RAMP_OKLCH[token]})`;
 }
 
-/** The token at an alpha, e.g. rampAlpha("pale-dune", "96%"). */
+/** `alpha` is a CSS percentage, e.g. "96%". */
 export function rampAlpha(token: RampToken, alpha: string): string {
 	return `oklch(${RAMP_OKLCH[token]} / ${alpha})`;
 }
 
-/**
- * The token projected into sRGB, gamut-clamped (`"#6E5038"`). Warning Ember and the deep
- * cool steps fall outside sRGB, so those come back clipped and a P3 screen paints them
- * more saturated than the projection reads.
- */
+/** Warning Ember and the deep cool steps fall outside sRGB: those come back clipped. */
 export function rampHex(token: RampToken): string {
 	const [L, C, Hdeg] = RAMP_OKLCH[token].split(" ").map(Number);
 	const H = (Hdeg * Math.PI) / 180;
@@ -61,10 +53,7 @@ export function rampHex(token: RampToken): string {
 	return `#${bytes.map((n) => n.toString(16).padStart(2, "0")).join("")}`.toUpperCase();
 }
 
-/**
- * Exact sRGB projections of the tokens above (the hexes the set pieces shipped with);
- * GSAP color tweens interpolate hex, not oklch.
- */
+/** GSAP color tweens interpolate hex, so these mirror RAMP_OKLCH. */
 export const RAMP_HEX = {
 	"first-light": "#FEFCF7",
 	"pale-dune": "#FAE8B8",

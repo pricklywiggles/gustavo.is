@@ -9,17 +9,11 @@ import { type ContactSource, EVENTS, track } from "@/lib/analytics";
 import { rampColor } from "@/lib/ramp";
 
 const DUSK_EARTH = rampColor("dusk-earth");
-// Several times the morph spring's tail; wall clock, so high-refresh displays
-// don't hit the fallback while the spring still runs.
+// Sized well past the morph spring's tail, so the fallback never fires mid-spring.
 const SETTLE_DEADLINE_MS = 2000;
-// The trigger's hover (Dusk Earth at 85% over Pale Dune) composites to almost exactly
-// Canyon Brown, so the dialog settles on the color of the button just hovered.
+// The trigger's hover (Dusk Earth 85% over Pale Dune) composites to almost exactly this.
 const CANYON_BROWN = rampColor("canyon-brown");
 
-/**
- * With morphId the popup morphs from the trigger, the form's layout-animated pieces held
- * static via motionReady until the morph settles; morphId null is a plain fading modal.
- */
 export function ContactDialog({
 	open,
 	onOpenChange,
@@ -30,28 +24,23 @@ export function ContactDialog({
 }: {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	/** Which surface opened the dialog; recorded with the contact events. */
 	source: ContactSource;
-	/** Shared layout id of the trigger to morph from (each trigger needs its own id and
-	 * a domMax provider); omitted, the dialog is a plain modal. */
+	/** Trigger's shared layout id: each trigger needs its own, under a domMax provider. */
 	morphId?: string | null;
-	/** Popup background at morph start (match the trigger's surface) and at
-	 * rest; defaults match the dusk-earth say-hello trigger. */
+	/** initialColor must match the trigger's surface; defaults fit the say-hello trigger. */
 	initialColor?: string;
 	settledColor?: string;
 }) {
 	const reducedMotion = useReducedMotionLive();
 	const [settled, setSettled] = useState(false);
 	const morphing = !reducedMotion && morphId != null;
-	// No trigger surface to match, so this path opens on the settled color.
 	const fading = !morphing && !reducedMotion;
 
 	useEffect(() => {
 		if (open) track(EVENTS.contactOpened, { source });
 	}, [open, source]);
 
-	// Reduced motion: every exit is instant, or AnimatePresence holds the popup and
-	// backdrop on screen until the slowest tween (the 0.3s color handback) ends.
+	// Every reduced-motion exit must be instant: AnimatePresence waits out the slowest tween.
 	const popupMotion = reducedMotion
 		? {
 				initial: false as const,
@@ -83,8 +72,7 @@ export function ContactDialog({
 			: {
 					initial: { backgroundColor: morphing ? initialColor : settledColor },
 					animate: { backgroundColor: settledColor },
-					// Hand the color back only when there is a trigger; with none the popup would
-					// close on a color it never wore.
+					// With no trigger the popup would close on a color it never wore.
 					exit: {
 						backgroundColor: morphId == null ? settledColor : initialColor,
 					},
@@ -96,8 +84,7 @@ export function ContactDialog({
 					},
 				};
 
-	// onLayoutAnimationComplete is unreliable for layoutId morphs and a fixed timer can
-	// land mid spring-tail; watch the rect and declare settled after several still frames.
+	// onLayoutAnimationComplete is unreliable for layoutId morphs; a fixed timer lands mid-tail.
 	useEffect(() => {
 		if (!open) {
 			setSettled(false);
@@ -113,13 +100,12 @@ export function ContactDialog({
 		const deadline = performance.now() + SETTLE_DEADLINE_MS;
 		let popup: Element | null = null;
 		const tick = () => {
-			// Past the deadline the morph is long over: settle rather than let a
-			// missing popup keep the watcher spinning for the dialog's whole open life.
+			// A missing popup would otherwise keep the watcher spinning for the dialog's life.
 			if (performance.now() > deadline) {
 				setSettled(true);
 				return;
 			}
-			// The popup element is stable once mounted; query until found, then reuse.
+			// The popup element is stable once mounted.
 			if (popup && !popup.isConnected) popup = null;
 			popup ??= document.querySelector('[role="dialog"]');
 			if (popup) {

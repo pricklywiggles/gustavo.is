@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import type { Retrospective } from "@/components/retrospective/retrospective-data";
 import { FEED_PATH, markdownPath, SITE_NAME, SITE_URL } from "./site";
 
-// Public URLs carry no content hash, so a redesigned card needs a new file name or
-// social scrapers keep serving the old one.
+// No content hash on public/ URLs: a redesigned card needs a new file name.
 export const OG_IMAGES = {
 	default: {
 		url: "/og/default.jpg",
@@ -25,14 +24,14 @@ export const OG_IMAGES = {
 
 export type OgImage = keyof typeof OG_IMAGES;
 
-/** Every card in OG_IMAGES is authored at this size. */
+/** The files in public/og must actually be this size. */
 export const OG_SIZE = { width: 1200, height: 630 } as const;
 
 export function ogImage(key: OgImage) {
 	return { ...OG_IMAGES[key], ...OG_SIZE };
 }
 
-/** A page's own picture, e.g. a post's cover; dimensions when the bundler knows them. */
+/** Width and height only when the bundler knows them. */
 export type CustomImage = {
 	url: string;
 	alt: string;
@@ -43,20 +42,16 @@ export type CustomImage = {
 type PageMetadataInput = {
 	path: string;
 	title: string;
-	/** Skip the "%s | gustavo.is" title template, as the landing does with the bare name. */
+	/** Skips the "%s | gustavo.is" template, as the landing does. */
 	absoluteTitle?: boolean;
 	description?: string;
 	image?: OgImage | CustomImage;
-	/** Present means og:type article; empty when nothing dated applies. */
+	/** Present means og:type article, even when empty. */
 	article?: { publishedTime?: string; tags?: string[] };
-	/** The page has a markdown mirror under /llms.mdx. */
 	markdown?: boolean;
 };
 
-/**
- * Every page's canonical, feed link, and Open Graph card in one shape. Next replaces a
- * parent's `alternates` and `openGraph` wholesale, so each page must restate them.
- */
+/** Next replaces a parent's `alternates` and `openGraph` wholesale, so each page restates them. */
 export function pageMetadata({
 	path,
 	title,

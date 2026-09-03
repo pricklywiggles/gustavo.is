@@ -21,12 +21,10 @@ const DEFAULTS: Assignment = {
 	legend: "kitora",
 };
 
-// Suffixed: the roles changed shape, and a stale entry would otherwise mask
-// the new defaults in any browser that used the earlier lab.
+// Suffixed: a stale entry from the earlier role shape would mask the new defaults.
 const STORAGE_KEY = "font-lab-3";
 
-// The lab's own chrome must stay legible whatever the roles are set to, so it
-// opts out of the site's type entirely.
+// The lab's chrome must stay legible whatever the roles are set to.
 const CHROME = { fontFamily: "ui-sans-serif, system-ui, sans-serif" };
 
 function apply(assignment: Assignment) {
@@ -51,10 +49,7 @@ function read(): Assignment {
 	) as Assignment;
 }
 
-/**
- * Dev-only type-comparison tool: reassigns the role variables live so faces are judged
- * on the real page. Non-modal on purpose; layout.tsx mounts it only in dev builds.
- */
+/** Non-modal on purpose: faces are judged against the real page. */
 export function FontLab() {
 	const [open, setOpen] = useState(false);
 	const [assignment, setAssignment] = useState<Assignment>(DEFAULTS);

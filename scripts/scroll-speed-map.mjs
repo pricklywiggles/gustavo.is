@@ -1,10 +1,3 @@
-/**
- * Prints the landing page's scroll pacing per budget viewport: every scrubbed tween's
- * travel over its scroll span, fastest peak first, then the budget offenders and each
- * chapter's exit window. `--json` dumps the rows instead.
- *   node scripts/scroll-speed-map.mjs [--json] [--all]
- * Rows with a mean under 0.5x are folded unless --all is passed.
- */
 import { register } from "node:module";
 
 register("./ts-resolve-hook.mjs", import.meta.url);

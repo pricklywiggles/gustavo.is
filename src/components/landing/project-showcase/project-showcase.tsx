@@ -141,10 +141,6 @@ function ProjectPanel({
 	);
 }
 
-/**
- * Purely presentational: the section drives selection from scroll and the rail via the
- * [data-rail-fill] / [data-rail-tip] hooks (the work-history HUD convention).
- */
 export function ProjectShowcase({
 	projects,
 	activeIndex,
@@ -152,15 +148,12 @@ export function ProjectShowcase({
 }: {
 	projects: Project[];
 	activeIndex: number;
-	/** Jump the scrub to a project (the section owns the scroll math). */
 	onSelect?: (index: number) => void;
 }) {
 	const reduced = useReducedMotionLive();
 	const mounted = useMounted();
 	const active = projects[activeIndex] ?? projects[0];
 
-	// Layout-specific transition: a vertical rise beside the manifest on desktop, a
-	// direction-aware horizontal slide when stacked (tab panes move sideways).
 	const stacked = useMediaQuery(BELOW_MD);
 
 	const previousIndex = useRef(activeIndex);

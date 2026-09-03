@@ -1,11 +1,6 @@
 import { Quote } from "lucide-react";
 import type { ReactNode } from "react";
 
-/**
- * The MDX blockquote: a traditional pull quote led by a Noon Sun mark
- * instead of a card. `icon` lets a post swap the mark for its own (an
- * emoji or any node); markdown `>` quotes get the default.
- */
 export function Blockquote({
 	icon,
 	children,
@@ -14,8 +9,7 @@ export function Blockquote({
 	children?: ReactNode;
 }) {
 	return (
-		// The mark hangs in a left gutter so mark and quote read as one
-		// coupled unit; mt-1 optically aligns it with the first cap line.
+		// mt-1 optically aligns the mark with the first cap line.
 		<figure className="not-prose my-10 flex gap-4 sm:gap-5">
 			<span aria-hidden="true" className="mt-1 shrink-0 text-noon-sun">
 				{icon ? (

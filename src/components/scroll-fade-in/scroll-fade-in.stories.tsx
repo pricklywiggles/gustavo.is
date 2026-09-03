@@ -3,13 +3,6 @@ import { useState } from "react";
 import { ScrollFadeIn } from "@/components/scroll-fade-in";
 import { cta } from "@/lib/cta";
 
-/**
- * The body-copy entrance: gsap.from, so children are authored at rest and
- * read fine with no JS or reduced motion. It plays once when scrolled into
- * view; InView starts on screen (replay remounts), OnScroll starts below
- * the fold. The text control drives the first block; two fixed blocks
- * follow for a fuller feel.
- */
 type TextArgs = {
 	text?: string;
 	font?: string;

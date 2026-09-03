@@ -9,23 +9,16 @@ export type BlogEntry = {
 	url: string;
 	title: string;
 	description?: string;
-	/** ISO date for the <time> element. */
 	dateTime: string;
-	/** Pre-formatted label; the server owns locale and timezone. */
+	/** Pre-formatted: the server owns locale and timezone. */
 	dateLabel: string;
 	cover?: PostCover;
 };
 
-/**
- * Only the entries sharing the first viewport stagger as a batch; a lone entry deep in
- * the list rises immediately instead of waiting out its absolute position.
- */
+/** Past the first viewport, entries rise with no delay instead of waiting out their index. */
 const STAGGER_BATCH = 4;
 
-/**
- * Server component: the resting state is what the server renders, so the list reads
- * with JavaScript disabled; ScrollFadeIn adds the rise after mount.
- */
+/** Rests visible from the server, so the list reads with JavaScript disabled. */
 export function BlogEntries({ entries }: { entries: BlogEntry[] }) {
 	return (
 		<ul className="flex flex-col gap-2">
@@ -43,8 +36,6 @@ export function BlogEntries({ entries }: { entries: BlogEntry[] }) {
 						href={entry.url}
 						className={cn(
 							"-mx-5 group block rounded-xl p-5 transition-colors duration-200 hover:bg-pale-dune/10 focus-visible:bg-pale-dune/10 sm:-mx-6 sm:p-6",
-							// With a cover the thumbnail takes a trailing column on every width;
-							// on phones it spans both text rows so date and title stay stacked.
 							entry.cover
 								? "grid grid-cols-[1fr_auto] gap-x-4 sm:grid-cols-[7rem_1fr_auto] sm:gap-x-6"
 								: "sm:grid sm:grid-cols-[7rem_1fr] sm:gap-x-6",
@@ -69,8 +60,7 @@ export function BlogEntries({ entries }: { entries: BlogEntry[] }) {
 								{entry.title}
 							</h2>
 							{entry.description ? (
-								// No display class: line-clamp owns display (-webkit-box); a competing
-								// display kills the clamp.
+								// line-clamp owns display (-webkit-box); a competing display kills it.
 								<p className="mt-2 line-clamp-4 text-pale-dune/80 leading-relaxed transition-colors duration-200 group-hover:text-pale-dune group-focus-visible:text-pale-dune">
 									{entry.description}
 								</p>

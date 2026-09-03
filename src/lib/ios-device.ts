@@ -1,8 +1,4 @@
-/**
- * Device test behind the iOS scroll-smoothing paths (FRA-185). Safari and Chrome on iOS
- * share WebKit and its scroll reporting, so it tests the device, never the browser;
- * Android, desktop Safari, and every desktop browser stay on the raw baseline.
- */
+/** Chrome on iOS is WebKit too: this tests the device, never the browser (FRA-185). */
 export type DeviceHints = {
 	userAgent: string;
 	maxTouchPoints: number;

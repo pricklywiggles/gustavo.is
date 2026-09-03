@@ -7,10 +7,7 @@ import {
 	youtubeWatchUrl,
 } from "@/lib/youtube";
 
-/**
- * A thumbnail link through the same-origin /_next/image proxy, so visitors make zero
- * Google requests; the oEmbed title runs once at build, `title` the author's fallback.
- */
+/** Zero Google requests from visitors: thumbnails proxy through /_next/image, title at build. */
 export async function YouTube({ url, title }: { url: string; title?: string }) {
 	const videoId = youtubeVideoId(url);
 	const watchUrl = youtubeWatchUrl(videoId);

@@ -26,8 +26,7 @@ export function GET() {
 		author: { name: AUTHOR_NAME, link: SITE_URL },
 		generator: false,
 	});
-	// No item-level author: RSS 2.0 defines <author> as an email address, and the
-	// channel already names the one writer.
+	// No item-level author: RSS 2.0 <author> is an email address, and the channel names one.
 	for (const post of posts) {
 		feed.addItem({
 			title: post.data.title,

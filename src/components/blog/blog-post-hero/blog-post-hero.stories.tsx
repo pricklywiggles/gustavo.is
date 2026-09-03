@@ -2,13 +2,6 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { BlogPostHero } from "@/components/blog/blog-post-hero";
 import { GroundStrata } from "@/components/blog/ground-strata";
 
-/**
- * The reading page's opening. Contrast on Dusk Earth: eyebrow Noon Sun 5.08:1, title
- * 6.03:1, standfirst 4.88:1. The content column is the article's own 65ch measure, so
- * the hero's left edge lines up with the body copy below it.
- *
- * pt-28 clears the overlaid riding bar, which Storybook does not mount here.
- */
 const meta = {
 	title: "Blog/Post hero",
 	component: BlogPostHero,
@@ -41,12 +34,10 @@ export const Full: Story = {
 	),
 };
 
-/** No standfirst and no tags: the title carries the whole hero. */
 export const Minimal: Story = {
 	args: { tags: [] },
 };
 
-/** The cover rises last, one beat after the tags, as a full-measure figure. */
 export const WithCover: Story = {
 	args: {
 		...Full.args,
@@ -60,10 +51,6 @@ export const WithCover: Story = {
 	render: Full.render,
 };
 
-/**
- * A long title wraps on its own balance point, and the standfirst delay steps back to
- * 0.16 when there are no tags to follow it.
- */
 export const LongTitle: Story = {
 	args: {
 		title:

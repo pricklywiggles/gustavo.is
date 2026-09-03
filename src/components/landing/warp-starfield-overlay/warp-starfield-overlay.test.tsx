@@ -13,11 +13,8 @@ describe("WarpStarfieldOverlay", () => {
 				astronautSrc="/projects/astronaut.webp"
 			/>,
 		);
-		// Class literals, since Tailwind scans source. Motion: the track starts at the
-		// theater's lock (200vh) and is 125vh tall, so its sticky screen holds for 25vh
-		// and then leaves at page speed, gone by 325vh where the showcase arrives.
-		// Reduced motion: no lock and no spacer, so the track sits at the top with zero
-		// stick.
+		// Class literals, since Tailwind scans source.
+		// The track starts at the 200vh theater lock, 125vh tall: 25vh of stick, gone by 325vh.
 		const track = container.querySelector<HTMLElement>(
 			"[data-warp-overlay-track]",
 		);

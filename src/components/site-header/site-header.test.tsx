@@ -4,8 +4,7 @@ import { DARK_BAR } from "@/components/bar-themes";
 import { FOCUS_OUTLINE } from "@/lib/focus-ring";
 import { headerHeld, SiteHeader, surfaceFromStack } from "./site-header";
 
-// The dialog arrives through next/dynamic; loading its chunk here keeps Vite's transform
-// time (seconds on a loaded machine) out of the open assertions' windows.
+// Preloading the dynamic chunk keeps Vite's transform time out of the open assertions' windows.
 beforeAll(async () => {
 	await import("@/components/contact-dialog");
 });
@@ -23,7 +22,6 @@ describe("SiteHeader", () => {
 		for (const label of ["Blog", "LinkedIn", "Bluesky", "GitHub"]) {
 			expect(screen.getByRole("link", { name: label })).toBeDefined();
 		}
-		// Contact triggers a dialog instead of navigating
 		expect(screen.getByRole("button", { name: "Contact" })).toBeDefined();
 	});
 
@@ -59,8 +57,7 @@ describe("SiteHeader", () => {
 		const toggle = screen.getByRole("button", { name: "Open menu" });
 		expect(toggle.getAttribute("aria-expanded")).toBe("false");
 
-		// The menu covers the bar rather than moving it, so the same toggle
-		// node persists across open and close.
+		// The menu covers the bar, so the same toggle node persists across open and close.
 		fireEvent.click(toggle);
 		expect(toggle.getAttribute("aria-expanded")).toBe("true");
 		expect(

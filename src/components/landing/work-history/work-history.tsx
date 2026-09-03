@@ -48,25 +48,21 @@ import { dockPose, heroPose } from "./year-pose";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-// Line 1 of the quote leads in while the section is still scrolling into view.
 const LINE1_LEAD_VH = 0.5;
 
-// Near full-bleed: the year is the whole frame when a city opens.
 const YEAR_HERO_WIDTH = 0.85;
 
-// GSAP can't interpolate the theme's oklch() strings; the ink drift uses the ramp's sRGB twins.
+// GSAP can't interpolate the theme's oklch(); these are the ramp's sRGB twins.
 const INK_HEX = RAMP_HEX["dusk-ink"];
 const EARTH_HEX = RAMP_HEX["dusk-earth"];
 
-// Headroom so the counter's inner edge clears the frame instead of kissing the corner.
+// Headroom so the counter's inner edge clears the frame corner.
 const FLYTHROUGH_MARGIN = 1.15;
-// Filters apply in element space, so on-screen blur is this times the live scale: about a
-// source pixel, the same order as the rasterized blocks it exists to hide.
+// Filters apply in element space: this times the live scale is about one source pixel.
 const FLYTHROUGH_BLUR_PX = 0.8;
 const FLYTHROUGH_FALLBACK = 200;
 
-// Optical centre of the "o" counter. A split char's box is a whole line box, so the ink
-// centre must come from font metrics.
+// A split char's box is a whole line box, so the "o" ink centre comes from font metrics.
 function counterPoint(line: HTMLElement): { x: number; y: number } | null {
 	const o = gsap.utils
 		.toArray<HTMLElement>(line.querySelectorAll(".split-char"))
@@ -87,7 +83,6 @@ function counterPoint(line: HTMLElement): { x: number; y: number } | null {
 	};
 }
 
-// Scaling about the counter sends the viewer through the hole.
 function counterOrigin(line: HTMLElement): string {
 	const point = counterPoint(line);
 	if (!point) return "50% 50%";
@@ -95,8 +90,7 @@ function counterOrigin(line: HTMLElement): string {
 	return `${point.x - box.left}px ${point.y - box.top}px`;
 }
 
-// Measured, not assumed: Kitora's "o" is nearly solid, a 0.05em pinhole, hence the
-// hundreds-scale fly-through. Cached because only the face can change it.
+// Kitora's "o" is nearly solid, a 0.05em pinhole: hence the hundreds-scale fly-through.
 const counterExtents = (() => {
 	const cache = new Map<string, { a: number; b: number } | null>();
 	return (weight: string, family: string) => {
@@ -161,7 +155,7 @@ function flythroughScale(line: HTMLElement, section: HTMLElement): number {
 	return needed * FLYTHROUGH_MARGIN;
 }
 
-// Rect with the live GSAP transform neutralized, so measured offsets never compound it.
+// Neutralize the live GSAP transform so measured offsets never compound it.
 function untransformedRect(el: HTMLElement): DOMRect {
 	const previous = el.style.transform;
 	el.style.transform = "none";
@@ -183,8 +177,7 @@ type ChapterCues = {
 	hudInLen: number;
 };
 
-// Offsets are functions so a resize re-measures instead of stranding the year mid-flight;
-// queries scope to this chapter's HUD root, since each chapter owns its instrument DOM.
+// Function offsets re-measure on resize instead of stranding the year mid-flight.
 function buildHudEntrance(
 	root: HTMLElement,
 	section: HTMLElement,
@@ -207,19 +200,15 @@ function buildHudEntrance(
 	);
 	if (!hero || !odometer) return;
 
-	// Measured against the section, never the viewport: these run during ScrollTrigger
-	// refresh, while pins are reverted. The section is viewport-sized, so its center is
-	// the screen center once the pin re-engages.
-	// One measurement shared across a refresh pass's start/end evaluations: each
-	// untransformedRect is a write-read-write reflow, so uncached they thrash layout.
+	// Measured against the section, never the viewport: these run while pins are reverted.
+	// Cached per refresh pass: each untransformedRect is a write-read-write reflow.
 	let measured: { rect: DOMRect; host: DOMRect; number: DOMRect } | null = null;
 	const measure = () => {
 		if (!measured) {
 			measured = {
 				rect: untransformedRect(hero),
 				host: section.getBoundingClientRect(),
-				// The AnimateNumber root owns the docked glyph box; the wrapper stands in
-				// until the library has rendered.
+				// The wrapper stands in until AnimateNumber has rendered its glyph box.
 				number: (
 					odometer.querySelector("[data-hud-year-number]") ?? odometer
 				).getBoundingClientRect(),
@@ -230,12 +219,8 @@ function buildHudEntrance(
 		}
 		return measured;
 	};
-	// The hero copy is a static string laid out at hero size (37vw) and only ever
-	// scaled DOWN: Safari rasters text at layout size and never re-rasters under a
-	// transform upscale (FRA-192). The odometer stays untransformed: its reels
-	// compute travel from transform-inclusive rects, so any ancestor scale breaks
-	// the spin. The string docks onto the odometer's glyph box, and a scrub-safe
-	// set() swaps them while both sit still.
+	// Safari rasters text at layout size, so the hero string only ever scales DOWN (FRA-192).
+	// The odometer stays untransformed: its reels read travel from transform-inclusive rects.
 	const heroAt = () => {
 		const { rect, host } = measure();
 		return heroPose(rect, host, YEAR_HERO_WIDTH);
@@ -253,8 +238,7 @@ function buildHudEntrance(
 	const heroY = () => heroAt().y;
 	const heroScale = () => heroAt().scale;
 
-	// Opacity only, never autoAlpha: the odometer is the year's one accessible copy,
-	// and server output keeps it visible for the no-JS reader.
+	// Opacity, never autoAlpha: the odometer is the year's one accessible copy.
 	gsap.set(odometer, { opacity: 0 });
 	const swapEnd = cue.yearSwapAt + cue.yearSwapLen;
 	// force3D false keeps a 1235px-wide text layer per chapter off the compositor.
@@ -284,8 +268,7 @@ function buildHudEntrance(
 			},
 			cue.yearDockAt,
 		)
-		// White while large for legibility over the panorama, ink once docked; the
-		// color settles before the swap so both copies match to the pixel.
+		// White over the panorama, ink by the dock: the color settles before the swap.
 		.to(
 			hero,
 			{ color: INK_HEX, duration: cue.yearSwapLen, ease: "none" },
@@ -319,8 +302,7 @@ function buildHudEntrance(
 			hudIn,
 		);
 	}
-	// One tween keeps both captions on the same beat by construction; the phone counter
-	// is display: none from sm up, so its share is inert there.
+	// One tween so both captions share a beat; the phone counter is display:none from sm.
 	const captions = [role, counter].filter((el): el is HTMLElement => !!el);
 	if (captions.length > 0) {
 		tl.fromTo(
@@ -355,13 +337,12 @@ function buildHudEntrance(
 	}
 }
 
-// On the blockquote so the terms inherit it and the rule can size its em thickness against it.
+// On the blockquote so the rule's em thickness sizes against the term type.
 const quoteSize = "text-[clamp(3.25rem,8.5vw,7rem)]";
 const quoteLineClass =
 	"font-bold font-display text-dusk-ink leading-[1.1] tracking-[-0.01em]";
 
-// The operator is always its line's final glyph (the NBSP welds it on), which the selector
-// leans on. Colour alpha, not opacity: the reveal animates per-char opacity over it.
+// The line's last glyph is always the operator; colour alpha leaves opacity to the reveal.
 const operatorClass = "[&_.split-char:last-child]:text-dusk-ink/85";
 
 // NBSPs weld each term to its operator so no width strands one on its own line.
@@ -387,8 +368,7 @@ export function WorkHistorySection() {
 		() => story.map((_, i) => carriedUsersBefore(story, i)),
 		[story],
 	);
-	// Stable per-index ref callbacks: a fresh inline closure per render would defeat the
-	// scenes' and HUDs' memo on every quantized readout push.
+	// A fresh inline ref closure per render would defeat the scenes' and HUDs' memo.
 	const stageRefFns = useMemo(
 		() =>
 			story.map((_, i) => (el: HTMLDivElement | null) => {
@@ -404,7 +384,7 @@ export function WorkHistorySection() {
 		[story],
 	);
 
-	// Full value so reduced motion and SSR read right; the motion path resets it at build.
+	// Full value so reduced motion and SSR read right; the scrubs reset it at build.
 	const [chapterIndex, setChapterIndex] = useState(0);
 	const [usersTotal, setUsersTotal] = useState(
 		() => carried[0] + cumulativeUsersAt(story[0].stints, story[0].span[1]),
@@ -420,8 +400,7 @@ export function WorkHistorySection() {
 		setStintIndex(0);
 	}, [story, carried]);
 
-	// The pin holds the quote static, so its reveals bind to absolute scroll positions;
-	// function values re-measure on refresh, while pins are reverted, so offsets stay real.
+	// The pin holds the quote static, so its reveals bind to absolute scroll positions.
 	const sectionTop = useCallback(() => {
 		const el = rootRef.current;
 		return el ? el.getBoundingClientRect().top + window.scrollY : 0;
@@ -431,8 +410,7 @@ export function WorkHistorySection() {
 		() => rootRef.current?.offsetHeight || window.innerHeight,
 		[],
 	);
-	// AnimatedLines rebuilds its trigger when start/end change identity, so these must only
-	// change with the phase map. Ends are each term's own phase end: the reveals overlap.
+	// AnimatedLines rebuilds its trigger when start/end change identity.
 	const cue = useMemo(() => {
 		const at = (vh: number) => () => sectionTop() + sectionHeight() * vh;
 		return {
@@ -445,7 +423,6 @@ export function WorkHistorySection() {
 		};
 	}, [sectionTop, sectionHeight, phase]);
 
-	// matchMedia leaves the section unpinned at its rendered static state under reduced motion.
 	useGSAP(
 		() => {
 			const section = rootRef.current;
@@ -461,10 +438,9 @@ export function WorkHistorySection() {
 			mm.add("(prefers-reduced-motion: no-preference)", () => {
 				// Whole-line ink: AnimatedLines splits the word after this layout effect runs.
 				if (result) gsap.set(result, { color: INK_HEX });
-				// Origin right: the rule grows from the edge the terms anchor to, under the "=".
 				if (rule) gsap.set(rule, { scaleX: 0, transformOrigin: "100% 50%" });
 
-				// Timeline seconds are viewport-heights, so phase offsets read as scroll distances.
+				// Timeline seconds are viewport-heights.
 				const tl = gsap.timeline({
 					scrollTrigger: {
 						trigger: section,
@@ -491,8 +467,6 @@ export function WorkHistorySection() {
 						phase.at.ink,
 					);
 				}
-				// The result scales about its "o" counter and never fades, so the frame ends
-				// inside the hole, not on a dissolved word; a function origin re-measures on resize.
 				if (operands) {
 					tl.to(
 						operands,
@@ -505,6 +479,7 @@ export function WorkHistorySection() {
 						phase.at["quote-exit"],
 					);
 				}
+				// The result never fades: the frame ends inside the hole, not on a dissolved word.
 				if (result) {
 					tl.to(
 						result,
@@ -512,14 +487,13 @@ export function WorkHistorySection() {
 							scale: () => flythroughScale(result, section),
 							transformOrigin: () => counterOrigin(result),
 							duration: phase.len["result-exit"],
-							// Apparent size goes as 1/distance: an even approach is a constant growth
-							// RATIO. Polynomial eases lurch then coast in depth terms; expo.in holds steady.
+							// Apparent size goes as 1/distance: an even approach is a constant ratio.
 							ease: "expo.in",
 						},
 						phase.at["result-exit"],
 					);
-					// The word rasterizes once, so edges break up as it grows; blur takes over from
-					// halfway. immediateRender off: GSAP cannot interpolate filter out of `none`.
+					// The word rasterizes once, so its edges break up as it grows.
+					// immediateRender off: GSAP cannot interpolate filter out of `none`.
 					tl.fromTo(
 						result,
 						{ filter: "blur(0px)" },
@@ -531,8 +505,8 @@ export function WorkHistorySection() {
 						},
 						phase.at["result-exit"] + phase.len["result-exit"] / 2,
 					);
-					// The grown word otherwise survives behind the panorama, where a resize reflow
-					// can expose it. A timeline set() stays scrub-safe: rewinding restores it.
+					// The grown word otherwise shows behind the panorama after a resize reflow.
+					// A timeline set() stays scrub-safe; an imperative one dies on rewind.
 					tl.set(
 						result,
 						{ autoAlpha: 0 },
@@ -540,8 +514,7 @@ export function WorkHistorySection() {
 					);
 				}
 
-				// Whichever chapter's scrub holds the playhead pushes the shared readout state
-				// into React; crossing a chapter boundary swaps the HUD's data source.
+				// Whichever chapter's scrub holds the playhead owns the shared readout state.
 				const shown = { chapter: 0, year: 0, index: -1, users: -1 };
 				const cleanups: (() => void)[] = [];
 
@@ -599,8 +572,7 @@ export function WorkHistorySection() {
 						hudInLen: phase.len[`hud-in@${i}`],
 					});
 
-					// The ruler tweens straight on the DOM; quantized readouts push into React
-					// only when their value changes.
+					// Readouts push into React only when a quantized value changes.
 					const [from, to] = chapter.span;
 					const clock = { year: from };
 					tl.to(
@@ -709,10 +681,8 @@ export function WorkHistorySection() {
 								(cascadeAt + vessel.cueStep * pano.stepVh + pano.durVh),
 					});
 					cleanups.push(vessels.cleanup);
-					// Never onToggle: a one-frame skip fires enter then leave, no toggle, and the
-					// sail still ends paused (forward skips update cues first, creation order;
-					// backward skips end on the cue's own rewind, since GSAP updates in reverse
-					// order going up). onRefresh: a mid-chapter load's refresh replays the cue.
+					// Never onToggle: a one-frame skip fires enter then leave, never a toggle.
+					// onRefresh: a mid-chapter load's refresh replays the cue.
 					const onStage = stageWindow(phase, i, story.length);
 					const syncAmbience = (self: ScrollTrigger) => {
 						if (self.isActive) {
@@ -735,7 +705,7 @@ export function WorkHistorySection() {
 					});
 				});
 
-				// The scrubs own the readouts now, so chapter 0's HUD arrives at its opening total.
+				// The scrubs own the readouts, so chapter 0's HUD starts at its opening total.
 				setUsersTotal(
 					carried[0] + cumulativeUsersAt(story[0].stints, story[0].span[0]),
 				);
@@ -831,7 +801,7 @@ export function WorkHistorySection() {
 			{/* Each chapter owns its HUD DOM so GSAP choreographs lifetimes without fighting
 			    React; inactive chapters get quiet props so hidden instruments never roll. */}
 			{story.map((chapter, i) => (
-				// Hidden, never unmounted: a GSAP target (invariant 6); the ledgers carry the data.
+				// Hidden, never unmounted: GSAP owns these nodes (invariant 6).
 				<div
 					key={`hud-${chapter.id}`}
 					className="motion-reduce:hidden"

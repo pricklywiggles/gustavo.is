@@ -4,13 +4,7 @@ import { useState } from "react";
 import { ContactDialog } from "@/components/contact-dialog";
 import { cta } from "@/lib/cta";
 
-/**
- * The say-hello dialog in its plain-modal mode (no morphId, so it fades in
- * on the settled color). The layoutId morph needs a shared trigger and a
- * page-level domMax provider; see the say-hello button story for the
- * trigger half. Provider is non-strict on purpose: the form inside uses
- * the full-motion AnimatedButton.
- */
+/** LazyMotion is non-strict on purpose: the form's AnimatedButton uses full motion. */
 const meta = {
 	title: "Components/Contact dialog",
 	parameters: { layout: "fullscreen" },

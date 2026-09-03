@@ -1,22 +1,16 @@
 import { cleanup } from "@testing-library/react";
-// Safe before the matchMedia polyfill below: ScrollTrigger only touches the window when a
-// component registers it, never at import.
+// Safe above the matchMedia polyfill: ScrollTrigger touches the window only at registration.
 import { ScrollTrigger as StaticScrollTrigger } from "gsap/ScrollTrigger";
 import { afterAll, afterEach } from "vitest";
 
-// @testing-library/react 16.3.2 has no /vitest auto-cleanup entrypoint; register cleanup
-// explicitly so DOM from one test doesn't leak into the next.
+// @testing-library/react 16.3.2 has no /vitest auto-cleanup entrypoint.
 afterEach(() => {
 	cleanup();
 });
 
-// ScrollTrigger registration starts a 250ms sync interval that can outlive jsdom and
-// crash the run ("requestAnimationFrame is not defined"); stop it while jsdom still
-// exists. isTouch is only assigned inside enable(), so it doubles as the
-// did-anything-register probe (a blind disable() throws). Two instances can exist: the
-// one the test file imported statically, and a fresh one after `vi.resetModules()`
-// (src/test/hydrate-reduced.tsx re-imports the component, which registers again). The
-// dynamic import resolves to whichever is current; the static one is held here.
+// ScrollTrigger's 250ms sync interval outlives jsdom and crashes the run; stop it early.
+// isTouch is only set inside enable(), so it probes registration (a blind disable() throws).
+// vi.resetModules() can leave two instances live: the static import and a fresh dynamic one.
 afterAll(async () => {
 	const { ScrollTrigger } = await import("gsap/ScrollTrigger");
 	for (const instance of new Set([StaticScrollTrigger, ScrollTrigger])) {
@@ -24,8 +18,7 @@ afterAll(async () => {
 	}
 });
 
-// jsdom lacks window.matchMedia and ScrollTrigger calls it at plugin-registration time
-// (module load), so anything importing a scroll component throws without this.
+// ScrollTrigger calls matchMedia at module load; this stub answers false for every query.
 if (typeof window !== "undefined" && !window.matchMedia) {
 	window.matchMedia = (query: string) => ({
 		matches: false,

@@ -4,10 +4,6 @@ import { defineCollections, defineConfig } from "fumadocs-mdx/config";
 import { z } from "zod";
 import { codeTheme } from "./src/lib/code-theme";
 
-/**
- * A post owns its assets: `image` is a `./` path to a file inside the post's own folder,
- * never under public/ and never a parent directory.
- */
 function isOwnedAsset(image: string, postPath: string): boolean {
 	if (!image.startsWith("./")) return false;
 	const dir = dirname(isAbsolute(postPath) ? postPath : resolve(postPath));
@@ -26,9 +22,9 @@ const postSchema = (postPath: string) =>
 			description: z.string().optional(),
 			tags: z.array(z.string()).default([]),
 			draft: z.boolean().default(false),
-			/** Cover image, `./name.webp` beside the post: hero figure, index thumbnail, OG card, BlogPosting.image. */
+			/** Cover, `./name.webp` beside the post: hero, index card, OG image, BlogPosting. */
 			image: z.string().optional(),
-			/** Alt text for the cover; omit when the picture is decorative. */
+			/** Omit when the cover is purely decorative. */
 			imageAlt: z.string().optional(),
 		})
 		.refine((post) => post.draft || post.description, {
@@ -43,10 +39,8 @@ const postSchema = (postPath: string) =>
 		});
 
 /**
- * Turns the frontmatter `image` into a bundler import exported as `cover`, so consumers
- * read `page.data._exports.cover` (a StaticImageData with src, width, height) and the
- * file ships hashed from /_next/static/media without a copy under public/. Only an
- * estree body survives MDX compilation; a `value` string alone is ignored.
+ * Frontmatter `image` becomes a bundler import exported as `cover`, so covers ship hashed
+ * from /_next/static/media instead of public/. Only estree survives MDX compilation.
  */
 function remarkCoverExport() {
 	return (
@@ -107,15 +101,12 @@ export const blog = defineCollections({
 	postprocess: { includeProcessedMarkdown: true },
 });
 
-// Global mdxOptions keep the preset's default plugins; a collection-level mdxOptions
-// would remove them all.
+// Global: a collection-level mdxOptions would drop the preset's default plugins.
 export default defineConfig({
 	mdxOptions: {
-		// The function form appends to the preset's plugins instead of replacing them.
 		remarkPlugins: (plugins) => [...plugins, remarkCoverExport],
 		rehypeCodeOptions: {
-			// A bare `theme` key loses to the preset's default dual `themes` in the shallow
-			// merge, leaving CSS-variable output nothing on this site consumes.
+			// A bare `theme` loses to the preset's dual `themes` in the shallow merge.
 			themes: { light: codeTheme },
 			defaultColor: "light",
 			icon: false,

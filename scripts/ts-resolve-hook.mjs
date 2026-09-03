@@ -1,5 +1,4 @@
-// Node strips types from .ts modules but resolves extensionless relative imports the way
-// ESM does (not at all); the source keeps bundler-style specifiers, so retry with .ts.
+// Node's ESM resolver ignores extensionless relative imports; the source uses bundler specifiers.
 export async function resolve(specifier, context, next) {
 	try {
 		return await next(specifier, context);

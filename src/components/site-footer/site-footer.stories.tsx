@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { SiteFooter } from "@/components/site-footer";
 
-/** The contentinfo landmark: link row, socials, copyright, and the
- * optional page-specific callout slot above the rows. */
 const meta = {
 	title: "Components/Site footer",
 	component: SiteFooter,

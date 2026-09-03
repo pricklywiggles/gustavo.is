@@ -14,8 +14,7 @@ import { useBelowSm } from "@/components/landing/use-below-sm";
 import type { Stint } from "@/components/landing/work-history-data";
 import { useReducedMotionLive } from "@/components/use-reduced-motion-live";
 
-// Ruler geometry, shared with the scrub tween. RULER_LEAD ticks sit above the marker so
-// the instrument reads as continuing past the chapter's first year.
+// RULER_LEAD ticks above the marker so the ruler reads as continuing past year one.
 export const RULER_PITCH = 12;
 export const RULER_TICKS_PER_YEAR = 6;
 export const RULER_LEAD = 4;
@@ -23,13 +22,11 @@ export const RULER_MARKER_TOP = RULER_LEAD * RULER_PITCH;
 // Enough ticks below the marker to fill a tall viewport at any scrub position.
 const RULER_TRAIL = 140;
 
-/** Pixels the strip travels across a chapter's whole span. */
 export function rulerTravel([from, to]: [number, number]): number {
 	return (to - from) * RULER_TICKS_PER_YEAR * RULER_PITCH;
 }
 
-// mode="wait" holds the incoming mark until the outgoing one is gone, so the fixed box
-// never holds two children; scale and opacity only, so the swap stays on the compositor.
+// Scale and opacity only: the swap stays on the compositor.
 const POP: Variants = {
 	initial: { opacity: 0, scale: 0.6 },
 	enter: {
@@ -47,7 +44,6 @@ const POP: Variants = {
 	},
 };
 
-// The role caption wants less theatre than the marks: a plain fade.
 const FADE: Variants = {
 	initial: { opacity: 0 },
 	enter: { opacity: 1, transition: { duration: 0.25, ease: "easeOut" } },
@@ -56,9 +52,7 @@ const FADE: Variants = {
 
 // Fixed slot: marks run 6.5:1 to 1:1, the counter must not shift; w-40 fits 375px phones.
 const COMPANY_BOX = "flex h-13.75 w-40 shrink-0 items-center sm:w-50";
-// Glass, not a card: translucent surface color over a backdrop blur, so the city still
-// reads through, with a hairline ring and a top highlight for the pane's edge. From sm
-// the padding tracks viewport height like the mark box, so a landscape phone keeps it.
+// Padding tracks viewport height from sm, so a landscape phone still fits the plate.
 const PRODUCT_PLATE =
 	"rounded-[2.5rem] bg-pale-dune/60 p-6 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.55)] ring-1 ring-white/40 backdrop-blur-md sm:p-[clamp(1.5rem,4.5vh,2.5rem)]";
 // Same height as the mark slot: font-derived content would drift with the legend face.
@@ -84,29 +78,23 @@ const RulerTicks = memo(function RulerTicks({ count }: { count: number }) {
 	);
 });
 
-/**
- * Purely presentational: GSAP drives visibility and motion through the data-hud-* slot
- * containers, Motion only ever animates their children, keeping the two-library rule.
- * memo: inactive chapters get constant props, so scrub pushes re-render only the
- * active HUD.
- */
+// GSAP drives the data-hud-* containers, Motion only their children (two-library rule).
+// memo pays off because inactive chapters get constant props during a scrub.
 export const WorkHistoryHud = memo(function WorkHistoryHud({
 	span,
 	year,
 	stint,
 	usersTotal,
 }: {
-	/** The chapter's [first, last] year, which sizes the ruler. */
+	/** [first, last] year. */
 	span: [number, number];
 	year: number;
 	stint: Stint;
 	usersTotal: number;
 }) {
 	const reducedMotion = useReducedMotionLive();
-	// Both dl shells stay mounted as stable GSAP targets; only the active one mounts the
-	// odometer, so three reel loops run instead of six (hydration caveat: use-below-sm.ts).
+	// Both counter shells stay mounted as GSAP targets; only the active one runs reels.
 	const belowSm = useBelowSm();
-	// No variants under reduced motion: AnimatePresence just replaces the node instantly.
 	const pop = reducedMotion ? undefined : POP;
 	const fade = reducedMotion ? undefined : FADE;
 	const tickCount =

@@ -29,7 +29,6 @@ function TechMark({ tech }: { tech: Technology }) {
 	return (
 		<span className="flex select-none items-center gap-3 whitespace-nowrap">
 			{mask ? (
-				// Mask, not img: the marks render as one First Light family.
 				<span
 					aria-hidden="true"
 					className="block size-8 shrink-0 bg-first-light/85"
@@ -43,8 +42,7 @@ function TechMark({ tech }: { tech: Technology }) {
 	);
 }
 
-// The Ticker re-clones marks only when it re-measures, so the item list refreshes on
-// this cadence instead of per frame; the per-frame rect reads are the feature.
+// The Ticker only re-clones marks when it re-measures, so re-querying per frame is waste.
 const REQUERY_EVERY_FRAMES = 10;
 
 // Owns the center-follow state, so caption swaps never re-render the Ticker band above.
@@ -60,7 +58,6 @@ function TickerCaption({
 	const [activeIndex, setActiveIndex] = useState(0);
 	const count = technologies.length;
 
-	// The caption follows whichever mark is nearest the band's center line.
 	useEffect(() => {
 		if (reduced || typeof IntersectionObserver === "undefined") return;
 		const bandEl = band.current;
@@ -81,8 +78,7 @@ function TickerCaption({
 			let best: HTMLElement | null = null;
 			let bestDist = Number.POSITIVE_INFINITY;
 			for (const item of items) {
-				// A clone detached by a Ticker re-measure rects to 0,0; skip it outright
-				// until the next cadence query repairs the list.
+				// A clone detached by a Ticker re-measure rects to 0,0.
 				if (!item.isConnected) continue;
 				const d = Math.abs(centerOf(item.getBoundingClientRect()) - mid);
 				if (d < bestDist) {
@@ -135,8 +131,7 @@ function TickerCaption({
 
 export function TechSection({ technologies }: { technologies: Technology[] }) {
 	const reduced = useReducedMotion();
-	// useReducedMotion is truthy on a reduced client's FIRST render while the server
-	// rendered the ticker branch; SSR always takes the ticker, swapped pre-paint after mount.
+	// useReducedMotion is truthy on a reduced client's first render: SSR always takes the ticker.
 	const [hydrated, setHydrated] = useState(false);
 	useLayoutEffect(() => {
 		setHydrated(true);

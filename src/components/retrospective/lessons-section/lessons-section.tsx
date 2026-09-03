@@ -14,10 +14,7 @@ import type { Lesson } from "../retrospective-data";
 import { SectionHeading } from "../section-heading";
 import { Runs } from "../text-runs";
 
-/**
- * Adapted from the Motion accordion example: height auto with a mask fade,
- * body copy blurring in. One lesson of prose open at a time.
- */
+/** Adapted from the Motion accordion example: height auto with a mask fade. */
 function LessonItem({
 	lesson,
 	open,
@@ -59,8 +56,7 @@ function LessonItem({
 			<m.div
 				id={id}
 				aria-labelledby={`${id}-button`}
-				// Collapsed prose must leave the accessibility tree, not just
-				// the viewport: height 0 alone still reads aloud.
+				// height 0 alone still reads aloud, so collapsed prose leaves the a11y tree too.
 				aria-hidden={open ? undefined : true}
 				inert={!open}
 				className="overflow-hidden"
@@ -95,7 +91,6 @@ function LessonItem({
 
 export function LessonsSection({ lessons }: { lessons: Lesson[] }) {
 	const reduced = useReducedMotion();
-	// One drawer at a time: opening a lesson folds the previous one away.
 	const [openId, setOpenId] = useState<string | null>(null);
 
 	return (

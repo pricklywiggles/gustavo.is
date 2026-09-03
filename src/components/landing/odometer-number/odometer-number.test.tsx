@@ -12,22 +12,19 @@ describe("reelPosition", () => {
 	});
 
 	it("cascades the carry while lower reels sweep nine to zero", () => {
-		// Halfway through 199 -> 200, every reel is mid-roll together.
 		expect(reelPosition(199.5, 1)).toBeCloseTo(9.5);
 		expect(reelPosition(199.5, 10)).toBeCloseTo(9.5);
 		expect(reelPosition(199.5, 100)).toBeCloseTo(1.5);
 	});
 
 	it("rolls only the reels whose lower digits are wrapping", () => {
-		// Halfway through 1998 -> 1999 the ones reel moves alone.
 		expect(reelPosition(1998.5, 1)).toBeCloseTo(8.5);
 		expect(reelPosition(1998.5, 10)).toBe(9);
 		expect(reelPosition(1998.5, 1000)).toBe(1);
 	});
 
 	it("stays continuous across the wrap", () => {
-		// Position 10 renders the strip's duplicate zero, so approaching 10
-		// and landing on 0 are pixel-identical states.
+		// Position 10 is the strip's duplicate zero, pixel-identical to 0.
 		expect(reelPosition(199.99, 100)).toBeCloseTo(1.99);
 		expect(reelPosition(200, 100)).toBe(2);
 		expect(reelPosition(9.99, 1)).toBeCloseTo(9.99);
@@ -52,7 +49,6 @@ describe("advanceReel", () => {
 	});
 
 	it("keeps rolling forward past a target that slipped just behind", () => {
-		// Travel direction wins: the reel laps around rather than backing up.
 		expect(advanceReel(2, 1.5, 1, 0.33)).toBeCloseTo(2.33);
 	});
 

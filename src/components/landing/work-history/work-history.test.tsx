@@ -45,9 +45,8 @@ describe("WorkHistorySection", () => {
 			expect(end()).toBe(`+=${1000 * total}`);
 			box = 800;
 			expect(end()).toBe(`+=${800 * total}`);
-			// FRA-192: the hero copy is a static string (scale-down only, 2D per chapter);
-			// the odometer never gets a transform and only ever an opacity change, so it
-			// stays the year's one accessible copy while the string is aria-hidden.
+			// FRA-192: the hero string scales down only, 2D per chapter.
+			// The odometer takes opacity alone, so it stays the year's one accessible copy.
 			const has = (attr: string) => (target: unknown) =>
 				(target as HTMLElement | undefined)?.hasAttribute?.(attr) === true;
 			const isHero = has("data-hud-year-hero");
@@ -57,8 +56,7 @@ describe("WorkHistorySection", () => {
 			expect(set.mock.calls.some((c) => isHero(c[0]))).toBe(false);
 			const odometerSets = set.mock.calls.filter((c) => isOdometer(c[0]));
 			expect(odometerSets).toHaveLength(CHAPTERS.length);
-			// gsap.set normalizes its vars in place (duration, immediateRender), so
-			// assert the keys that matter rather than the whole object.
+			// gsap.set normalizes its vars in place, so assert only the keys that matter.
 			for (const c of odometerSets) {
 				expect(vars(c[1]).opacity).toBe(0);
 				for (const key of ["autoAlpha", "visibility", "x", "y", "scale"]) {
@@ -90,8 +88,6 @@ describe("WorkHistorySection", () => {
 					expect(typeof v[key]).toBe("function");
 				}
 			}
-			// The swap contract: color to ink across year-swap, then both hard sets at its
-			// end, hero first; the odometer's only timeline writes are those sets.
 			const { at, len } = storyPhases(CHAPTERS);
 			const swapEnd = (i: number) =>
 				at[`year-swap@${i}`] + len[`year-swap@${i}`];
@@ -210,12 +206,10 @@ describe("WorkHistorySection", () => {
 	it("renders the equation terms and the rule, with no attribution", () => {
 		const { container } = render(<WorkHistorySection />);
 		const quote = container.querySelector("blockquote");
-		// Terms weld their operator on with a non-breaking space, so compare on
-		// normalized whitespace.
+		// Terms weld their operator on with a non-breaking space, so normalize whitespace.
 		const text = quote?.textContent?.replace(/\s+/g, " ");
 		expect(text).toContain("Play +");
-		// The equals is drawn from two hyphens (.kitora-equals): split chars carry "-",
-		// the sr-only copy restoring the real "=" for assistive tech.
+		// The equals is two hyphens (.kitora-equals); the sr-only copy carries the real "=".
 		expect(text).toContain("Purpose -");
 		expect(text).toContain("Purpose =");
 		expect(text).toContain("Work");
@@ -223,8 +217,6 @@ describe("WorkHistorySection", () => {
 		expect(container.querySelector("figcaption")).toBeNull();
 	});
 
-	// One gesture: both operands arrive together, and each later beat opens while the
-	// previous is still resolving.
 	it("starts both operands together, then overlaps the later beats", () => {
 		const { at, len } = storyPhases(CHAPTERS);
 		expect(at.line2).toBe(at.line1);
@@ -244,7 +236,7 @@ describe("WorkHistorySection", () => {
 			expect(end).toBe(
 				phase.at[`scene-out@${i}`] + phase.len[`scene-out@${i}`],
 			);
-			// Exactly: resolvePhases starts the next cascade at this exit's end.
+			// resolvePhases starts the next cascade at this exit's end.
 			expect(end).toBe(phase.at[`panorama-in@${i + 1}`]);
 		}
 		const last = stageWindow(phase, CHAPTERS.length - 1, CHAPTERS.length);
@@ -255,13 +247,12 @@ describe("WorkHistorySection", () => {
 	it("renders every chapter's panorama layers in z-order", () => {
 		const { container } = render(<WorkHistorySection />);
 		const layers = container.querySelectorAll("[data-pano-layer]");
-		// A layer is either the img itself or a wrapper animating an img.
 		const srcOf = (el: Element) =>
 			el.getAttribute("src") ?? el.querySelector("img")?.getAttribute("src");
 		// Seattle 15 + San Francisco 21 + Los Angeles 18, scene order.
 		expect(layers.length).toBe(54);
 		expect(srcOf(layers[0])).toBe("/seattle-panorama/1-high-cloud-left.webp");
-		// The ferry tops Seattle's stack, welded to the front strip's top edge.
+		// The ferry tops Seattle's stack.
 		expect(srcOf(layers[14])).toBe("/seattle-panorama/10-ferry.webp");
 		expect(srcOf(layers[15])).toBe("/san-francisco-panorama/1-clouds-far.webp");
 		expect(srcOf(layers[36])).toBe("/los-angeles-panorama/1-large-cloud.webp");
@@ -269,8 +260,7 @@ describe("WorkHistorySection", () => {
 
 	it("renders one HUD per chapter, each centering its first product", () => {
 		const { container } = render(<WorkHistorySection />);
-		// Both marks name their subject: the logos carry the wordmarks, so alt
-		// text is the only place the company and product are stated.
+		// The logos carry the wordmarks, so alt text is the only place the names are stated.
 		expect(screen.getByAltText("Microsoft")).toBeDefined();
 		expect(screen.getByAltText("Word")).toBeDefined();
 		const section = container.querySelector("section#work");
@@ -295,8 +285,7 @@ describe("WorkHistorySection", () => {
 		expect(container.querySelector("[data-hud-divider]")).toBeNull();
 		const role = container.querySelector("[data-hud-role]");
 		expect(role?.textContent).toBe("Software Design Engineer");
-		// Two counter homes per chapter: the bar slot (sm and up) and the
-		// top-left phone instrument; CSS shows exactly one per breakpoint.
+		// Two counter homes per chapter, bar and phone; CSS shows one per breakpoint.
 		expect(screen.getAllByText("Total users reached")).toHaveLength(6);
 	});
 
@@ -315,7 +304,7 @@ describe("WorkHistorySection", () => {
 		expect(scenes).toHaveLength(3);
 		expect(ledgers).toHaveLength(3);
 		expect(huds).toHaveLength(3);
-		// Scene, ledger, scene, ledger: DOM order is the reduced reading order.
+		// DOM order is the reduced reading order.
 		for (const [i, ledger] of ledgers.entries()) {
 			expect(ledger.previousElementSibling).toBe(scenes[i]);
 			expect(ledger.className).toContain("hidden");
@@ -339,8 +328,7 @@ describe("WorkHistorySection", () => {
 		expect(container.querySelector("section#work")).not.toBeNull();
 	});
 
-	// FRA-192: the swap is anchored to the dock's end and hides inside hud-in's
-	// tail, so the scrub keeps starting where hud-in ends, exactly as before it.
+	// FRA-192: the swap hides inside hud-in's tail, so the scrub still starts where hud-in ends.
 	it("anchors the year swap to the dock's end without moving the scrub", () => {
 		const { at, len } = storyPhases(CHAPTERS);
 		const end = (id: string) => at[id] + len[id];

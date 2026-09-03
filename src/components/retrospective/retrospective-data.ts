@@ -1,11 +1,7 @@
-/**
- * Copy imported from the sunset ponder.to retrospectives, none of the old code. Ponder
- * Blogs' "Customization" walkthrough deliberately keeps the old site's duplicate video id.
- */
+/** Copy from the sunset ponder.to site; the duplicate "Customization" video id is deliberate. */
 
 import type { OgImage } from "@/lib/site-metadata";
 
-/** A paragraph is a run list so link text can sit inside the prose. */
 export type TextRun = string | { text: string; href: string };
 export type Paragraph = TextRun[];
 
@@ -21,7 +17,7 @@ export type Technology = {
 	name: string;
 	type: string;
 	highlights: string[];
-	/** Monochrome band glyph, rendered as a CSS mask. */
+	/** Painted as a CSS mask: color in the asset is discarded. */
 	icon?: string;
 };
 
@@ -32,17 +28,15 @@ export type Feature = {
 	videoUrl: string;
 	videoTitle: string;
 	highlights: string[];
-	/** Self-hosted still of the walkthrough, shown on the facade. */
+	/** Self-hosted still for the video facade. */
 	poster: string;
 };
 
-/** What the client feature sections receive: nothing renders `highlights`, so the
- * server page strips them from the RSC payload. */
+/** The client-side shape: `highlights` is stripped so it never rides the RSC payload. */
 export type FeatureCard = Omit<Feature, "highlights">;
 
 export type Retrospective = {
 	slug: string;
-	/** Social card in public/og; "default" when the product has none of its own. */
 	ogImage: OgImage;
 	/** Follows the wordmark in the h1, e.g. Ponder "blogs,". */
 	wordmarkSuffix?: string;
@@ -423,5 +417,5 @@ export const PONDER_BLOGS: Retrospective = {
 	],
 };
 
-/** Every retrospective; the sitemap, llms index, and markdown mirrors fan out from here. */
+/** The sitemap, llms index, and markdown mirrors all fan out from this list. */
 export const RETROSPECTIVES: readonly Retrospective[] = [PONDER, PONDER_BLOGS];

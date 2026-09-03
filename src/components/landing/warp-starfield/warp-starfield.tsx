@@ -20,34 +20,26 @@ import {
 	wordProgress,
 } from "./warp-starfield-math";
 
-/** Streak length as seconds of travel, so it scales with camera speed for free. */
+/** Streak length in seconds of travel, so it scales with camera speed. */
 const TAIL_SECONDS = 0.085;
 /** Cap on a frame's dt so a backgrounded tab doesn't teleport the field. */
 const MAX_FRAME_DT = 0.05;
 const TAU = Math.PI * 2;
-/** Seconds between headline echo samples into the past; the smear scales with real speed. */
+/** Spacing between echo samples, in seconds, so the smear scales with speed. */
 const TEXT_TRAIL_DT = 0.045;
-/** Fraction of the flight spent fading in from nothing. */
 const TEXT_FADE_IN = 0.12;
-/** Hold at full seed before the jump, letting the field and UFO register. */
+/** Hold at full seed before the jump, so the field and UFO register. */
 const WARP_ARM_DELAY = 0.3;
-/** World-units of camera drift per scene pixel; a near star moves at ~8% of scroll speed. */
+/** Arrival-field parallax; a star at z=2 drifts about 8% of the scroll distance. */
 const REST_PARALLAX = 0.16;
-/**
- * Catch-up time (seconds) for the scroll sample that drifts the arrival field, on iOS
- * devices only, whose sparse scroll events would otherwise step the star camera.
- * Everywhere else the raw sample is the baseline.
- */
+/** Catch-up time (seconds) for the iOS scroll sample; its sparse events step the star camera. */
 const SCROLL_SMOOTHING = 0.08;
-/** Beat between the last word landing and the astronaut's pop. */
 const ASTRONAUT_DELAY = 0.25;
-/** Beat between the astronaut's pop and the scroll cue appearing. */
 const HINT_DELAY = 0.5;
-/** Resting pose; the wrapper carries the rotation, so the pop's translateY travels along
- * the astronaut's tilted spine. */
+/** The wrapper carries the rotation, so this translateY travels the tilted spine. */
 const ASTRONAUT_REST = "translateY(0)";
 
-/** Ease-in: words accelerate the whole way and stop cold; the trail catches up after. */
+/** Words accelerate the whole way and stop cold; the trail catches up after. */
 const flightEase = (p: number) => p ** 3;
 
 type FlyingWord = {
@@ -56,11 +48,11 @@ type FlyingWord = {
 	font: string;
 	letterSpacing: string;
 	color: string;
-	/** Advance width at rest size, from the same canvas font. */
+	/** Canvas advance width at rest size. */
 	width: number;
-	/** Baseline offset from box center (half-leading model), so canvas glyphs match the DOM. */
+	/** Baseline offset from box center (half-leading), so canvas matches the DOM. */
 	baselineOff: number;
-	/** Resting box center, relative to the viewport center (the flight ray). */
+	/** Resting box center relative to the canvas center: the flight ray. */
 	offsetX: number;
 	offsetY: number;
 	landed: boolean;
@@ -70,41 +62,22 @@ type WarpStarfieldProps = {
 	className?: string;
 	/** Dots placed before the jump. */
 	starCount?: number;
-	/** Seconds of acceleration once the field is set. */
+	/** Seconds of acceleration ramp. */
 	warpDuration?: number;
-	/**
-	 * Polled every frame for the seeding scrub, 0..1. Stars accumulate with it and the UFO
-	 * rides it in; holding 1 for a beat triggers the warp. Omitted, the warp self-starts.
-	 */
+	/** Polled each frame, 0..1: stars accumulate with it, holding 1 arms the warp (default 1). */
 	seedProgress?: () => number;
-	/**
-	 * Polled every frame: pixels scrolled into the follow-on content. Drifts the arrival
-	 * field in parallax.
-	 */
+	/** Polled each frame: pixels scrolled into the follow-on content; drifts the arrival field. */
 	sceneScroll?: () => number;
-	/**
-	 * The settled scene (`WarpStarfieldOverlay`): its `[data-warp-word]` spans are the
-	 * headline the words fly into, `[data-warp-astronaut]` pops after them, and
-	 * `[data-scroll-hint]` follows. It lives in document flow, so its screen must coincide
-	 * with the canvas while the theater plays (the page is locked there).
-	 */
+	/** The settled scene; its screen must coincide with the canvas while the theater plays. */
 	overlay?: RefObject<HTMLElement | null>;
-	/** Ghost echoes per word; more steps reach further into the past, lengthening the smear. */
 	textTrailSteps?: number;
-	/** Fires once after the last streak and headline land; immediate under reduced motion. */
+	/** Fires once after the last streak and word land; immediate under reduced motion. */
 	onComplete?: () => void;
-	/**
-	 * The self-running theater window: true when the warp arms, false once the scene settles.
-	 * Callers hold the page still with it; never fired on reduced-motion or no-canvas paths.
-	 */
+	/** True when the warp arms, false once settled; silent on reduced-motion and no-canvas paths. */
 	onTheater?: (playing: boolean) => void;
 };
 
-/**
- * The warp-speed set piece: the canvas and the UFO. Plays once per mount (change key to
- * replay, and remount the overlay with it: the effect mutates its inline styles); the
- * root fills whatever positioned box the caller gives it.
- */
+/** Plays once per mount; a replay key must remount the overlay, whose styles this mutates. */
 export function WarpStarfield({
 	className,
 	starCount = 100,
@@ -174,7 +147,7 @@ export function WarpStarfield({
 		};
 		const view: Viewport = { width: 0, height: 0, focal: 0 };
 		const dpr = Math.min(window.devicePixelRatio || 1, 2);
-		// The ramp's darkest token, resolved so the sky tracks the palette.
+		// Read from the token so the sky tracks the palette.
 		const background =
 			getComputedStyle(document.documentElement)
 				.getPropertyValue("--color-dusk-ink")
@@ -191,13 +164,11 @@ export function WarpStarfield({
 			canvas.width = Math.round(rect.width * dpr);
 			canvas.height = Math.round(rect.height * dpr);
 			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-			// Resting rects move with the viewport-relative type size.
+			// Type is sized in vw, so the resting rects move.
 			wordsMeasured = false;
 		};
 
-		// Measured at warp start so the display font has loaded and rects reflect real
-		// glyphs. Canvas-relative: the overlay's screen coincides with the canvas at the
-		// theater's lock, which is where the flight happens.
+		// Measured at warp start, once the display font has loaded and rects show real glyphs.
 		const measureWords = () => {
 			const rootRect = canvas.getBoundingClientRect();
 			words = spans.map((el, i) => {
@@ -231,7 +202,6 @@ export function WarpStarfield({
 			wordsMeasured = true;
 		};
 
-		// Vertical camera drift (world units) for the arrival field.
 		let restCamY = 0;
 
 		const drawWordAt = (word: FlyingWord, z: number) => {
@@ -246,8 +216,7 @@ export function WarpStarfield({
 			ctx.restore();
 		};
 
-		// The last echo's alpha stays ~0.17 of the base at any step count, so raising
-		// textTrailSteps lengthens the smear instead of appending invisible copies.
+		// 0.7**5 at the last echo whatever the step count, so more steps lengthen the smear.
 		const echoFalloff = (k: number) =>
 			0.7 ** (((k - 1) * 5) / Math.max(textTrailSteps - 1, 1));
 
@@ -265,7 +234,6 @@ export function WarpStarfield({
 				ctx.textAlign = "left";
 				ctx.textBaseline = "alphabetic";
 
-				// Each echo dies at the resting spot, so the trail sweeps in after the cold stop.
 				ctx.globalCompositeOperation = "lighter";
 				for (let k = textTrailSteps; k >= 1; k--) {
 					const past: WarpSim = {
@@ -279,8 +247,7 @@ export function WarpStarfield({
 					drawWordAt(word, wordDepth(flightEase(pk)));
 				}
 
-				// The word composites normally: at touchdown its color must equal the DOM
-				// text it hands off to. Once landed, the DOM span carries it.
+				// source-over: at touchdown the canvas color must equal the DOM text it hands off to.
 				if (!word.landed) {
 					ctx.globalCompositeOperation = "source-over";
 					ctx.globalAlpha = Math.min(p / TEXT_FADE_IN, 1);
@@ -322,8 +289,6 @@ export function WarpStarfield({
 			ctx.globalCompositeOperation = "lighter";
 			ctx.lineCap = "round";
 
-			// Arrival field, parked behind everything; camera drift parallaxes it as the
-			// showcase scrolls through.
 			for (const star of sim.rest) {
 				drawDot(
 					projectAt(star, star.z, view, restCamY),
@@ -346,8 +311,7 @@ export function WarpStarfield({
 					continue;
 				}
 
-				// A mid stop keeps most of the streak luminous (a head-only ramp reads as
-				// grey thread); the halo pass under it supplies the neon bloom.
+				// A mid stop keeps the streak luminous; a head-only ramp read as grey thread.
 				const streak = ctx.createLinearGradient(tail.x, tail.y, head.x, head.y);
 				streak.addColorStop(0, color(0));
 				streak.addColorStop(0.35, color(alpha * 0.7));
@@ -401,7 +365,7 @@ export function WarpStarfield({
 		};
 
 		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-			// The resting end state: star births backdated so the fade-in math renders them lit.
+			// Births backdated so the fade-in math renders them already lit.
 			sim.warpAt = 0;
 			seedTo(sim, 1, view, config);
 			for (const star of sim.stars) star.bornAt = -star.fadeSeconds;
@@ -410,21 +374,19 @@ export function WarpStarfield({
 			popAstronaut(true);
 			showHint(true);
 			finish();
-			// Stars stay parked, no parallax here; the overlay's own track rides the page.
 			return () => observer.disconnect();
 		}
 
 		let frame = 0;
 		let last: number | null = null;
 		let running = false;
-		// Sim time the scrub first held 1; the warp arms WARP_ARM_DELAY later.
+		// Sim time the scrub first held 1.
 		let armedAt: number | null = null;
-		// Sim time the last word landed; the astronaut pops a beat later, the cue follows.
+		// Sim time the last word landed.
 		let astronautAt: number | null = null;
 		let astronautPopped = false;
 		let hintShown = false;
 		const smoothScroll = isIOSDevice();
-		// Scroll sample; low-passed on iOS (see SCROLL_SMOOTHING), snapping within half a pixel.
 		let scenePx = 0;
 		const step = (now: number) => {
 			if (!running) return;
@@ -491,9 +453,7 @@ export function WarpStarfield({
 				onTheaterRef.current?.(false);
 			}
 
-			// Done once every word's deepest echo has caught up (a landed word still smears).
-			// finish() fires once, but the loop stays alive: the arrival field keeps
-			// twinkling; the guard keeps the per-word sim copies from allocating forever.
+			// Waits for each word's deepest echo; the guard stops the sim copies while the loop lives on.
 			if (!finished) {
 				const textDone =
 					spans.length === 0 ||
@@ -510,11 +470,11 @@ export function WarpStarfield({
 			frame = requestAnimationFrame(step);
 		};
 
-		// Run only while the stage is near the viewport, or the canvas burns GPU from page
-		// load onward; resetting `last` on resume keeps the off-screen gap out of the sim clock.
+		// Run only near the viewport, or the canvas burns GPU from page load onward.
 		const start = () => {
 			if (running) return;
 			running = true;
+			// Resetting on resume keeps the off-screen gap out of the sim clock.
 			last = null;
 			frame = requestAnimationFrame(step);
 		};

@@ -27,8 +27,7 @@ describe("BlogEntries", () => {
 	it("renders every entry visible at rest (no JS-gated opacity)", () => {
 		render(<BlogEntries entries={ENTRIES} />);
 		for (const item of screen.getAllByRole("listitem")) {
-			// The resting state is authored visible; an inline opacity would blank the list
-			// for no-JS visitors and failed hydrations.
+			// An inline opacity would blank the list for no-JS visitors and failed hydrations.
 			expect(item.style.opacity).not.toBe("0");
 		}
 	});
@@ -45,7 +44,6 @@ describe("BlogEntries", () => {
 			name: "First post",
 		});
 		expect(links[0].contains(heading)).toBe(true);
-		// Optional description stays optional.
 		expect(links[1].querySelector("p")).toBeNull();
 	});
 

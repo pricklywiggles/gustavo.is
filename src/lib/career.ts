@@ -3,24 +3,23 @@ import {
 	type CityChapter,
 } from "@/components/landing/work-history-data";
 
-/** A title held at one employer; `end` is null while the role is ongoing. */
+/** `end` is null while the role is ongoing. */
 export type Role = { title: string; start: number; end: number | null };
 
 export type Employment = {
 	company: string;
 	city: string;
-	/** Consecutive same-title stints merged, so each role keeps its own dates. */
+	/** Consecutive same-title stints merged into one role. */
 	roles: Role[];
 	products: string[];
-	/** Whole years: starts rounded down, ends rounded; null end means ongoing. */
+	/** Whole years: start rounded down, end rounded. */
 	start: number;
 	end: number | null;
 };
 
 /**
- * One entry per company, chronological, collapsed from the landing's per-product
- * stints; the scroll story only ever shows one stint at a time. A stint reaching
- * the last chapter's span end is ongoing, since that span ends at "now".
+ * One entry per company, chronological, collapsed from the landing's per-product stints.
+ * The last chapter's span ends at "now", so a stint reaching it is ongoing.
  */
 export function employmentHistory(
 	chapters: readonly CityChapter[] = CHAPTERS,

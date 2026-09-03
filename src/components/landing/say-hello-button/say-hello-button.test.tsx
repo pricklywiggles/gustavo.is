@@ -20,8 +20,7 @@ describe("SayHelloButton on a reduced-motion client", () => {
 		});
 		unmount = result.unmount;
 		expect(result.errors).toEqual([]);
-		// whileTap makes Motion emit a tabindex on the server; the reduced client
-		// removes it only after hydration.
+		// whileTap makes Motion emit a tabindex on the server; the client drops it after hydration.
 		expect(result.html).toContain('tabindex="0"');
 		expect(
 			result.container.querySelector("button")?.hasAttribute("tabindex"),

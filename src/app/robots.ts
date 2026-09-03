@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { absoluteUrl } from "@/lib/site";
 
-// Every crawler, AI ones included, may read the public pages: the site exists to be found.
+// AI crawlers stay allowed on purpose: the site exists to be found.
 export default function robots(): MetadataRoute.Robots {
 	return {
 		rules: {

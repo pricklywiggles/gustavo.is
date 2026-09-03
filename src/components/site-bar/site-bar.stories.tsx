@@ -2,11 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { SKY_BAR, SURFACE_THEMES } from "@/components/bar-themes";
 import { SiteBar } from "@/components/site-bar";
 
-/**
- * The bar content across its shipped themes (bar-themes.ts), each on the
- * ground it rides in the app. The frame chrome (theme.bar) is normally
- * applied by HostedBar, so each panel recreates that wrapper here.
- */
+/** HostedBar normally applies the frame chrome (theme.bar); each panel recreates it. */
 const meta = {
 	title: "Components/Site bar",
 	parameters: { layout: "fullscreen" },
@@ -49,8 +45,7 @@ const PANELS = [
 		captionColor: "text-pale-dune/60",
 	},
 	{
-		// Its own theme rather than DARK_BAR: a warm light bar clashes with the
-		// cool surface, so the bar goes dark and keeps the warm pill below it.
+		// Day Sky gets its own theme, not DARK_BAR: a warm light bar clashes with the cool surface.
 		name: "Day Sky surface (landfall vista)",
 		theme: SURFACE_THEMES["day-sky"],
 		ground: "bg-day-sky",

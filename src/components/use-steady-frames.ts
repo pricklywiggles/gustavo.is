@@ -6,8 +6,7 @@ const CALM_FRAME_MS = 50;
 const CALM_FRAMES_NEEDED = 2;
 const GIVE_UP_MS = 1500;
 
-// True once two consecutive rAF ticks land under 50ms apart (the post-hydration storm
-// is over); bails to true after 1.5s so a permanently janky machine gets its entrance.
+// Two calm rAF ticks mean the post-hydration storm passed; the give-up unblocks janky machines.
 export function useSteadyFrames() {
 	const [steady, setSteady] = useState(false);
 	useEffect(() => {

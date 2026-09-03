@@ -4,23 +4,18 @@ import { createMDX } from "fumadocs-mdx/next";
 
 const csp = [
 	"default-src 'self'",
-	// 'unsafe-inline' is deliberate: Next streams RSC hydration via inline scripts whose
-	// content differs per page/build (not hash-allowlistable), and a nonce CSP requires
-	// dynamic rendering site-wide. Accepted: nothing here reflects visitor content into
-	// the page as raw HTML, so there is no injection point this directive would guard.
-	// 'unsafe-eval' in dev only: React dev mode uses eval() for callstack reconstruction.
+	// 'unsafe-inline' is unavoidable: RSC hydration inlines per-build scripts, and a nonce
+	// CSP forces dynamic rendering site-wide. React's dev mode needs eval() for callstacks.
 	`script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""}`,
 	"style-src 'self' 'unsafe-inline'",
 	"img-src 'self' data:",
 	"font-src 'self'",
-	// Only for the retrospectives' Vimeo walkthroughs.
 	"frame-src https://player.vimeo.com",
 	"object-src 'none'",
 	"base-uri 'self'",
 	"form-action 'self'",
 	"frame-ancestors 'none'",
-	// Production only: Safari applies this to localhost subresources (WebKit bug 250776),
-	// upgrading every dev asset fetch to https against the plain-HTTP dev server.
+	// Safari upgrades localhost subresources too, breaking the http dev server (WebKit 250776).
 	...(process.env.NODE_ENV === "production"
 		? ["upgrade-insecure-requests"]
 		: []),
@@ -30,8 +25,7 @@ const csp = [
 const nextConfig = {
 	poweredByHeader: false,
 	images: {
-		// The blog's YouTube-card thumbnails; the browser only fetches the same-origin
-		// /_next/image URL. Explicit empty port and search: omitting them wildcards both.
+		// Empty port and search are deliberate: omitting either wildcards it.
 		remotePatterns: [
 			{
 				protocol: "https",
@@ -43,7 +37,6 @@ const nextConfig = {
 		],
 	},
 	async redirects() {
-		// The pre-redesign URL; external links and search results still point at it.
 		return [
 			{
 				source: "/remembering/ponder_blogs",
@@ -58,8 +51,7 @@ const nextConfig = {
 				source: "/(.*)",
 				headers: [
 					{ key: "Content-Security-Policy", value: csp },
-					// Production only: Safari caches HSTS from http://localhost (others ignore
-					// it per RFC 6797) and then force-upgrades dev to https, which cannot connect.
+					// Safari alone caches HSTS from http://localhost, then force-upgrades the dev server.
 					...(process.env.NODE_ENV === "production"
 						? [
 								{
@@ -84,12 +76,11 @@ const nextConfig = {
 const withMDX = createMDX();
 
 export default withSentryConfig(withBotId(withMDX(nextConfig)), {
-	// Source maps upload only when SENTRY_AUTH_TOKEN is set; the build otherwise skips it.
+	// Without SENTRY_AUTH_TOKEN the build skips source-map upload instead of failing.
 	org: process.env.SENTRY_ORG,
 	project: process.env.SENTRY_PROJECT,
 	authToken: process.env.SENTRY_AUTH_TOKEN,
-	// Same-origin ingest: the CSP has no connect-src carve-out (events ride default-src
-	// 'self'), and ad blockers don't see sentry.io.
+	// Same-origin ingest: no connect-src carve-out needed, and ad blockers don't see sentry.io.
 	tunnelRoute: "/sentry-tunnel",
 	silent: !process.env.CI,
 	telemetry: false,

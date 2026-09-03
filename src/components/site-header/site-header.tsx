@@ -18,10 +18,7 @@ import {
 import { useReducedMotionLive } from "@/components/use-reduced-motion-live";
 import { INNER_TEXT_LINKS, LANDING_TEXT_LINKS } from "@/lib/site-links";
 
-/**
- * Overlapping sections make document order lie, so the visual stack decides; the first
- * [data-surface] ancestor wins, unknown values keeping the first-light fallback.
- */
+/** Overlapping sections make document order lie, so the painted stack decides. */
 export function surfaceFromStack(stack: Element[]): Surface {
 	for (const el of stack) {
 		const declaring = el.closest?.("[data-surface]");
@@ -36,9 +33,8 @@ export function surfaceFromStack(stack: Element[]): Surface {
 }
 
 /**
- * A data-header-hold section owns the top edge while it fills the viewport: the bar
- * sliding in would land on its year readout. Reduced motion hides that readout and
- * stacks the section many screens tall, so the hold would only lock the bar out.
+ * A data-header-hold section owns the top edge: the sliding bar would land on its year
+ * readout. Reduced motion hides that readout and stacks the section many screens tall.
  */
 export function headerHeld(
 	rect: DOMRect | undefined,
@@ -49,20 +45,17 @@ export function headerHeld(
 	return rect.top <= 1 && rect.bottom >= viewportHeight - 1;
 }
 
-// Travel between backdrop re-samples; the bar is 64px tall, and surfaces only change
-// across section boundaries, so finer sampling buys nothing.
+// Re-sample travel: the bar is 64px tall and surfaces change only at section boundaries.
 const SURFACE_SAMPLE_PX = 64;
 
 /**
- * Two headers, one bar: the transparent riding header leaves with the page, the return
- * header slides in on upward scroll. The blog index mounts its own BarHost, keeping one
- * header authority per route by construction.
+ * Two headers, one bar: the riding header leaves with the page, the return header slides
+ * in on upward scroll. The blog index mounts its own BarHost, one authority per route.
  */
 export function SiteHeader({
 	onDarkSurface = false,
 }: {
-	/** Force the dark-surface label theme where no route predicate can
-	 * (the 404 scene matches every unmatched pathname). */
+	/** Forces dark labels where no route predicate can: 404 matches every unmatched path. */
 	onDarkSurface?: boolean;
 } = {}) {
 	const pathname = usePathname();
@@ -72,11 +65,9 @@ export function SiteHeader({
 	const reducedMotion = useReducedMotionLive();
 	const { scrollY } = useScroll();
 	const holdRef = useRef<HTMLElement | null>(null);
-	// null while the return bar is hidden; else the scrollY of the last backdrop sample.
 	const surfaceSampleY = useRef<number | null>(null);
 
-	// The layout keeps this mounted across grouped navigations; without a reset the
-	// previous page's return header and adopted theme survive onto the next.
+	// Kept mounted across grouped navigations, so the previous page's header and theme leak.
 	// biome-ignore lint/correctness/useExhaustiveDependencies: pathname is the trigger, reset the return header on any route change
 	useEffect(() => {
 		setReturnVisible(false);
@@ -88,8 +79,7 @@ export function SiteHeader({
 
 	useMotionValueEvent(scrollY, "change", (y) => {
 		const prev = scrollY.getPrevious() ?? 0;
-		// Show only past the riding header and, on home, past the blob reveal (pin +
-		// delay + scrub, about 2.4vh): the bar never competes with the growing hole.
+		// Past the riding header and, on home, the blob reveal (~2.4vh); the bar never competes.
 		const threshold = (isHome ? window.innerHeight * 2.4 : 64) + 64;
 		const held = headerHeld(
 			holdRef.current?.getBoundingClientRect(),
@@ -103,9 +93,7 @@ export function SiteHeader({
 			return;
 		}
 
-		// Adopt the surface painted under the bar (see surfaceFromStack): sampled on
-		// arrival, then per SURFACE_SAMPLE_PX; elementsFromPoint is a forced hit test,
-		// too expensive for every tick.
+		// elementsFromPoint forces a hit test, too expensive for every tick.
 		const lastY = surfaceSampleY.current;
 		if (lastY === null || Math.abs(y - lastY) >= SURFACE_SAMPLE_PX) {
 			surfaceSampleY.current = y;
@@ -118,8 +106,7 @@ export function SiteHeader({
 	// No bar ground: labels carry the contrast; light pill one ramp step below the surface.
 	const onContact = pathname === "/contact";
 	const scenicSky = isHome || onContact;
-	// Retrospective heroes and blog posts open on dark earth, so labels flip light; the
-	// /blog index keeps its panorama sky.
+	// Retrospectives and blog posts open on dark earth; the /blog index keeps its panorama sky.
 	const onDarkHero =
 		onDarkSurface ||
 		pathname.startsWith("/remembering") ||
