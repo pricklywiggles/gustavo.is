@@ -1,19 +1,23 @@
 import * as Sentry from "@sentry/nextjs";
 import { initBotId } from "botid/client/core";
 import { initAnalytics } from "@/lib/analytics";
+import { isVercelDeploy } from "@/lib/deploy-env";
 
-try {
-	// Mirrors the server init's privacy posture in instrumentation.ts.
-	Sentry.init({
-		dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-		// NEXT_PUBLIC_ mirror: the client bundle only inlines public env vars.
-		environment: process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.NODE_ENV,
-		sendDefaultPii: false,
-		tracesSampleRate: 0,
-		enableLogs: false,
-	});
-} catch (error) {
-	console.error("Sentry client init failed", error);
+// Same gate as instrumentation.ts: a DSN in .env.local must not file hot-reload errors.
+if (isVercelDeploy()) {
+	try {
+		// Mirrors the server init's privacy posture in instrumentation.ts.
+		Sentry.init({
+			dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+			// NEXT_PUBLIC_ mirror: the client bundle only inlines public env vars.
+			environment: process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.NODE_ENV,
+			sendDefaultPii: false,
+			tracesSampleRate: 0,
+			enableLogs: false,
+		});
+	} catch (error) {
+		console.error("Sentry client init failed", error);
+	}
 }
 
 // Next loads one instrumentation-client file and src/ beats the root; a root copy is dead.
