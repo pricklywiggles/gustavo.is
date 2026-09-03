@@ -2,11 +2,6 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { domMax, LazyMotion } from "motion/react";
 import { SayHelloButton } from "@/components/landing/say-hello-button";
 
-/**
- * The shared contact trigger: the mail glyph waves on hover, and with a
- * morphId the contact dialog morphs out of the button. The surface prop
- * carries the colors so each section grounds it on its own scene.
- */
 const meta = {
 	title: "Buttons/Say hello",
 	component: SayHelloButton,

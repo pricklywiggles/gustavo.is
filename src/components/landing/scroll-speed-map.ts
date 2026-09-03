@@ -51,10 +51,8 @@ import {
 import { CHAPTERS, type PanoramaConfig } from "./work-history-data";
 
 /**
- * The landing page's scroll pacing, one row per scrubbed tween: how far it travels
- * (viewport-heights) over how much scroll (viewport-heights). A ratio of 1.0 moves with
- * the finger; 2.0 moves twice as fast. Derived from config alone so it runs in Node
- * (scripts/scroll-speed-map.mjs) and as a budget test (FRA-187).
+ * One row per scrubbed tween: travel over scroll, both in viewport-heights, so 1.0 moves with
+ * the finger. Config alone, no DOM: it runs in Node (scripts/scroll-speed-map.mjs) and in tests.
  */
 
 export type SpeedClass =
@@ -68,27 +66,26 @@ export type SpeedEntry = {
 	phase: string;
 	target: string;
 	class: SpeedClass;
-	/** Translation (or scale edge travel) in viewport-heights; null when nothing moves. */
+	/** Translation, or a scale's edge travel; null when nothing moves. */
 	travelVh: number | null;
 	spanVh: number;
 	ease: string;
 	meanRatio: number | null;
 	/** Mean times the ease's peak-rate factor. */
 	peakRatio: number | null;
-	/** Span in hard phone flicks and in seconds at browsing and skimming speed. */
+	/** The span in hard flicks and in seconds. */
 	flicks: number;
 	secondsBrowse: number;
 	secondsSkim: number;
 	note?: string;
 };
 
-/** A hard iOS flick travels about its release velocity over three (5% decay per frame): 2,700px. */
+/** A hard iOS flick travels about its release velocity over three (5% decay per frame). */
 export const HARD_FLICK_PX = 2700;
-/** Ordinary browsing and skimming scroll speeds, CSS px per second. */
 export const BROWSE_PX_PER_S = 1500;
 export const SKIM_PX_PER_S = 3000;
 
-/** Peak rate of each ease over its mean rate (GSAP: power1 is quadratic, power2 cubic). */
+/** Peak rate over mean rate; GSAP's power1 is quadratic, power2 cubic. */
 const EASE_PEAK: Record<string, number> = {
 	none: 1,
 	"power1.in": 2,
@@ -101,8 +98,7 @@ const EASE_PEAK: Record<string, number> = {
 	"power3.out": 4,
 	"power3.inOut": 4,
 	"sine.inOut": Math.PI / 2,
-	// 3 * c3 - 2 * c1 at t = 0, with c1 = 1.7 and c3 = c1 + 1; the 5% overshoot adds
-	// about a tenth to the path the endpoint delta understates.
+	// 3*c3 - 2*c1 at t = 0 (c1 = 1.7, c3 = c1 + 1), plus a tenth for the 5% overshoot.
 	"back.out(1.7)": 4.7,
 };
 
@@ -153,7 +149,6 @@ function heroRows(viewport: Viewport): Rated[] {
 			note: "corner of the disc's box, origin center",
 		}),
 	);
-	// The character is 200x400 CSS px from sm up, 130x260 below; origin bottom left.
 	const [cw, ch] = viewport.w >= 640 ? [200, 400] : [130, 260];
 	rows.push(
 		entry({
@@ -573,7 +568,6 @@ function projectsRows(): Rated[] {
 	];
 }
 
-/** A span in gestures and seconds: what a reader's hand does with it. */
 export function gesture(spanVh: number, viewport: Viewport) {
 	const px = spanVh * viewport.h;
 	return {
@@ -583,7 +577,7 @@ export function gesture(spanVh: number, viewport: Viewport) {
 	};
 }
 
-/** Every scrubbed tween at one viewport, fastest peak first. */
+/** Fastest peak first. */
 export function speedMap(viewport: Viewport): SpeedEntry[] {
 	const rows = [
 		...heroRows(viewport),
@@ -597,10 +591,7 @@ export function speedMap(viewport: Viewport): SpeedEntry[] {
 		.sort((a, b) => (b.peakRatio ?? -1) - (a.peakRatio ?? -1));
 }
 
-/**
- * Each city's build, the beat a reader must see: it has to outlast one hard flick, or
- * a swipe from the quote lands past the skyline (Seattle did, at 2.6 viewports).
- */
+/** A build must outlast one hard flick: a swipe from the quote landed past Seattle's skyline. */
 export function buildSpans(viewport: Viewport) {
 	const phase = storyPhases(CHAPTERS);
 	return CHAPTERS.map((chapter, i) => {
@@ -609,13 +600,11 @@ export function buildSpans(viewport: Viewport) {
 	});
 }
 
-/** One project's beat: the reader must be able to land on each one from a flick. */
 export function showcaseSpan(viewport: Viewport) {
 	const spanVh = PROJECT_SCRUB_VH_PER_PROJECT;
 	return { spanVh, ...gesture(spanVh, viewport) };
 }
 
-/** Rows whose class carries a cap and that exceed it. */
 export function budgetViolations(entries: SpeedEntry[]): SpeedEntry[] {
 	return entries.filter((row) => {
 		if (row.class !== "large" && row.class !== "small") return false;
@@ -627,7 +616,6 @@ export function budgetViolations(entries: SpeedEntry[]): SpeedEntry[] {
 	});
 }
 
-/** Where each transitioning chapter's last exit ends, against the phase length. */
 export function exitWindows(): {
 	chapter: string;
 	endVh: number;

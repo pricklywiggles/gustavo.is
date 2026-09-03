@@ -20,14 +20,13 @@ import { LandfallVista } from "../landfall-vista";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-/** The limb's glow, shared by the scrubbed earth and the reduced-motion still. */
 const EARTH_RIM_GLOW = [
 	"0 -1vh 3vh 0.5vh color-mix(in oklab, var(--color-day-sky) 80%, transparent)",
 	"0 -4vh 14vh 2vh color-mix(in oklab, var(--color-zenith-blue) 55%, transparent)",
 	"inset 0 2vh 3vh -1vh color-mix(in oklab, var(--color-first-light) 80%, transparent)",
 ].join(", ");
 
-/** The still's sky: space at the top, the entry flood, day sky at the vista seam. */
+/** The last stop must stay day-sky: it meets the vista's top edge. */
 const STILL_SKY =
 	"linear-gradient(to bottom, var(--color-dusk-ink) 0%, var(--color-stratos) 40%, var(--color-zenith-blue) 62%, var(--color-day-sky) 100%)";
 
@@ -36,7 +35,6 @@ export function LandfallSection() {
 
 	useGSAP(
 		() => {
-			// Reduced motion collapses the scrub to one static frame; layers rest at CSS state.
 			const mm = gsap.matchMedia();
 			mm.add("(prefers-reduced-motion: no-preference)", () => {
 				const at = DESCENT_PHASE.at;
@@ -47,16 +45,14 @@ export function LandfallSection() {
 						trigger: "[data-descent]",
 						start: "top top",
 						end: "bottom bottom",
-						// Raw scroll everywhere but iOS, whose sparse samples stepped the earth's
-						// swell and the cloud deck (FRA-185).
+						// Raw scroll but iOS, where sparse samples stepped the swell (FRA-185).
 						scrub: scrollScrub(),
-						// Cloud travel is a function of rendered height; re-derive on refresh.
+						// Cloud travel is a function of rendered height.
 						invalidateOnRefresh: true,
 					},
 				});
 
-				// Handoff dissolve over the pinned projects canvas; immediateRender parks the
-				// stage invisible until the fade starts.
+				// Handoff dissolve over the pinned projects canvas; fromTo parks it invisible.
 				tl.fromTo(
 					"[data-descent-stage]",
 					{ autoAlpha: 0 },
@@ -64,7 +60,7 @@ export function LandfallSection() {
 					at.fade,
 				);
 
-				// Stars drift from the first pinned pixel; no pause at the handoff.
+				// No pause at the handoff: one drift across the whole descent.
 				for (const layer of STAR_LAYERS) {
 					tl.fromTo(
 						`[data-star-layer="${layer.name}"]`,
@@ -74,7 +70,7 @@ export function LandfallSection() {
 					);
 				}
 
-				// The start pose (top 24% + 80vh) keeps the station below the fold until its crossing.
+				// The start pose keeps the station below the fold until its crossing.
 				tl.fromTo(
 					"[data-descent-station]",
 					{
@@ -91,7 +87,7 @@ export function LandfallSection() {
 					at.drift,
 				);
 
-				// Glow-first rise; the entry swell flattens the horizon as we fall toward it.
+				// The entry swell flattens the horizon as we fall toward it.
 				tl.fromTo(
 					"[data-descent-earth]",
 					{ y: "0vh" },
@@ -132,8 +128,7 @@ export function LandfallSection() {
 						`[data-cloud-slot="${i}"]`,
 						{ y: "0vh" },
 						{
-							// Clear the frame (viewport + own height + margin) by the settle
-							// boundary, so the breather is a clean sky.
+							// The settle boundary must be clean sky.
 							y: () => {
 								const el = document.querySelector<HTMLElement>(
 									`[data-cloud-slot="${i}"]`,
@@ -155,9 +150,8 @@ export function LandfallSection() {
 	);
 
 	return (
-		// No section background: nothing opaque may rise over the projects canvas before
-		// the fade. Clip HERE so the bluff's entry offset cannot extend scroll past the
-		// document end while vista sky art may still overflow its own block's top edge.
+		// No section background: nothing opaque may rise over the projects canvas before the fade.
+		// Clip HERE: the bluff's entry offset would extend scroll past the document end.
 		<section
 			ref={wrapper}
 			data-landfall

@@ -6,11 +6,7 @@ export type TimelineCall = {
 	args: unknown[];
 };
 
-/**
- * Keeps each timeline's vars (its ScrollTrigger included) but drops its tweens: a real
- * section build plus revert is thousands of jsdom style writes (work history: 5s).
- * Pass `record` to capture the dropped calls' targets and vars for assertions.
- */
+/** Keeps each timeline's vars, drops its tweens: a real build plus revert costs seconds in jsdom. */
 export function spyEmptyTimelines(record?: TimelineCall[]) {
 	return vi.spyOn(gsap, "timeline").mockImplementation((vars) => {
 		const tl = new gsap.core.Timeline(vars);

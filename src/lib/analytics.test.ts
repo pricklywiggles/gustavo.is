@@ -41,7 +41,6 @@ describe("analytics", () => {
 			typeof config.customProperties === "function"
 				? config.customProperties("pageview")
 				: config.customProperties;
-		// The vitest matchMedia polyfill answers false for every query.
 		expect(custom).toEqual({ motion: "full" });
 
 		track(EVENTS.contactSent, { source: "intro" });

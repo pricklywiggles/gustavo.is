@@ -54,8 +54,6 @@ describe("BarHost", () => {
 		const frame = shell.firstElementChild;
 		fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
 		expect(dialog()).toBeDefined();
-		// The bar stays exactly the in-flow element it was: no fixed copy,
-		// no placeholder. The menu covers it instead.
 		expect(shell.firstElementChild).toBe(frame);
 		expect(shell.querySelector(".fixed")).toBeNull();
 	});
@@ -64,7 +62,6 @@ describe("BarHost", () => {
 		renderHost();
 		mockToggleRect(150, 340);
 		fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
-		// Center of a 38px toggle at (340, 150): 359, 169.
 		expect(dialog().style.clipPath).toContain("359px 169px");
 	});
 
@@ -83,7 +80,6 @@ describe("BarHost", () => {
 		const toggle = screen.getByRole("button", { name: "Open menu" });
 		toggle.focus();
 		fireEvent.click(toggle);
-		// The trap moved focus into the dialog.
 		expect(dialog().contains(document.activeElement)).toBe(true);
 
 		fireEvent.keyDown(document, { key: "Escape" });
@@ -97,8 +93,7 @@ describe("BarHost", () => {
 		const touch = new Event("touchmove", { cancelable: true, bubbles: true });
 		document.dispatchEvent(touch);
 		expect(touch.defaultPrevented).toBe(true);
-		// No overflow lock on purpose: it would re-root the scroll container
-		// and un-stick sticky bars behind the menu.
+		// No overflow lock: it would re-root the scroll container and un-stick sticky bars.
 		expect(document.body.style.overflow).toBe("");
 		expect(document.documentElement.style.overflow).toBe("");
 
@@ -143,7 +138,6 @@ describe("BarHost", () => {
 		fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
 		expect(dialog()).toBeDefined();
 
-		// History navigation: pathname changes while the menu is open.
 		usePathname.mockReturnValue("/");
 		view.rerender(
 			<BarHost links={INNER_TEXT_LINKS} showContact>
@@ -153,7 +147,6 @@ describe("BarHost", () => {
 			</BarHost>,
 		);
 
-		// The exit is still running.
 		const during = new Event("touchmove", { cancelable: true, bubbles: true });
 		document.dispatchEvent(during);
 		expect(during.defaultPrevented).toBe(true);
@@ -195,7 +188,6 @@ describe("BarHost", () => {
 		fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
 
 		fireEvent.keyDown(document, { key: "Escape" });
-		// The dialog is exiting but still mounted; the page behind it stays inert.
 		expect(queryDialog()).not.toBeNull();
 		expect(shell.hasAttribute("inert")).toBe(true);
 		await waitFor(() => expect(queryDialog()).toBeNull(), { timeout: 4000 });
@@ -254,7 +246,7 @@ describe("BarHost", () => {
 		expect(inertAtRestore).toEqual([false]);
 	});
 
-	it("never inerts Next's route announcer or scripts", async () => {
+	it("never inerts Next's route announcer or scripts, only ordinary siblings", async () => {
 		const announcer = document.createElement("next-route-announcer");
 		const script = document.createElement("script");
 		const plain = document.createElement("div");
@@ -265,7 +257,6 @@ describe("BarHost", () => {
 			fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
 			expect(announcer.hasAttribute("inert")).toBe(false);
 			expect(script.hasAttribute("inert")).toBe(false);
-			// Control: the walk did reach body level.
 			expect(plain.hasAttribute("inert")).toBe(true);
 
 			fireEvent.keyDown(document, { key: "Escape" });
@@ -286,7 +277,6 @@ describe("BarHost", () => {
 		closeButton.focus();
 
 		fireEvent.keyDown(document, { key: "Escape" });
-		// Dialog is exiting but still mounted: Tab must stay inside it.
 		const exiting = queryDialog();
 		if (exiting) {
 			fireEvent.keyDown(document, { key: "Tab" });

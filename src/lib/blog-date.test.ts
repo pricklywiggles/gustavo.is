@@ -2,8 +2,7 @@ import { describe, expect, it } from "vitest";
 import { blogDateTime, formatBlogDate } from "./blog-date";
 
 describe("blog dates", () => {
-	// A UTC midnight: any local-time formatting west of Greenwich would
-	// slide it to Jul 15.
+	// A UTC midnight: any local-time formatting west of Greenwich would slide it to Jul 15.
 	const date = new Date("2026-07-16");
 
 	it("formats pinned to UTC", () => {

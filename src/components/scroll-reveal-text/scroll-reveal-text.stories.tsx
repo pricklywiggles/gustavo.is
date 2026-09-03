@@ -3,12 +3,6 @@ import { useState } from "react";
 import { ScrollRevealText } from "@/components/scroll-reveal-text";
 import { cta } from "@/lib/cta";
 
-/**
- * The signature letter reveal. Two bindings: Trigger plays once in real
- * time (replay remounts it), ScrollScrub ties the playhead to the page
- * scroll. The text control drives the first block (newlines become real
- * lines); the two blocks below it are fixed copy for a fuller feel.
- */
 type TextArgs = {
 	text?: string;
 	font?: string;

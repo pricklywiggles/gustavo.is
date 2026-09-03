@@ -1,31 +1,25 @@
 import gsap from "gsap";
 
-// The sheet's hole: an even-odd clip-path blob of 8 polar lobes, base radii fixed, each
-// breathing on its own phase.
+// Even-odd path: the frame minus the hole; hero.tsx's clipPath sets clipRule="evenodd".
 const LOBE_RADII = [1.0, 1.24, 0.8, 1.14, 0.88, 1.28, 0.76, 1.1];
 const LOBE_PHASES = [0, 2.1, 4.4, 1.3, 5.2, 3.0, 0.7, 5.9];
 const LOBE_COUNT = LOBE_RADII.length;
 const UNDULATION = 0.14; // per-lobe radius swing
 const SMOOTHING = 0.18; // Catmull-Rom-ish tangent factor for the closed curve
-// Below this radius (px) the hole is closed and the path is the bare frame.
 const CLOSED_PX = 0.5;
 
 export type HoleGeometry = {
 	vw: number;
 	vh: number;
-	/** Hole center in viewport pixels. */
+	/** Hole center, viewport px. */
 	cx: number;
 	cy: number;
-	/** Sheet height in viewport heights: the frame the hole is cut out of. */
 	sheetVh: number;
-	/** Hole scale in viewport heights. */
+	/** Hole scale, viewport heights. */
 	s: number;
-	/** The sheet's travel (px): path coordinates are sheet-local, so the hole climbs the
-	 * sheet by exactly what the sheet has scrolled to stay put on screen. */
+	/** Sheet travel (px): path coords are sheet-local, so the hole stays put on screen. */
 	yOff: number;
-	/** Sway, degrees. */
 	rotation: number;
-	/** Breath phase, radians. */
 	phase: number;
 };
 
@@ -70,29 +64,19 @@ export function holePath({
 }
 
 export type ClipWriter = {
-	/** Writes now if the path changed. Setup and refresh use it: a clip that references
-	 * an empty path hides the sheet for a frame. */
+	/** Synchronous: a clip referencing an empty path hides the sheet for a frame. */
 	write(): void;
-	/** Writes on the next frame; any number of requests in a frame make one write. */
 	request(): void;
-	/** Drops every write until `show()`: nothing is worth rasterizing on a hidden sheet. */
 	hide(): void;
-	/** Resumes writing, starting with one synchronous write so no stale frame shows. */
 	show(): void;
 	dispose(): void;
 };
 
-/**
- * Every write of the clip's `d` invalidates the clip over the whole sheet, which iOS
- * repaints on the main thread. Four callers (scroll, staged growth, sway, breath)
- * collapse to one write per frame, none while the path is unchanged (the closed hole's
- * frame-only path is constant), and none while the sheet is hidden.
- */
+/** Each `d` write invalidates the clip sheet-wide, which iOS repaints on the main thread. */
 export function createClipWriter({
 	path,
 	compute,
-	// gsap.ticker.add(fn, true) returns a wrapper, not `fn`, so a later ticker.remove(fn)
-	// never matches; disposal is a flag the write checks instead.
+	// gsap.ticker.add(fn, true) returns a wrapper, so ticker.remove(fn) never matches.
 	schedule = (fn) => {
 		gsap.ticker.add(fn, true);
 	},

@@ -13,16 +13,12 @@ const listFor = (query: string) => {
 	return mql;
 };
 
-/**
- * Below Tailwind's md breakpoint in the px form the stacked layouts have always keyed
- * off; md: itself is rem-based, and keeping the px value is the shipped behavior.
- */
+/** Tailwind's md as px: md: is rem-based, and the px value is the shipped behavior. */
 export const BELOW_MD = "(max-width: 767px)";
 
 /**
- * Hydration-safe live media-query state: the server snapshot is false, so branch DOM
- * only where the first-frame mismatch is harmless. Pass module-constant query strings:
- * the cache never evicts, so a per-render string pins one MediaQueryList per value.
+ * Server snapshot is false: branch DOM only where a first-frame mismatch is harmless.
+ * Pass module-constant queries; the cache never evicts, so a per-render string leaks a list.
  */
 export function useMediaQuery(query: string): boolean {
 	const subscribe = useCallback(

@@ -4,8 +4,7 @@ import { describe, expect, it } from "vitest";
 import { sharp } from "../../../scripts/sharp.mjs";
 import { PANORAMA_DIMENSIONS } from "./panorama-dimensions";
 
-// The manifest is generated (scripts/panorama-dimensions.mjs); this pins it to the assets
-// so a re-trimmed or re-scaled layer cannot silently skew the pacing math.
+// The manifest is generated (scripts/panorama-dimensions.mjs); a re-scaled layer skews pacing.
 describe("panorama dimension manifest", () => {
 	it("matches every panorama asset under public/", async () => {
 		const files: string[] = [];

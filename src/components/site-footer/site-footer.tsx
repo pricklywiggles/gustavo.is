@@ -5,14 +5,12 @@ import { FOCUS_OUTLINE } from "@/lib/focus-ring";
 import { FOOTER_LINKS, SOCIAL_LINKS } from "@/lib/site-links";
 
 /**
- * Rendered as a sibling of <main>: nesting demotes <footer> to role generic. Server
- * component, so the year serializes once and cannot hydration-mismatch. Opacities are
+ * Sibling of <main>: nesting demotes <footer> to role generic. The opacities are
  * contrast-checked on Dusk Earth (/85 is 5.70:1, /75 is 4.86:1); do not lower them.
  */
 export function SiteFooter({ callout }: { callout?: ReactNode }) {
 	return (
-		// Landing MotionAnchor point, selectable only once the footer outgrows
-		// the viewport (shorter footers ride the vista anchor); inert elsewhere.
+		// MotionAnchor point, selectable only once the footer outgrows the viewport.
 		<footer data-motion-anchor="flow" className="bg-dusk-earth">
 			{callout}
 			<div className="mx-auto w-full max-w-6xl px-6 pt-8 pb-10 sm:px-10">

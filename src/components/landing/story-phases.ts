@@ -1,40 +1,33 @@
 import { type PhaseMap, type PhaseSpec, resolvePhases } from "./scroll-phases";
 import type { CityChapter, PanoramaConfig } from "./work-history-data";
 
-/**
- * The work-history story's phase list and pacing knobs, DOM-free so the speed map can
- * audit them (scripts/scroll-speed-map.mjs). Seconds are viewport-heights (README inv. 1).
- */
+/** DOM-free so the speed map can audit it; seconds are viewport-heights (README inv. 1). */
 
-// 0.4 keeps San Francisco's 13-year scrub (a still scene) near 5 viewports; at 0.5 it
-// was the longest beat on the page after the builds.
+// 0.4 keeps SF's 13-year scrub near 5 viewports; at 0.5 it was the page's longest beat.
 export const SCRUB_VH_PER_YEAR = 0.4;
-// Shared by the dock and the swap anchored to its end, so the two cannot drift apart.
+// Shared by the dock and the phases anchored to its end, so they cannot drift apart.
 const YEAR_DOCK_VH = 0.6;
 // Ends inside hud-in's tail (0.25 at most), so the scrub and every later phase stay put.
 export const PRODUCT_IN_VH = 0.2;
-// The two chapter-transition beats overlap so the departure reads as one gesture.
 export const HUD_OUT_VH = 0.5;
 export const SCENE_OUT_VH = 1.8;
-/** Floor for one layer's exit; layers whose travel would outrun the budget get longer. */
+/** Floor for one layer's exit; a layer that would outrun the budget gets longer. */
 export const EXIT_SETTLE_VH = 0.9;
 
 /**
- * Perceived speed caps as multiples of scroll speed (travel / span). Large: bands, city
- * masses, the cloud deck, anything that fills the frame. Small: ambient clouds, stars,
- * distant planes. Peak is the eased maximum (power1 peaks at twice its mean).
+ * Caps on travel / span, as multiples of scroll speed. Large: bands, city masses, the cloud
+ * deck, anything filling the frame. Small: ambient clouds, stars, distant planes.
  */
 export const PACING_BUDGET = {
 	large: { mean: 1, peak: 2 },
 	small: { mean: 1.5, peak: 3 },
 } as const;
 
-/** Scroll length of the full cascade, in viewport-heights. */
 export function cascadeLength(config: PanoramaConfig): number {
 	return config.lastStep * config.stepVh + config.durVh;
 }
 
-/** A chapter's ambience's on-stage span; the last ends with outro-dusk (veil opaque). */
+/** The last chapter's window ends with outro-dusk: the veil is opaque by then. */
 export function stageWindow(
 	phase: PhaseMap,
 	i: number,
@@ -65,7 +58,7 @@ export function storyPhases(story: CityChapter[]) {
 			// Far slower than the operands' exit: the word hangs before the rush at the viewer.
 			specs.push({ id: "result-exit", len: 1.4, with: "panorama-in@0" });
 		}
-		// Starts while the last cascade layer is still landing: the cascade's own overlap rhythm.
+		// Starts while the last cascade layer is still landing.
 		specs.push({
 			id: `parallax@${i}`,
 			len: 0.5,
@@ -74,8 +67,7 @@ export function storyPhases(story: CityChapter[]) {
 		});
 		specs.push({ id: `year-in@${i}`, len: 0.45 });
 		specs.push({ id: `year-dock@${i}`, len: YEAR_DOCK_VH });
-		// The hero string hands off to the odometer while both sit still: after the
-		// dock, inside hud-in's tail, so the scrub and every later phase stay put.
+		// Hands the year to the odometer while both sit still; 0.2 stays inside hud-in's tail.
 		specs.push({
 			id: `year-swap@${i}`,
 			len: 0.2,

@@ -11,7 +11,7 @@ export const blogSource = loader({
 	},
 });
 
-/** Non-draft posts, newest first: the index, sitemap, feed, and llms routes all agree. */
+/** The one ordering the index, sitemap, feed, and llms routes share. */
 export function publishedPosts() {
 	return blogSource
 		.getPages()
@@ -19,11 +19,7 @@ export function publishedPosts() {
 		.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 }
 
-/**
- * source.config.ts exports the frontmatter `image` from each MDX module as `cover`, a
- * StaticImageData whose `src` is the hashed /_next/static/media URL. Undefined when
- * the post has no image.
- */
+/** `_exports.cover` comes from source.config.ts's remarkCoverExport. */
 export function coverOf(post: {
 	data: { _exports: Record<string, unknown>; imageAlt?: string };
 }): PostCover | undefined {

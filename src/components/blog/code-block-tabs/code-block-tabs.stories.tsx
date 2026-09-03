@@ -12,15 +12,6 @@ import {
 	TS_SAMPLE,
 } from "@/components/blog/code-sample";
 
-/**
- * The shape remarkCodeTab emits: consecutive fences carrying tab="Label" arrive as one
- * CodeBlockTabs around a trigger list and one CodeBlockTab per fence. The frame here
- * owns the chrome, so the CodeBlocks inside drop their own and their title strips sit
- * on the frame's ink instead of a Dune Tan band.
- *
- * The active pill is the Tabs.Indicator itself, sliding between labels. Panels are
- * keepMounted so every tab's code ships in the prerendered HTML.
- */
 const meta = {
 	title: "Blog/Code block tabs",
 	component: CodeBlockTabs,
@@ -39,7 +30,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Click between tabs to watch the indicator slide. */
 export const Tabs: Story = {
 	args: {
 		defaultValue: "ramp.ts",
@@ -66,7 +56,6 @@ export const Tabs: Story = {
 	},
 };
 
-/** With per-fence titles, which sit on the frame's ink rather than their own band. */
 export const TitledPanels: Story = {
 	args: {
 		defaultValue: "typescript",

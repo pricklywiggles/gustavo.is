@@ -3,8 +3,7 @@ import { dirname, join, resolve } from "node:path";
 import { frontmatter } from "fumadocs-core/content/md/frontmatter";
 import { describe, expect, it } from "vitest";
 
-// Reads the raw files on purpose: the loader keys pages by slug with Map.set, so a
-// duplicate slug silently replaces the earlier post and is invisible through blogSource.
+// Reads raw files: blogSource keys by slug, so a duplicate silently replaces the earlier post.
 const BLOG_DIR = resolve("content/blog");
 
 const posts = readdirSync(BLOG_DIR, { recursive: true, encoding: "utf8" })

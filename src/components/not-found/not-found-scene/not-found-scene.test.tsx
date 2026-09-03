@@ -14,11 +14,7 @@ vi.mock("motion/react", async (importOriginal) => {
 
 import { NotFoundScene } from "./not-found-scene";
 
-/**
- * The vitest matchMedia polyfill answers false for every query, so the
- * GSAP motion context never activates in jsdom: every case below asserts
- * the deterministic authored markup (the SSR and reduced-motion frame).
- */
+// The matchMedia polyfill answers false, so GSAP never activates: these assert authored markup.
 describe("NotFoundScene", () => {
 	it("keeps the real heading and the home link accessible", () => {
 		render(<NotFoundScene />);
@@ -44,15 +40,13 @@ describe("NotFoundScene", () => {
 		for (const img of images) {
 			expect(img.getAttribute("alt")).toBe("");
 			expect(img.closest('[aria-hidden="true"]')).not.toBeNull();
-			// Preflight's img{max-width:100%} is 0px inside the zero-size rig
-			// spans; without the escape hatch an actor renders invisible.
+			// Preflight's img{max-width:100%} is 0px inside the zero-size rig spans.
 			expect(img.className).toContain("max-w-none");
 		}
 	});
 
 	it("renders identical markup whichever way the preference reads", () => {
-		// The reduced branch may only collapse the entrance transition;
-		// forking the rendered tree on the preference tears hydration.
+		// Forking the rendered tree on the preference tears hydration.
 		reducedState.value = false;
 		const markup = renderToStaticMarkup(<NotFoundScene />);
 		reducedState.value = true;

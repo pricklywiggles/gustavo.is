@@ -25,12 +25,10 @@ import { scrollScrub } from "@/lib/scroll-scrub";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-/** Unique per trigger: the landfall CTA mints its own, so the dialog always
- * morphs from the button that opened it. */
+/** Per trigger: the dialog morphs from the button that opened it (landfall mints its own). */
 const HELLO_MORPH_ID = "say-hello-morph";
 
-/** Module-stable so SSR and reduced-motion clients render identical style
- * attributes; reduced motion disables the whileHover trigger instead. */
+/** Module-stable so SSR and reduced-motion clients emit identical style attributes. */
 const NOD_VARIANTS: Variants = {
 	rest: { y: 0, transition: { duration: 0.25, ease: "easeOut" } },
 	hover: {
@@ -43,27 +41,19 @@ const NOD_VARIANTS: Variants = {
 	},
 };
 
-// Absolute scroll positions: the intro is held by the hero's sticky reveal, so
-// it can't measure its own trigger. Module-level for stable identity.
-// Short of the very end: a seek to duration itself flags `ended`, and WebKit has
-// painted stale frames on end-of-stream seeks.
+// Short of the very end: seeking to duration flags `ended`, and WebKit paints stale frames.
 const LAST_FRAME_BACKOFF_S = 0.05;
 
-// Only WebKit renders HEVC alpha, and only WebKit puts webkitPresentationMode on video;
-// every other engine gets VP9 alpha. Firefox on macOS would also claim the HEVC file
-// (it decodes it, opaque), which is why no <source> list can make this choice.
+// Only WebKit renders HEVC alpha and only WebKit exposes webkitPresentationMode; rest get VP9.
+// A <source> list can't decide it: Firefox on macOS decodes the HEVC file too, opaque.
 const sceneSrc = (video: HTMLVideoElement) =>
 	"webkitPresentationMode" in video ? "/scene_home.mov" : "/scene_home.webm";
 
-// The section fills the hero's sticky `h-screen`, the same CSS viewport the hero paces
-// its scrubs by; innerHeight tracks iOS Safari's toolbar instead.
+// offsetHeight, not innerHeight: iOS Safari's innerHeight tracks the toolbar, not the CSS vh.
 const viewportHeight = (section: HTMLElement | null) =>
 	section?.offsetHeight || window.innerHeight;
 
-/**
- * Revealed as the hero sheet scrolls away. Pale Dune deliberately matches the mobile
- * menu's sheet: both "reveal" surfaces share one color in the system.
- */
+/** Pale Dune matches the mobile menu's sheet: reveal surfaces share one color. */
 export function IntroSection() {
 	const hello = useContactDialogState();
 	const reducedMotion = useReducedMotionLive();
@@ -82,35 +72,30 @@ export function IntroSection() {
 			(REVEAL_COMPLETE_VH + HEADLINE_REVEAL_VH),
 		[],
 	);
-	// Only reaches the effect: the server's `true` and an iOS client's number never
-	// disagree in the DOM.
+	// No hydration risk: the scrub value reaches GSAP only, never the DOM.
 	const headlineScrub = scrollScrub();
 
-	// A filter on a playing video is re-rendered every video frame, and on iOS that ran
-	// under the hole's per-frame clip raster, where the intro stuttered. Before first
-	// paint, and it sticks: React never rewrites a style key whose value has not changed.
+	// A filter on a playing video re-renders every video frame, under the hole's clip raster.
 	useLayoutEffect(() => {
 		const video = videoRef.current;
 		if (video && isIOSDevice()) video.style.filter = "none";
 	}, []);
 
-	// The markup names no file: anything listed there is fetched at parse time by whichever
-	// engine claims it, before this runs. Declared before the reduced-motion effect so the
-	// source precedes its metadata wait; the guard keeps StrictMode's re-run from reloading.
+	// Set here, not in markup: a listed source is fetched at parse time, before this can choose.
+	// Ordered before the reduced-motion effect so the source precedes its metadata wait.
 	useEffect(() => {
 		const video = videoRef.current;
 		if (video && !video.getAttribute("src")) video.src = sceneSrc(video);
 	}, []);
 
-	// Reduced motion never plays the scene, so it rests on the last frame (Gustavo at the
-	// desk, Kiwi asleep) instead of the empty room; a flip back rewinds for the hero's cue.
+	// Reduced motion rests on the finished-room last frame; a flip back rewinds for the cue.
 	useEffect(() => {
 		const video = videoRef.current;
 		if (!video || !reducedMotion) return;
 		const seekToEnd = () => {
 			// A WebM without a Duration element reports Infinity, and the setter throws.
 			if (!Number.isFinite(video.duration)) return;
-			// A flip mid-play must not keep playing past the seek.
+			// The flip can land mid-play.
 			video.pause();
 			video.currentTime = Math.max(0, video.duration - LAST_FRAME_BACKOFF_S);
 		};
@@ -123,8 +108,7 @@ export function IntroSection() {
 		};
 	}, [reducedMotion]);
 
-	// Touch gets no hover beat for the intent prefetch; the first scroll or touch warms
-	// the chunk viewports before any tap can reach a CTA.
+	// Touch has no hover to prefetch on; the first scroll or touch warms the chunk instead.
 	useEffect(() => {
 		const warm = () => warmContactDialog();
 		window.addEventListener("scroll", warm, { once: true, passive: true });
@@ -178,8 +162,7 @@ export function IntroSection() {
 					tabIndex={-1}
 					className="w-full max-w-lg justify-self-center md:justify-self-end"
 					style={{
-						// drop-shadow follows the scene's alpha silhouette (box-shadow draws a
-						// rectangle); Dusk Earth, not black, keeps the shadow on the ramp.
+						// Follows the alpha silhouette; Dusk Earth keeps the shadow on the ramp.
 						filter: `drop-shadow(0 10px 12px ${rampAlpha("dusk-earth", "0.28")}) drop-shadow(0 30px 44px ${rampAlpha("dusk-earth", "0.16")})`,
 					}}
 				/>

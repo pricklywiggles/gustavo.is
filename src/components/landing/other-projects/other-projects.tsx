@@ -13,30 +13,23 @@ import { PROJECTS } from "../projects-data";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-/**
- * The warp opener plus the locked showcase over one sticky starfield stage; completing
- * the seed scrub locks the page while the theater plays, then PROJECT_SCRUB_VH_PER_PROJECT
- * viewports of scrub per project.
- */
 export function OtherProjectsSection() {
 	const wrapper = useRef<HTMLElement>(null);
 	const overlay = useRef<HTMLDivElement>(null);
-	// A live reduced-motion flip remounts the starfield and its overlay together, from a
-	// pristine DOM: the starfield's effect mutates the overlay's inline styles.
+	// A reduced-motion flip must remount both: the starfield writes the overlay's inline styles.
 	const [motionEpoch, setMotionEpoch] = useState(0);
 	const seedProgress = useRef(0);
 	const sceneScroll = useRef(0);
 	const scrubRef = useRef<ScrollTrigger | null>(null);
-	/** Page scroll position held while the warp theater plays; null = free. */
+	/** Scroll position held while the theater plays; null = free. */
 	const lockY = useRef<number | null>(null);
-	/** Once the theater has played, reaching the scrub end never locks again. */
+	/** After the theater, the scrub end never locks again. */
 	const theaterOver = useRef(false);
 	const engageLockRef = useRef<(top: number) => void>(() => {});
 	const releaseLockRef = useRef<() => void>(() => {});
 	const [active, setActive] = useState(0);
 
-	// Theater scroll lock: block inputs and snap back what slips through. Non-passive
-	// listeners attach only while engaged, or every scroll frame site-wide pays for them.
+	// Non-passive listeners attach only while engaged: otherwise every scroll frame site-wide pays.
 	useEffect(() => {
 		const clamp = () => {
 			if (lockY.current !== null && window.scrollY !== lockY.current) {
@@ -75,8 +68,7 @@ export function OtherProjectsSection() {
 		};
 		engageLockRef.current = engage;
 		releaseLockRef.current = release;
-		// A live reduced-motion flip must end the theater for good: the reduced branch never
-		// emits onTheater(false), so a flip back would re-engage the lock at progress 1.
+		// The reduced branch never emits onTheater(false): a flip back would re-lock at progress 1.
 		const reducedQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 		const onPreferenceChange = () => {
 			setMotionEpoch((epoch) => epoch + 1);
@@ -94,8 +86,7 @@ export function OtherProjectsSection() {
 
 	useGSAP(
 		() => {
-			// Reduced motion never runs the theater, so it must never lock. The query stays
-			// live: a snapshot would let the lock engage under a since-flipped preference.
+			// Live query, not a snapshot: a stale one would lock under a since-flipped preference.
 			const reducedMotion = window.matchMedia(
 				"(prefers-reduced-motion: reduce)",
 			);
@@ -106,8 +97,7 @@ export function OtherProjectsSection() {
 				end: "+=200%",
 				onUpdate: (self) => {
 					seedProgress.current = self.progress;
-					// Lock at the trigger's exact end so even a fast fling can't carry the
-					// showcase into view over the warp.
+					// Lock at the trigger's exact end so a fast fling can't carry the showcase in.
 					if (
 						self.progress >= 1 &&
 						!reducedMotion.matches &&
@@ -116,8 +106,7 @@ export function OtherProjectsSection() {
 						engageLockRef.current(self.end);
 					}
 				},
-				// The refreshed end is the lock's authoritative position; assign lockY first
-				// so the clamp listener chases the new spot.
+				// Assign lockY before scrolling so the clamp listener chases the refreshed end.
 				onRefresh: (self) => {
 					if (lockY.current === null) return;
 					lockY.current = self.end;
@@ -128,7 +117,6 @@ export function OtherProjectsSection() {
 			const scrub = wrapper.current?.querySelector("[data-projects-scrub]");
 			if (!scrub) return;
 
-			// Pixels since the showcase began entering; drives the overlay exit and star parallax.
 			ScrollTrigger.create({
 				trigger: scrub,
 				start: "top bottom",
@@ -145,8 +133,7 @@ export function OtherProjectsSection() {
 			} as const;
 			// Raw scroll everywhere but iOS, where a catch-up hides the sparse samples.
 			const railScrub = scrollScrub();
-			// The rail flips orientation with the panel layout; both scale axes are pinned
-			// explicitly so the pre-JS scale(0,0) class never leaks into the animated state.
+			// Both axes pinned so the pre-JS scale(0,0) class never leaks into the tween.
 			const mm = gsap.matchMedia();
 			mm.add("(min-width: 768px)", () => {
 				gsap.fromTo(
@@ -193,13 +180,11 @@ export function OtherProjectsSection() {
 				);
 			});
 
-			// Clipping while pinned would crop focusable links on short viewports, so the
-			// class toggles on only at release, while the showcase rides off.
+			// Clipping while pinned would crop focusable links on short viewports.
 			ScrollTrigger.create({
 				trigger: scrub,
 				start: "bottom bottom",
-				// Half a viewport past full exit: overflowing panel content must stay clipped
-				// until every pixel is offscreen.
+				// Overflowing panel content must stay clipped until every pixel is offscreen.
 				end: "bottom top-=50%",
 				toggleClass: {
 					targets: "[data-showcase-box]",
@@ -207,7 +192,7 @@ export function OtherProjectsSection() {
 				},
 			});
 
-			// Quantized state pushes only; the functional setState bails when unchanged.
+			// Quantized pushes only: a state push per tick would re-render the showcase.
 			scrubRef.current = ScrollTrigger.create({
 				...locked,
 				onUpdate: (self) => {
@@ -223,7 +208,7 @@ export function OtherProjectsSection() {
 		const scrub = scrubRef.current;
 		if (!scrub) return;
 		const top = scrubJumpTarget(scrub, index, PROJECTS.length);
-		// A smooth glide walks through every project; reduced motion jumps directly.
+		// The smooth glide deliberately walks the scrub through every project on the way.
 		const reduced = window.matchMedia(
 			"(prefers-reduced-motion: reduce)",
 		).matches;

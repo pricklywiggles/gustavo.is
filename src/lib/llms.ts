@@ -17,10 +17,8 @@ export type PostSummary = {
 	url: string;
 	title: string;
 	description?: string;
-	/** ISO date, YYYY-MM-DD. */
 	date: string;
 	tags: string[];
-	/** The cover's served path (hashed under /_next/static/media). */
 	image?: string;
 };
 
@@ -93,7 +91,7 @@ export function postMarkdown(post: PostSummary, body: string): string {
 	].join("\n");
 }
 
-/** Chronological, but without dates: the timeline is the owner's to share. */
+/** No dates: the timeline is the owner's to share. */
 export function careerMarkdown(
 	history: readonly Employment[] = employmentHistory(),
 ): string {
@@ -111,10 +109,7 @@ const link = (text: string, path: string, note?: string) =>
 const postNote = (post: PostSummary) =>
 	[post.description, `(published ${post.date})`].filter(Boolean).join(" ");
 
-/**
- * The /llms.txt index in the llmstxt.org shape: H1, blockquote summary, free detail,
- * then H2 sections that hold only links. The career list is detail, not a section.
- */
+/** llmstxt.org shape: H2 sections hold links only, so the career list stays free detail. */
 export function llmsIndex(
 	posts: readonly PostSummary[],
 	retrospectives: readonly Retrospective[],

@@ -17,10 +17,7 @@ export const metadata = pageMetadata({
 	description: SITE_DESCRIPTION,
 });
 
-/**
- * The landing scroll story. SiteFooter must stay a sibling of <main> (inside it the
- * landmark demotes to role generic); the landfall ground shares its Dusk Earth surface.
- */
+/** SiteFooter stays a sibling of <main>: nested, the landmark demotes to role generic. */
 export default function HomePage() {
 	return (
 		<>

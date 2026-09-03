@@ -14,10 +14,7 @@ type Status = "idle" | "submitting" | "success" | "error";
 const MESSAGE_LIMIT = 5000;
 const COUNTER_LOW = 250;
 
-/**
- * Tone switches between light (/contact) and dark (the dialog) surfaces. Warnings use
- * Warning Ember on light but Noon Sun on dark, where ember has no contrast.
- */
+/** Warnings use Warning Ember on light, Noon Sun on dark where ember has no contrast. */
 const TONES = {
 	light: {
 		label: "text-dusk-ink",
@@ -50,19 +47,16 @@ export function ContactForm({
 	source,
 	onCancel,
 	onSuccess,
-	// False while a host container is morphing: the button and counter render without
-	// their own layout/motion to ride the morph rigidly, then animate once it settles.
+	// False while a host morphs: layout animation here would fight the morph.
 	motionReady = true,
 }: {
 	tone: Tone;
-	/** Which surface hosts the form; recorded with the contact events. */
 	source: ContactSource;
 	onCancel?: () => void;
 	onSuccess?: () => void;
 	motionReady?: boolean;
 }) {
-	// Ids are namespaced per instance: the header dialog can open this form
-	// over the /contact page's copy, and duplicate ids cross-wire the labels.
+	// Two instances can coexist (the dialog over /contact), and duplicate ids cross-wire labels.
 	const uid = useId();
 	const [status, setStatus] = useState<Status>("idle");
 	const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -75,8 +69,7 @@ export function ContactForm({
 		event.preventDefault();
 		setServerError(null);
 
-		// Capture the form element now: React nulls event.currentTarget once the handler
-		// yields at an await, so reading it after the fetch would throw.
+		// React nulls event.currentTarget once the handler yields at an await.
 		const form = event.currentTarget;
 		const formData = new FormData(form);
 		const values = {
@@ -126,8 +119,7 @@ export function ContactForm({
 			track(EVENTS.contactFailed, { source, status: "network" });
 			return;
 		}
-		// Outside the try: a host's success handler throwing must not repaint a
-		// delivered message as a send failure.
+		// Outside the try: a throwing onSuccess must not turn a delivered message into an error.
 		onSuccess?.();
 	}
 

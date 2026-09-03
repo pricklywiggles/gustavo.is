@@ -1,8 +1,7 @@
 import { init, track as trackEvent } from "@plausible-analytics/tracker";
 import { SITE_URL } from "@/lib/site";
 
-/** Vercel stamps every deployment with NEXT_PUBLIC_VERCEL_ENV; anything but
- * production would report under the live domain. */
+/** Previews and dev would otherwise report under the live domain. */
 export const isProductionDeploy = () =>
 	process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
 
@@ -17,7 +16,6 @@ export const EVENTS = {
 
 export type EventName = (typeof EVENTS)[keyof typeof EVENTS];
 
-/** Which surface hosted the contact form. */
 export type ContactSource = "intro" | "landfall" | "header" | "page";
 
 const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
@@ -31,7 +29,6 @@ export function initAnalytics() {
 		// Same-origin path, rewritten in vercel.json: no CSP carve-out, no ad-block hit.
 		endpoint: "/api/pa",
 		outboundLinks: true,
-		// Every event says which edition of the site the visitor got.
 		customProperties: () => ({
 			motion: window.matchMedia(REDUCED_MOTION).matches ? "reduced" : "full",
 		}),
@@ -39,13 +36,11 @@ export function initAnalytics() {
 	ready = true;
 }
 
-/** No-op until initAnalytics ran (dev, tests, previews). Props stay
- * low-cardinality and never carry visitor input. */
+/** Props stay low-cardinality and never carry visitor input. */
 export function track(event: EventName, props?: Record<string, string>) {
 	if (!ready) return;
+	// trackEvent's send self-catches; this guards the sync throws (init guard, customProperties).
 	try {
 		trackEvent(event, { props });
-	} catch {
-		// Analytics must never break the interaction it observes.
-	}
+	} catch {}
 }

@@ -3,8 +3,7 @@ import { describe, expect, it } from "vitest";
 import { defaultOrderFor, ScrollRevealText } from "./scroll-reveal-text";
 
 describe("ScrollRevealText", () => {
-	// The line resolves from the end furthest from entry, filling toward the incoming
-	// side; callers pass `order` to fill the other way.
+	// The line resolves from the end furthest from entry; callers pass `order` to reverse it.
 	it("defaults the letter order to fill toward the incoming side", () => {
 		expect(defaultOrderFor("right")).toBe("normal");
 		expect(defaultOrderFor("left")).toBe("reverse");

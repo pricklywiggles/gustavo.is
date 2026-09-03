@@ -11,10 +11,7 @@ import { navPill } from "@/lib/cta";
 import { FOCUS_OUTLINE } from "@/lib/focus-ring";
 import { SOCIAL_LINKS } from "@/lib/site-links";
 
-/**
- * The bar itself, every positioning and overlay concern left to the caller; state lives
- * with the caller so a page's two bars share one contact dialog and mobile menu.
- */
+/** State lives with the caller so a page's two bars share one dialog and menu. */
 export function SiteBar({
 	links,
 	theme,
@@ -29,7 +26,6 @@ export function SiteBar({
 	theme: BarTheme;
 	showContact: boolean;
 	contactOpen: boolean;
-	/** First sign of intent (hover/focus): prefetch the dialog chunk. */
 	onContactIntent: () => void;
 	onContactOpen: () => void;
 	mobileOpen: boolean;

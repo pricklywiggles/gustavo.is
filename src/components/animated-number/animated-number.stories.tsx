@@ -3,11 +3,6 @@ import { useState } from "react";
 import { AnimatedNumber } from "@/components/animated-number";
 import { cta } from "@/lib/cta";
 
-/**
- * Site-standard rolling counter. The point of the wrapper is directional
- * consistency: digits roll forward when the value grows and backward when
- * it shrinks, and widths never jitter thanks to tabular-nums.
- */
 const meta = {
 	title: "Components/Animated number",
 	parameters: { layout: "centered" },

@@ -17,19 +17,13 @@ import { groupIntoLines } from "@/lib/text-lines";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-// Scroll span (% of viewport) of the reveal at speed 1 in scrub mode.
-const SCRUB_PCT = 100;
-// Pin mode scroll span (% of viewport) per line unit of the cascade.
+const SCRUB_VIEWPORT_PCT = 100;
 const PIN_PCT_PER_LINE = 70;
-// Target real-time length (seconds) per line unit at speed 1 in trigger mode.
 const TRIGGER_SECONDS_PER_LINE = 1;
 
 type StartEnd = string | number | (() => number);
 
-/**
- * Adds one line's tweens to `timeline` starting at `at` and returns the
- * line's natural length in timeline seconds (drives the line stagger).
- */
+/** Adds a line's tweens at `at`; returns its length in seconds, which drives the stagger. */
 export type LineEffect = (context: {
 	chars: HTMLElement[];
 	lineIndex: number;
@@ -40,14 +34,11 @@ export type LineEffect = (context: {
 
 type AnimatedLinesOwnProps = {
 	children: string;
-	/** Screen-reader copy when it must differ from the drawn glyphs. aria-label cannot
-	 * serve: naming is prohibited on paragraph/generic roles, so a hidden node carries it. */
 	accessibleText?: string;
 	as?: ElementType;
-	/** How each line animates; pass a stable (memoized) reference. */
+	/** Must be memoized: the reference is a timeline-rebuild dependency. */
 	effect: LineEffect;
-	/** "scrub" (default) follows scroll; "pin" scrubs while pinning the element;
-	 * "trigger" plays once in real time at the start position. */
+	/** "scrub" follows scroll; "pin" scrubs while pinned; "trigger" plays once in real time. */
 	mode?: "scrub" | "pin" | "trigger";
 	/** Fraction of a line's length before the next line starts (0 together, 1 sequential). */
 	lineStagger?: number;
@@ -57,23 +48,16 @@ type AnimatedLinesOwnProps = {
 	speed?: number;
 	/** Trigger mode: viewport % (0 top, 100 bottom) the element's top crosses to start. */
 	triggerAt?: number;
-	/** ScrollTrigger element; defaults to the text. "viewport" binds to absolute scroll
-	 * positions (for text held static by a sticky ancestor); needs a numeric/function start. */
+	/** ScrollTrigger element; "viewport" takes absolute positions, for sticky-held text. */
 	trigger?: gsap.DOMTarget | "viewport";
 	start?: StartEnd;
 	end?: StartEnd;
-	/** Scrub/pin: GSAP's scrub; `true` (default) follows the raw scroll, a number adds
-	 * that many seconds of catch-up. */
 	scrub?: boolean | number;
 };
 
 export type AnimatedLinesProps = AnimatedLinesOwnProps &
 	Omit<HTMLAttributes<HTMLElement>, keyof AnimatedLinesOwnProps>;
 
-/**
- * Splits text into grapheme spans grouped into the browser's wrapped lines, playing
- * `effect` per line staggered; the real text stays available via a visually hidden copy.
- */
 export function AnimatedLines({
 	children,
 	accessibleText,
@@ -100,9 +84,8 @@ export function AnimatedLines({
 	const lineSignature = useRef<string | null>(null);
 	const safeSpeed = speed > 0 ? speed : 1;
 
-	// Wait for the web font: the fallback wraps differently, and rebuilding a pinned
-	// trigger later strands its pin-spacer. Rebuild on resize only if wrapping changed:
-	// recreating a pinned trigger mid-scroll races GSAP's refresh and corrupts distances.
+	// Fonts first: the fallback wraps differently and a later pinned rebuild strands its spacer.
+	// Resize rebuilds only when wrapping changed: rebuilding mid-scroll races GSAP's refresh.
 	useEffect(() => {
 		let cancelled = false;
 		const ready = () => !cancelled && setFontsReady(true);
@@ -138,7 +121,6 @@ export function AnimatedLines({
 			);
 			if (chars.length === 0) return;
 
-			// Under reduced motion the callback never registers; letters stay at rest.
 			const mm = gsap.matchMedia();
 			mm.add("(prefers-reduced-motion: no-preference)", () => {
 				const lines = groupIntoLines(chars);
@@ -171,8 +153,7 @@ export function AnimatedLines({
 				});
 
 				if (mode === "trigger") {
-					// A timeline `delay` is consumed while ScrollTrigger holds it paused, so
-					// bake in the lead instead; shiftChildren works in pre-timeScale units.
+					// ScrollTrigger eats a paused timeline's `delay`; shiftChildren works pre-timeScale.
 					master.duration(
 						(TRIGGER_SECONDS_PER_LINE / safeSpeed) *
 							(1 + (lines.length - 1) * lineStagger),
@@ -286,13 +267,12 @@ function buildScrollTrigger({
 				scrub: scrub ?? true,
 			};
 			if (end !== undefined) vars.end = end;
-			else if (element) vars.end = `+=${SCRUB_PCT / speed}%`;
-			// Percent-relative ends need a trigger element; compute absolute.
-			// (No element implies "viewport", whose start is validated above.)
+			else if (element) vars.end = `+=${SCRUB_VIEWPORT_PCT / speed}%`;
+			// Percent-relative ends need a trigger element.
 			else
 				vars.end = () =>
 					toNumber(start ?? 0) +
-					(window.innerHeight * (SCRUB_PCT / 100)) / speed;
+					(window.innerHeight * (SCRUB_VIEWPORT_PCT / 100)) / speed;
 			return vars;
 		}
 	}
@@ -311,9 +291,7 @@ const segmenter =
 		? new Intl.Segmenter(undefined, { granularity: "grapheme" })
 		: null;
 
-// Grapheme-cluster chars; keys are string offsets, stable because the text is fixed.
-// NBSP is deliberately NOT a separator: between two inline-blocks it does not bind at
-// all, so callers using NBSP to control headline wrapping would silently get nothing.
+// NBSP is deliberately not a separator: it never binds between inline-blocks (wrap control no-ops).
 const BREAKABLE_SPACE = /([^\S\u00A0]+)/;
 const ONLY_BREAKABLE_SPACE = /^[^\S\u00A0]+$/;
 

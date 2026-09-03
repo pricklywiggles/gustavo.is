@@ -12,14 +12,12 @@ import { EASE_OUT_EXPO } from "@/lib/motion-tokens";
 
 gsap.registerPlugin(useGSAP);
 
-/** The landfall far/mid star radii, reseeded and thinned. */
 const STAR_PLANES = [
 	{ seed: 404, count: 80, min: 0.5, max: 1.0 },
 	{ seed: 405, count: 40, min: 0.7, max: 1.4 },
 ] as const;
 
-/** Dips below the One Ramp on purpose: a dusk-ink hole would vanish into the dusk-ink
- * page, so the ramp only supplies the lit ring. */
+/** #06070c dips below the One Ramp on purpose: a dusk-ink hole would vanish into the page. */
 const CORE_GRADIENT =
 	"radial-gradient(circle, #06070c 0%, #06070c 62%, var(--color-dusk-ink) 100%)";
 const RING_GRADIENT =
@@ -31,30 +29,25 @@ const RING_GLOW = [
 	"0 0 7vmin 1vmin color-mix(in oklab, var(--color-noon-sun) 15%, transparent)",
 ].join(", ");
 const RING_SPIN_SECONDS = 45;
-/** The edge-on disk band: brightest at the hole, dim under the digits. */
 const DISK_GRADIENT =
 	"radial-gradient(ellipse closest-side, var(--color-noon-sun) 0%, var(--color-amber-mirage) 34%, color-mix(in oklab, var(--color-amber-mirage) 55%, transparent) 58%, transparent 100%)";
 
-/** Where the fall ends, as a fraction of the stage's min dimension. */
 const CORE_END = 0.02;
 
-/**
- * `outer` spawns at a fraction of the stage's min dimension; `seed` starts mid-fall so
- * the rhythms never sync; `parked` is the designed still, tilt countering the orbit.
- */
 type OrbitConfig = {
 	name: string;
 	duration: number;
 	turns: number;
 	startAngle: number;
+	/** Spawn radius, as a fraction of the stage's min dimension. */
 	outer: number;
+	/** Starting progress: staggered so the actors' rhythms never sync. */
 	seed: number;
 	tumble: number;
 	repeatDelay: number;
 	parked: { angle: number; radius: string; tilt: number };
 };
 
-// Durations sized for a page nobody lingers on; seeds open with actors already in frame.
 const LEGO_ORBIT: OrbitConfig = {
 	name: "lego",
 	duration: 9,
@@ -90,8 +83,7 @@ const STATION_ORBIT: OrbitConfig = {
 };
 const ACTORS = [LEGO_ORBIT, UFO_ORBIT, STATION_ORBIT];
 
-// Unconditional entrance poses (branching `initial` on reduced motion forks
-// the SSR markup); the transition collapses to INSTANT instead.
+// Branching `initial` on reduced motion forks the SSR markup: only the transition varies.
 const COPY_ENTRANCE = { opacity: 0, y: 18 };
 const COPY_TARGET = { opacity: 1, y: 0 };
 const COPY_TRANSITION = {
@@ -101,11 +93,7 @@ const COPY_TRANSITION = {
 };
 const INSTANT = { duration: 0 };
 
-/**
- * Nested zero-size layers compose the orbit rotation with the arm's
- * outward translation, so plain tweens produce the spiral without
- * MotionPathPlugin.
- */
+/** Nested zero-size layers compose the spiral from plain tweens, no MotionPathPlugin. */
 function ActorRig({
 	actor,
 	children,
@@ -143,14 +131,10 @@ function ActorRig({
 	);
 }
 
-/**
- * GSAP owns the actors and the accretion ring; Motion owns the copy
- * block's entrance; they never share an element (the two-library rule).
- */
+/** GSAP owns the actors and ring, Motion the copy: never the same element (two-library rule). */
 export function NotFoundScene() {
 	const stageRef = useRef<HTMLElement>(null);
-	// Mount-snapshot hook on purpose: truthy on a reduced client's first
-	// render, so the entrance starts INSTANT (a late flip cannot cancel it).
+	// Mount snapshot on purpose: truthy on a reduced client's first render, so INSTANT wins.
 	const reducedMotion = useReducedMotion();
 	const [sizeEpoch, setSizeEpoch] = useState(0);
 
@@ -159,8 +143,7 @@ export function NotFoundScene() {
 			const stage = stageRef.current;
 			if (!stage) return;
 
-			// matchMedia, not a one-shot check: a live Reduce Motion flip reverts
-			// to the authored still and rebuilds on flip back (blog-hero pattern).
+			// matchMedia so a live Reduce Motion flip reverts to the authored still and rebuilds.
 			const mm = gsap.matchMedia();
 			mm.add("(prefers-reduced-motion: no-preference)", () => {
 				const dim = Math.min(stage.clientWidth, stage.clientHeight);
@@ -215,7 +198,6 @@ export function NotFoundScene() {
 							},
 							0,
 						)
-						// Fade both ends so the respawn never pops.
 						.fromTo(
 							node,
 							{ opacity: 0 },
@@ -230,8 +212,7 @@ export function NotFoundScene() {
 					tl.progress(actor.seed);
 				}
 
-				// Radii are px snapshots, so a real resize rebuilds through React
-				// state: revertOnUpdate restores the still before remeasuring.
+				// Radii are px snapshots; a resize rebuilds, revertOnUpdate restoring the still.
 				let debounce: ReturnType<typeof setTimeout> | undefined;
 				const observer =
 					typeof ResizeObserver === "undefined"
@@ -310,8 +291,7 @@ export function NotFoundScene() {
 							height={1536}
 							sizes="80px"
 							draggable={false}
-							// max-w-none: preflight's img{max-width:100%} collapses to 0
-							// inside the zero-size rig spans.
+							// max-w-none: preflight's max-width:100% collapses to 0 in the zero-size rig.
 							className="h-auto w-[clamp(44px,7vw,80px)] max-w-none select-none"
 						/>
 					</ActorRig>

@@ -3,13 +3,9 @@
 import { type HTMLMotionProps, motion } from "motion/react";
 
 /**
- * Button whose box animates when state changes its content size; the system rule is any
- * button with state-driven content uses this. Full `motion`, so it needs no LazyMotion
- * provider; the layout="position" inner span keeps text from stretching mid-animation.
- *
- * Caveat: a layout child inside a morphing (layoutId) container ALWAYS decouples and
- * drifts on its own spring. Morphing hosts must render layout={false} during the morph
- * and REMOUNT with layout after; toggling without a remount does not re-arm projection.
+ * The system's button for state-driven content; layout="position" stops text stretching.
+ * Caveat: a layout child inside a morphing (layoutId) container decouples onto its own
+ * spring, so morphing hosts must render layout={false} and then REMOUNT with layout.
  */
 export function AnimatedButton({
 	children,

@@ -3,15 +3,6 @@ import type { ComponentProps, ComponentType } from "react";
 import { blogMdxComponents } from "@/components/blog/blog-mdx-components";
 import { CodeSample, TS_SAMPLE } from "@/components/blog/code-sample";
 
-/**
- * The whole reading-page type specimen in one place: everything `.blog-prose` remaps
- * off the typography plugin, on the ground it ships on. Its palette is documented in
- * Design system > Palette under "The reading page's prose ladder".
- *
- * Headings take Kitora per the Two Voices Rule, and the h2's Noon Sun period echoes the
- * index's "Blog."; the alt-text syntax keeps it out of the accessibility tree. The
- * horizon rule is a hairline broken by a Noon Sun disc ringed in the page's own ground.
- */
 const meta = {
 	title: "Blog/Reading page prose",
 	parameters: { layout: "fullscreen" },
@@ -20,8 +11,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// The MDX map is typed for the MDX runtime, which does not describe these as plain
-// React components; the story renders them directly, so it narrows them here.
+// MDX runtime types do not describe these as plain React components.
 const { a: A, blockquote: Quote } = blogMdxComponents as unknown as {
 	a: ComponentType<ComponentProps<"a">>;
 	blockquote: ComponentType<ComponentProps<"blockquote">>;

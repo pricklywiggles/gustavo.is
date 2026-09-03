@@ -5,10 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ComponentProps, MouseEvent } from "react";
 
-// One curtain transaction at a time, released only when the reveal settles.
 let inFlight = false;
-// Destination-keyed token: ScrollReset consumes it on the arrival it was
-// minted for, so back/forward keeps the browser's own scroll restoration.
+// Destination-keyed so ScrollReset fires only on the curtained arrival, never on back/forward.
 let scrollResetPath: string | null = null;
 
 export function consumeScrollReset(pathname: string) {
@@ -17,8 +15,6 @@ export function consumeScrollReset(pathname: string) {
 	return true;
 }
 
-/** The curtain only makes sense for plain, different-path internal urls;
- * anything else keeps stock Link behavior. */
 function curtainHref(href: ComponentProps<typeof Link>["href"]) {
 	if (typeof href !== "string" || !href.startsWith("/")) return null;
 	if (href.includes("?") || href.includes("#")) return null;
@@ -26,11 +22,6 @@ function curtainHref(href: ComponentProps<typeof Link>["href"]) {
 	return href;
 }
 
-/**
- * next/link that swaps pages behind a Motion+ blinds curtain. Commit is detected by
- * pathname or a [data-curtain-target] marker; a wall-clock deadline and a popstate
- * listener guarantee the reveal, so nothing can strand the visitor covered.
- */
 export function CurtainLink({
 	href,
 	onClick,
@@ -52,7 +43,6 @@ export function CurtainLink({
 			return;
 		}
 		if (inFlight) {
-			// Coalesce rapid clicks: one transaction, no queued pushes.
 			event.preventDefault();
 			return;
 		}
@@ -61,8 +51,7 @@ export function CurtainLink({
 		event.preventDefault();
 		inFlight = true;
 
-		// The user's Back always wins: before the push it cancels it, after
-		// the push it opens the blinds immediately.
+		// The user's Back wins: it cancels a pending push, or opens the blinds on a committed one.
 		let popped = false;
 		const onPopstate = () => {
 			popped = true;
@@ -81,8 +70,7 @@ export function CurtainLink({
 					function settleSoon() {
 						clearTimeout(timeout);
 						cancelAnimationFrame(raf);
-						// Two extra frames so the committed route has painted
-						// before the slats start opening.
+						// Two frames so the committed route has painted before the slats open.
 						requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
 					}
 					const committed = () => {

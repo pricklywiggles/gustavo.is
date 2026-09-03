@@ -30,8 +30,7 @@ describe("TechSection", () => {
 	});
 
 	it("server markup is the ticker branch even under reduced motion", () => {
-		// The reduced swap must wait for the client mount: branching the
-		// SSR tree on the preference is a hydration mismatch.
+		// Branching the SSR tree on the preference is a hydration mismatch.
 		reducedState.value = true;
 		const markup = renderToStaticMarkup(
 			<TechSection technologies={PONDER.technologies} />,
@@ -45,7 +44,6 @@ describe("TechSection", () => {
 			<TechSection technologies={PONDER.technologies} />,
 		);
 		expect(queryByTestId("ticker")).toBeNull();
-		// One accessible copy of the content: no sr-only duplicate.
 		expect(queryAllByText("GraphQL client")).toHaveLength(1);
 	});
 });

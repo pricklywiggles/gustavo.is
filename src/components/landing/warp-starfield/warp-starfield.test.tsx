@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { WarpStarfieldOverlay } from "@/components/landing/warp-starfield-overlay";
 import { WarpStarfield } from "./warp-starfield";
 
-// The starfield and its overlay as the section mounts them: siblings sharing one ref.
+// Mirrors how OtherProjectsSection mounts the pair.
 function Scene({
 	sceneScroll,
 	onComplete,
@@ -31,8 +31,7 @@ function Scene({
 	);
 }
 
-// jsdom has no 2d context; the component must degrade to an inert canvas
-// with the headline text readable rather than stuck transparent.
+// jsdom has no 2d context, so the component must degrade to an inert canvas with readable text.
 describe("WarpStarfield", () => {
 	it("renders a canvas and reveals the overlay's headline without a 2d context", () => {
 		const getContext = vi
@@ -55,14 +54,12 @@ describe("WarpStarfield", () => {
 			expect(el.style.opacity).toBe("1");
 		}
 
-		// The astronaut degrades to its resting peek pose.
 		const astronaut = container.querySelector<HTMLElement>(
 			"[data-warp-astronaut]",
 		);
 		expect(astronaut).not.toBeNull();
 		expect(astronaut?.style.transform).toBe("translateY(0)");
 
-		// The scroll cue degrades to visible.
 		const hint = container.querySelector<HTMLElement>("[data-scroll-hint]");
 		expect(hint).not.toBeNull();
 		expect(hint?.style.opacity).toBe("1");
@@ -106,8 +103,7 @@ describe("WarpStarfield under reduced motion", () => {
 			<Scene sceneScroll={() => 100} onComplete={onComplete} />,
 		);
 		expect(onComplete).toHaveBeenCalledTimes(1);
-		// The overlay's sticky track rides the showcase's scroll by itself (FRA-185):
-		// nothing writes an inline translate to any piece of it any more.
+		// FRA-185: the track rides the showcase's scroll, so nothing writes an inline translate.
 		const hint = container.querySelector<HTMLElement>("[data-scroll-hint]");
 		expect(hint?.style.opacity).toBe("1");
 		expect(hint?.style.translate).toBe("");

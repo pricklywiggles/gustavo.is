@@ -9,10 +9,7 @@ import { RetroHero } from "../retro-hero";
 import type { Retrospective } from "../retrospective-data";
 import { TechSection } from "../tech-section";
 
-/**
- * data-curtain-target tells the landing's CurtainLink the route committed,
- * so the blinds only open once this page is really on screen.
- */
+/** data-curtain-target tells CurtainLink the route committed: the blinds open then. */
 export function RetrospectivePage({
 	retrospective,
 }: {

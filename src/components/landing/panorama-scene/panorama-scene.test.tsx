@@ -35,7 +35,7 @@ const renderScene = () =>
 		<PanoramaScene config={CONFIG} stageRef={createRef<HTMLDivElement>()} />,
 	).container;
 
-/** JS mirror of the CSS clamp, for numeric spot checks. */
+// JS mirror of the CSS clamp.
 const clampedLeft = (focusX: number, vw: number, vh: number) => {
 	const stageW = Math.max(vw, 1.5 * vh);
 	return Math.min(0, Math.max(vw - stageW, vw / 2 - focusX * stageW));
@@ -49,12 +49,9 @@ describe("panoFocusLeft", () => {
 	});
 
 	it("recenters portrait phones and degrades to edge-flush when slack runs out", () => {
-		// 390x844 portrait: desired shift fits inside the coverage slack.
 		expect(clampedLeft(0.38, 390, 844)).toBeCloseTo(-286.08, 1);
-		// 568x320 landscape: stage width equals the viewport, so a left bias
-		// pins to the edge instead of exposing canvas.
+		// 568x320 landscape: stage width equals the viewport, so a left bias would expose canvas.
 		expect(clampedLeft(0.3, 568, 320)).toBe(0);
-		// Centered focus never moves regardless of regime.
 		expect(clampedLeft(0.5, 568, 320)).toBe(0);
 	});
 });
@@ -91,8 +88,7 @@ describe("PanoramaScene mobile placement", () => {
 			'[style*="--pano-w"]',
 		);
 		expect(stage?.style.getPropertyValue("--pano-w")).toBe("max(100vw, 150vh)");
-		// Additive-only halved pair, generated from the same constants as
-		// --pano-w so the two cannot drift.
+		// The halved pair is generated from --pano-w's constants, so the two cannot drift.
 		expect(stage?.style.getPropertyValue("--pano-left-base")).toBe(
 			"calc(50% - max(50vw, 75vh))",
 		);
@@ -111,7 +107,6 @@ describe("PanoramaScene mobile placement", () => {
 		// Desktop box: left 60 - 10/2 = 55%; mobile: 42 - 10/2 = 37%.
 		expect(track?.style.getPropertyValue("--mp-l")).toBe("55%");
 		expect(track?.style.getPropertyValue("--mp-lm")).toBe("37%");
-		// top falls back to the desktop-derived box when mobile omits it.
 		expect(track?.style.getPropertyValue("--mp-tm")).toBe(
 			track?.style.getPropertyValue("--mp-t"),
 		);

@@ -24,7 +24,6 @@ afterEach(() => {
 	vi.restoreAllMocks();
 });
 
-// The setup stub answers every query false, which skips the motion-only GSAP path.
 const allowMotion = () => {
 	const original = window.matchMedia;
 	window.matchMedia = ((query: string) => ({
@@ -36,7 +35,6 @@ const allowMotion = () => {
 	};
 };
 
-// Every scrub the hero builds: the parallax bands, the sun, the character, the hole.
 const heroScrubs = () => {
 	const to = vi.spyOn(gsap, "to");
 	const timeline = vi.spyOn(gsap, "timeline");
@@ -60,9 +58,7 @@ describe("ParallaxHero", () => {
 		const { container } = render(
 			<ParallaxHero reveal={<div data-reveal>intro</div>} />,
 		);
-		// Class literals, since Tailwind scans source: the reduced track is exactly the
-		// sheet scrolling away (1vh) plus the revealed intro (1vh), and the sheet's
-		// wrapper has no stick distance, so nothing sits still before it moves.
+		// Class literals (Tailwind scans source); the reduced track is 1vh sheet + 1vh intro.
 		const track = container.querySelector('[data-motion-anchor="scrub"]');
 		expect(track?.className).toContain("h-[200vh]");
 		expect(track?.className).toContain("motion-safe:h-(--hero-track)");
@@ -74,8 +70,7 @@ describe("ParallaxHero", () => {
 
 	it("neutralizes every entrance transform from CSS for the reduced first paint", () => {
 		const { container } = render(<ParallaxHero />);
-		// The server HTML carries the bunched-pose inline transforms (FRA-170); a band
-		// without the override flashes bunched on a reduced client.
+		// FRA-170: without the override a band flashes its bunched server pose when reduced.
 		const posed = container.querySelectorAll<HTMLElement>(
 			'[data-motion-anchor="scrub"] [style*="transform:"]',
 		);
@@ -85,8 +80,6 @@ describe("ParallaxHero", () => {
 		}
 	});
 
-	// The hole's timeline, with the sheet and carrier it drives; jsdom's viewport is
-	// 768px tall, which the hero reads as `metrics.vh`.
 	const holeTimeline = () => {
 		const timeline = vi.spyOn(gsap, "timeline");
 		const { container, unmount } = render(
@@ -105,11 +98,11 @@ describe("ParallaxHero", () => {
 		timeline.mockRestore();
 		return { sheet, carrier, range, unmount };
 	};
+	// jsdom's viewport height, which the hero reads as `metrics.vh`.
 	const VH = 768;
 
 	it("keeps the iOS carrier's geometry tied to the reveal", () => {
-		// The carrier sticks for exactly the reveal, and once the sheet has travelled,
-		// its remainder below the viewport is exactly the carrier's box.
+		// The carrier sticks for exactly the reveal; the travelled sheet's remainder is its box.
 		expect(WRAPPER_VH - CARRIER_VH).toBeCloseTo(REVEAL_COMPLETE_VH, 10);
 		expect(SHEET_VH - REVEAL_TRAVEL_VH).toBeCloseTo(CARRIER_VH, 10);
 		expect(CARRIER_VH * 100).toBeCloseTo(106.667, 2);
@@ -124,7 +117,6 @@ describe("ParallaxHero", () => {
 			expect(sheet.className).toContain("sticky");
 			expect(sheet.style.position).toBe("");
 			expect(sheet.style.transform).toBe("");
-			// The trigger spans only the hole's growth.
 			expect(range).toEqual({
 				start: `top+=${(PIN_VH + REVEAL_DELAY_VH) * VH} top`,
 				end: `+=${REVEAL_LENGTH_VH * VH}`,
@@ -146,7 +138,6 @@ describe("ParallaxHero", () => {
 			expect(parseFloat(carrier.style.height)).toBeCloseTo(CARRIER_VH * 100, 6);
 			expect(carrier.style.height.endsWith("vh")).toBe(true);
 			expect(sheet.style.position).toBe("absolute");
-			// One clock: the trigger spans the sheet's whole travel from its release.
 			expect(range).toEqual({
 				start: `top+=${PIN_VH * VH} top`,
 				end: `+=${REVEAL_TRAVEL_VH * VH}`,
@@ -161,8 +152,7 @@ describe("ParallaxHero", () => {
 		}
 	});
 
-	// FRA-185: the raw sample is the baseline feel on desktop and Android; only iOS
-	// devices get the catch-up that hides their sparse scroll reports.
+	// FRA-185: raw scroll is the baseline; iOS gets catch-up to hide its sparse scroll reports.
 	it("scrubs by raw scroll everywhere but iOS", () => {
 		const restore = allowMotion();
 		try {

@@ -1,3 +1,2 @@
-// The App Router runs on React's canary channel (Next aliases `react` to its own
-// bundled build), so `ViewTransition` exists at runtime but not in stable @types/react.
+// Next bundles React canary for the App Router; stable @types/react has no ViewTransition.
 /// <reference types="react/canary" />

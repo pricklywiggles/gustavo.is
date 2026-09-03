@@ -43,7 +43,6 @@ describe("scroll speed map (FRA-187)", () => {
 				expect(row?.meanRatio, target).toBeLessThanOrEqual(
 					PACING_BUDGET.large.mean,
 				);
-				// Drift layers get the settle floor and buildSceneExit's ease, not a stretch.
 				expect(row?.spanVh, target).toBe(EXIT_SETTLE_VH);
 				expect(row?.ease, target).toBe("power1.in");
 			}
@@ -110,8 +109,7 @@ describe("scroll speed map (FRA-187)", () => {
 		}
 	});
 
-	// The known fast rows: the hole's reveal curve and the towers' authored pop. Anything
-	// else above 2x mean is a regression the budget classes would otherwise miss.
+	// The hole's reveal and the towers' pop are the only known rows above 2x mean.
 	it.each(
 		viewports,
 	)("leaves only reveals and cascade entrances above 2x mean at %s", (_name, viewport) => {

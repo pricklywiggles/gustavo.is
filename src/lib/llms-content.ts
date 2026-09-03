@@ -37,7 +37,6 @@ export async function llmsFullText(): Promise<string> {
 	]);
 }
 
-/** Site paths of every page with a markdown mirror. */
 export function markdownPages(): string[] {
 	return [
 		...RETROSPECTIVES.map((r) => `/remembering/${r.slug}`),

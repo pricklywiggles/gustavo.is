@@ -7,15 +7,13 @@ import { useEffect } from "react";
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Re-anchors scroll across geometry reflows (live reduced-motion flips, resizes). One
- * data-motion-anchor per top-level scroll region: on resize "scrub" regions preserve
- * normalized progress, "flow" regions the pixel offset; flips preserve pixels everywhere.
+ * Re-anchors scroll across geometry reflows. One data-motion-anchor per top-level scroll
+ * region; on resize "scrub" keeps normalized progress and "flow" pixels, flips keep pixels.
  */
 
 export type AnchorMode = "scrub" | "flow";
 
-/** Last anchor whose top sits at or above scrollY (tops must be sorted). Ranges may
- * overlap (the landfall pull-up), so only tops decide. */
+/** Tops must be sorted. Ranges overlap (the landfall pull-up), so only tops decide. */
 export function resolveAnchorIndex(
 	tops: number[],
 	scrollY: number,
@@ -27,8 +25,6 @@ export function resolveAnchorIndex(
 	return found;
 }
 
-/** Pixel-preserving target: the old offset survives while it exists inside the anchor;
- * only a region collapsed out from under it clamps to keep its content in view. */
 export function compensatedScroll(
 	offset: number,
 	next: { top: number; height: number },
@@ -39,8 +35,6 @@ export function compensatedScroll(
 	return next.top + Math.max(0, clamped);
 }
 
-/** Normalized progress through a scrub region's OLD scrollable extent;
- * the floor keeps shorter-than-viewport anchors from dividing by zero. */
 export function scrubFraction(
 	scrollY: number,
 	prev: { top: number; height: number },
@@ -50,8 +44,6 @@ export function scrubFraction(
 	return Math.min(1, Math.max(0, (scrollY - prev.top) / extent));
 }
 
-/** The same fraction restored against the post-resize geometry; floors
- * at the new top when the region is shorter than the viewport. */
 export function scrubScroll(
 	fraction: number,
 	next: { top: number; height: number },
@@ -87,15 +79,13 @@ type Pending =
 			fraction: number;
 	  };
 
-/** GSAP's pin wraps the section in a pin-spacer and moves the section
- * itself out of flow, so the spacer carries the document position. */
+/** GSAP's pin moves the section out of flow; the pin-spacer carries the document position. */
 function anchorBox(el: HTMLElement): HTMLElement {
 	const parent = el.parentElement;
 	return parent?.classList.contains("pin-spacer") ? parent : el;
 }
 
-/** gsap's core dispatcher is real since 3.11 (ScrollTrigger subscribes to
- * these same lifecycle events through it) but absent from the public types. */
+/** gsap's core dispatcher: real since 3.11 (ScrollTrigger uses it), absent from the types. */
 const gsapCore = gsap as unknown as {
 	addEventListener(type: string, cb: () => void): void;
 	removeEventListener(type: string, cb: () => void): void;
@@ -110,8 +100,8 @@ export function MotionAnchor() {
 		// Scrub fractions divide by this cached pre-reflow height, never live innerHeight.
 		let viewport = { width: window.innerWidth, height: window.innerHeight };
 
-		// The reflow clamps scrollY and fires scroll BEFORE media listeners run, poisoning
-		// the newest samples; use the newest sample older than the frame (120ms is past it).
+		// The reflow clamps scrollY and fires scroll BEFORE media listeners, poisoning the newest
+		// samples; take the newest sample older than the frame (120ms clears it).
 		let history: Array<{ at: number; y: number }> = [];
 		// Backdated so the sample is immediately older than the 120ms filter.
 		const seedHistory = () => {
@@ -150,9 +140,7 @@ export function MotionAnchor() {
 			viewport = { width: window.innerWidth, height: window.innerHeight };
 		};
 
-		// The reflow is a run of refreshes over several hundred ms, each restoring
-		// ScrollTrigger's stale scroll; pending re-applies after every one, releasing
-		// once the dance goes quiet.
+		// The reflow is a burst of refreshes over several hundred ms, each restoring a stale scroll.
 		let settleTimer: ReturnType<typeof setTimeout> | undefined;
 		let fallbackTimer: ReturnType<typeof setTimeout> | undefined;
 		const cancelSettle = () => {
@@ -172,8 +160,7 @@ export function MotionAnchor() {
 		const applyPending = () => {
 			if (!pending) return;
 			clearTimeout(fallbackTimer);
-			// A control focused since arming means a keyboard may own the
-			// viewport now; dropping the apply beats moving the page under it.
+			// A control focused since arming means a keyboard may own the viewport; drop the apply.
 			if (pending.kind === "resize" && formControlFocused()) {
 				cancelSettle();
 				release();
@@ -195,8 +182,7 @@ export function MotionAnchor() {
 			restartSettle();
 		};
 
-		// If the awaited refresh never arrives (gsap gated it), apply anyway; comfortably
-		// past ScrollTrigger's 200ms debounce.
+		// Applies anyway if gsap gated the refresh; 500 is past ScrollTrigger's 200ms debounce.
 		const armFallback = () => {
 			clearTimeout(fallbackTimer);
 			fallbackTimer = setTimeout(applyPending, 500);
@@ -235,8 +221,7 @@ export function MotionAnchor() {
 			armFallback();
 		};
 
-		// Mirror ScrollTrigger's resize gate exactly so pending arms only when its refresh
-		// will come; base dims re-base only on orientation change (_setBaseDimensions).
+		// Mirrors ScrollTrigger's _setBaseDimensions gate, so pending arms only when a refresh follows.
 		let baseWidth = window.innerWidth;
 		let baseHeight = window.innerHeight;
 		const portrait = window.matchMedia("(orientation: portrait)");
@@ -261,12 +246,10 @@ export function MotionAnchor() {
 			armResize();
 		};
 
-		// matchMediaInit: layout already reflects the flipped media, so the pre-flip world
-		// exists only in the caches above; resolve the anchor before gsap's own refresh.
+		// At matchMediaInit the layout already flipped: resolve from the caches before gsap refreshes.
 		const onInit = () => {
 			if (query.matches === lastMatches) {
-				// A width-media crossing (767/768) refreshes BEFORE the window resize event;
-				// arm now or our own onRefresh clobbers the pre-resize snapshot.
+				// A width-media crossing (767/768) refreshes BEFORE resize; arm or onRefresh clobbers it.
 				if (
 					pending === null &&
 					(viewport.width !== window.innerWidth ||
@@ -278,8 +261,7 @@ export function MotionAnchor() {
 			}
 			lastMatches = query.matches;
 			const scrollY = preReflowScrollY();
-			// This flip's clamp sample must not survive into a rapid follow-up flip: collapse
-			// history to the pre-flip position; tracking stays paused while pending.
+			// This flip's clamp sample must not survive into a rapid follow-up flip.
 			history = [{ at: performance.now() - 200, y: scrollY }];
 			const index = resolveAnchorIndex(
 				snapshot.map((a) => a.top),
@@ -303,8 +285,7 @@ export function MotionAnchor() {
 		};
 
 		measure();
-		// Seed on mount and bfcache restore: a restored deep page resized before its first
-		// scroll event must not fall back to the already clamped live value.
+		// Seeded on mount and bfcache restore, so a deep restore never falls back to a clamped value.
 		seedHistory();
 		window.addEventListener("pageshow", seedHistory);
 		window.addEventListener("scroll", trackScroll, { passive: true });

@@ -3,10 +3,6 @@ import { GLogo, PonderLogo } from "@/components/icons";
 import { navPill } from "@/lib/cta";
 import { SOCIAL_LINKS } from "@/lib/site-links";
 
-/**
- * The inlined icon set. Every mark but Ponder's paints in currentColor, so it
- * picks up its host's theme rather than carrying a colour of its own.
- */
 const meta = {
 	title: "Components/Icons",
 	parameters: { layout: "fullscreen" },
@@ -21,7 +17,6 @@ const TONES = [
 	{ name: "Dark bar", ground: "bg-dusk-earth", color: "text-pale-dune" },
 ];
 
-/** The G mark on each shipped bar tone; it rides the site bar and mobile menu. */
 export const BarTones: Story = {
 	render: () => (
 		<div className="flex min-h-screen flex-col">
@@ -38,10 +33,6 @@ export const BarTones: Story = {
 	),
 };
 
-/**
- * The socials come from SOCIAL_LINKS, so this gallery covers whatever the footer
- * ships. They wear the footer's own icon pill on Dusk Earth.
- */
 export const Social: Story = {
 	render: () => (
 		<div className="min-h-screen bg-dusk-earth p-12">
@@ -67,11 +58,6 @@ export const Social: Story = {
 	),
 };
 
-/**
- * Ponder's wordmark on the retrospective hero's ground. Its coral is hard-coded
- * rather than taken from the One Ramp: it is Ponder's brand colour, the same
- * exception the marks in public/logos/ get.
- */
 export const PonderWordmark: Story = {
 	render: () => (
 		<div className="flex min-h-screen items-center gap-6 bg-dusk-earth p-12">

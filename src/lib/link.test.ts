@@ -2,9 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { textLink } from "@/lib/link";
 
-// The recipe's classes are plain CSS in globals.css, so nothing type-checks the link
-// between the two; a rename on either side silently hands the anchors back to the
-// typography plugin's underline.
+// The classes are plain CSS, so a rename silently hands anchors back to the typography underline.
 const globals = readFileSync("src/app/globals.css", "utf8");
 
 describe("textLink", () => {

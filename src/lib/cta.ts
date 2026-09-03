@@ -17,9 +17,7 @@ const ctaVariants = cva(
 	},
 );
 
-/** DESIGN.md's CTA archetype (44px, rounded-lg, press physics); color classes stay
- * with the call site. `tone` is required: cva can't demand a variant, and an omitted
- * tone would render no ring at all. */
+/** `tone` is required: cva can't demand a variant, and no tone means no focus ring. */
 export function cta({
 	tone,
 	...props
@@ -40,8 +38,6 @@ const navPillVariants = cva("rounded-full transition-colors duration-150", {
 	},
 });
 
-/** The bar/footer pill archetype (rounded-full nav links and icon buttons); color and
- * hover classes come from the call site's bar theme, whose `tone` is passed through. */
 export function navPill({
 	tone,
 	...props

@@ -3,10 +3,7 @@ import { ScrollingMural } from "@/components/retrospective/scrolling-mural";
 import { ScrollFadeIn } from "@/components/scroll-fade-in";
 import type { Retrospective } from "../retrospective-data";
 
-/**
- * Darkest ramp step with the product's own screens as the light source; the mural runs
- * full strength behind a hard slanted edge (the old site's treatment), no scrims.
- */
+/** The old site's treatment: the mural runs full strength behind a hard slanted edge, no scrims. */
 export function RetroHero({ retrospective }: { retrospective: Retrospective }) {
 	const { tagline, wordmarkSuffix, contributions, years, mural } =
 		retrospective;
