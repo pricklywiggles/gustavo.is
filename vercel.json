@@ -1,10 +1,10 @@
 {
-  "installCommand": "echo \"//api.motion.dev/npm/:_authToken=${MOTION_TOKEN}\" >> \"$HOME/.npmrc\" && pnpm install",
-  "buildCommand": "pnpm run build",
-  "rewrites": [
-    {
-      "source": "/api/pa",
-      "destination": "https://metrics.whpl.sh/api/event"
-    }
-  ]
+	"installCommand": "echo \"//api.motion.dev/npm/:_authToken=${MOTION_TOKEN}\" >> \"$HOME/.npmrc\" && pnpm install",
+	"buildCommand": "pnpm run build",
+	"rewrites": [
+		{
+			"source": "/api/pa",
+			"destination": "https://metrics.whpl.sh/api/event"
+		}
+	]
 }
