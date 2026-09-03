@@ -177,6 +177,8 @@ type ChapterCues = {
 	yearDockLen: number;
 	yearSwapAt: number;
 	yearSwapLen: number;
+	productInAt: number;
+	productInLen: number;
 	hudInAt: number;
 	hudInLen: number;
 };
@@ -195,7 +197,7 @@ function buildHudEntrance(
 	const role = q("[data-hud-role]");
 	const counter = q("[data-hud-counter]");
 	const marker = q("[data-hud-marker]");
-	const divider = q("[data-hud-divider]");
+	const product = q("[data-hud-product]");
 	const ticks = gsap.utils.toArray<HTMLElement>(
 		root.querySelectorAll("[data-hud-ruler] > *"),
 	);
@@ -342,12 +344,13 @@ function buildHudEntrance(
 			hudIn + hudLen * 0.15,
 		);
 	}
-	if (divider) {
+	// Never a scale here: the mark inside is Motion's pop (FRA-192).
+	if (product) {
 		tl.fromTo(
-			divider,
-			{ scaleY: 0 },
-			{ scaleY: 1, duration: hudLen * 0.5, ease: "power2.out" },
-			hudIn + hudLen * 0.35,
+			product,
+			{ autoAlpha: 0, y: 12 },
+			{ autoAlpha: 1, y: 0, duration: cue.productInLen, ease: "power2.out" },
+			cue.productInAt,
 		);
 	}
 }
@@ -590,6 +593,8 @@ export function WorkHistorySection() {
 						yearDockLen: phase.len[`year-dock@${i}`],
 						yearSwapAt: phase.at[`year-swap@${i}`],
 						yearSwapLen: phase.len[`year-swap@${i}`],
+						productInAt: phase.at[`product-in@${i}`],
+						productInLen: phase.len[`product-in@${i}`],
 						hudInAt: phase.at[`hud-in@${i}`],
 						hudInLen: phase.len[`hud-in@${i}`],
 					});

@@ -11,6 +11,8 @@ import type { CityChapter, PanoramaConfig } from "./work-history-data";
 export const SCRUB_VH_PER_YEAR = 0.4;
 // Shared by the dock and the swap anchored to its end, so the two cannot drift apart.
 const YEAR_DOCK_VH = 0.6;
+// Ends inside hud-in's tail (0.25 at most), so the scrub and every later phase stay put.
+export const PRODUCT_IN_VH = 0.2;
 // The two chapter-transition beats overlap so the departure reads as one gesture.
 export const HUD_OUT_VH = 0.5;
 export const SCENE_OUT_VH = 1.8;
@@ -77,6 +79,13 @@ export function storyPhases(story: CityChapter[]) {
 		specs.push({
 			id: `year-swap@${i}`,
 			len: 0.2,
+			with: `year-dock@${i}`,
+			offset: YEAR_DOCK_VH,
+		});
+		// Starts at the dock's end: the year holds the center until then.
+		specs.push({
+			id: `product-in@${i}`,
+			len: PRODUCT_IN_VH,
 			with: `year-dock@${i}`,
 			offset: YEAR_DOCK_VH,
 		});

@@ -97,6 +97,17 @@ describe("CHAPTERS invariants", () => {
 		}
 	});
 
+	it("carries an intrinsic size with every company logo", () => {
+		// The HUD's shrink-to-fit img reads its ratio from these before the file loads.
+		for (const { stints } of CHAPTERS) {
+			for (const { companyLogo } of stints) {
+				if (!companyLogo) continue;
+				expect(companyLogo.width).toBeGreaterThan(0);
+				expect(companyLogo.height).toBeGreaterThan(0);
+			}
+		}
+	});
+
 	it("keeps stints sorted by start year", () => {
 		// stintIndexAt scans backwards and silently misbehaves on unsorted data.
 		for (const { stints } of CHAPTERS) {

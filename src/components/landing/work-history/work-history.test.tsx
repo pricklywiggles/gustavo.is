@@ -120,6 +120,26 @@ describe("WorkHistorySection", () => {
 			expect(
 				calls.filter((c) => isOdometer(c.args[0]) && c.method !== "set"),
 			).toHaveLength(0);
+			// FRA-194: never a GSAP scale over a Motion child (the FRA-192 reel crawl).
+			const isProduct = has("data-hud-product");
+			const productFromTos = calls.filter(
+				(c) => c.method === "fromTo" && isProduct(c.args[0]),
+			);
+			expect(productFromTos).toHaveLength(CHAPTERS.length);
+			productFromTos.forEach((c, i) => {
+				const to = vars(c.args[2]);
+				expect(c.args[3]).toBe(at[`product-in@${i}`]);
+				expect(to.duration).toBe(len[`product-in@${i}`]);
+				expect(to).toHaveProperty("autoAlpha");
+				for (const key of ["scale", "scaleX", "scaleY"]) {
+					expect(vars(c.args[1])).not.toHaveProperty(key);
+					expect(to).not.toHaveProperty(key);
+				}
+			});
+			expect(
+				calls.filter((c) => isProduct(c.args[0]) && c.method !== "fromTo"),
+			).toHaveLength(0);
+			expect(calls.some((c) => has("data-hud-divider")(c.args[0]))).toBe(false);
 			const heroEl = container.querySelector("[data-hud-year-hero]");
 			expect(heroEl?.getAttribute("aria-hidden")).toBe("true");
 			expect(heroEl?.textContent).toBe(String(CHAPTERS[0].span[0]));
@@ -247,12 +267,32 @@ describe("WorkHistorySection", () => {
 		expect(srcOf(layers[36])).toBe("/los-angeles-panorama/1-large-cloud.webp");
 	});
 
-	it("renders one HUD per chapter, chapter 0 showing its first stint", () => {
+	it("renders one HUD per chapter, each centering its first product", () => {
 		const { container } = render(<WorkHistorySection />);
 		// Both marks name their subject: the logos carry the wordmarks, so alt
 		// text is the only place the company and product are stated.
 		expect(screen.getByAltText("Microsoft")).toBeDefined();
 		expect(screen.getByAltText("Word")).toBeDefined();
+		const section = container.querySelector("section#work");
+		if (!section) throw new Error("no section");
+		const huds = [...section.children].filter((el) =>
+			el.querySelector("[data-hud-year]"),
+		);
+		expect(huds).toHaveLength(CHAPTERS.length);
+		expect(CHAPTERS.map((chapter) => chapter.stints[0].product)).toEqual([
+			"Word",
+			"Slide Photo Sharing App",
+			"Jawbone Health",
+		]);
+		huds.forEach((hud, i) => {
+			const products = hud.querySelectorAll("[data-hud-product]");
+			expect(products).toHaveLength(1);
+			expect(products[0].querySelector("img")?.getAttribute("alt")).toBe(
+				CHAPTERS[i].stints[0].product,
+			);
+			expect(hud.querySelector("[data-hud-bar] [data-hud-product]")).toBeNull();
+		});
+		expect(container.querySelector("[data-hud-divider]")).toBeNull();
 		const role = container.querySelector("[data-hud-role]");
 		expect(role?.textContent).toBe("Software Design Engineer");
 		// Two counter homes per chapter: the bar slot (sm and up) and the
@@ -310,6 +350,11 @@ describe("WorkHistorySection", () => {
 			expect(at[`year-swap@${i}`]).toBe(end(`year-dock@${i}`));
 			expect(end(`year-swap@${i}`)).toBeLessThanOrEqual(at[`scrub@${i}`]);
 			expect(at[`scrub@${i}`]).toBe(end(`hud-in@${i}`));
+			// FRA-194: after the year clears the center, inside hud-in so the scrub stays put.
+			expect(len[`product-in@${i}`]).toBe(0.2);
+			expect(at[`product-in@${i}`]).toBe(end(`year-dock@${i}`));
+			expect(end(`product-in@${i}`)).toBeLessThanOrEqual(at[`scrub@${i}`]);
+			expect(end(`product-in@${i}`)).toBeLessThanOrEqual(end(`hud-in@${i}`));
 		}
 	});
 });
