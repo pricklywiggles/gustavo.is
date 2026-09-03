@@ -26,6 +26,15 @@ export type Project = {
 
 export const PROJECTS: Project[] = [
 	{
+		name: "Sanum",
+		description:
+			"A macOS desktop application for viewing Apple Health and FHIR clinical data on your computer, with AI that scans clinical lab-result PDFs.",
+		tech: "TypeScript / Rust",
+		links: [{ label: "Visit project", url: "https://sanum.app" }],
+		image: "/projects/sanum.webp",
+		imageBg: "#0e121a",
+	},
+	{
 		name: "Hone",
 		description:
 			"A macOS and Windows TUI to practice coding problems using spaced repetition.",
@@ -35,15 +44,6 @@ export const PROJECTS: Project[] = [
 		],
 		image: "/projects/hone-demo.gif",
 		imageRatio: 1200 / 600,
-	},
-	{
-		name: "Sanum",
-		description:
-			"A macOS desktop application for viewing Apple Health and FHIR clinical data on your computer, with AI that scans clinical lab-result PDFs.",
-		tech: "TypeScript / Rust",
-		links: [{ label: "Visit project", url: "https://sanum.app" }],
-		image: "/projects/sanum.webp",
-		imageBg: "#0e121a",
 	},
 	{
 		name: "Niamos",
