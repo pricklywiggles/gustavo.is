@@ -10,6 +10,10 @@ import { useEffect, useRef } from "react";
 export function AnimatedNumber({
 	className,
 	children,
+	locales,
+	format,
+	prefix,
+	suffix,
 	...rest
 }: Omit<AnimateNumberProps, "ref"> & { className?: string }) {
 	const numeric = Number(children);
@@ -18,14 +22,26 @@ export function AnimatedNumber({
 		committed.current = numeric;
 	}, [numeric]);
 	const trend = Math.sign(numeric - committed.current) || 0;
+	// The same string the library builds for its own label.
+	const text = `${prefix ?? ""}${new Intl.NumberFormat(locales, format).format(numeric)}${suffix ?? ""}`;
 
 	return (
-		<AnimateNumber
-			trend={trend}
-			className={className ? `tabular-nums ${className}` : "tabular-nums"}
-			{...rest}
-		>
-			{children}
-		</AnimateNumber>
+		<>
+			{/* Motion+ puts aria-label on a role-less span, which ARIA prohibits and screen
+			    readers drop: hide its markup and carry the value as text instead. */}
+			<AnimateNumber
+				trend={trend}
+				className={className ? `tabular-nums ${className}` : "tabular-nums"}
+				locales={locales}
+				format={format}
+				prefix={prefix}
+				suffix={suffix}
+				{...rest}
+				aria-hidden="true"
+			>
+				{children}
+			</AnimateNumber>
+			<span className="sr-only">{text}</span>
+		</>
 	);
 }
