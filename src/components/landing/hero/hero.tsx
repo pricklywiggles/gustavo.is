@@ -1,0 +1,613 @@
+"use client";
+
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { domMax, LazyMotion, m } from "motion/react";
+import Image from "next/image";
+import { type CSSProperties, useRef } from "react";
+import { useReducedMotionLive } from "@/components/use-reduced-motion-live";
+import { useSteadyFrames } from "@/components/use-steady-frames";
+import { isIOSDevice } from "@/lib/ios-device";
+import { EASE_OUT_EXPO, SUN_CREST_SPRING } from "@/lib/motion-tokens";
+import { RAMP_HEX } from "@/lib/ramp";
+import { scrollScrub } from "@/lib/scroll-scrub";
+import {
+	CARRIER_VH,
+	CHARACTER_SHRINK_SCALE,
+	CONVERGENCE_PROGRESS,
+	CONVERGENCE_SPAN_VH,
+	HERO_PARALLAX,
+	HOLE_STAGES,
+	PIN_VH,
+	REVEAL_DELAY_VH,
+	REVEAL_LENGTH_VH,
+	REVEAL_TRAVEL_VH,
+	SHEET_VH,
+	SUN_CONVERGENCE_SCALE,
+	TEXT_REVEAL_VH,
+	WRAPPER_VH,
+} from "../scroll-geometry";
+import { createClipWriter, holePath } from "./hero-hole";
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
+
+// Hex twins of the ramp tokens: GSAP and Motion can't interpolate the theme's oklch().
+const COLORS = {
+	sky1: RAMP_HEX["pale-dune"],
+	sky2: RAMP_HEX["amber-mirage"],
+	sky3: RAMP_HEX["horizon-blaze"],
+	sun: RAMP_HEX["noon-sun"],
+	ground1: RAMP_HEX["dune-tan"],
+	ground2: RAMP_HEX["desert-clay"],
+	ground3: RAMP_HEX["canyon-brown"],
+	ground4: RAMP_HEX["dusk-earth"],
+};
+
+const HORIZON_PCT = 60;
+
+// Visible band heights grow 3/2 toward the horizon: 12.6%, 18.9%, 28.4% of the 60% sky.
+const SKY_TOPS = {
+	s1: 0.0,
+	s2: 11.6,
+	s3: 20.5,
+};
+
+// Visible band heights shrink 2/3 toward the horizon: g4 16.6%, g3 11.1%, g2 7.4%, g1 4.9%.
+const GROUND_TOPS = {
+	g1: 60.0,
+	g2: 64.9,
+	g3: 72.3,
+	g4: 83.4,
+};
+
+// Entrance transforms live on the inner m.div, GSAP scroll tweens on the outer layer.
+const SKY_BANDS = [
+	{
+		parallax: HERO_PARALLAX.sky2,
+		top: SKY_TOPS.s2,
+		color: COLORS.sky2,
+		bunchedTop: 31,
+		step: 1,
+	},
+	{
+		parallax: HERO_PARALLAX.sky3,
+		top: SKY_TOPS.s3,
+		color: COLORS.sky3,
+		bunchedTop: 35,
+		step: 0,
+	},
+];
+
+const GROUND_BANDS = [
+	{
+		parallax: HERO_PARALLAX.ground1,
+		top: GROUND_TOPS.g1,
+		color: COLORS.ground1,
+		bunchedTop: 60, // the horizon anchor: zero travel
+		step: 0,
+	},
+	{
+		parallax: HERO_PARALLAX.ground2,
+		top: GROUND_TOPS.g2,
+		color: COLORS.ground2,
+		bunchedTop: 62,
+		step: 0,
+	},
+	{
+		parallax: HERO_PARALLAX.ground3,
+		top: GROUND_TOPS.g3,
+		color: COLORS.ground3,
+		bunchedTop: 64,
+		step: 1,
+	},
+	{
+		parallax: HERO_PARALLAX.ground4,
+		top: GROUND_TOPS.g4,
+		color: COLORS.ground4,
+		bunchedTop: 66,
+		step: 2,
+	},
+];
+
+const entranceTransition = (step: number) => ({
+	delay: 0.15 + step * 0.045,
+	duration: 0.6,
+	ease: EASE_OUT_EXPO,
+});
+
+// At scale 2 the disc doubles about its center, so a 100% offset would clear the horizon.
+const SUN_ENTRANCE = { y: "155%", scale: 2 };
+// Shares the ground's first beat so the disc crests while the bands are still fanning out.
+const SUN_TRANSITION = {
+	delay: entranceTransition(0).delay,
+	...SUN_CREST_SPRING,
+};
+
+const VIDEO_CUE = 0.1;
+
+export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
+	const wrapperRef = useRef<HTMLDivElement>(null);
+	const carrierRef = useRef<HTMLDivElement>(null);
+	const sheetRef = useRef<HTMLDivElement>(null);
+	const sceneRef = useRef<HTMLDivElement>(null);
+	const characterRef = useRef<HTMLDivElement>(null);
+	const sunRef = useRef<HTMLDivElement>(null);
+	const revealRef = useRef<HTMLDivElement>(null);
+	const blobRef = useRef<SVGPathElement>(null);
+	// False through SSR and hydration (FRA-170): no SSR-visible branch may depend on it.
+	const reducedMotion = useReducedMotionLive();
+	const steady = useSteadyFrames();
+	// Animation clocks run on real time: the post-hydration task storm eats an early entrance.
+	const play = reducedMotion || steady;
+
+	useGSAP(
+		() => {
+			const scene = sceneRef.current;
+			if (!wrapperRef.current || !scene || !characterRef.current) return;
+
+			// Reduced motion keeps the sheet's plain scroll-away as the designed reveal.
+			const mm = gsap.matchMedia();
+			mm.add("(prefers-reduced-motion: no-preference)", () => {
+				const video = revealRef.current?.querySelector("video") ?? null;
+				const scrub = scrollScrub();
+				const ios = isIOSDevice();
+
+				// vh from the scene's h-screen box: iOS innerHeight tracks the toolbar, CSS doesn't.
+				const metrics = { vh: 0, vw: 0, cx: 0, cy: 0 };
+				const measure = () => {
+					metrics.vh = scene.offsetHeight || window.innerHeight;
+					metrics.vw = scene.clientWidth || window.innerWidth;
+					// The video's rect is only the revealed position while its underlay is stuck.
+					const rect = video?.getBoundingClientRect();
+					if (
+						rect &&
+						rect.width > 0 &&
+						window.scrollY < (WRAPPER_VH - 1) * metrics.vh
+					) {
+						metrics.cx = rect.left + rect.width / 2;
+						metrics.cy = rect.top + rect.height / 2;
+					} else {
+						metrics.cx = 0.28 * metrics.vw;
+						metrics.cy = 0.5 * metrics.vh;
+					}
+				};
+				measure();
+
+				let rebuildFn: (() => void) | null = null;
+				let disposeWriter = () => {};
+				const onRefreshInit = () => {
+					measure();
+					rebuildFn?.();
+				};
+				ScrollTrigger.addEventListener("refreshInit", onRefreshInit);
+
+				scene.querySelectorAll<HTMLElement>("[data-parallax]").forEach((el) => {
+					const factor = parseFloat(el.dataset.parallax ?? "0");
+					if (factor === 0) return;
+
+					gsap.to(el, {
+						y: () => -(factor * metrics.vh),
+						ease: "none",
+						scrollTrigger: {
+							trigger: wrapperRef.current,
+							start: "top top",
+							end: () => `+=${metrics.vh}`,
+							scrub,
+							invalidateOnRefresh: true,
+						},
+					});
+				});
+
+				gsap.set(sunRef.current, { transformOrigin: "center center" });
+				gsap.to(sunRef.current, {
+					scale: SUN_CONVERGENCE_SCALE,
+					ease: "none",
+					scrollTrigger: {
+						trigger: wrapperRef.current,
+						start: () => `top+=${CONVERGENCE_PROGRESS * metrics.vh} top`,
+						end: () => `+=${CONVERGENCE_SPAN_VH * metrics.vh}`,
+						scrub,
+						invalidateOnRefresh: true,
+					},
+				});
+
+				// Origin bottom left: the character shrinks without lifting off its ground band.
+				gsap.set(characterRef.current, { transformOrigin: "bottom left" });
+				gsap.to(characterRef.current, {
+					scale: CHARACTER_SHRINK_SCALE,
+					ease: "none",
+					scrollTrigger: {
+						trigger: wrapperRef.current,
+						start: () => `top+=${CONVERGENCE_PROGRESS * metrics.vh} top`,
+						end: () => `+=${CONVERGENCE_SPAN_VH * metrics.vh}`,
+						scrub,
+						invalidateOnRefresh: true,
+					},
+				});
+
+				if (
+					blobRef.current &&
+					revealRef.current &&
+					sheetRef.current &&
+					carrierRef.current
+				) {
+					const blobPath = blobRef.current;
+					const sheet = sheetRef.current;
+					const carrier = carrierRef.current;
+					const hole = { s: 0, yOff: 0 };
+					const wobble = { r: -12 };
+					const pulse = { t: 0 };
+
+					const writer = createClipWriter({
+						path: blobPath,
+						compute: () =>
+							holePath({
+								vw: metrics.vw,
+								vh: metrics.vh,
+								cx: metrics.cx,
+								cy: metrics.cy,
+								sheetVh: SHEET_VH,
+								s: hole.s,
+								yOff: hole.yOff,
+								rotation: wobble.r,
+								phase: pulse.t,
+							}),
+					});
+					disposeWriter = writer.dispose;
+					rebuildFn = writer.write;
+					writer.write();
+					sheet.style.clipPath = "url(#hero-hole)";
+
+					// Own clock, not the scrub: the hole's edge keeps living while scroll parks.
+					const sway = gsap.to(wobble, {
+						r: 12,
+						yoyo: true,
+						repeat: -1,
+						duration: 3,
+						ease: "sine.inOut",
+						onUpdate: writer.request,
+					});
+					const breath = gsap.to(pulse, {
+						t: Math.PI * 2,
+						repeat: -1,
+						duration: 3.6,
+						ease: "none",
+						onUpdate: writer.request,
+					});
+
+					// Hidden past the reveal: the trailing edge rasterizes a hairline over the intro.
+					// Progress-driven; enter/leave callbacks never fired here.
+					let hidden = false;
+					const syncSheet = (progress: number) => {
+						const hide = progress >= 1;
+						if (hide === hidden) return;
+						hidden = hide;
+						if (hide) {
+							sway.pause();
+							breath.pause();
+							writer.hide();
+							sheet.style.visibility = "hidden";
+						} else {
+							writer.show();
+							sheet.style.visibility = "visible";
+							sway.play();
+							breath.play();
+						}
+					};
+
+					if (ios) {
+						// One clock (FRA-185): a sticky carrier puts the sheet on the hole's own
+						// scrub, so the catch-up delays both and the hole can't drift off the video.
+						gsap.set(carrier, {
+							display: "block",
+							position: "sticky",
+							top: 0,
+							height: `${CARRIER_VH * 100}vh`,
+						});
+						gsap.set(sheet, {
+							position: "absolute",
+							top: 0,
+							left: 0,
+							right: 0,
+						});
+					}
+
+					const revealProgress = ios
+						? (progress: number) =>
+								gsap.utils.clamp(
+									0,
+									1,
+									(progress * REVEAL_TRAVEL_VH - REVEAL_DELAY_VH) /
+										REVEAL_LENGTH_VH,
+								)
+						: (progress: number) => progress;
+
+					const tl = gsap.timeline({
+						scrollTrigger: {
+							trigger: wrapperRef.current,
+							start: () =>
+								`top+=${(ios ? PIN_VH : PIN_VH + REVEAL_DELAY_VH) * metrics.vh} top`,
+							end: () =>
+								`+=${(ios ? REVEAL_TRAVEL_VH : REVEAL_LENGTH_VH) * metrics.vh}`,
+							scrub,
+							invalidateOnRefresh: true,
+							onUpdate: (self) => {
+								const progress = revealProgress(self.progress);
+								syncSheet(progress);
+								if (!ios) {
+									hole.yOff =
+										(REVEAL_DELAY_VH + progress * REVEAL_LENGTH_VH) *
+										metrics.vh;
+									writer.request();
+								}
+								if (!video) return;
+								// A finished video also reports paused, so every tick would restart it.
+								if (progress > VIDEO_CUE && video.paused && !video.ended) {
+									video.play().catch(() => {});
+								} else if (progress <= VIDEO_CUE && !video.paused) {
+									video.pause();
+								}
+							},
+							onLeaveBack: () => {
+								if (video) {
+									video.pause();
+									video.currentTime = 0;
+								}
+							},
+						},
+					});
+					// Seed for a page loaded past the reveal: onUpdate waits for scroll.
+					syncSheet(revealProgress(tl.scrollTrigger?.progress ?? 0));
+
+					if (ios) {
+						// Timeline seconds are viewport heights.
+						tl.to(
+							sheet,
+							{
+								y: () => -REVEAL_TRAVEL_VH * metrics.vh,
+								duration: REVEAL_TRAVEL_VH,
+								ease: "none",
+							},
+							0,
+						).to(
+							hole,
+							{
+								yOff: () => REVEAL_TRAVEL_VH * metrics.vh,
+								duration: REVEAL_TRAVEL_VH,
+								ease: "none",
+								onUpdate: writer.request,
+							},
+							0,
+						);
+					}
+					const growth = gsap.timeline();
+					for (const { s, duration, ease } of HOLE_STAGES) {
+						growth.to(hole, {
+							s,
+							duration: duration * REVEAL_LENGTH_VH,
+							ease,
+							onUpdate: writer.request,
+						});
+					}
+					tl.add(growth, ios ? REVEAL_DELAY_VH : 0);
+				}
+
+				return () => {
+					ScrollTrigger.removeEventListener("refreshInit", onRefreshInit);
+					disposeWriter();
+					// GSAP won't revert manual style writes; a reduced flip must not strand the sheet.
+					if (sheetRef.current) {
+						sheetRef.current.style.clipPath = "";
+						sheetRef.current.style.visibility = "";
+					}
+				};
+			});
+
+			return () => mm.revert();
+		},
+		{ scope: wrapperRef },
+	);
+
+	return (
+		<LazyMotion features={domMax}>
+			{/* The intro stays pinned beneath for the full range plus TEXT_REVEAL_VH so its
+			    text can scrub in while held; the extra tail is empty scroll over the intro.
+			    Reduced motion: 2vh, one for the sheet to scroll off, one for the intro to leave. */}
+			<div
+				data-motion-anchor="scrub"
+				className="relative h-[200vh] motion-safe:h-(--hero-track)"
+				style={
+					{
+						"--hero-track": `${(WRAPPER_VH + TEXT_REVEAL_VH) * 100}vh`,
+					} as CSSProperties
+				}
+			>
+				{reveal && (
+					<div className="absolute inset-0">
+						<div ref={revealRef} className="sticky top-0 h-screen">
+							{reveal}
+						</div>
+					</div>
+				)}
+
+				{/* Twice the viewport tall so the trailing edge arrives after the hole swallows
+				    the screen; reduced motion drops the extension and the stick distance. */}
+				{/* The transparent wrapper would swallow every click over the intro; the sheet
+				    re-enables hit testing so it blocks input only where it visually covers. */}
+				<div
+					ref={wrapperRef}
+					className="pointer-events-none relative z-10 h-screen motion-safe:h-(--hero-pin)"
+					style={{ "--hero-pin": `${WRAPPER_VH * 100}vh` } as CSSProperties}
+				>
+					{/* No box of its own: the sheet sticks inside the wrapper as if this were not
+					    here. On iOS the motion callback turns it into the sticky carrier the sheet
+					    rides through the reveal (one clock, FRA-185). */}
+					<div ref={carrierRef} className="contents">
+						<div
+							ref={sheetRef}
+							className="pointer-events-auto sticky top-0 h-screen motion-safe:h-(--hero-sheet)"
+							style={{ "--hero-sheet": `${SHEET_VH * 100}vh` } as CSSProperties}
+						>
+							<div
+								ref={sceneRef}
+								className="relative h-screen overflow-hidden"
+								style={{ background: COLORS.sky1 }}
+							>
+								{/* Zenith base: its top edge is the viewport, so it has no entrance. */}
+								<div
+									data-parallax={HERO_PARALLAX.sky1}
+									className="absolute w-full"
+									style={{
+										top: `${SKY_TOPS.s1}%`,
+										height: "200%",
+										background: COLORS.sky1,
+									}}
+								/>
+								{/* The motion-reduce important override on every entrance m.div: the
+							    server HTML carries the bunched-pose inline transforms, so
+							    reduced-motion first paint must neutralize them from CSS (FRA-170). */}
+								{SKY_BANDS.map(({ parallax, top, color, bunchedTop, step }) => (
+									<div
+										key={color}
+										data-parallax={parallax}
+										className="absolute w-full"
+										style={{ top: `${top}%`, height: "200%" }}
+									>
+										<m.div
+											className="motion-reduce:transform-none! absolute inset-0"
+											style={{ background: color }}
+											initial={
+												reducedMotion ? false : { y: `${bunchedTop - top}vh` }
+											}
+											animate={{ y: play ? "0vh" : `${bunchedTop - top}vh` }}
+											transition={
+												reducedMotion
+													? { duration: 0 }
+													: entranceTransition(step)
+											}
+										/>
+									</div>
+								))}
+
+								{/* Clipped to the sky: the sun can never show below the horizon while
+							    the bands are still separating. */}
+								<div
+									className="pointer-events-none absolute inset-x-0 top-0 overflow-hidden"
+									style={{ height: `${HORIZON_PCT}%` }}
+								>
+									<div
+										ref={sunRef}
+										data-parallax={HERO_PARALLAX.sun}
+										className="absolute"
+										style={{
+											width: "min(38vw, 38vh)",
+											height: "min(38vw, 38vh)",
+											right: "1%",
+											// Bottom third of the sun sits below the horizon (= wrapper bottom)
+											top: "calc(100% - min(36vw, 36vh))",
+										}}
+									>
+										<m.div
+											className="motion-reduce:transform-none! absolute inset-0 rounded-full"
+											style={{ background: COLORS.sun }}
+											initial={reducedMotion ? false : SUN_ENTRANCE}
+											animate={play ? { y: "0%", scale: 1 } : SUN_ENTRANCE}
+											transition={
+												reducedMotion ? { duration: 0 } : SUN_TRANSITION
+											}
+										/>
+									</div>
+								</div>
+
+								{/* height: 200% ensures bands never expose a bottom edge as they parallax up */}
+								{GROUND_BANDS.map(
+									({ parallax, top, color, bunchedTop, step }) => (
+										<div
+											key={color}
+											data-parallax={parallax}
+											className="absolute w-full"
+											style={{ top: `${top}%`, height: "200%" }}
+										>
+											<m.div
+												className="motion-reduce:transform-none! absolute inset-0"
+												style={{ background: color }}
+												initial={
+													reducedMotion ? false : { y: `${bunchedTop - top}vh` }
+												}
+												animate={{ y: play ? "0vh" : `${bunchedTop - top}vh` }}
+												transition={
+													reducedMotion
+														? { duration: 0 }
+														: entranceTransition(step)
+												}
+											/>
+										</div>
+									),
+								)}
+
+								{/* Feet anchored to g3's top edge via bottom positioning. */}
+								<div
+									ref={characterRef}
+									data-parallax={HERO_PARALLAX.character}
+									className="absolute left-[4%]"
+									style={{ bottom: `${100 - GROUND_TOPS.g3}%` }}
+								>
+									{/* Offset and timing identical to ground band 3's, so the sneakers
+								    stay planted on it as it slides down. */}
+									<m.div
+										className="motion-reduce:transform-none!"
+										initial={
+											reducedMotion
+												? false
+												: {
+														y: `${GROUND_BANDS[2].bunchedTop - GROUND_TOPS.g3}vh`,
+													}
+										}
+										animate={{
+											y: play
+												? "0vh"
+												: `${GROUND_BANDS[2].bunchedTop - GROUND_TOPS.g3}vh`,
+										}}
+										transition={
+											reducedMotion
+												? { duration: 0 }
+												: entranceTransition(GROUND_BANDS[2].step)
+										}
+									>
+										<Image
+											src="/lego-hero.webp"
+											width={1024}
+											height={1536}
+											alt="Lego Gustavo looking at the horizon"
+											priority
+											sizes="(min-width: 640px) 200px, 130px"
+											className="h-65 w-32.5 object-contain object-bottom sm:h-100 sm:w-50"
+										/>
+									</m.div>
+								</div>
+							</div>
+							<div
+								className="motion-reduce:hidden"
+								style={{
+									height: `${(SHEET_VH - 1) * 100}vh`,
+									background: COLORS.ground4,
+								}}
+							/>
+						</div>
+					</div>
+				</div>
+
+				{reveal && (
+					<svg aria-hidden="true" className="absolute h-0 w-0">
+						<defs>
+							<clipPath id="hero-hole" clipPathUnits="userSpaceOnUse">
+								<path ref={blobRef} clipRule="evenodd" />
+							</clipPath>
+						</defs>
+					</svg>
+				)}
+			</div>
+		</LazyMotion>
+	);
+}

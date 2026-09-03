@@ -1,0 +1,29 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font-size",
+        "value": "1.0625rem",
+        "createdAt": "2026-08-24T21:45:50.601Z",
+        "reason": "documented in DESIGN.md Typography as a vetted step of Body (retrospective reading: 1.0625rem/1.75/66ch), recorded during /impeccable document"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "999px",
+        "createdAt": "2026-08-27T21:54:46.989Z",
+        "reason": "pill radius is a shipped idiom: rounded-full appears 20x in src/ including the cta() recipe; DESIGN.md's rounded scale just does not enumerate the pill"
+      },
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "src/components/blog/blog-mdx-components/blog-mdx-components.tsx"
+        ],
+        "createdAt": "2026-08-28T20:17:05.400Z",
+        "reason": "Claude: src is a guarded prop of the MDX img bridge (returns null when missing), not a literal empty src"
+      }
+    ]
+  }
+}

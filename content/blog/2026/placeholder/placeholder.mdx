@@ -1,0 +1,90 @@
+---
+title: Placeholder post
+slug: placeholder
+date: 2026-07-16
+draft: true
+description: A styling exercise for the blog's reading page. Every element the typography skin styles appears here once, so a single scroll checks the whole set against the dark ground.
+tags: [scaffold]
+---
+
+This post exists to prove the content pipeline end to end: fumadocs-mdx resolves the frontmatter, validates it against the zod schema, compiles the MDX, and the page renders it through the `blog-prose` skin. Replace it with real writing before launch.
+
+The hero above owns the post title, so body copy starts at the second heading level. Here is a [link to the contact page](/contact) that should ride the curtain, and an [external link](https://gsap.com) that should open in a new tab.
+
+## Text on dark ground
+
+Body copy is Pale Dune on Dusk Earth. **Bold text** stays on the same step, *italics* lean without changing color, and inline code like `pnpm run dev` sits in a small ink chip.
+
+> A quote reads as a traditional pull quote: led by a Noon Sun mark, no card, no hairline, body a step larger than the running text.
+
+A post can also hand the quote its own mark:
+
+<Blockquote icon="🎧">
+	<p>Custom-icon quotes swap the mark and keep the same voice.</p>
+</Blockquote>
+
+### Lists, ordered and not
+
+Unordered bullets take Dune Tan:
+
+- The first item in the list
+- A second item, long enough to wrap on a phone so the hanging indent shows
+- A third item with `inline code` in it
+
+Ordered counters take Noon Sun:
+
+1. Measure against the real background
+2. Pick tints from the ladder
+3. Ship only what passes
+
+---
+
+## Code
+
+A single fenced block with a title:
+
+```ts title="verify.ts"
+type Check = { name: string; passed: boolean };
+
+export function summarize(checks: Check[]): string {
+	const failed = checks.filter((check) => !check.passed);
+	if (failed.length === 0) return "all green";
+	return `${failed.length} of ${checks.length} failed`;
+}
+```
+
+Consecutive fences with tab labels become one tabbed block:
+
+```ts tab="TypeScript"
+export function greet(name: string): string {
+	return `Hello, ${name}!`;
+}
+```
+
+```js tab="JavaScript"
+export function greet(name) {
+	return `Hello, ${name}!`;
+}
+```
+
+And a block that opts out of the copy button:
+
+```bash title="one-time setup" noCopy
+pnpm install --frozen-lockfile
+```
+
+## Media
+
+A YouTube video renders as a privacy-clean thumbnail card. Clicking it opens the video on YouTube in a new tab; the page itself never talks to Google.
+
+<YouTube url="https://www.youtube.com/watch?v=aqz-KE-bpKQ" title="Big Buck Bunny" />
+
+## Tables
+
+| Element    | Color on Dusk Earth | Contrast |
+| ---------- | ------------------- | -------- |
+| Body       | Pale Dune           | 6.03:1   |
+| Links      | Noon Sun            | 5.08:1   |
+| Standfirst | Pale Dune at 85%    | 4.88:1   |
+
+Nothing about this content should be read as writing advice. It is the smallest real exercise of every element the reading page styles.

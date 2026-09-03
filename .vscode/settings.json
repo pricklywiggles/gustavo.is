@@ -1,3 +1,34 @@
 {
-  "css.customData": [".vscode/css_custom_data.json"]
+	// Biome (biome.json: tabs, double quotes) owns formatting for everything
+	// it parses. Single-language keys on purpose: VS Code treats a filter
+	// naming ONE language as more specific than one naming several, and
+	// specificity beats scope, so a combined [ts][tsx] key here loses to a
+	// user-level "[typescript]": prettier and saves get Prettier'd. Each
+	// language listed alone outranks user settings at equal specificity.
+	"editor.formatOnSave": true,
+	"editor.codeActionsOnSave": {
+		"source.fixAll.biome": "explicit",
+		"source.organizeImports.biome": "explicit"
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[javascriptreact]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[json]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[jsonc]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[css]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	}
 }

@@ -1,0 +1,359 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import {
+	ContrastMatrix,
+	Dot,
+	Note,
+	PaletteStyles,
+	RampStrip,
+	Rule,
+	Swatches,
+} from "./palette-blocks";
+
+<Meta title="Design system/Palette" />
+
+<PaletteStyles />
+
+# The palette
+
+One warm ramp, one cool branch reserved for a single section, and a semantic layer mapped
+onto the ramp. Every value on this page is read from `src/lib/ramp.ts` at render time, and
+`src/app/design-tokens.test.ts` fails the suite when that file, `src/app/globals.css`, and
+`DESIGN.md`'s front matter disagree. So the swatches cannot go stale; only the prose can.
+
+Source of truth: the `@theme` block in `src/app/globals.css`. Narrative: `DESIGN.md`.
+
+## The one ramp
+
+Every warm token sorted by OKLCH lightness, palest first. Hover a step to read it, click to
+copy the hex. Warning Ember sits in the strip by lightness but belongs to none of it: at
+C 0.245 it is the one colour that leaves the warm family on purpose.
+
+<RampStrip />
+
+<Rule title="The One Ramp Rule">
+	Every surface colour, from the palest background to the darkest text, comes from this
+	single warm ramp. The cool branch is the one scoped exception and may not grow. If a new
+	colour does not sit on the ramp it does not belong on the site, including any future dark
+	mode, which this system does not have.
+</Rule>
+
+<Rule title="The Rare Blaze Rule">
+	Horizon Blaze is a focus and data colour, not a decoration. It shows up on a ring, a
+	chart line, a rare accent, never as a background flood.
+</Rule>
+
+<Rule title="The Unbroken Ground Rule">
+	Every page closes on Dusk Earth and hands off to the Dusk Earth footer with no visible
+	seam. The landing page's landfall vista, the blog's `main`, and `SiteFooter` are all the
+	same ground.
+</Rule>
+
+## Core roles
+
+Primary, secondary, and tertiary. These three carry most of the interface.
+
+<Swatches group="core" />
+
+## Neutrals
+
+Backgrounds, strokes, and text. Warm at every step except Dusk Ink, which reads
+near-neutral so body copy never competes with the palette.
+
+<Swatches group="neutral" />
+
+## Mid-ramp steps
+
+Declared for hero ground bands and data viz, held in reserve for months, and put to work by
+the blog reading page. Both now carry real roles and neither is spare capacity any more.
+
+<Swatches group="mid" />
+
+## Signal and focus
+
+The saturated end of the extended ramp, plus the two rings. The landing hero is the one
+place these are allowed to appear together.
+
+<Swatches group="extended" />
+
+## The cool branch
+
+Five tokens scoped to the landfall section: the descent from Dusk Ink's space, through
+daytime atmosphere, into the Pacific. Every other surface stays warm, and the bluff in the
+vista's foreground returns to the ramp with Canyon Brown and Dune Tan.
+
+<Swatches group="cool" />
+
+## Type roles
+
+Three role variables in `@theme static`, resolving to two faces. Roles are named by usage,
+not by face, so the dev-only font lab can repoint them inline on `html` without touching a
+component. `static` is what forces all three into `:root` even when a role has no utility in
+the source yet.
+
+| Role | Face | Weights | Used for |
+| --- | --- | --- | --- |
+| `--font-sans` | Wotfard | 100 to 700 loaded, 400 to 700 in practice | Body copy, labels, form text, UI copy. Applied to `html` in the base layer. |
+| `--font-display` | Kitora Bold | 700 | Every title-like and display role: the landing equation, section titles, page and reading-page headings. |
+| `--font-legend` | Kitora Bold | 700 | Instrument text: panorama roles, the year, the counter and its label. |
+
+Kitora ships one bold cut, so hierarchy inside the title voice comes from size alone.
+
+| Step | Face and weight | Size | Line height | Tracking |
+| --- | --- | --- | --- | --- |
+| Display | Kitora 700 | clamp(2.25rem, 4.5vw, 3.5rem) | 1.05 to 1.1 | -0.01em |
+| Headline | Kitora 700 | clamp(1.875rem, 3vw, 2.25rem) | 1.15 | normal |
+| Title | Kitora 700 | 1.25rem | 1.3 | normal |
+| Legend | Kitora 700 | 0.8125rem | 1.4 | 0.01em |
+| Body | Wotfard 400 | 1rem | 1.6 | normal |
+| Label | Wotfard 500 | 0.8125rem | 1.4 | 0.01em |
+
+<Note>
+	<p>
+		<strong>Kitora carries two roles, not one.</strong> Display and legend both resolve to
+		the same face today. They are separate variables so the instrument text can diverge
+		later without dragging headings with it.
+	</p>
+	<p>
+		<strong>Kitora needs two hand-tuned corrections</strong>, both in the base layer of
+		`globals.css`. Its word space is 0.366em against Wotfard's 0.233em, so `.font-display`
+		pulls word-spacing back to about 0.27em. And its equals sign draws as a single bar that
+		reads as a minus, so `.kitora-equals` stacks a second hyphen with hand-tuned offsets.
+		Both are calibrated to this face. Swapping the display face means re-measuring both in
+		the font lab.
+	</p>
+	<p>
+		<strong>The blog holdout is settled.</strong> The reading page's headings take Kitora;
+		the blog index's entry titles stay Wotfard medium on purpose, because the entry list
+		reads as UI rather than as titles.
+	</p>
+</Note>
+
+## Focus rings
+
+The ring is picked by the ground it lands on, never by habit. Both live in
+`src/lib/focus-ring.ts`, keyed by `Tone`, and every recipe that renders a control requires
+one: `cta`, `navPill`, `textLink`, and the bar themes, whose `text` is narrowed per ground
+so a theme cannot pair light labels with a light ring.
+
+| Tone | Ring | Measured |
+| --- | --- | --- |
+| dark | <Dot token="horizon-blaze" />opaque Horizon Blaze | 6.41:1 on Dusk Ink, 3.20:1 on Dusk Earth |
+| light | <Dot token="canyon-brown" />opaque Canyon Brown | 3.77:1 on Pale Dune, 4.04:1 on Sand Haze, 4.47:1 on First Light |
+
+`FOCUS_RING` hugs controls that carry their own padding (buttons, pills, inputs, media
+boxes). `FOCUS_OUTLINE` is the same colour stepped 3px out, for bare text and glyphs
+(footer links, menu links, tabs, the logo) where a hugging ring crowds the letters.
+
+<Rule title="The Ground Picks the Ring Rule">
+	A hand-written ring class is a bug, not a variant. Blaze on Pale Dune measures 1.89:1 and
+	is not an indicator; the `/50` blaze tint the dark ring once wore fell to 2.63:1 on Dusk
+	Ink and was retired for the same reason.
+</Rule>
+
+## Semantic layer
+
+The shadcn token set, declared on `:root` and re-exported through `@theme inline` so
+utilities like `bg-primary` resolve. Every surviving token maps to a ramp colour.
+
+| CSS var | Resolves to | Read by |
+| --- | --- | --- |
+| <Dot token="first-light" />`--background` | `--color-first-light` | `button.tsx`, base layer (`body`) |
+| <Dot token="dusk-ink" />`--foreground` | `--color-dusk-ink` | `button.tsx`, base layer (`body`) |
+| <Dot token="dusk-earth" />`--primary` | `--color-dusk-earth` | `button.tsx` |
+| <Dot token="first-light" />`--primary-foreground` | `--color-first-light` | `button.tsx` |
+| <Dot token="pale-dune" />`--secondary` | `--color-pale-dune` | `button.tsx` |
+| <Dot token="dusk-earth" />`--secondary-foreground` | `--color-dusk-earth` | `button.tsx` |
+| <Dot token="sand-haze" />`--muted` | `--color-sand-haze` | `button.tsx` |
+| <Dot token="warning-ember" />`--destructive` | `--color-warning-ember` | `button.tsx` |
+| <Dot token="sand-line" />`--border` | `--color-sand-line` | `button.tsx`, base layer (default border on every element) |
+| <Dot token="sand-line" />`--input` | `--color-sand-line` | nothing today; kept for the next copy-in |
+| <Dot token="horizon-blaze" />`--ring` | `--color-horizon-blaze` | `button.tsx`, base layer (default outline) |
+
+<Note>
+	<p>
+		<strong>This layer renders nowhere but here.</strong> `src/components/ui/button.tsx` is
+		its only reader, and nothing imports that button, so the semantic tokens are the base
+		for future UI rather than live chrome. The base-layer rules are the exception: they
+		make `--background`, `--foreground`, and `--border` real on every page.
+	</p>
+	<p>
+		<strong>The base layer's default outline is off-system.</strong> The shadcn preset's
+		`* &#123; @apply outline-ring/50 &#125;` is still there, and blaze at `/50` measures
+		2.63:1 on Dusk Ink, under the 3:1 indicator floor. Every real control supersedes it
+		with `FOCUS_RING` or `FOCUS_OUTLINE`, so anything actually falling back to it is a bug.
+	</p>
+	<p>
+		<strong>The gray layer is gone.</strong> Twenty tokens from the shadcn preset (card,
+		popover, accent, muted-foreground, five charts, eight sidebar tokens) were chroma-0
+		grays with no consumers. Deleted. When a future copy-in needs one, re-add it mapped to
+		a ramp colour, never a gray.
+	</p>
+	<p>
+		<strong>Dark mode is neutered by construction.</strong> The `@custom-variant dark` line
+		scopes `dark:` to a `.dark` class nothing ever applies, so dark-mode classes arriving
+		with future shadcn copy-ins are inert instead of activating on OS preference.
+	</p>
+</Note>
+
+## Radius scale
+
+Not a colour, but it lives in the same `@theme inline` block and every card and control
+derives from it.
+
+| Token | Expression | Computed | Per DESIGN.md |
+| --- | --- | --- | --- |
+| `--radius` | `0.625rem` | 10px | base |
+| `--radius-sm` | `calc(var(--radius) * 0.6)` | 6px | `rounded.sm`, links |
+| `--radius-md` | `calc(var(--radius) * 0.8)` | 8px | `rounded.md`, inputs |
+| `--radius-lg` | `var(--radius)` | 10px | `rounded.lg`, buttons |
+| `--radius-xl` | `calc(var(--radius) * 1.4)` | 14px | `rounded.xl`, cards, prose media |
+| `--radius-2xl` | `calc(var(--radius) * 1.8)` | 18px | |
+| `--radius-3xl` | `calc(var(--radius) * 2.2)` | 22px | |
+| `--radius-4xl` | `calc(var(--radius) * 2.6)` | 26px | |
+
+## Shadow vocabulary
+
+The Pressed treatment from DESIGN.md's Elevation section, shipped as tokens and utilities.
+Inline shadow values are banned.
+
+| Utility | Value | Used by |
+| --- | --- | --- |
+| `shadow-pressed` | `inset 0 2px 2px rgb(0 0 0 / 0.4), 0 2px 0 rgb(255 255 255 / 0.4)` | Buttons on `:active`, paired with the 1px press-down translate |
+| `shadow-pressed-soft` | `inset 0 2px 2px rgb(0 0 0 / 0.1), 0 2px 0 rgb(255 255 255 / 0.55)` | The contact scene's card at rest, where the full inset would read as damage |
+| `shadow-raised` | `inset 0 2px 2px rgb(255 255 255 / 0.5), 0 2px 8px rgb(0 0 0 / 0.45)` | The video play discs, the one role that must sit proud of the surface |
+
+## The overlay ladder
+
+Four named steps, tokens in `globals.css` and utilities on top of them. Never hand-write a
+z-index on fixed or sticky chrome.
+
+| Token | Utility | Value | Holds |
+| --- | --- | --- | --- |
+| `--z-index-bar` | `z-bar` | 50 | Every site bar: the riding header, the return header, the blog's sticky sky bar |
+| `--z-index-overlay` | `z-overlay` | 60 | Full-viewport sheets and scrims that cover the bar: the mobile menu, the contact dialog's backdrop |
+| `--z-index-dialog` | `z-dialog` | 70 | The modal panel above its scrim. The step names the panel, not the ARIA role: the mobile menu is `role="dialog"` and sits at `overlay` |
+| `--z-index-dev` | `z-dev` | 100 | Development-only chrome (the font lab). Never reaches a visitor |
+
+Page-internal layering (`z-0` to `z-30`, `-z-1`) is local to a section and must stay under
+`bar`. The Motion+ blinds curtain paints at its own library-owned 999999, above the ladder.
+
+## Tints
+
+The palette's second dimension: translucent steps of ramp colours doing the work of muted
+text, hairlines, and scrims. 83 utilities in `src/` carry an opacity modifier across 18
+distinct steps, 41 of them on the ladder below. The shipped values were vetted visually and
+stay as they are; the ladder is the guidance for new code.
+
+| Step | Role | Example |
+| --- | --- | --- |
+| `/10` | Scrim, faint surface lift | `bg-pale-dune/10` |
+| `/30` | Hairline, quiet border | `border-dusk-earth/30` |
+| `/50` | Mid tint | `bg-dusk-ink/50` |
+| `/75` | Secondary text | `text-first-light/75` |
+| `/85` | Primary text as a tint | `text-first-light/85` |
+
+<Note>
+	<p>
+		<strong>Contrast-check every text tint against its real background.</strong> The steps
+		are not interchangeable: `text-pale-dune/85` on Dusk Earth holds AA at 4.88:1, but
+		`/75` drops to 4.21:1 and fails. When rounding toward the ladder would cross 4.5:1,
+		take the step up, not down.
+	</p>
+	<p>
+		<strong>No wholesale renormalization.</strong> A sweep moving the 42 off-ladder call
+		sites onto the ladder would change vetted pixels across the site for no visible
+		benefit. The ladder constrains new code; the existing values are the record of what was
+		tuned by eye.
+	</p>
+</Note>
+
+## Surface themes
+
+A section declares its background with `data-surface`. The return header probes the visual
+stack, finds the declaring element, and renders one ramp step off that surface. The table
+lives in `src/components/bar-themes.ts`. Every new full-bleed section has to declare one,
+and an unknown value falls back to first-light.
+
+| data-surface | Bar | Label text | Hover pill | Tone |
+| --- | --- | --- | --- | --- |
+| <Dot token="first-light" />`first-light` | sand-haze/90 + blur | dusk-earth, 6.4:1 | pale-dune | light |
+| <Dot token="pale-dune" />`pale-dune` | dusk-earth/90 + blur | pale-dune | canyon-brown | dark |
+| <Dot token="dusk-ink" />`dusk-ink` | dusk-earth/90 + blur | pale-dune | canyon-brown | dark |
+| <Dot token="dusk-earth" />`dusk-earth` | dusk-earth/90 + blur | pale-dune | canyon-brown | dark |
+| <Dot token="day-sky" />`day-sky` | dusk-ink/80 + blur | pale-dune | dusk-earth | dark |
+| <Dot token="pale-dune" />`SKY_BAR` | pale-dune, opaque | dusk-ink | amber-mirage | light |
+
+The three middle rows share one `DARK_BAR` object. It is dark on purpose: over bright
+surfaces a light bar measured 1.06:1 against the section and the backdrop blur smeared the
+headline through it. Dusk Earth gives 4.83:1 for the bar and 5.72:1 for its labels. Day Sky
+gets its own dark theme because a warm light bar clashes with the cool surface. SKY_BAR is
+opaque and carries no blur, so the blog's sticky bar does not pay for continuous backdrop
+compositing.
+
+## The code theme
+
+`src/lib/code-theme.ts` builds a Shiki theme out of ramp tokens, so syntax highlighting on
+the reading page stays inside the system and every scope clears AA on the Dusk Ink surface.
+`colorReplacements` swaps the hexes back out for `var(--color-*)` after highlighting.
+
+| Scope | Token | On Dusk Ink |
+| --- | --- | --- |
+| Surface and default text | <Dot token="dusk-ink" />Dusk Ink / <Dot token="pale-dune" />Pale Dune | 12.09:1 |
+| Variables, properties, object keys | <Dot token="pale-dune" />Pale Dune | 12.09:1 |
+| Comments (italic) | <Dot token="desert-clay" />Desert Clay | 5.08:1 |
+| Punctuation, braces, operators | <Dot token="dune-tan" />Dune Tan | 7.55:1 |
+| Keywords, storage, deleted, invalid | <Dot token="horizon-blaze" />Horizon Blaze | 6.41:1 |
+| Strings, numbers, constants, inserted | <Dot token="noon-sun" />Noon Sun | 10.18:1 |
+| Functions, tags, commands | <Dot token="amber-mirage" />Amber Mirage | 8.82:1 |
+| Types, classes, attribute names | <Dot token="first-light" />First Light | 14.32:1 |
+
+## The reading page's prose ladder
+
+`.blog-prose` in `globals.css` remaps the typography plugin onto the dark-earth ground. It
+is left unlayered so it beats the plugin's layered utilities without `!important`.
+
+| Prose role | Token | Why |
+| --- | --- | --- |
+| Body, headings, bold, quotes, code | <Dot token="pale-dune" />Pale Dune | 6.03:1 on Dusk Earth |
+| Links, ordered-list counters, the h2 period, the rule's dot | <Dot token="noon-sun" />Noon Sun | Counters read as text, so they take the 4.5:1 floor and hold 5.08:1 |
+| Bullets, quote borders, the code header strip | <Dot token="dune-tan" />Dune Tan | Glyphs take the 3:1 floor and hold 3.77:1 |
+| Code block background, inline code chips | <Dot token="dusk-ink" />Dusk Ink | The site's darkest ground, one step below the page |
+
+Hairlines and scrims here (Pale Dune at 15, 25, and 30 percent) sit off the tint ladder on
+purpose, reviewed and kept as non-text decoration.
+
+## Contrast
+
+WCAG 2.1 ratios computed from the sRGB projections above. AA needs 4.5:1 for body text and
+3:1 for large text or UI strokes. Cells are painted in the pairing they describe, so an
+unreadable number is the finding.
+
+<ContrastMatrix />
+
+## Gaps and exceptions
+
+Vetted deviations, kept on purpose, so nobody rediscovers them as bugs.
+
+| Item | Where | Why it stands |
+| --- | --- | --- |
+| `text-white` on the vista CTA | `landing/landfall-vista/landfall-vista.tsx` | True white on Canyon Brown, chosen visually over First Light. |
+| `bg-white/[0.03]` media frame | `landing/project-showcase/project-showcase.tsx` | A 3% white lift over dark ground; no ramp token exists at that role. |
+| The reading page's decorative tints | `.blog-prose`, the YouTube card | Hairlines and scrims at 15 to 35 percent, off the ladder, reviewed as non-text decoration. |
+| The 404 black hole's core | `not-found/not-found-scene/not-found-scene.tsx` | A near-black `#06070c` below the ramp's darkest step, because a Dusk Ink core would vanish into the scene's Dusk Ink sky. The ramp supplies the accretion ring. |
+| Error text on dark ground | `contact-form/contact-form.tsx` | Warning Ember reaches 1.54:1 on Dusk Earth, so the dark tone renders errors in Noon Sun. |
+| 42 off-ladder tint steps | across `src/` | Vetted by eye, not to be renormalized wholesale. |
+
+## Keeping this page honest
+
+Swatch values, hexes, and every contrast number are computed from `src/lib/ramp.ts` at
+render, and `design-tokens.test.ts` holds that file, the `@theme` block, and DESIGN.md's
+front matter in verbatim sync, both directions. Adding a token to `globals.css` without
+describing it here fails the suite; describing one that no longer exists fails it too.
+
+The prose is hand-maintained and can still drift. Reference counts used to live on the
+swatches and were the first thing to go stale, so each token now names where it is used
+instead.
+
+sRGB hex is projected from OKLCH through Oklab and gamma-encoded, then clamped to gamut.
+Warning Ember and Deep Sea fall outside sRGB, so their hex is a clipped approximation and a
+P3 display renders them more saturated than the swatch here.

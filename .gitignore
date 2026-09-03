@@ -1,69 +1,85 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Dependencies
+node_modules/
+.pnp/
+.pnp.*
+.venv/
+venv/
+__pycache__/
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
+# Build output
+dist/
+build/
+out/
+.next/
+.astro/
+.svelte-kit/
+.output/
+*.tsbuildinfo
+next-env.d.ts
 
-# testing
-/coverage
+# Vercel
+.vercel
 
-# next.js
-/.next/
-/out/
+# fumadocs-mdx generated output — regenerated on next dev/build
+.source
 
-# production
-/build
+# impeccable local state (assets/ and design.json are committed)
+.impeccable/hook.cache.json
+.impeccable/config.local.json
+.impeccable/live/
 
-# misc
+# Caches
+.cache/
+.turbo/
+.parcel-cache/
+.eslintcache
+
+# Secrets and local env
+.env
+.env.*
+!.env.example
+
+# Editor and OS
 .DS_Store
-*.pem
+Thumbs.db
+*.swp
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
 
-# debug
+# Logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
-# local env files
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+# Test/coverage output
+coverage/
+.nyc_output/
 
-# vercel
-.vercel
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+*storybook.log
+storybook-static
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
+# Video source material: only the encoded scene_home.webm and scene_home.mov ship
+public/input.mov
+public/frames/
 
-# testing
-/coverage
+# Untracked folders
+/tmp
+# Licensed faces: tracked only as src/fonts/fonts.tar.enc, decrypted by
+# scripts/fonts.mjs before dev and build. In the clear they would be the
+# redistribution both foundry EULAs forbid.
+src/fonts/*.woff2
+src/fonts/*.otf
 
-# next.js
-/.next/
-/out/
+# ship-it worktrees live under .claude but must never be committed
+.claude/worktrees/
 
-# production
-/build
+# Trial faces for the dev font lab stay local: demo licenses do not cover
+# redistribution, and production never loads them.
+src/fonts/try/
 
-# misc
-.DS_Store
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# local env files
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-.vercel
-.env*.local
-
-.playwright-mcp
+# Panorama masters: local only, regenerate runtime sets with scripts/scale-panorama-set.mjs
+assets/panorama-masters/

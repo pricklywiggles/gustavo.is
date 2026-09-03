@@ -1,48 +1,73 @@
-import { NextRequest, NextResponse } from 'next/server';
-import * as postmark from 'postmark';
+import { checkBotId } from "botid/server";
+import { NextResponse } from "next/server";
+import { Resend } from "resend";
+import { contactSchema } from "@/lib/contact-schema";
 
-type ContactData = {
-  name: string;
-  email: string;
-  message: string;
-};
+// Recipient and sender come from env only: a body-chosen recipient makes this an open relay,
+// and no address belongs in a public repo.
+const REQUIRED_ENV = [
+	"RESEND_API_KEY",
+	"CONTACT_EMAIL_TO",
+	"RESEND_FROM",
+] as const;
 
-const isProduction = process.env.NODE_ENV === 'production';
+export async function POST(request: Request) {
+	const body = await request.json().catch(() => null);
+	if (!body) {
+		return NextResponse.json(
+			{ error: "Invalid request body" },
+			{ status: 400 },
+		);
+	}
 
-let client: postmark.ServerClient;
-if (isProduction)
-  client = new postmark.ServerClient(process.env.POSTMARK_API_TOKEN || '');
+	const parsed = contactSchema.safeParse(body);
+	if (!parsed.success) {
+		return NextResponse.json(
+			{ error: "Invalid submission", issues: parsed.error.issues },
+			{ status: 400 },
+		);
+	}
 
-export async function POST(req: NextRequest) {
-  if (isProduction) {
-    const data = req.json() as unknown as ContactData;
-    const { name, email, message } = data;
+	// Honeypot: fake success so a bot gets no signal it was caught.
+	if (parsed.data.website) {
+		return NextResponse.json({ ok: true });
+	}
 
-    if (!isProduction) {
-      return NextResponse.json({ message: 'Sent' }, { status: 200 });
-    }
+	// checkBotId() needs Vercel infra: fail open locally rather than break the endpoint.
+	try {
+		const verdict = await checkBotId();
+		if (verdict.isBot) {
+			return NextResponse.json({ error: "Request blocked" }, { status: 403 });
+		}
+	} catch {}
 
-    if (!isValidEmail(email)) {
-      return NextResponse.json({ message: 'Invalid Email' }, { status: 400 });
-    } else {
-      try {
-        await client.sendEmail({
-          From: process.env.POSTMARK_SENDER || '',
-          To: process.env.POSTMARK_RECIPIENT,
-          Subject: 'Gustavo.is CONTACT FORM',
-          TextBody: `${name} (${email}): ${message}`,
-          MessageStream: 'outbound'
-        });
+	const missing = REQUIRED_ENV.filter((key) => !process.env[key]);
+	if (missing.length > 0) {
+		return NextResponse.json(
+			{
+				error: `Email delivery is not configured (${missing.join(", ")} missing)`,
+			},
+			{ status: 500 },
+		);
+	}
 
-        return NextResponse.json({ message: 'SUCCESS' }, { status: 200 });
-      } catch (error) {
-        return NextResponse.json({ message: error }, { status: 400 });
-      }
-    }
-  } else return NextResponse.json({ message: 'SUCCESS' }, { status: 200 });
+	const resend = new Resend(process.env.RESEND_API_KEY);
+	const { name, email, message } = parsed.data;
+
+	const { error } = await resend.emails.send({
+		from: process.env.RESEND_FROM as string,
+		to: [process.env.CONTACT_EMAIL_TO as string],
+		replyTo: email,
+		subject: "New contact form submission",
+		text: `From: ${name} <${email}>\n\n${message}`,
+	});
+
+	if (error) {
+		return NextResponse.json(
+			{ error: "Failed to send message" },
+			{ status: 502 },
+		);
+	}
+
+	return NextResponse.json({ ok: true });
 }
-
-const isValidEmail = (email: string) =>
-  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))[ ]*$/.test(
-    email
-  );
