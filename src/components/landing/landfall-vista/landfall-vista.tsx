@@ -272,7 +272,7 @@ export function LandfallVista() {
 							}}
 						/>
 						<div
-							className="absolute top-1/2 left-1/2 size-[150vmax] motion-safe:animate-[shimmer-spin_8.1s_linear_infinite_reverse]"
+							className="absolute top-1/2 left-1/2 size-[150vmax] motion-safe:animate-[shimmer-spin_5.1s_linear_infinite_reverse]"
 							style={{
 								transform: "translate(-50%, -50%)",
 								animationPlayState: "paused",
