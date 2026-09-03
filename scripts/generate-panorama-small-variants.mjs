@@ -1,10 +1,3 @@
-/**
- * Emits quarter- and half-width webp variants (`<base>.w<width>.webp`) for blog panorama
- * layers wider than MIN_NATIVE; never upscales, skips up-to-date variants. Run after
- * changing any asset in public/los-angeles-panorama-small:
- *   node scripts/generate-panorama-small-variants.mjs
- * then update `srcWidths` in blog-panorama-data.ts if the printed table changed.
- */
 import { readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { sharp } from "./sharp.mjs";
@@ -34,7 +27,7 @@ for (const file of files) {
 			const src = statSync(path).mtimeMs;
 			if (statSync(out).mtimeMs > src) continue;
 		} catch {
-			// statSync throws when the variant is missing; fall through and generate it.
+			// statSync throws when the variant is missing.
 		}
 		await sharp(path)
 			.resize({ width: w, kernel: "lanczos3" })

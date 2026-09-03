@@ -9,8 +9,7 @@ afterEach(() => {
 describe("ContactScene", () => {
 	it("names the section with an accessible heading", () => {
 		render(<ContactScene />);
-		// The name comes from AnimatedLines' sr-only text, not the
-		// aria-hidden split glyphs.
+		// The name comes from AnimatedLines' sr-only text, not the aria-hidden split glyphs.
 		const heading = screen.getByRole("heading", { name: "Say hello" });
 		expect(heading.tagName).toBe("H1");
 		expect(screen.getByRole("region", { name: "Say hello" })).toBeDefined();

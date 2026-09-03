@@ -11,13 +11,7 @@ const REDUCED_QUERIES = [
 
 type ActGlobal = { IS_REACT_ACT_ENVIRONMENT?: boolean };
 
-/**
- * Server-renders a tree, then hydrates it as a reduced-motion client (FRA-170): a branch
- * on the live hook shows up as a hydration error. It proves the post-hydration flip only;
- * renderToString runs with jsdom's window, so `typeof window` branches and Motion's
- * module-level snapshot see a browser on the "server" pass too (a static test pins the
- * hook rule instead).
- */
+/** Proves the post-hydration reduced flip only (FRA-170): jsdom has a window on the server pass. */
 export async function hydrateReduced(load: () => Promise<ReactElement>) {
 	const actGlobal = globalThis as ActGlobal;
 	const previousActFlag = actGlobal.IS_REACT_ACT_ENVIRONMENT;
@@ -53,8 +47,7 @@ export async function hydrateReduced(load: () => Promise<ReactElement>) {
 		const ui = await load();
 		html = renderToString(ui);
 		container.innerHTML = html;
-		// React serializes muted="" but jsdom never initializes the property from the
-		// parsed attribute, which hydration would then report as a mismatch.
+		// jsdom never initializes muted from the parsed attribute, so hydration reports a mismatch.
 		for (const video of container.querySelectorAll<HTMLVideoElement>(
 			"video[muted]",
 		)) {
@@ -81,10 +74,8 @@ export async function hydrateReduced(load: () => Promise<ReactElement>) {
 	}
 
 	return {
-		/** The server HTML, before hydration. */
 		html,
 		container,
-		/** Hydration mismatches (recoverable errors) and console errors during hydration. */
 		errors,
 		unmount: async () => {
 			await act(async () => root?.unmount());

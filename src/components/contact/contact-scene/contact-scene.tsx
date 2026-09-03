@@ -7,13 +7,12 @@ import { ContactForm } from "@/components/contact-form";
 import { ScrollRevealText } from "@/components/scroll-reveal-text";
 import { EASE_OUT_EXPO, SUN_CREST_SPRING } from "@/lib/motion-tokens";
 
-// The horizon sits low so the card reads against sky, not ground.
+// The horizon sits low so the card reads against sky.
 const HORIZON_PCT = 72;
 const SKY_TOP = 44;
 const GROUND_MID = 84;
 
-// Unconditional module-stable poses: branching `initial` on reduced motion forks the SSR
-// markup into a hydration mismatch; the transition collapses to INSTANT instead.
+// Branching `initial` on reduced motion forks the SSR markup: only the transition varies.
 const SKY_ENTRANCE = { y: "18vh" };
 const GROUND_ENTRANCE = { y: "-10vh" };
 const CARD_ENTRANCE = { opacity: 0, y: 18 };
@@ -25,14 +24,11 @@ const bandTransition = (step: number) => ({
 	ease: EASE_OUT_EXPO,
 });
 
-// 155% of the disc's own height: at scale 1.6 it grows 30% past its center,
-// so a plain 100% offset would already crest the horizon before the spring.
+// At scale 1.6 the disc grows 30% past its center, so 100% would already crest.
 const SUN_ENTRANCE = { y: "155%", scale: 1.6 };
-// Starts while the bands are still separating, so the disc crests as they land.
 const SUN_TRANSITION = { delay: 0.45, ...SUN_CREST_SPRING };
 
-// Sky-layer-relative: below sm the disc rests high, where an own-height offset could
-// never reach the ground; 80% leaves about half the disc peeking over the horizon.
+// Below sm the disc rests high: 80% of the sky layer leaves half of it over the horizon.
 const SUN_RISE_MOBILE = { y: "80%" };
 const SUN_SCALE_ENTRANCE = { scale: 1.6 };
 
@@ -67,8 +63,7 @@ function SunDisc({ pulsing }: { pulsing: boolean }) {
 	);
 }
 
-/** A shareable direct link for emailing Gustavo; elsewhere the header's
- * dialog does this job. */
+/** The shareable /contact page; everywhere else the header dialog does this job. */
 export function ContactScene() {
 	const reducedMotion = useReducedMotion();
 	const [flying, setFlying] = useState(false);

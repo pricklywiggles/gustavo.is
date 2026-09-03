@@ -35,8 +35,7 @@ describe("heroPose", () => {
 });
 
 describe("dockPose", () => {
-	// Measured on the base build at 1440x900: a 48.96px dock font renders a 1.3em
-	// AnimateNumber box whose digits' 1em line boxes sit 0.15em (7.34px) down.
+	// Measured at 1440x900: a 48.96px dock font puts the 1em line box 0.15em (7.34px) down.
 	it("lands the string's line box on the odometer's centered line box", () => {
 		const number = box(1278.5, 32, 113.5, 63.64);
 		const p = dockPose(hero, number, 532.8, 48.96);

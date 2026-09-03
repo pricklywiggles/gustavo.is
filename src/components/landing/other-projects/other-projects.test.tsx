@@ -17,7 +17,6 @@ afterEach(() => {
 	vi.restoreAllMocks();
 });
 
-// A matchMedia whose reduced-motion answer can flip live, notifying its listeners.
 const liveReducedMotion = () => {
 	const original = window.matchMedia;
 	const listeners = new Set<() => void>();
@@ -47,8 +46,6 @@ const liveReducedMotion = () => {
 	};
 };
 
-// The rail tweens live under width queries the setup stub answers false; match them
-// both so each orientation's pair builds. jsdom has no 2d context either way.
 const railScrubs = () => {
 	const original = window.matchMedia;
 	window.matchMedia = ((query: string) => ({
@@ -80,7 +77,6 @@ describe("OtherProjectsSection", () => {
 			getByRole("heading", { level: 2, name: "Other Tools & Projects" }),
 		).toBeTruthy();
 		expect(container.querySelector("canvas")).not.toBeNull();
-		// The visual headline is decorative; the h2 carries the semantics.
 		expect(
 			container
 				.querySelector("[data-warp-word]")
@@ -109,13 +105,11 @@ describe("OtherProjectsSection", () => {
 		const track = container.querySelector("[data-warp-overlay-track]");
 		expect(stage?.nextElementSibling).toBe(track);
 		expect(track?.querySelector("[data-warp-word]")).not.toBeNull();
-		// The canvas stage no longer carries any of the settled pieces.
 		expect(stage?.querySelector("[data-warp-word]")).toBeNull();
 		expect(stage?.querySelector("[data-scroll-hint]")).toBeNull();
 	});
 
-	// FRA-185: the starfield writes inline styles into the overlay, so a live
-	// reduced-motion flip must give both a pristine DOM, not just the canvas.
+	// FRA-185: the starfield writes inline styles into the overlay, so both need a fresh DOM.
 	it("remounts the starfield and its overlay together on a live reduced-motion flip", () => {
 		vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
 		const media = liveReducedMotion();
@@ -156,9 +150,7 @@ describe("OtherProjectsSection", () => {
 		};
 		try {
 			render(<OtherProjectsSection />);
-			// jsdom rects are zero, so the seed trigger measured at mount spans 0 to two
-			// viewports (a refresh now would re-base it on the new scroll); past its end
-			// the trigger reads progress 1 and engages the lock there.
+			// jsdom rects are zero, so the seed trigger spans two viewports and locks past its end.
 			scrollY = window.innerHeight * 3;
 			ScrollTrigger.update();
 			expect(scrollTo).toHaveBeenCalledWith({
@@ -174,11 +166,11 @@ describe("OtherProjectsSection", () => {
 		}
 	});
 
-	// FRA-185: the rail follows the raw scroll on desktop and Android; iOS devices get
-	// the catch-up that hides their sparse scroll reports.
+	// FRA-185: raw scroll everywhere; iOS gets catch-up for its sparse scroll reports.
 	it("scrubs the rail by raw scroll everywhere but iOS", () => {
 		vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
 		const raw = railScrubs();
+		// Both width queries match, so both orientations build their pair: 4 tweens.
 		expect(raw).toHaveLength(4);
 		expect(new Set(raw)).toEqual(new Set([true]));
 		iosState.value = true;
@@ -200,7 +192,6 @@ describe("OtherProjectsSection", () => {
 		expect(scrub?.className).toContain(
 			`motion-reduce:h-[${(PROJECTS.length + 1) * 100}vh]`,
 		);
-		// The span is the box minus one viewport only while the scrub runs its full height.
 		const spans = ScrollTrigger.getAll()
 			.filter((trigger) => trigger.trigger === scrub)
 			.map((trigger) => [trigger.vars.start, trigger.vars.end]);

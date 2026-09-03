@@ -4,8 +4,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { IOS_SCRUB_S } from "@/lib/scroll-scrub";
 import { IntroSection } from "./intro";
 
-// The dialog arrives through next/dynamic; loading its chunk here keeps Vite's transform
-// time (seconds on a loaded machine) out of the open assertion's window.
+// Preloading the dynamic chunk keeps Vite's transform time out of the open assertion's window.
 beforeAll(async () => {
 	await import("@/components/contact-dialog");
 });
@@ -25,7 +24,6 @@ afterEach(() => {
 	vi.restoreAllMocks();
 });
 
-// The setup stub answers every query false, which skips the motion-only GSAP paths.
 const allowMotion = () => {
 	const original = window.matchMedia;
 	window.matchMedia = ((query: string) => ({
@@ -37,8 +35,7 @@ const allowMotion = () => {
 	};
 };
 
-// Exactly one build: the headline's start/end callbacks must keep their identity
-// across the intro's re-renders, or AnimatedLines rebuilds its trigger each time.
+// The headline's callbacks must keep identity across re-renders, or AnimatedLines rebuilds.
 const headlineScrub = async () => {
 	const timeline = vi.spyOn(gsap, "timeline");
 	const { unmount } = render(<IntroSection />);
@@ -59,8 +56,7 @@ const headlineScrub = async () => {
 const DURATION = 5.084;
 const LAST_FRAME = DURATION - 0.05;
 
-// jsdom never loads media: `duration` and `currentTime` are stubbed on the element, and
-// readyState is 0 unless a test raises it.
+// jsdom never loads media, so duration, currentTime and readyState are stubbed here.
 const instrument = (
 	video: HTMLVideoElement,
 	readyState = 0,
@@ -136,8 +132,7 @@ describe("IntroSection", () => {
 		expect(screen.getByText(/pair programming with my dog Kiwi/)).toBeDefined();
 		const video = container.querySelector("video");
 		expect(video?.hasAttribute("controls")).toBe(false);
-		// No <source> list: a file named in the markup gets fetched by whichever engine
-		// claims it at parse time, before the mount effect can choose.
+		// A <source> in the markup gets fetched at parse time, before the mount effect chooses.
 		expect(video?.querySelector("source")).toBeNull();
 	});
 
@@ -170,8 +165,7 @@ describe("IntroSection", () => {
 		}
 	});
 
-	// FRA-185: desktop and Android keep the shadow and the raw scroll; only iOS devices
-	// (Safari and Chrome alike) trade them for a stutter-free reveal.
+	// FRA-185: iOS devices (Safari and Chrome alike) trade the shadow for a stutter-free reveal.
 	it("keeps the scene's drop shadow off iOS devices", () => {
 		const { container, unmount } = render(<IntroSection />);
 		expect(container.querySelector("video")?.style.filter).toContain(

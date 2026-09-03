@@ -1,8 +1,7 @@
 import type { CityChapter } from "@/components/landing/work-history-data";
 import { employmentHistory } from "@/lib/career";
 
-// Over the full CHAPTERS, never the previewed story: career.ts reads "present" from the
-// last chapter's span end, so a ?chapter=0 preview would otherwise mark Microsoft ongoing.
+// Full CHAPTERS, never a ?chapter=N preview: "present" comes from the last chapter's end.
 const LEDGER = employmentHistory();
 
 const LEGEND =
@@ -14,8 +13,6 @@ function yearRange(start: number, end: number | null): string {
 	return `${start} to ${end ?? "present"}`;
 }
 
-/** One city's companies, positions, products and years, shown under the static panorama;
- * hidden under motion, where the HUD tells it one stint at a time. */
 export function CityLedger({ chapter }: { chapter: CityChapter }) {
 	const jobs = LEDGER.filter((job) => job.city === chapter.name);
 	const headingId = `ledger-${chapter.id}`;

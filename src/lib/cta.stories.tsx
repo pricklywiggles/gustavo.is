@@ -2,12 +2,6 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { cta } from "./cta";
 import type { Tone } from "./focus-ring";
 
-/**
- * The CTA recipe is element-agnostic on purpose: the same classes dress
- * <button>, <a>, m.button, and CurtainLink. This gallery shows every color
- * pairing shipped today, on the ground it actually sits on, labeled with
- * its call site.
- */
 const meta = {
 	title: "Buttons/CTA recipe",
 	parameters: { layout: "fullscreen" },

@@ -5,8 +5,7 @@ import { CLOUD_SLOTS, DESCENT_PHASE } from "../landfall-geometry";
 import { SKY_CLOUDS } from "../landfall-vista";
 import { LandfallSection } from "./landfall";
 
-// scrollScrub() owns the raw-scroll-or-iOS choice (scroll-scrub.test.ts); one render
-// here, each motion render of this section costs seconds under a loaded suite.
+// Covered in scroll-scrub.test.ts; a motion render of this section costs seconds.
 const { SCRUB_SENTINEL } = vi.hoisted(() => ({ SCRUB_SENTINEL: 0.123 }));
 vi.mock("@/lib/scroll-scrub", () => ({
 	scrollScrub: () => SCRUB_SENTINEL,
@@ -16,7 +15,6 @@ afterEach(() => {
 	vi.restoreAllMocks();
 });
 
-// The descent's and the vista's scrubs; the setup stub answers false, skipping motion.
 const descentScrubs = () => {
 	const original = window.matchMedia;
 	window.matchMedia = ((query: string) => ({
@@ -41,8 +39,7 @@ const descentScrubs = () => {
 	return scrubs;
 };
 
-// jsdom has no IntersectionObserver, so the vista's warm-up fallback would fire the real
-// chunk import on every render and leak past environment teardown (flaky CI).
+// jsdom has no IntersectionObserver: the warm-up fallback would import the real chunk and leak.
 vi.mock("@/components/lazy-contact-dialog", async (importOriginal) => {
 	const actual =
 		await importOriginal<typeof import("@/components/lazy-contact-dialog")>();
@@ -59,15 +56,13 @@ describe("LandfallSection", () => {
 	});
 
 	it("sizes the descent scrub from the phase map", () => {
-		// The motion-safe height class is a literal (Tailwind scans source); this pins
-		// its arithmetic so a phase change tells you which class to update.
+		// The height class is a literal (Tailwind scans source); this pins its arithmetic.
 		expect((DESCENT_PHASE.total + 1) * 100).toBe(1150);
 		const { container } = render(<LandfallSection />);
 		expect(container.querySelector("[data-descent]")?.className).toContain(
 			"motion-safe:h-[1150vh]",
 		);
-		// The overlap contract: fade + hold cover the 200vh pull-up over the
-		// projects section's tail (stage release + showcase exit windows).
+		// fade + hold cover the 200vh pull-up over the projects section's tail.
 		expect(DESCENT_PHASE.len.fade + DESCENT_PHASE.len.hold).toBe(2);
 		expect(container.querySelector("section")?.className).toContain(
 			"-mt-[200vh]",
@@ -76,15 +71,13 @@ describe("LandfallSection", () => {
 
 	it("keeps the descent stage decorative and the CTA semantic", () => {
 		const { container, getByRole } = render(<LandfallSection />);
-		// The whole stage is aria-hidden scenery.
 		const stage = container.querySelector("[data-descent-stage]");
 		expect(stage).not.toBeNull();
 		expect(stage?.querySelectorAll("[data-star-layer]")).toHaveLength(3);
 		expect(stage?.querySelectorAll("[data-cloud-slot]")).toHaveLength(
 			CLOUD_SLOTS.length,
 		);
-		// The vista carries the CTA; the footer landmark lives in SiteFooter,
-		// outside <main> (nesting it here would demote it to role generic).
+		// SiteFooter owns the footer landmark; nested in <main> it demotes to role generic.
 		expect(
 			getByRole("heading", {
 				level: 2,
@@ -95,8 +88,7 @@ describe("LandfallSection", () => {
 	});
 
 	it("keeps the cloud deck inside the clouds window with rising speeds", () => {
-		// All slots share a fixed end at the settle boundary, so later starts must read
-		// nearer (faster); the nominal check here uses a 2:1 viewport aspect.
+		// Slots share a fixed end at settle, so later starts read faster; *2 is a 2:1 viewport.
 		const window = DESCENT_PHASE.at.settle - DESCENT_PHASE.at.clouds;
 		let lastAt = -1;
 		let lastSpeed = 0;
@@ -119,20 +111,16 @@ describe("LandfallSection", () => {
 		expect(still?.hasAttribute("data-descent-still")).toBe(true);
 		expect(still?.className).toContain("hidden");
 		expect(still?.className).toContain("motion-reduce:block");
-		// Inside the descent so its scrub anchor spans both reduced screens; a sibling
-		// anchor sorted after the tucked vista and hijacked flips. Reduced motion lets
-		// the descent size to its content, with the stage in flow.
+		// A sibling scrub anchor sorted after the tucked vista and hijacked flips.
 		expect(still?.getAttribute("data-motion-anchor")).toBeNull();
 		expect(descent?.className).toContain("h-auto");
 		expect(descent?.className).toContain("motion-safe:h-[1150vh]");
-		// relative, never static: static drops the stage as containing block and the
-		// station, earth and clouds resolve against the two-screen descent, unclipped.
+		// static drops the stage as containing block: station, earth and clouds go unclipped.
 		expect(stage?.className).toContain("motion-reduce:relative");
 		expect(descent?.nextElementSibling?.getAttribute("data-surface")).toBe(
 			"day-sky",
 		);
-		// None of the scrub's targets may live inside it: the timeline's selectors span
-		// the whole section.
+		// The timeline's selectors span the whole section, so no scrub target may live inside.
 		expect(
 			still?.querySelector(
 				"[data-star-layer], [data-descent-station], [data-descent-earth], [data-descent-veil-entry], [data-descent-veil-day], [data-cloud-slot], [data-motion-anchor]",
@@ -146,8 +134,7 @@ describe("LandfallSection", () => {
 	});
 
 	it("keeps every vista cloud mobileBox gated to max-sm", () => {
-		// A bare utility in mobileBox would silently reposition a DESKTOP
-		// cloud: the whole point of the field is below-sm-only tuning.
+		// A bare utility in mobileBox would silently reposition the desktop cloud too.
 		for (const cloud of SKY_CLOUDS) {
 			for (const token of cloud.mobileBox.split(/\s+/).filter(Boolean)) {
 				expect(token, `${cloud.src}: ${token}`).toMatch(/^max-sm:/);

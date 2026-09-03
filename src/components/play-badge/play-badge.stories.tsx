@@ -1,11 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { PlayBadge } from "@/components/play-badge";
 
-/**
- * The media-facade play affordance. Decorative by contract: the host link
- * or button carries the accessible name and the `group` class the swell
- * listens to, so each example here is a labeled host button.
- */
+/** Decorative by contract: the host carries the accessible name and the `group` class. */
 const meta = {
 	title: "Components/Play badge",
 	component: PlayBadge,

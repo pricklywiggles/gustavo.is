@@ -2,9 +2,8 @@ import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 
-// Motion's useReducedMotion is true on a reduced client's first render while the server
-// rendered false (README, reduced motion). The hydration helper cannot catch a swap back
-// (jsdom's window is present on its "server" pass), so the rule is pinned here.
+// useReducedMotion is true on a reduced client's first render (landing README, reduced motion).
+// A hydration test cannot catch it: jsdom's window is present on the "server" pass too.
 const GUARDED = ["src/components/landing", "src/components/contact-dialog"];
 const SNAPSHOT_IMPORT =
 	/import\s*{[^}]*\buseReducedMotion\b[^}]*}\s*from\s*"motion\/react"/;

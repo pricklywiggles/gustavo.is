@@ -3,10 +3,7 @@ const SIZES = {
 	lg: { disc: "size-20", glyph: "size-8" },
 } as const;
 
-/**
- * The shared media-facade play affordance. Decorative; the host link or button provides
- * the accessible name.
- */
+/** Decorative: the host link or button provides the accessible name. */
 export function PlayBadge({ size = "md" }: { size?: keyof typeof SIZES }) {
 	const s = SIZES[size];
 	return (

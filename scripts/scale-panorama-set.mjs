@@ -1,10 +1,4 @@
-/**
- * Writes a panorama layer set scaled uniformly from its masters, so every sprite keeps
- * its filename, crop extents, and aspect ratio and the layer percentages in
- * work-history-data.ts stay valid. Never upscales; skips up-to-date outputs.
- *   node scripts/scale-panorama-set.mjs <masters-dir> <out-dir> <scale>
- *   node scripts/scale-panorama-set.mjs assets/panorama-masters/los-angeles public/los-angeles-panorama 1/3
- */
+// Uniform scale from the masters keeps work-history-data.ts's layer percentages valid.
 import { mkdirSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { sharp } from "./sharp.mjs";
@@ -22,8 +16,7 @@ const scale = scaleArg.includes("/")
 if (!(scale > 0 && scale <= 1))
 	throw new Error(`scale must be in (0, 1]: ${scaleArg}`);
 
-// Integer pixels cannot keep the master's aspect ratio exactly; the layer box is CSS width
-// times the natural ratio, so pick the rounding pair whose ratio drifts least.
+// The layer box is CSS width times the natural ratio, so pick the rounding pair drifting least.
 function bestDimensions(width, height, scale) {
 	const ratio = height / width;
 	let best;
@@ -50,7 +43,7 @@ for (const file of files) {
 	try {
 		if (statSync(out).mtimeMs > statSync(src).mtimeMs) status = "up to date";
 	} catch {
-		// statSync throws when the output is missing; fall through and write it.
+		// statSync throws when the output is missing.
 	}
 	if (status === "written") {
 		await sharp(src)

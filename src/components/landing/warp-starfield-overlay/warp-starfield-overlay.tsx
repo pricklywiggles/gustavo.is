@@ -1,34 +1,20 @@
 import type { Ref } from "react";
 
 type WarpStarfieldOverlayProps = {
-	/** The sticky screen the starfield lands its words, astronaut, and cue in. */
 	ref?: Ref<HTMLDivElement>;
-	/**
-	 * Headline that drops out of warp, as lines of word units; flattened order is the
-	 * stagger order. Rendered as real DOM text each word reveals on landing.
-	 */
+	/** Lines of words; the flattened order is the flight stagger order. */
 	headline: string[][];
-	/** Pops out of the lower-left once the headline settles; leans in the words' empty left. */
 	astronautSrc?: string;
 };
 
-/**
- * The settled warp scene (headline, astronaut, scroll cue) in document flow: an absolute
- * track from the theater's lock, 200vh into the projects section, holding a sticky screen
- * for 25vh and then releasing it at page speed (FRA-185). That is the piecewise path the
- * starfield used to translate every frame, now drawn by the compositor: `200vh - x`
- * before the lock, `0` through it, `225vh - x` on the way out, with the showcase arriving
- * at 325vh. Reduced motion has no lock or spacer, so the track sits at the section's top
- * with zero stick. `WarpStarfield` reveals the pieces through the `data-*` hooks.
- */
+/** The compositor draws the track the starfield once translated per frame (FRA-185). */
 export function WarpStarfieldOverlay({
 	ref,
 	headline,
 	astronautSrc,
 }: WarpStarfieldOverlayProps) {
 	return (
-		// Decorative: the section supplies the accessible heading; split spans would read
-		// as one mashed word.
+		// aria-hidden: the section owns the heading; split spans read as one mashed word.
 		<div
 			aria-hidden="true"
 			data-warp-overlay-track
@@ -36,8 +22,7 @@ export function WarpStarfieldOverlay({
 		>
 			<div ref={ref} className="sticky top-0 z-10 h-screen overflow-hidden">
 				{astronautSrc && (
-					// Width-relative and bottom-anchored so the astronaut-to-words proportion holds
-					// at any viewport; the negative left tucks his backpack edge offscreen.
+					// Sized in vw against the 20vw words; the negative left tucks the backpack offscreen.
 					<div className="absolute bottom-[10vw] left-[-1.5vw] w-[22.5vw] rotate-[16deg]">
 						{/* The drift lives on its own layer so it never fights the pop transition below. */}
 						<div className="motion-safe:animate-[float-bob_2.8s_ease-in-out_infinite_alternate]">

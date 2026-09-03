@@ -3,10 +3,6 @@
 import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 
-/**
- * Deliberately a bare wireframe (the designed page comes later) so a render failure
- * degrades gracefully; boundary-caught errors are not auto-reported, so capture here.
- */
 export default function ErrorPage({
 	error,
 	reset,
@@ -14,6 +10,7 @@ export default function ErrorPage({
 	error: Error & { digest?: string };
 	reset: () => void;
 }) {
+	// Sentry does not auto-report errors a boundary caught.
 	useEffect(() => {
 		Sentry.captureException(error);
 	}, [error]);

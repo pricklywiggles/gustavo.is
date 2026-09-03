@@ -1,14 +1,9 @@
 import * as Sentry from "@sentry/nextjs";
 
-/**
- * Errors only, nothing personal: no tracing, replay, or logs, and sendDefaultPii stays
- * false so no IP, cookies, or headers attach (v10 gates IP inference behind it). Sentry
- * sets no cookies, so no consent obligations; without a DSN the SDK stays disabled.
- */
+/** sendDefaultPii false also gates v10 IP inference; no cookies either, so no consent duty. */
 const options = {
 	dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-	// Sentry defaults events to "production"; VERCEL_ENV separates production from
-	// preview (both build with NODE_ENV=production), NODE_ENV covers local dev.
+	// Previews build with NODE_ENV=production, so only VERCEL_ENV tells them apart.
 	environment: process.env.VERCEL_ENV ?? process.env.NODE_ENV,
 	sendDefaultPii: false,
 	tracesSampleRate: 0,
@@ -24,5 +19,4 @@ export function register() {
 	}
 }
 
-/** Unhandled SSR and route-handler errors (the real 500s) land in Sentry. */
 export const onRequestError = Sentry.captureRequestError;

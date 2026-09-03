@@ -1,13 +1,7 @@
-// Filled brand marks: lucide ships only deprecated outline brand icons, and the header
-// design calls for the real filled glyphs.
-// Path data is svgo-optimized (`svgo -p 2 --multipass`): these inline in every bar
-// instance, and design-tool exports carry 6-8 invisible decimals. Re-run after
-// re-exporting art.
+// Hand-rolled because lucide's brand icons are deprecated outlines. Path data is
+// svgo-optimized (`svgo -p 2 --multipass`); these inline in every bar, so re-run after re-export.
 
-/**
- * Inlined rather than loaded from public/ so `currentColor` picks up the header's
- * surface theme; the viewBox carries the source file's group-transform offset.
- */
+/** Inlined so `currentColor` takes the header theme; the viewBox holds the group offset. */
 export function GLogo({ className }: { className?: string }) {
 	return (
 		<svg
@@ -21,10 +15,7 @@ export function GLogo({ className }: { className?: string }) {
 	);
 }
 
-/**
- * Coral is hard-coded rather than taken from the One Ramp: it is Ponder's own
- * brand color, the same exception `public/logos/` marks already get.
- */
+/** Coral is Ponder's brand color, off the One Ramp like the marks in `public/logos/`. */
 export function PonderLogo({ className }: { className?: string }) {
 	return (
 		<svg

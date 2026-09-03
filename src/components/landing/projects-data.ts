@@ -1,30 +1,33 @@
 export type ProjectLink = {
 	label: string;
-	/**
-	 * Root-relative navigates in the same tab and animates; absolute opens a new
-	 * tab; null renders the action as a disabled button until wired.
-	 */
+	/** Root-relative navigates in-tab; absolute opens a new tab; null disables the button. */
 	url: string | null;
 };
 
 export type Project = {
 	name: string;
 	description: string;
-	/** Short tag shown beside the heading; omitted, no chip renders. */
 	tech?: string;
 	/** Action buttons: the first renders solid, the rest outlined. */
 	links: ProjectLink[];
 	/** Screenshot under public/projects/. null shows the standby treatment. */
 	image: string | null;
-	/** Width/height of the asset when it isn't 16:10; the frame adopts it so
-	 * the image fills edge-to-edge instead of letterboxing. */
+	/** Width/height when the asset isn't 16:10; the frame adopts it and fills edge to edge. */
 	imageRatio?: number;
-	/** Fill behind a letterboxed asset, sampled from the asset's own ground
-	 * so the frame reads as one panel; defaults to dusk-ink. */
+	/** Fill behind a letterboxed asset, sampled from its own ground; defaults to dusk-ink. */
 	imageBg?: string;
 };
 
 export const PROJECTS: Project[] = [
+	{
+		name: "Sanum",
+		description:
+			"A macOS desktop application for viewing Apple Health and FHIR clinical data on your computer, with AI that scans clinical lab-result PDFs.",
+		tech: "TypeScript / Rust",
+		links: [{ label: "Visit project", url: "https://sanum.app" }],
+		image: "/projects/sanum.webp",
+		imageBg: "#0e121a",
+	},
 	{
 		name: "Hone",
 		description:
@@ -35,15 +38,6 @@ export const PROJECTS: Project[] = [
 		],
 		image: "/projects/hone-demo.gif",
 		imageRatio: 1200 / 600,
-	},
-	{
-		name: "Sanum",
-		description:
-			"A macOS desktop application for viewing Apple Health and FHIR clinical data on your computer, with AI that scans clinical lab-result PDFs.",
-		tech: "TypeScript / Rust",
-		links: [{ label: "Visit project", url: "https://sanum.app" }],
-		image: "/projects/sanum.webp",
-		imageBg: "#0e121a",
 	},
 	{
 		name: "Niamos",

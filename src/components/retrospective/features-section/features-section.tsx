@@ -11,16 +11,11 @@ import { SectionHeading } from "../section-heading";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-/**
- * Motion-safe visitors get a pinned section where scroll walks through the
- * tabs; the trigger pushes state only when the quantized index changes.
- * Reduced motion (and jsdom) falls back to plain click tabs, unpinned.
- */
+/** Scroll walks the tabs in a pinned section; reduced motion and jsdom get plain click tabs. */
 export function FeaturesSection({ features }: { features: FeatureCard[] }) {
 	const section = useRef<HTMLElement>(null);
 	const trigger = useRef<ScrollTrigger | null>(null);
-	// The view transition slides by travel direction; exit callbacks read this
-	// ref at animation time, after state has already moved on.
+	// A ref, not state: exit callbacks read the direction after state has moved on.
 	const direction = useRef<"next" | "prev">("next");
 	const [active, setActive] = useState(features[0]?.id ?? "");
 

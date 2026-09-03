@@ -1,7 +1,6 @@
 import { markdownPages, pageMarkdown } from "@/lib/llms-content";
 
 export const dynamic = "force-static";
-// Paths outside generateStaticParams 404 in routing, never reaching the handler.
 export const dynamicParams = false;
 
 export function generateStaticParams() {
@@ -18,7 +17,7 @@ export async function GET(
 	return new Response(markdown, {
 		headers: {
 			"content-type": "text/markdown; charset=utf-8",
-			// The HTML page is the canonical copy; keep the mirror out of search results.
+			// The HTML page is the canonical copy.
 			"x-robots-tag": "noindex",
 		},
 	});

@@ -20,13 +20,8 @@ const SLIDE_SPRING = {
 	bounce: 0.15,
 } as const;
 
-/**
- * The Motion+ filmstrip swap. popLayout keeps the leaving slide mounted mid-flight,
- * which is why the stage is one clipped window instead of Base UI panels (those unmount
- * instantly); only one player exists at rest, so switching still tears the old one down.
- */
-// Exiting slides are purely visual: while they ride out they must be
-// unreachable to focus and assistive tech.
+/** popLayout keeps the leaving slide mounted: hence one clipped window, not Base UI panels. */
+// A slide riding out must be unreachable to focus and assistive tech.
 function SlideGuard({ children }: { children: ReactNode }) {
 	const isPresent = useIsPresent();
 	return (

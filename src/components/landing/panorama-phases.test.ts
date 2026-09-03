@@ -11,8 +11,7 @@ import { CHAPTERS } from "./work-history-data";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// 390x844 portrait: stage 1266 wide. Centered puts its left edge at -438;
-// Seattle's 0.3 focus shifts it to -253 (clamped calc), SF's 0.38 to -286.
+// 390x844 portrait, stage 1266: centered left edge -438, Seattle's 0.3 focus -253, SF's 0.38 -286.
 const VESSEL = { fromSide: "right", leftPct: 26, widthPct: 31.5 } as const;
 
 const enterXpx = (pct: number, geo: { stageWidth: number }) => {
@@ -70,8 +69,7 @@ describe("buildYearCues", () => {
 
 		const cued = sf.panorama.layers.filter((l) => l.yearCue !== undefined);
 		expect(cued.map((l) => l.yearCue)).toEqual([2015]);
-		// Two tweens per cued layer (rise + fade), both parked at the cue:
-		// 2015 sits (2015 - 2005) * 0.5vh = 5vh into the scrub.
+		// Rise and fade both park at the cue: scrubAt 10 + (2015 - 2005) * 0.5 = 15.
 		const starts = tl.getChildren().map((t) => t.startTime());
 		expect(starts).toEqual([15, 15]);
 		tl.kill();
@@ -157,15 +155,12 @@ describe("attachVessels", () => {
 			controls.resume();
 			expect(sail.paused()).toBe(false);
 			expect(sail.progress()).toBe(progress);
-			// One-frame skip past the chapter: cue onEnter, then the window's leave. The
-			// cue's 0.6s reveal must not keep fading the frozen boat back in: the window
-			// re-hides it and leaves nothing active on the layer.
+			// One-frame skip: the cue's 0.6s reveal must not fade the frozen boat back in.
 			controls.pause();
 			expect(sail.paused()).toBe(true);
 			expect(Number(gsap.getProperty(vesselEl, "opacity"))).toBe(0);
 			expect(gsap.getProperty(vesselEl, "visibility")).toBe("hidden");
 			expect(reveal?.paused()).toBe(true);
-			// Back on stage mid-cast-off: the reveal resumes with the sail.
 			controls.resume();
 			expect(reveal?.paused()).toBe(false);
 			controls.pause();

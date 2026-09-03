@@ -21,7 +21,7 @@ describe("FeatureShowcase", () => {
 		expect(
 			getByRole("button", { name: facade(PONDER.features[1].name) }),
 		).toBeTruthy();
-		// The leaving slide stays mounted while it rides out; wait it out.
+		// The leaving slide stays mounted while it rides out.
 		await waitFor(
 			() =>
 				expect(
@@ -68,7 +68,6 @@ describe("FeatureShowcase", () => {
 			(getByRole("tabpanel") as HTMLElement).getAttribute("aria-labelledby"),
 		).toBe(thirdTab.id);
 
-		// While the old slide rides out it must be unreachable.
 		await waitFor(() => {
 			expect(container.querySelector("[inert]")).toBeTruthy();
 		});

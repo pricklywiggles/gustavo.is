@@ -32,7 +32,7 @@ describe("holePath", () => {
 		expect(d.startsWith(`${FRAME} M `)).toBe(true);
 		expect(d.endsWith(" Z")).toBe(true);
 		const closed = anchors(d);
-		// The last curve lands back on the `M` point, closing the loop.
+		// 8 lobes plus the closing anchor back on `M`.
 		expect(closed).toHaveLength(9);
 		expect(closed[8]).toEqual(closed[0]);
 		const points = closed.slice(0, 8);
@@ -99,7 +99,6 @@ describe("createClipWriter", () => {
 		expect(scheduled).toHaveLength(1);
 		flush();
 		expect(path.setAttribute).toHaveBeenCalledTimes(1);
-		// Unchanged paths cost no write at all.
 		writer.request();
 		flush();
 		expect(path.setAttribute).toHaveBeenCalledTimes(1);

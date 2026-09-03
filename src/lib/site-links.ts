@@ -1,18 +1,14 @@
 import { BlueskyIcon, GitHubIcon, LinkedInIcon } from "@/components/icons";
 
-/** The site's routes and identity links, shared so URLs live in one place. */
 export const HOME_LINK = { href: "/", label: "Home" } as const;
 export const BLOG_LINK = { href: "/blog", label: "Blog" } as const;
 export const CONTACT_LINK = { href: "/contact", label: "Contact" } as const;
 
-// Inner pages lead with a way home; the landing is home, so it only shows
-// Blog. All bar navigation runs behind the curtain transition.
 export const LANDING_TEXT_LINKS = [BLOG_LINK] as const;
 export const INNER_TEXT_LINKS = [HOME_LINK, BLOG_LINK] as const;
 
 export const FOOTER_LINKS = [BLOG_LINK, CONTACT_LINK] as const;
 
-// external lives on the data so consumers never restate target/rel intent.
 export const SOCIAL_LINKS = [
 	{
 		href: "https://www.linkedin.com/in/gustavogallegos",

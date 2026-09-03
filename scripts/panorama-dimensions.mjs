@@ -1,9 +1,4 @@
-/**
- * Writes src/components/landing/panorama-dimensions.ts: the intrinsic pixel size of every
- * panorama layer, keyed by its public path. Layer travel (yPercent, xPercent) is a fraction
- * of the rendered box, so pacing math needs these; the assets are the only source.
- *   node scripts/panorama-dimensions.mjs
- */
+// Pacing math needs intrinsic layer sizes: yPercent travel is a fraction of the rendered box.
 import { readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { sharp } from "./sharp.mjs";

@@ -3,10 +3,7 @@
 import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 
-/**
- * Catches errors from the root layout itself, replacing it entirely: fonts and
- * globals.css are gone, so everything here must be inline and self-contained.
- */
+/** Replaces the root layout: no fonts, no globals.css, so every style here is inline. */
 export default function GlobalError({
 	error,
 	reset,

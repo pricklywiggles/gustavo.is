@@ -2,29 +2,23 @@ import { PANORAMA_DIMENSIONS } from "./panorama-dimensions";
 import { EXIT_SETTLE_VH, PACING_BUDGET } from "./story-phases";
 import type { PanoramaConfig, PanoramaLayer } from "./work-history-data";
 
-/**
- * Panorama layer geometry from config alone (no DOM): stage size, rendered layer boxes,
- * the band-clearance amplifier, the curtain's rise, and each layer's entrance and exit
- * travel. panorama-phases.ts drives tweens from the same math; the speed map audits it.
- */
+/** Layer geometry from config alone, no DOM: the tween builders and the speed map share it. */
 
 export type Viewport = { w: number; h: number };
 
-/** The viewports the pacing budget is audited at (CSS px; a phone's h is its large viewport, 100vh). */
+/** CSS px; the phone's h is the large viewport (100vh), never innerHeight. */
 export const BUDGET_VIEWPORTS: Record<"desktop" | "phone", Viewport> = {
 	desktop: { w: 1440, h: 900 },
 	phone: { w: 390, h: 844 },
 };
 
-/** Tailwind's sm breakpoint: below it the scene applies each layer's `mobile` placement. */
+/** Tailwind's sm breakpoint. */
 const SM_BREAKPOINT_PX = 640;
 
-// The cover-fit stage width: every derived expression in panorama-scene.tsx is generated
-// from these two numbers, so they cannot drift apart.
+// Cover-fit stage width; panorama-scene.tsx generates its expressions from these two numbers.
 export const PANO_W_VW = 100;
 export const PANO_W_VH = 150;
 
-/** Width over height of the stage, for converting width-% into height-%. */
 export function stageAspect(config: PanoramaConfig): number {
 	const [w, h] = config.aspect.split("/").map((n) => Number.parseFloat(n));
 	return w > 0 && h > 0 ? w / h : 1.5;
@@ -44,8 +38,7 @@ export function stageHeightPx(
 	return stageWidthPx(viewport) / stageAspect(config);
 }
 
-// Band target: a viewport fraction floored at enough rows for the stint bar. A 3:2
-// viewport reproduces the authored shift exactly; only shorter/wider ones amplify.
+// Floored at the stint bar's rows; only viewports off 3:2 amplify the authored shift.
 const BAND_VH_FRACTION = 0.125;
 const BAND_MIN_PX = 112;
 
@@ -54,9 +47,8 @@ export function bandTargetPx(vh: number): number {
 }
 
 /**
- * Amplifies the rising parallax so the band clears its target on short/wide viewports.
- * Solve bandTop = (vh - H)/2 + H*(1 + shift) = vh - target for shift; the ratio scales
- * the whole foreground group so relative depths (and the ferry's weld) survive.
+ * Solve bandTop = (vh - H)/2 + H*(1 + shift) = vh - target for shift. The ratio scales the whole
+ * foreground group, so relative depths (and the ferry's weld) survive.
  */
 export function bandClearanceScale(
 	config: PanoramaConfig,
@@ -71,10 +63,7 @@ export function bandClearanceScale(
 	return Math.max(1, needed / authored);
 }
 
-/**
- * The curtain's rise (px, negative up) for horizon-locked cities: the band it opens is
- * clamped so the curtain's top always leaves a sliver of front water under the horizon.
- */
+/** Horizon-locked rise (px, negative up), clamped to keep front water under the horizon. */
 export function curtainRisePx(
 	config: PanoramaConfig,
 	stageHeight: number,
@@ -92,7 +81,6 @@ export function curtainRisePx(
 	return vh - band - (stageTop + stageHeight);
 }
 
-/** A layer's rendered box at a viewport, or null when the asset is not in the manifest. */
 export function layerBoxPx(
 	layer: PanoramaLayer,
 	viewport: Viewport,
@@ -108,7 +96,7 @@ export function layerBoxPx(
 	return { w, h: (w * dims.h) / dims.w };
 }
 
-/** The breath's shift for one layer (px, positive down), amplified where the band needs it. */
+/** The breath's shift for one layer: px, positive down. */
 export function parallaxShiftPx(
 	config: PanoramaConfig,
 	layer: PanoramaLayer,
@@ -124,7 +112,6 @@ export function parallaxShiftPx(
 	return stageHeight * shift * scale;
 }
 
-/** The `from` pose's translation (px, positive right/down) relative to the layer's rest. */
 export function poseDeltaPx(
 	layer: PanoramaLayer,
 	box: { w: number; h: number },
@@ -134,10 +121,7 @@ export function poseDeltaPx(
 	return { dx: (xPercent / 100) * box.w, dy: (yPercent / 100) * box.h };
 }
 
-/**
- * Edge travel of the `from` pose's scale (px): the farthest corner from the transform
- * origin moves |scale - 1| times its distance. Null when the pose has no scale.
- */
+/** The farthest corner from the transform origin moves |scale - 1| times its distance. */
 export function scaleEdgeTravelPx(
 	layer: PanoramaLayer,
 	box: { w: number; h: number },
@@ -158,7 +142,6 @@ export function scaleEdgeTravelPx(
 	return Math.abs(Number(scale) - 1) * reach;
 }
 
-/** Cascade entrance: the pose's translation, in viewport-heights. */
 export function entranceTravelVh(
 	layer: PanoramaLayer,
 	viewport: Viewport,
@@ -169,10 +152,7 @@ export function entranceTravelVh(
 	return Math.hypot(dx, dy) / viewport.h;
 }
 
-/**
- * Scene exit: the layer returns to its pose while its breath shift unwinds to zero in
- * the same tween, so the two signed y deltas add before the magnitude is taken.
- */
+/** Pose retrace and breath unwind ride one tween: the signed y deltas add before the magnitude. */
 export function exitTravelVh(
 	config: PanoramaConfig,
 	layer: PanoramaLayer,
@@ -187,12 +167,11 @@ export function exitTravelVh(
 
 export type LayerClass = keyof typeof PACING_BUDGET;
 
-/** Ambient clouds are distant and blurred; everything else fills the frame. */
 export function layerClass(layer: PanoramaLayer): LayerClass {
 	return layer.ambient ? "small" : "large";
 }
 
-/** Exit order: last in, first out; year-cued and drift layers lead. */
+/** Last in, first out; step-less layers (year-cued, drift) lead. */
 export function exitOrder(
 	config: PanoramaConfig,
 	layer: PanoramaLayer,
@@ -202,11 +181,7 @@ export function exitOrder(
 		: 0;
 }
 
-/**
- * One layer's exit duration in viewport-heights: the settle floor, stretched so the
- * layer never exceeds its class's mean cap at either budget viewport. Fixed at build,
- * never from live DOM: images have no box yet when the timeline builds.
- */
+/** Fixed at build, never from live DOM: images have no box yet when the timeline builds. */
 export function exitDurationVh(
 	config: PanoramaConfig,
 	layer: PanoramaLayer,
@@ -221,7 +196,6 @@ export function exitDurationVh(
 	return duration;
 }
 
-/** Where the last layer's exit ends, relative to the phase start. */
 export function exitWindowVh(config: PanoramaConfig, len: number): number {
 	const spread = Math.max(len - EXIT_SETTLE_VH, 0.01);
 	return Math.max(

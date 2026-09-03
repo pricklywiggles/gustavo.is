@@ -1,12 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { GroundStrata } from "@/components/blog/ground-strata";
 
-/**
- * The hero's ground bands compressed to hairline seams. The reading page uses both
- * orientations: the opening seam is content-width under the title (full bleed read as
- * a wall between title and body), the closing seam is full bleed and flipped so it
- * thickens toward the article it is closing.
- */
 const meta = {
 	title: "Blog/Ground strata",
 	component: GroundStrata,
@@ -16,7 +10,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Both seams as the reading page stacks them, with the article body between. */
 export const InPlace: Story = {
 	render: () => (
 		<div className="min-h-screen bg-dusk-earth">
@@ -40,7 +33,6 @@ export const InPlace: Story = {
 	),
 };
 
-/** The two orientations side by side, enlarged, so the mirror is legible. */
 export const Orientations: Story = {
 	render: () => (
 		<div className="grid min-h-screen grid-cols-2 gap-10 bg-dusk-earth p-12">

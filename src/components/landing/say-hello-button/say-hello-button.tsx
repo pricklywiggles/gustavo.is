@@ -6,8 +6,8 @@ import { useReducedMotionLive } from "@/components/use-reduced-motion-live";
 import { cta } from "@/lib/cta";
 import type { Tone } from "@/lib/focus-ring";
 
-// Passed unconditionally: a conditional variants prop broke React 19 hydration. Reduced
-// motion drops whileHover/whileTap instead, post-hydration (whileTap emits a tabindex).
+// Passed unconditionally: a conditional variants prop broke React 19 hydration.
+// whileTap emits a tabindex, so its gate must flip only after hydration.
 const WAVE_VARIANTS: Variants = {
 	rest: {
 		rotate: 0,
@@ -21,12 +21,7 @@ const WAVE_VARIANTS: Variants = {
 	},
 };
 
-/**
- * The shared "say hello" trigger. Must render inside a LazyMotion tree with
- * domMax features when morphId is set (the dialog morph uses layout
- * projection). `surface` carries the color classes so each section can sit
- * the button on its own ground without forking the component.
- */
+/** morphId requires a LazyMotion domMax tree: the morph uses layout projection. */
 export function SayHelloButton({
 	onClick,
 	onIntent,
@@ -35,11 +30,10 @@ export function SayHelloButton({
 	tone,
 }: {
 	onClick: () => void;
-	/** First sign of intent (hover/focus): hosts prefetch the dialog chunk. */
+	/** Hover or focus; hosts prefetch the dialog chunk. */
 	onIntent?: () => void;
 	/** Shared layout id the contact dialog morphs from; omit for no morph. */
 	morphId?: string;
-	/** Background, text, and hover color classes. */
 	surface?: string;
 	/** The ground the button sits on; picks the focus ring. */
 	tone: Tone;

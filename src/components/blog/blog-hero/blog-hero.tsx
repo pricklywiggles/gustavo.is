@@ -17,39 +17,27 @@ import { EASE_OUT_EXPO } from "@/lib/motion-tokens";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-/**
- * One synchronized move: every layer travels its own delta on the same clock and ease,
- * so intermediate frames are coherent blends of the two authored states.
- */
+/** One clock for every layer: intermediate frames are blends of the two authored states. */
 const TRANSITION = {
 	delay: 0.35,
 	duration: 1.3,
 	ease: EASE_OUT_EXPO,
 };
 
-/**
- * Depth derives from the entrance deltas (depth = 1 - dy/max) so the scroll parallax
- * continues the same multiplane model; the ground plane (depth 0) stays glued to the page.
- */
+/** Depth reuses the entrance deltas so parallax continues the same multiplane model. */
 const PARALLAX_REACH = 0.4;
-/** The settled strip's pixel height; vw-derived, so resize-stable via refresh. */
 const settledHeightPx = () => (BLOG_PANO_SETTLED_VW / 100) * window.innerWidth;
 const MAX_DY = Math.max(...BLOG_PANO_LAYERS.map((l) => l.dy));
 const depthOf = (dy: number) => +(1 - dy / MAX_DY).toFixed(3);
 
-/**
- * Loads at the full composition, then compresses upward to a settled strip. Motion owns
- * the load entrance on INNER elements; GSAP scroll tweens own the OUTER wrappers.
- */
+/** Motion owns the load entrance on the inner images; GSAP owns the outer wrappers. */
 export function BlogHero() {
-	// False on the server and first client render, so SSR markup carries the full
-	// composition; the re-render snaps reduced clients settled via the zero-duration path.
+	// False on the server and first client render, so SSR markup carries the full composition.
 	const reducedMotion = useReducedMotionLive();
 	const steady = useSteadyFrames();
 	const stageRef = useRef<HTMLDivElement>(null);
 
-	// Hold the entrance until the layers decode (bounded at 1.5s), so a slow connection
-	// can't pop late images into the middle of the synchronized settle.
+	// The entrance waits for decode (1.5s cap): late images must not pop in mid-settle.
 	const [decoded, setDecoded] = useState(false);
 	useEffect(() => {
 		let finished = false;
@@ -65,8 +53,7 @@ export function BlogHero() {
 		return () => clearTimeout(timeout);
 	}, []);
 
-	// Hold until frames render steadily: the post-hydration stall can outlast the whole
-	// move, snapping the scene straight to its end state.
+	// The post-hydration stall can outlast the move, snapping the scene to its end state.
 	const play = reducedMotion || (steady && decoded);
 
 	useGSAP(
@@ -74,8 +61,7 @@ export function BlogHero() {
 			const stage = stageRef.current;
 			if (!stage) return;
 
-			// matchMedia, not a one-shot check: a mid-session Reduce Motion toggle reverts
-			// the scrubs and re-creates them on the way back.
+			// matchMedia so a mid-session Reduce Motion toggle reverts the scrubs and rebuilds.
 			const mm = gsap.matchMedia();
 			mm.add("(prefers-reduced-motion: no-preference)", () => {
 				for (const el of stage.querySelectorAll<HTMLElement>(
@@ -84,8 +70,7 @@ export function BlogHero() {
 					const depth = Number.parseFloat(el.dataset.blogParallax ?? "0");
 					if (!depth) continue;
 					gsap.to(el, {
-						// The settled-height constant, never a live measurement: the height
-						// animates after load, and mid-entrance geometry jumps at the refresh.
+						// The constant, never a live measurement: the height is still animating.
 						y: () => PARALLAX_REACH * depth * settledHeightPx(),
 						ease: "none",
 						scrollTrigger: {
@@ -106,8 +91,7 @@ export function BlogHero() {
 	const settle = (dx: number, dy: number) =>
 		play ? { x: "0vw", y: "0vw" } : { x: `${dx}vw`, y: `${dy}vw` };
 
-	// sizes is each layer's authored vw width: a blanket 100vw would let a 3.47vw tower
-	// claim the viewport and drag the full-resolution source onto a phone.
+	// sizes is the layer's authored vw: 100vw would drag full-resolution sources onto phones.
 	const srcSetOf = (layer: (typeof BLOG_PANO_LAYERS)[number]) =>
 		layer.srcWidths
 			? [
@@ -134,14 +118,13 @@ export function BlogHero() {
 						: `${BLOG_PANO_INITIAL_VW}vw`,
 				}}
 				transition={reducedMotion ? { duration: 0 } : TRANSITION}
-				// The settle changes every layer's document position; refresh re-measures the tweens.
+				// The settle changes every layer's document position.
 				onAnimationComplete={() => ScrollTrigger.refresh()}
 			>
 				{BLOG_PANO_LAYERS.map((layer) => {
 					const { src, left, top, width, dx, dy } = layer;
 					return (
-						// Outer wrapper GSAP, inner image Motion. Preflight clamps img to
-						// max-width 100%; w-full sizes it to the wrapper's authored width.
+						// w-full sizes to the wrapper's authored vw; max-w-none defeats preflight's clamp.
 						<div
 							key={src}
 							data-blog-parallax={depthOf(dy)}
