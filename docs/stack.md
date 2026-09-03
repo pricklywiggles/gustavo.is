@@ -13,7 +13,7 @@ Personal site (about, two `/remembering` retrospectives, a blog) with a contact 
 | Dev server | `pnpm run dev` (localhost:3000) |
 | Build | `pnpm run build` |
 | Run the build | `pnpm run start` |
-| Test | `pnpm test` (jsdom unit tests plus Storybook browser tests) |
+| Test | `pnpm test` is watch mode; use `pnpm exec vitest run` for one shot |
 | Lint | `pnpm run lint` |
 | Format | `pnpm run format` |
 | Lint + format, writing fixes | `pnpm run check` |
@@ -75,7 +75,7 @@ Personal site (about, two `/remembering` retrospectives, a blog) with a contact 
 | react-email | 6.6.9 |
 | BotID | 1.5.11 |
 
-### Testing
+### Testing & CI
 
 | Tool | Version |
 |---|---|
@@ -83,6 +83,7 @@ Personal site (about, two `/remembering` retrospectives, a blog) with a contact 
 | @testing-library/react | 16.3.2 |
 | Storybook (nextjs-vite) | 10.4.6 |
 | Playwright | 1.61.1 |
+| GitHub Actions (`.github/workflows/ci.yml`) | n/a |
 
 ### Security & ops
 
@@ -100,8 +101,7 @@ Personal site (about, two `/remembering` retrospectives, a blog) with a contact 
 
 ## Rules
 
-- Package manager is pnpm, never npm; the `npm install` lines in `.claude/stack-it/stack.yaml` are historical records of the original installs.
-- Pass script args without `--` (`pnpm run dev -p 4200`); with `--`, Next reads `-p` as its project directory.
+- Package manager is pnpm, never npm (the `npm install` lines in `.claude/stack-it/stack.yaml` are historical records of the original installs); pass script args without `--`, because with `--` Next reads `-p` as its project directory.
 - Keep TypeScript on 6.x: 7.x has no stable programmatic API and tooling cannot consume it.
 - `pnpm-workspace.yaml` owns the supply-chain policy (7-day `minimumReleaseAge`, `allowBuilds`, the `@babel/core` override); pnpm reads none of it from `.npmrc` or `package.json`.
 - Tailwind is CSS-first: tokens live in `@theme` in `src/app/globals.css`, there is no `tailwind.config.js`, and new tokens can need `rm -rf .next` plus a restart.
@@ -110,11 +110,12 @@ Personal site (about, two `/remembering` retrospectives, a blog) with a contact 
 - Never set `output: "export"` (it disables the route handler) and never enable SPA fallback routing.
 - Blog routes by frontmatter `slug` through the `slugs()` override in `src/lib/source.ts`, never by file path.
 - Import animation from `motion/react` (never `framer-motion`) as `m` inside `LazyMotion`; full `motion` components throw under the `strict` provider.
-- Never animate the same property of the same element with both Motion and GSAP; GSAP owns scroll pinning and scrubbing.
-- `useReducedMotion` is truthy on a reduced client's first render; mount-gate instead of branching SSR-visible DOM on it.
+- GSAP owns scroll pinning and scrubbing. Never drive one element's property from both libraries, and never put a GSAP scale on a Motion or Motion+ animated node: `AnimateNumber` measures reel travel from transform-inclusive rects, so an ancestor scale breaks the spin while every settled rect still reads correct.
+- Read reduced motion through `useReducedMotionLive` (`src/components/use-reduced-motion-live.ts`), never Motion's `useReducedMotion`, which is true on a reduced client's first render and would branch SSR-visible DOM.
+- Gate iOS-only fixes on `isIOSDevice()` (`src/lib/ios-device.ts`), never a media query, and never trade desktop or Android behavior for an iOS fix. Chrome on iOS shares Safari's engine and the same code path.
 - Instrumentation lives in `src/`: Next loads one `instrumentation-client.ts` and `src/` wins, so a root copy is dead and BotID then rejects every visitor.
-- Vercel needs `ENABLE_EXPERIMENTAL_COREPACK=1` (or it falls back to pnpm 6) and `MOTION_TOKEN` (or the Motion+ install 401s).
-- Async Server Components are not vitest-testable; verify them with a build plus browser checks.
+- CI and Vercel both need `MOTION_TOKEN` or the Motion+ install 401s; Vercel additionally needs `ENABLE_EXPERIMENTAL_COREPACK=1` or it falls back to an old pnpm that rejects the pnpm 11 workspace file.
+- CI gates every PR on `biome check`, `tsc --noEmit`, `vitest run` and a production build. Async Server Components are not vitest-testable, so verify those with the build plus browser checks.
 
 Detail for every pin, the wiring, and the notes carried forward from earlier docs: docs/stack-notes.md. Read it before changing configuration or adding a tool.
 <!-- stack-it:stack end -->

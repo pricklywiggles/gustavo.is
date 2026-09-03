@@ -21,8 +21,9 @@ Personal site: about, two project retrospectives, and a blog, with a working con
 - **[Motion](https://motion.dev)** + **Motion+** (Ticker, blinds page-transition curtains) + **[GSAP](https://gsap.com)**/ScrollTrigger for animation (deliberately both libraries, they cover different capabilities)
 - **Wotfard** and **Kitora** as self-hosted faces (body and display respectively)
 - **[Resend](https://resend.com)** for the contact form, with **[BotID](https://vercel.com/docs/botid)** bot protection and a honeypot field
-- **[Vitest](https://vitest.dev)** + **Testing Library** for tests, **[Storybook](https://storybook.js.org)** as the component workshop, **[Biome](https://biomejs.dev)** for lint/format
+- **[Vitest](https://vitest.dev)** + **Testing Library** for tests, **[Storybook](https://storybook.js.org)** as the component workshop, **[Biome](https://biomejs.dev)** for lint/format, all gated on every PR by GitHub Actions
 - **[Plausible](https://plausible.io)** analytics (self-hosted Community Edition at `metrics.whpl.sh`, reached through the npm tracker and a same-origin Vercel rewrite) and **Vercel Speed Insights** for Core Web Vitals, both live on production deploys only
+- **[Sentry](https://sentry.io)** for error tracking, errors only: no tracing, no replay, no PII
 - Deployed on **[Vercel](https://vercel.com)**
 
 Agent-facing reference: [`docs/stack.md`](docs/stack.md) (pins, commands, rules) and [`docs/stack-notes.md`](docs/stack-notes.md) (wiring and rationale). Full version-pinned decision record with the research behind each choice: [`.claude/stack-it/stack.yaml`](.claude/stack-it/stack.yaml).
@@ -39,7 +40,7 @@ pnpm run dev       # http://localhost:3000
 Other commands:
 
 ```bash
-pnpm test                # Vitest (jsdom unit tests + Storybook browser tests)
+pnpm exec vitest run     # one test pass (bare `pnpm test` watches)
 pnpm run lint            # Biome lint
 pnpm run check           # Biome lint + format, writes fixes
 pnpm run build           # production build; pnpm run start serves it
@@ -48,13 +49,13 @@ pnpm run storybook       # component workshop at :6006
 
 Passing extra args to a script works differently than npm: `pnpm run dev -p 4200`, not `pnpm run dev -- -p 4200`.
 
-### Before this goes live
+### Configuring a clone
 
-A few things are deliberately left for a human to do, not automated:
+The deployed project already has all of this set. A fresh clone does not, so:
 
-- **`RESEND_API_KEY`, `CONTACT_EMAIL_TO`, and `RESEND_FROM`** aren't set: copy `.env.example` to `.env.local` and fill them in, or the contact form will return a graceful error instead of sending. No email address is committed to the repo; the recipient and sender live only in env.
-- **Fonts are licensed**: Wotfard and Kitora Bold are self-hosted under their foundry webfont licenses. The license records live outside the repo; only the Latin-subset WOFF2 files ship, and the OTF masters stay gitignored.
-- **Sentry is wired but dormant**: set `NEXT_PUBLIC_SENTRY_DSN` (and, on Vercel, `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN` for source maps) or no errors are reported. See `.env.example`.
-- **Vercel needs two env vars**: `ENABLE_EXPERIMENTAL_COREPACK=1` (so the pinned pnpm is used) and `MOTION_TOKEN` (so the Motion+ private registry install succeeds).
-- **Analytics need two dashboard steps**: create the custom-event goals listed under Analytics in `docs/stack-notes.md` in the Plausible site settings, and enable Speed Insights for the project on Vercel. Neither reports from dev or preview deploys.
+- **Copy `.env.example` to `.env.local`** and fill in `RESEND_API_KEY`, `CONTACT_EMAIL_TO`, and `RESEND_FROM`, or the contact form returns a graceful error instead of sending. No email address is committed to the repo; the recipient and sender live only in env.
+- **`NEXT_PUBLIC_SENTRY_DSN` turns error reporting on**, and `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN` add source maps at build. Nothing gates the SDK on the environment, so a DSN in `.env.local` also files your dev hot-reload errors.
+- **Deploying needs two Vercel project vars**: `ENABLE_EXPERIMENTAL_COREPACK=1` (so the pinned pnpm is used) and `MOTION_TOKEN` (so the Motion+ private registry install succeeds). "Enable access to System Environment Variables" must be on, or the analytics never start in production. CI needs `MOTION_TOKEN` as an Actions secret for the same reason.
+- **Analytics need one dashboard step**: create the custom-event goals listed under Analytics in `docs/stack-notes.md` in the Plausible site settings. Speed Insights needs no toggle; it starts recording with the first production traffic. Neither reports from dev or preview deploys.
+- **Fonts are licensed**: Wotfard and Kitora Bold are self-hosted under their foundry webfont licenses. The license records live outside the repo; only the Latin-subset WOFF2 files ship, and the OTF masters stay gitignored. Supply your own faces.
 <!-- stack-it:stack end -->
