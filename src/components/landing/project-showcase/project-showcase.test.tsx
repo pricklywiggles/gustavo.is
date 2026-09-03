@@ -9,8 +9,9 @@ vi.mock("next/navigation", () => ({
 
 describe("ProjectShowcase", () => {
 	it("marks the active project and stages its details", () => {
+		const sanumIndex = PROJECTS.findIndex((p) => p.name === "Sanum");
 		const { getByRole } = render(
-			<ProjectShowcase projects={PROJECTS} activeIndex={1} />,
+			<ProjectShowcase projects={PROJECTS} activeIndex={sanumIndex} />,
 		);
 		const activeItem = getByRole("button", { name: "Sanum" });
 		expect(activeItem.getAttribute("aria-current")).toBe("true");
