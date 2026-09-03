@@ -11,30 +11,22 @@ import type {
 	PanoramaConfig,
 } from "@/components/landing/work-history-data";
 
-/**
- * Presentational renderer; animation lives in panorama-phases. Mobile adaptations are
- * CSS-gated (custom properties behind max-sm: classes): no JS observes the breakpoint.
- */
+/** Mobile adaptations are CSS-gated: no JS here observes the breakpoint. */
 
-// The cover-fit width; panorama-geometry owns the two numbers so the pacing math and
-// the CSS cannot drift apart.
+// panorama-geometry owns the two numbers so the pacing math and the CSS can't drift.
 const PANO_W = `max(${PANO_W_VW}vw, ${PANO_W_VH}vh)`;
 // Additive-only calc (pre-halved values) fits the oldest calc() grammar browsers support.
 const PANO_LEFT_CENTERED = `calc(50% - max(${PANO_W_VW / 2}vw, ${PANO_W_VH / 2}vh))`;
 
-/**
- * Below-sm stage left centering the crop on canvas x-fraction focusX, clamped to real
- * coverage slack so any focus degrades to an edge-flush crop. focusX pre-multiplies into
- * the pair (valid since focusX >= 0: f * max(a, b) = max(f*a, f*b)), staying additive-only.
- */
+/** Clamped to real coverage slack, so any focusX degrades to an edge-flush crop.
+ * focusX pre-multiplies into the pair: f * max(a, b) = max(f*a, f*b) for f >= 0. */
 export function panoFocusLeft(focusX: number): string {
 	const vw = +(focusX * PANO_W_VW).toFixed(2);
 	const vh = +(focusX * PANO_W_VH).toFixed(2);
 	return `clamp(calc(100% - var(--pano-w)), calc(50% - max(${vw}vw, ${vh}vh)), 0px)`;
 }
 
-// Positions come from custom properties so the classes stay static for Tailwind while
-// the values live in config.
+// Custom properties keep the classes static for Tailwind while the values live in config.
 const MOBILE_PLACEMENT_CLASSES =
 	"left-(--mp-l) top-(--mp-t) w-(--mp-w) max-sm:left-(--mp-lm) max-sm:top-(--mp-tm) max-sm:w-(--mp-wm)";
 
@@ -54,8 +46,7 @@ function placementVars(
 	} as CSSProperties;
 }
 
-// memo: the parent pushes quantized scrub state per tick; every prop here is
-// module-stable, so the ~50-img layer tree must not reconcile along.
+// The parent pushes scrub state per tick; the ~50-img layer tree must not reconcile along.
 export const PanoramaScene = memo(function PanoramaScene({
 	config,
 	stageRef,
@@ -63,12 +54,11 @@ export const PanoramaScene = memo(function PanoramaScene({
 }: {
 	config: PanoramaConfig;
 	stageRef: Ref<HTMLDivElement>;
-	/** The last scene carries the dusk veil buildDusk closes over everything. */
+	/** The last scene carries the dusk veil (buildDusk). */
 	veil?: boolean;
 }) {
 	const sun = config.sun;
-	// Sun config coordinates are the disc's CENTER, baked into layout offsets (hence the
-	// aspect factor) so no transform is involved and scale-up radiates from the middle.
+	// Sun config coords are the disc's CENTER: baked into offsets so scale-up radiates from it.
 	const sunBox = (left: number, top: number, size: number) => ({
 		left: `${left - size / 2}%`,
 		top: `${top - (size / 2) * stageAspect(config)}%`,
@@ -85,7 +75,7 @@ export const PanoramaScene = memo(function PanoramaScene({
 		);
 		return placementVars(rest, m);
 	})();
-	// Reduced motion: one in-flow screen per scene; layers at authored rest are the composite.
+	// Reduced motion: layers at their authored rest are the finished composite.
 	return (
 		<div
 			aria-hidden="true"
@@ -107,7 +97,7 @@ export const PanoramaScene = memo(function PanoramaScene({
 				}
 			>
 				{sun && (
-					// The sun renders below every layer: clouds cross in front, it sets behind hills.
+					// Below every layer: clouds cross in front, the sun sets behind hills.
 					<div
 						data-pano-sun-track
 						className={
@@ -137,9 +127,7 @@ export const PanoramaScene = memo(function PanoramaScene({
 						: layer.style;
 					const placement = mobile ? ` ${MOBILE_PLACEMENT_CLASSES}` : "";
 					return fill ? (
-						// The wrapper is the animated layer, so the extension below
-						// the band rides every tween with it and covers the layers
-						// that would otherwise show under the risen band.
+						// The extension covers layers that would show under the risen band.
 						<div
 							key={src}
 							data-pano-layer
@@ -164,10 +152,7 @@ export const PanoramaScene = memo(function PanoramaScene({
 							/>
 						</div>
 					) : ambient ? (
-						// will-change keeps the endlessly swaying clouds (and the
-						// sailing ferry below) on their own GPU layers: without it,
-						// sub-pixel-per-frame motion re-rasterizes and snaps to whole
-						// pixels, which reads as discrete hops.
+						// Without a GPU layer, sub-pixel sway snaps to whole pixels and hops.
 						<div
 							key={src}
 							data-pano-sway
@@ -185,10 +170,7 @@ export const PanoramaScene = memo(function PanoramaScene({
 							/>
 						</div>
 					) : (
-						// Preflight clamps img to max-width 100%, which silently pins
-						// wider-than-canvas strips (the SF hills) at stage width and
-						// makes their configured width a no-op: max-w-none on every
-						// layer keeps authored widths true.
+						// max-w-none: preflight would pin wider-than-canvas strips at stage width.
 						// biome-ignore lint/performance/noImgElement: layered scene sprites animate as plain elements; next/image adds nothing here
 						<img
 							key={src}
@@ -207,10 +189,7 @@ export const PanoramaScene = memo(function PanoramaScene({
 					);
 				})}
 				{config.horizonLocked && (
-					// Horizon-locked cities can't open the HUD band by raising the
-					// front water (sea level caps its travel), so the page surface
-					// itself rises as a curtain over the lower water instead. Rests
-					// fully below the stage; buildSurfaceReveal lifts it.
+					// Sea level caps the front water; this curtain opens the HUD band instead.
 					<div
 						data-pano-surface
 						className="absolute left-0 w-full motion-safe:will-change-transform"
@@ -224,8 +203,6 @@ export const PanoramaScene = memo(function PanoramaScene({
 					/>
 				)}
 				{veil && (
-					// Above every layer and the curtain; invisible until buildDusk
-					// fades it in.
 					<div
 						data-pano-veil
 						className="invisible absolute inset-0 bg-dusk-ink opacity-0"

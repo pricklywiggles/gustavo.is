@@ -1,32 +1,23 @@
-/**
- * The blog hero's LA panorama, template-matched from the owner's two reference mockups
- * (initial: full composition; settled: compressed upward). Positions are in vw; never
- * round or "tidy" them. Array order is z-order, back to front.
- */
+/** Template-matched vw positions, never rounded; array order is z-order, back to front. */
 
 import { RAMP_HEX } from "@/lib/ramp";
 
 export type BlogPanoramaLayer = {
 	src: string;
-	/** Settled position, vw from the hero's top-left. */
 	left: number;
 	top: number;
 	width: number;
 	/** Entrance offset: the initial mockup's position minus the settled one. */
 	dx: number;
 	dy: number;
-	/**
-	 * Responsive candidates for large layers: native width plus the generated variants
-	 * (scripts/generate-panorama-small-variants.mjs); small sprites omit this.
-	 */
+	/** Native width plus the variants from scripts/generate-panorama-small-variants.mjs. */
 	srcWidths?: { native: number; variants: number[] };
 };
 
-/** Hero heights, vw: the initial full composition and the settled strip. */
 export const BLOG_PANO_INITIAL_VW = 67.26;
 export const BLOG_PANO_SETTLED_VW = 34.92;
 
-/** The canvas sky, identical to the landing hero's zenith band. */
+/** Matches the landing hero's zenith band. */
 export const BLOG_PANO_SKY = RAMP_HEX["pale-dune"];
 
 const DIR = "/los-angeles-panorama-small";
@@ -192,8 +183,7 @@ export const BLOG_PANO_LAYERS: BlogPanoramaLayer[] = [
 		dy: 32.04,
 		srcWidths: { native: 4032, variants: [1008, 2016] },
 	},
-	// Authored to spec, not matched. Feet flush with the visible bottom (34.92 - 8.26);
-	// same dy as street-view so it stays glued to the ground through the entrance.
+	// Authored, not matched: feet flush at 34.92 - 8.26, street-view's dy keeps it grounded.
 	{
 		src: `${DIR}/walking-kiwi.webp`,
 		left: 35.14,

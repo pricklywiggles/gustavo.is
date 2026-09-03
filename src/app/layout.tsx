@@ -12,8 +12,7 @@ import { ogImage } from "@/lib/site-metadata";
 import { fontVariables } from "./fonts";
 import "./globals.css";
 
-// Pages restate alternates/openGraph through pageMetadata(); this is the floor for
-// routes without their own (the 404 page).
+// The floor for routes with no pageMetadata() of their own (the 404 page).
 export const metadata: Metadata = {
 	metadataBase: new URL(SITE_URL),
 	title: { default: AUTHOR_NAME, template: `%s | ${SITE_NAME}` },
@@ -34,9 +33,7 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	// The NODE_ENV check is statically replaced at build time, so production never
-	// imports the lab or its candidate faces (no lab chunk, no candidate @font-face);
-	// the candidates' variables go on <html>, where the lab's indirection resolves.
+	// NODE_ENV is inlined at build time: production ships no lab chunk and no candidate faces.
 	let fontLab: React.ReactNode = null;
 	let labVariables = "";
 	if (process.env.NODE_ENV === "development") {

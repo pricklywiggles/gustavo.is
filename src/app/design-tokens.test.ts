@@ -3,16 +3,13 @@ import { describe, expect, it } from "vitest";
 import { RAMP_HEX, RAMP_OKLCH, rampColor, rampHex } from "@/lib/ramp";
 import { PALETTE } from "../../.storybook/design/palette-data";
 
-// The three token copies (globals.css @theme is the source of truth, DESIGN.md front
-// matter, src/lib/ramp.ts) must match verbatim; change all three. The Storybook palette
-// page reads its values from ramp.ts, so it only has to cover the same set of tokens.
+// globals.css @theme is the source of truth; DESIGN.md and ramp.ts must match it verbatim.
 
 const globals = readFileSync("src/app/globals.css", "utf8");
 const design = readFileSync("DESIGN.md", "utf8");
 
 function themeColors(css: string): Map<string, string> {
-	// Only the first plain `@theme {` block; `@theme static`/`inline` hold
-	// font roles and semantic re-exports, not palette tokens.
+	// Only the first plain `@theme {` block; `@theme static`/`inline` hold no palette tokens.
 	const block = css.match(/@theme \{([\s\S]*?)\n\}/)?.[1] ?? "";
 	const map = new Map<string, string>();
 	for (const m of block.matchAll(/--color-([a-z0-9-]+):\s*([^;]+);/g)) {
@@ -93,8 +90,7 @@ describe("palette token sync", () => {
 				token,
 				`RAMP_HEX documents ${slug}, which globals.css no longer declares`,
 			).toBeDefined();
-			// Assert the form before converting: a valid variant rampHex() can't parse must
-			// fail with the slug named, not silently project from NaN.
+			// A variant rampHex() can't parse must fail naming the slug, not project from NaN.
 			expect(
 				token,
 				`--color-${slug} (${token}) is not in the bare oklch(L C H) number form rampHex() parses`,

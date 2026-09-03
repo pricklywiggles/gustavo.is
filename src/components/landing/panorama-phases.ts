@@ -14,11 +14,7 @@ import type {
 
 export type AmbienceControls = { pause: () => void; resume: () => void };
 
-/**
- * Timeline builders for one city panorama. Scroll-driven phases write into a master
- * timeline whose seconds are viewport-heights; time-based ambience runs on its own clock.
- * Geometry that the speed map audits lives in panorama-geometry.ts.
- */
+/** Master-timeline seconds are viewport-heights; ambience runs on a real-time clock. */
 
 export function panoramaLayers(stage: HTMLElement): HTMLElement[] {
 	return gsap.utils.toArray<HTMLElement>(
@@ -26,7 +22,6 @@ export function panoramaLayers(stage: HTMLElement): HTMLElement[] {
 	);
 }
 
-/** Hide every layer at its entrance offsets; vessels park off-screen. */
 export function setLayersBeforeEntrance(
 	stage: HTMLElement,
 	config: PanoramaConfig,
@@ -49,10 +44,7 @@ export function setLayersBeforeEntrance(
 	});
 }
 
-/**
- * Each layer casts on a third into the previous one's landing; with the flat ease two to
- * three layers stay visibly in motion at once (a snappier ease reads as a queue).
- */
+/** Two to three layers stay in motion at once; a snappier ease reads as a queue. */
 export function buildCascade(
 	tl: gsap.core.Timeline,
 	at: number,
@@ -79,10 +71,6 @@ export function buildCascade(
 	});
 }
 
-/**
- * Year-cued layers rise where the clock crosses their year on the master timeline, so
- * they build and un-build with the time scrub like everything else.
- */
 export function buildYearCues(
 	tl: gsap.core.Timeline,
 	scrub: { at: number; vhPerYear: number; spanStart: number },
@@ -110,9 +98,8 @@ export function buildYearCues(
 }
 
 /**
- * Post-landing breath: foreground rises, background sinks, sea level holds as the pivot.
- * Animated on `y`, which composes with the entrance yPercent and the vessels' xPercent.
- * `viewportHeight`: the section's h-screen box, never innerHeight (iOS toolbar).
+ * Animated on `y`: it composes with the entrance yPercent and the vessels' xPercent.
+ * `viewportHeight` is the section's h-screen box, never innerHeight (iOS toolbar).
  */
 export function buildParallaxShift(
 	tl: gsap.core.Timeline,
@@ -144,10 +131,7 @@ export function buildParallaxShift(
 	});
 }
 
-/**
- * The curtain that opens the band for horizon-locked cities (sea level caps the water's
- * rise); clamped so its top always leaves a sliver of front water under the horizon.
- */
+/** Horizon-locked cities open their band with a curtain: sea level caps the water's rise. */
 export function buildSurfaceReveal(
 	tl: gsap.core.Timeline,
 	at: number,
@@ -171,11 +155,6 @@ export function buildSurfaceReveal(
 	);
 }
 
-/**
- * The cascade in reverse, last-in-first-out; scrubbed, so scrolling back re-assembles.
- * Each layer's duration is budget-derived (FRA-187): the settle floor, stretched so tall
- * sprites like the towers never outrun the scroll.
- */
 export function buildSceneExit(
 	tl: gsap.core.Timeline,
 	at: number,
@@ -188,7 +167,7 @@ export function buildSceneExit(
 		const layer = config.layers[i];
 		const { from, origin, drift, parallax } = layer;
 		const exitAt = at + exitOrder(config, layer) * spread;
-		// Vessels keep their sail-owned x; y: 0 unwinds the parallax shift alongside.
+		// Vessels keep their sail-owned x; y: 0 unwinds the parallax shift.
 		const vars: gsap.TweenVars = drift
 			? { autoAlpha: 0 }
 			: { ...from, autoAlpha: 0, transformOrigin: origin ?? "50% 50%" };
@@ -218,7 +197,6 @@ export function buildSceneExit(
 	}
 }
 
-/** Outro part one: the band parallax reverses and the curtain lowers before dusk falls. */
 export function buildOutroClose(
 	tl: gsap.core.Timeline,
 	at: number,
@@ -240,10 +218,7 @@ export function buildOutroClose(
 	}
 }
 
-/**
- * Outro part two: dusk dims to the palette's off-black, staggered by depth (foreground
- * first, sky last), and a dusk-ink veil closes so the end state is the palette color.
- */
+/** Dimming ends on black; the closing dusk-ink veil is what lands the palette color. */
 export function buildDusk(
 	tl: gsap.core.Timeline,
 	cues: { at: number; len: number },
@@ -252,8 +227,8 @@ export function buildDusk(
 ) {
 	const { at, len } = cues;
 	const sun = stage.querySelector("[data-pano-sun]");
-	// Starts stagger back-to-front so the street darkens while the sky still glows.
-	// Explicit brightness(1) start: GSAP cannot interpolate from filter: none.
+	// Stagger back-to-front: the street darkens while the sky still glows.
+	// Explicit brightness(1) start: GSAP cannot interpolate filter from `none`.
 	const layers = panoramaLayers(stage);
 	const dimLen = len * 0.55;
 	layers.forEach((el, i) => {
@@ -294,19 +269,14 @@ export function buildDusk(
 	}
 }
 
-/**
- * The sun's day arc, linear with the scrub so years and daylight pass together and
- * reversing the scroll raises it back.
- */
+/** The day arc runs linear with the scrub so years and daylight pass together. */
 export function buildSunset(
 	tl: gsap.core.Timeline,
 	cues: {
 		enterAt: number;
 		scrubAt: number;
 		scrubLen: number;
-		/** Length of the outro-close beat between scrub and dusk, if any. */
 		closeLen?: number;
-		/** Length of the dusk outro the growth arc runs through, if any. */
 		duskLen?: number;
 	},
 	stage: HTMLElement,
@@ -327,7 +297,7 @@ export function buildSunset(
 		growthStart,
 	} = config.sun;
 	const gs = growthStart ?? 0.5;
-	// Width-% to height-% conversion for the disc's radius.
+	// `size` is a width-%; the aspect converts the radius to height-%.
 	const [aw, ah] = config.aspect.split("/").map((n) => Number.parseFloat(n));
 	const aspect = aw > 0 && ah > 0 ? aw / ah : 1.5;
 	const radiusPct = (scale: number) => (size / 2) * scale * aspect;
@@ -339,9 +309,8 @@ export function buildSunset(
 		cues.enterAt,
 	);
 
-	// Split across the nested pair so every tween stays declarative (scrub-rewind safe).
-	// The TRACK carries the crown's line, running through outro-close so the sun never
-	// freezes; the DISC pairs swell with an equal-ease dive, so the crown cannot stall.
+	// Declarative only: an imperative crown arc dies after one scrub rewind (README inv. 3).
+	// Track owns the crown's line; the disc's swell pairs with an equal-ease dive so it cannot stall.
 	const centerAtGs = top + (endTop - top) * gs;
 	const finalCenter = duskEndTop ?? endTop;
 	const crownEnd = finalCenter - radiusPct(endScale);
@@ -393,9 +362,8 @@ export function buildSunset(
 }
 
 /**
- * Drift on the sway wrappers, entrances on the images inside: two owners, no shared
- * properties. Period scales with width for equal perceived speed; phase seeds desync.
- * Born paused at their seeds; the stage window (work-history.tsx) resumes them in place.
+ * Sway on the wrappers, entrances on the images: two owners, no shared property. Period scales
+ * with width for equal perceived speed. Born paused; the stage window resumes them in place.
  */
 export function attachCloudSway(
 	stage: HTMLElement,
@@ -435,10 +403,7 @@ export function attachCloudSway(
 	};
 }
 
-/**
- * The bow starts 5% of the VIEWPORT into the frame (the stage is wider than narrow
- * viewports), so the entrance delay after the cue matches on every screen width.
- */
+/** The bow starts 5% of the VIEWPORT in, so the entrance delay matches on every screen width. */
 export function vesselSailStartPct(
 	geo: { stageWidth: number; stageLeft: number; viewportWidth: number },
 	vessel: Pick<VesselConfig, "fromSide" | "leftPct" | "widthPct">,
@@ -446,8 +411,7 @@ export function vesselSailStartPct(
 	const { stageWidth, stageLeft, viewportWidth } = geo;
 	const spriteWidth = (vessel.widthPct / 100) * stageWidth;
 	const restX = (vessel.leftPct / 100) * stageWidth;
-	// Viewport edges in stage-local space: the stage is not guaranteed centered on the
-	// viewport (mobileFocusX shifts it below sm).
+	// Viewport edges in stage-local space: mobileFocusX can shift the stage off center.
 	const enterX =
 		vessel.fromSide === "right"
 			? viewportWidth - stageLeft - viewportWidth * 0.05
@@ -456,8 +420,7 @@ export function vesselSailStartPct(
 }
 
 function vesselSailStart(stage: HTMLElement, vessel: VesselConfig): number {
-	// offsetLeft is layout-resolved (the stage positions via `left`, no x transform), so
-	// it stays truthful while GSAP transforms the layers mid-exit.
+	// offsetLeft stays truthful while GSAP transforms layers: the stage positions via `left`.
 	return vesselSailStartPct(
 		{
 			stageWidth: stage.offsetWidth,
@@ -468,11 +431,7 @@ function vesselSailStart(stage: HTMLElement, vessel: VesselConfig): number {
 	);
 }
 
-/**
- * Casts off once the cue layer lands, then sails on real time. Visibility lives outside
- * the sail: scroll-back fades the boat mid-glide, and only once hidden does it rewind.
- * The chapter's stage window pauses sails off stage and resumes them in place.
- */
+/** Visibility sits outside the sail: scroll-back fades the boat mid-glide, rewinds once hidden. */
 export function attachVessels({
 	stage,
 	config,
@@ -480,7 +439,7 @@ export function attachVessels({
 }: {
 	stage: HTMLElement;
 	config: PanoramaConfig;
-	/** Absolute document scroll position of a vessel's cast-off cue. */
+	/** Absolute document scroll position of the cast-off cue. */
 	cueScrollY: (vessel: VesselConfig) => () => number;
 }): AmbienceControls & { cleanup: () => void } {
 	const vessels = (config.vessels ?? []).flatMap((vessel) => {
@@ -546,8 +505,7 @@ export function attachVessels({
 		return {
 			sail,
 			isCastOff: () => castOff,
-			// The 0.6s reveal is clock-driven too: a one-frame skip past the chapter would
-			// otherwise keep fading a frozen boat back in over the next chapter's opening.
+			// Clock-driven too: a skip past the chapter would fade a frozen boat back in.
 			pauseReveal: () => {
 				// progress, not isActive: a reveal created this frame has not ticked yet.
 				if (reveal && !reveal.paused() && reveal.progress() < 1) {

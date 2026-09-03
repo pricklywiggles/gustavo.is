@@ -19,7 +19,7 @@ vi.mock("motion-plus/curtains", () => ({
 
 import { CurtainLink, consumeScrollReset } from "./curtain-link";
 
-/** Resolve the in-flight transaction: Back always opens the blinds. */
+// Back always opens the blinds.
 async function releaseCurtain() {
 	await act(async () => {
 		window.dispatchEvent(new PopStateEvent("popstate"));
@@ -53,7 +53,6 @@ describe("CurtainLink", () => {
 		expect(curtainsMock).toHaveBeenCalledTimes(1);
 		expect(push).toHaveBeenCalledTimes(1);
 
-		// Back releases the lock, so a later click starts a fresh transaction.
 		await releaseCurtain();
 		fireEvent.click(link);
 		expect(curtainsMock).toHaveBeenCalledTimes(2);
@@ -83,7 +82,6 @@ describe("CurtainLink", () => {
 
 	it("skips the push when Back fires before the route change", async () => {
 		curtainsMock.mockImplementationOnce(async (update) => {
-			// Back lands while the cover is still closing.
 			window.dispatchEvent(new PopStateEvent("popstate"));
 			await update();
 		});

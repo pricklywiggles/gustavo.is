@@ -32,8 +32,7 @@ import { createClipWriter, holePath } from "./hero-hole";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-// The tokens' exact sRGB twins (the palette was derived from this hero); hex because the
-// entrance and GSAP tweens slide plain-style backgrounds around.
+// Hex twins of the ramp tokens: GSAP and Motion can't interpolate the theme's oklch().
 const COLORS = {
 	sky1: RAMP_HEX["pale-dune"],
 	sky2: RAMP_HEX["amber-mirage"],
@@ -47,16 +46,14 @@ const COLORS = {
 
 const HORIZON_PCT = 60;
 
-// Visible sky band height grows by 3/2 toward the horizon within the 60% sky:
-// s1 shows 12.6%, s2 18.9%, s3 28.4% (down to the horizon).
+// Visible band heights grow 3/2 toward the horizon: 12.6%, 18.9%, 28.4% of the 60% sky.
 const SKY_TOPS = {
 	s1: 0.0,
 	s2: 11.6,
 	s3: 20.5,
 };
 
-// Visible ground band height shrinks by 2/3 toward the horizon within the 40% below it:
-// g4 shows 16.6%, g3 11.1%, g2 7.4%, g1 4.9%.
+// Visible band heights shrink 2/3 toward the horizon: g4 16.6%, g3 11.1%, g2 7.4%, g1 4.9%.
 const GROUND_TOPS = {
 	g1: 60.0,
 	g2: 64.9,
@@ -64,9 +61,7 @@ const GROUND_TOPS = {
 	g4: 83.4,
 };
 
-// The entrance separates bands from a bunched pose (`bunchedTop`) to their tops, closest
-// edges leading (`step`); g1 never moves, it IS the line the scene grows from. Entrance
-// transforms live on INNER elements, GSAP scroll tweens on OUTER layers, never sharing one.
+// Entrance transforms live on the inner m.div, GSAP scroll tweens on the outer layer.
 const SKY_BANDS = [
 	{
 		parallax: HERO_PARALLAX.sky2,
@@ -121,17 +116,14 @@ const entranceTransition = (step: number) => ({
 	ease: EASE_OUT_EXPO,
 });
 
-// y is 155% of the sun's height: at scale 2 the disc doubles around its center, so a
-// plain 100% offset would already poke above the horizon.
+// At scale 2 the disc doubles about its center, so a 100% offset would clear the horizon.
 const SUN_ENTRANCE = { y: "155%", scale: 2 };
-// Rises on the ground's first beat, so the disc crests while the bands are still
-// fanning out instead of after they land; the clip hides it below the horizon until then.
+// Shares the ground's first beat so the disc crests while the bands are still fanning out.
 const SUN_TRANSITION = {
 	delay: entranceTransition(0).delay,
 	...SUN_CREST_SPRING,
 };
 
-// Reveal progress below which the intro video is held paused at frame 0.
 const VIDEO_CUE = 0.1;
 
 export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
@@ -143,11 +135,10 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 	const sunRef = useRef<HTMLDivElement>(null);
 	const revealRef = useRef<HTMLDivElement>(null);
 	const blobRef = useRef<SVGPathElement>(null);
-	// Live hook: false through SSR and hydration, so no SSR-visible branch may depend
-	// on it; geometry collapses via motion-reduce classes instead (FRA-170).
+	// False through SSR and hydration (FRA-170): no SSR-visible branch may depend on it.
 	const reducedMotion = useReducedMotionLive();
 	const steady = useSteadyFrames();
-	// Hold the bunched pose until frames render steadily; tween clocks can't survive a stall.
+	// Animation clocks run on real time: the post-hydration task storm eats an early entrance.
 	const play = reducedMotion || steady;
 
 	useGSAP(
@@ -155,25 +146,19 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 			const scene = sceneRef.current;
 			if (!wrapperRef.current || !scene || !characterRef.current) return;
 
-			// Under reduced motion the sheet simply scrolls away over the pinned intro,
-			// itself a designed reveal; matchMedia builds/reverts the pins on live flips.
+			// Reduced motion keeps the sheet's plain scroll-away as the designed reveal.
 			const mm = gsap.matchMedia();
 			mm.add("(prefers-reduced-motion: no-preference)", () => {
 				const video = revealRef.current?.querySelector("video") ?? null;
-				// Raw scroll everywhere but iOS, where a catch-up hides the sparse samples.
 				const scrub = scrollScrub();
 				const ios = isIOSDevice();
 
-				// Re-measured on every refresh so tween distances and hole geometry never go stale.
-				// The scene's box is the CSS `h-screen` the sticky geometry is built from; on iOS
-				// that is the large viewport, while innerHeight is the toolbar-dependent visual
-				// height and would pace the scrubs against a different, shifting number.
+				// vh from the scene's h-screen box: iOS innerHeight tracks the toolbar, CSS doesn't.
 				const metrics = { vh: 0, vw: 0, cx: 0, cy: 0 };
 				const measure = () => {
 					metrics.vh = scene.offsetHeight || window.innerHeight;
 					metrics.vw = scene.clientWidth || window.innerWidth;
-					// Center the hole on the intro video while its underlay is still sticky-pinned
-					// (the rect is the revealed position); deeper, fall back to proportional coords.
+					// The video's rect is only the revealed position while its underlay is stuck.
 					const rect = video?.getBoundingClientRect();
 					if (
 						rect &&
@@ -227,7 +212,7 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 					},
 				});
 
-				// transformOrigin keeps feet on the ground and left edge fixed as scale drops.
+				// Origin bottom left: the character shrinks without lifting off its ground band.
 				gsap.set(characterRef.current, { transformOrigin: "bottom left" });
 				gsap.to(characterRef.current, {
 					scale: CHARACTER_SHRINK_SCALE,
@@ -241,8 +226,6 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 					},
 				});
 
-				// The hole grows through a staged curve as the sheet scrolls away; scrubbed, so
-				// scrolling back up reverses it.
 				if (
 					blobRef.current &&
 					revealRef.current &&
@@ -252,7 +235,6 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 					const blobPath = blobRef.current;
 					const sheet = sheetRef.current;
 					const carrier = carrierRef.current;
-					// yOff compensates the sheet's travel so the hole stays fixed over the video.
 					const hole = { s: 0, yOff: 0 };
 					const wobble = { r: -12 };
 					const pulse = { t: 0 };
@@ -277,7 +259,7 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 					writer.write();
 					sheet.style.clipPath = "url(#hero-hole)";
 
-					// Time-based sway and breathing so the hole's edge keeps living while scroll parks.
+					// Own clock, not the scrub: the hole's edge keeps living while scroll parks.
 					const sway = gsap.to(wobble, {
 						r: 12,
 						yoyo: true,
@@ -294,9 +276,8 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 						onUpdate: writer.request,
 					});
 
-					// Hidden past the reveal: the sheet's trailing edge rasterizes a hairline against
-					// the intro. Driven off scrub progress; enter/leave callbacks never fired here.
-					// A hidden sheet gets no clip writes, and the ambient tweens sleep with it.
+					// Hidden past the reveal: the trailing edge rasterizes a hairline over the intro.
+					// Progress-driven; enter/leave callbacks never fired here.
 					let hidden = false;
 					const syncSheet = (progress: number) => {
 						const hide = progress >= 1;
@@ -316,12 +297,8 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 					};
 
 					if (ios) {
-						// One clock (FRA-185): on iOS the sheet rides a sticky carrier for the whole
-						// reveal and travels by the same scrubbed timeline as the hole, so the
-						// catch-up delays both together and the hole never drifts off the video.
-						// The carrier's stick distance and the sheet's travel reproduce the native
-						// sheet's rect exactly. Set inside the context so a reduced-motion flip
-						// reverts the styles.
+						// One clock (FRA-185): a sticky carrier puts the sheet on the hole's own
+						// scrub, so the catch-up delays both and the hole can't drift off the video.
 						gsap.set(carrier, {
 							display: "block",
 							position: "sticky",
@@ -336,8 +313,6 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 						});
 					}
 
-					// Elsewhere the sheet scrolls natively and the trigger spans only the hole's
-					// growth; on iOS it spans the whole travel, and progress maps back to growth.
 					const revealProgress = ios
 						? (progress: number) =>
 								gsap.utils.clamp(
@@ -361,16 +336,13 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 								const progress = revealProgress(self.progress);
 								syncSheet(progress);
 								if (!ios) {
-									// The native sheet's travel since release: the pre-reveal delay
-									// plus the scrubbed portion.
 									hole.yOff =
 										(REVEAL_DELAY_VH + progress * REVEAL_LENGTH_VH) *
 										metrics.vh;
 									writer.request();
 								}
 								if (!video) return;
-								// `ended` also reports paused; unguarded, every tick would restart a
-								// finished video.
+								// A finished video also reports paused, so every tick would restart it.
 								if (progress > VIDEO_CUE && video.paused && !video.ended) {
 									video.play().catch(() => {});
 								} else if (progress <= VIDEO_CUE && !video.paused) {
@@ -385,12 +357,11 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 							},
 						},
 					});
-					// onUpdate only runs once scroll moves; seed for a page loaded past the reveal.
+					// Seed for a page loaded past the reveal: onUpdate waits for scroll.
 					syncSheet(revealProgress(tl.scrollTrigger?.progress ?? 0));
 
 					if (ios) {
-						// Timeline seconds are viewport heights. The path is sheet-local, so yOff
-						// must climb by exactly the sheet's travel.
+						// Timeline seconds are viewport heights.
 						tl.to(
 							sheet,
 							{
@@ -425,8 +396,7 @@ export function ParallaxHero({ reveal }: { reveal?: React.ReactNode }) {
 				return () => {
 					ScrollTrigger.removeEventListener("refreshInit", onRefreshInit);
 					disposeWriter();
-					// Manual style writes GSAP can't revert; a flip to reduced must not
-					// strand the sheet clipped or hidden.
+					// GSAP won't revert manual style writes; a reduced flip must not strand the sheet.
 					if (sheetRef.current) {
 						sheetRef.current.style.clipPath = "";
 						sheetRef.current.style.visibility = "";

@@ -1,4 +1,3 @@
-/** Site identity for metadata, feeds, and structured data; the one place the origin lives. */
 export const SITE_URL = "https://gustavo.is";
 export const SITE_NAME = "gustavo.is";
 export const AUTHOR_NAME = "Gustavo Gallegos";
@@ -10,5 +9,4 @@ export const FEED_PATH = "/feed.xml";
 
 export const absoluteUrl = (path: string) => new URL(path, SITE_URL).href;
 
-/** A page's markdown mirror for agents, e.g. /llms.mdx/blog/hello-world. */
 export const markdownPath = (path: string) => `/llms.mdx${path}`;

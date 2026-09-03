@@ -1,10 +1,6 @@
 import type { ReactElement } from "react";
 
-/**
- * Deterministic starfield for the landfall descent. Seeded so the server and
- * client render identical markup (Math.random in render would break
- * hydration) and so a layer's scatter never reshuffles between visits.
- */
+// Seeded so server and client render identically and the scatter never reshuffles.
 
 export type StarSpec = {
 	/** Percent of layer width. */
@@ -28,7 +24,6 @@ export function starRandom(seed: number): () => number {
 	};
 }
 
-/** Mostly white, with occasional warm and cool tints like the warp field. */
 const STAR_TINTS = ["#fff7e8", "#dbe9ff"];
 
 export function starField(
@@ -47,10 +42,7 @@ export function starField(
 	}));
 }
 
-/**
- * One parallax depth plane. Positions are percentages so the scatter stretches with the
- * layer; radii stay in px so stars remain round dots at any size.
- */
+/** Percent positions stretch with the layer; px radii keep stars round at any size. */
 export function StarLayer({
 	seed,
 	count,

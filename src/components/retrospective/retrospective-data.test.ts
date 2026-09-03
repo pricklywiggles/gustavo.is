@@ -44,8 +44,7 @@ describe("retrospective content", () => {
 		]);
 	});
 
-	// The sitemap, llms index, and markdown mirrors fan out from RETROSPECTIVES while the
-	// pages are hand-written files, so the two must name the same slugs.
+	// The sitemap and mirrors fan out from RETROSPECTIVES; the pages are hand-written files.
 	it("registers exactly the retrospectives that have a page", () => {
 		const pages = readdirSync(
 			join(process.cwd(), "src/app/(with-header)/remembering"),

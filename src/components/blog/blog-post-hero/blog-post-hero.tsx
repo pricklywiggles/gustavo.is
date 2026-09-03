@@ -5,10 +5,7 @@ import { ScrollFadeIn } from "@/components/scroll-fade-in";
 import { FOCUS_OUTLINE } from "@/lib/focus-ring";
 import type { PostCover } from "@/lib/post-cover";
 
-/**
- * Contrast on Dusk Earth: eyebrow Noon Sun 5.08:1, title 6.03:1, standfirst 4.88:1.
- * The content column is the article's own 65ch measure so the left edges line up.
- */
+/** Contrast on Dusk Earth: eyebrow 5.08, title 6.03, standfirst 4.88; 65ch matches the article. */
 export function BlogPostHero({
 	title,
 	dateTime,
@@ -24,7 +21,6 @@ export function BlogPostHero({
 	tags: string[];
 	cover?: PostCover;
 }) {
-	// Each optional block steps the rise back by one beat after the one before it.
 	const tagsDelay = standfirst ? 0.22 : 0.16;
 	const coverDelay = tags.length > 0 ? tagsDelay + 0.06 : tagsDelay;
 	return (

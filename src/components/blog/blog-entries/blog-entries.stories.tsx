@@ -1,14 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { BlogEntries, type BlogEntry } from "@/components/blog/blog-entries";
 
-/**
- * The index's editorial rail. Entry titles stay Wotfard medium on purpose: the list
- * reads as UI rather than as titles, so the Two Voices Rule keeps Kitora out of it.
- *
- * Hover or tab through an entry: the wash lifts the ground, and the muted roles must
- * brighten with it. At rest they clear AA on Dusk Earth; on the lightened ground the
- * resting opacities would fall to 3.74:1 and 4.06:1, so the stepped set takes over.
- */
 const meta = {
 	title: "Blog/Blog entries",
 	component: BlogEntries,
@@ -58,10 +50,6 @@ export const Rail: Story = {
 	args: { entries: ENTRIES },
 };
 
-/**
- * A cover becomes a trailing thumbnail. Entries without one keep the two-column rail, so
- * the two shapes can share a list.
- */
 export const WithCovers: Story = {
 	args: {
 		entries: ENTRIES.map((entry, i) =>
@@ -75,17 +63,12 @@ export const WithCovers: Story = {
 	},
 };
 
-/** Descriptions are optional; a post without one collapses to date and title. */
 export const WithoutDescriptions: Story = {
 	args: {
 		entries: ENTRIES.map(({ description: _description, ...entry }) => entry),
 	},
 };
 
-/**
- * Only the first four entries stagger as a batch. Past that a lone entry deep in the
- * list rises immediately rather than waiting out its absolute position.
- */
 export const PastTheStaggerBatch: Story = {
 	args: {
 		entries: Array.from({ length: 7 }, (_, i) => ({

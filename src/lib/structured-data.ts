@@ -21,10 +21,7 @@ const author = {
 	url: SITE_URL,
 };
 
-/**
- * Person + WebSite for the landing. worksFor wraps each Organization in an
- * EmployeeRole (schema.org's Role pattern), one per title, so each carries its own dates.
- */
+/** worksFor nests an EmployeeRole per title: schema.org's Role pattern carries the dates. */
 export function siteJsonLd() {
 	const person = {
 		...author,
@@ -92,7 +89,6 @@ export function retrospectiveJsonLd(retrospective: Retrospective) {
 		url,
 		mainEntityOfPage: url,
 		image: absoluteUrl(OG_IMAGES[retrospective.ogImage].url),
-		// "2019 to 2021" as an ISO interval.
 		temporalCoverage: retrospective.years.replace(" to ", "/"),
 		inLanguage: "en",
 		author,

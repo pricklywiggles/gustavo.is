@@ -1,11 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Blockquote } from "@/components/blog/blockquote";
 
-/**
- * The MDX blockquote: a pull quote led by a Noon Sun mark rather than a card.
- * Markdown `>` quotes get the default mark; a post can pass its own via `icon`.
- * Always sits on the reading page's Dusk Earth ground.
- */
 const meta = {
 	title: "Blog/Blockquote",
 	component: Blockquote,
@@ -35,7 +30,6 @@ export const Default: Story = {
 	},
 };
 
-/** `icon` takes any node, so a post can lead with an emoji or its own mark. */
 export const CustomIcon: Story = {
 	args: {
 		icon: "🥝",
@@ -48,7 +42,6 @@ export const CustomIcon: Story = {
 	},
 };
 
-/** Multiple paragraphs keep the mark hanging beside the first cap line. */
 export const MultiParagraph: Story = {
 	args: {
 		children: (

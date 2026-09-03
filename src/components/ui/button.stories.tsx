@@ -1,12 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Button } from "./button";
 
-/**
- * The shadcn copy-in, and the only reader of the semantic token layer. Nothing in
- * the app imports it, so these stories are the one place --primary, --secondary,
- * --muted, --destructive, --border, and --ring are actually painted; see
- * Design system > Palette. Not the marketing CTA archetype: see Buttons/CTA recipe.
- */
+/** These stories are the only consumer of the semantic token layer (:root in globals.css). */
 const meta = {
 	title: "Buttons/UI Button",
 	component: Button,
@@ -36,7 +31,6 @@ const VARIANTS = [
 	{ variant: "link", tokens: "--primary" },
 ] as const;
 
-/** Every variant the copy-in ships, labelled with the tokens it exercises. */
 export const Variants: Story = {
 	render: () => (
 		<div className="flex flex-col gap-4 bg-background p-10">

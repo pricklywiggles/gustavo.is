@@ -209,7 +209,6 @@ describe("advance", () => {
 		expect(sim.stars).toHaveLength(0);
 		expect(phaseAt(sim, config)).toBe("done");
 
-		// Drain never spawns: the field stays empty.
 		advance(sim, 1, view, config, seededRandom(9));
 		expect(sim.stars).toHaveLength(0);
 	});
@@ -224,7 +223,6 @@ describe("advance", () => {
 		for (let i = 0; i < 40; i++) advance(sim, 0.05, view, config, random);
 		expect(sim.rest).toHaveLength(REST_STAR_COUNT);
 
-		// Arrival stars are parked: more time moves nothing.
 		const depths = sim.rest.map((s) => s.z);
 		advance(sim, 1, view, config, random);
 		expect(sim.rest.map((s) => s.z)).toEqual(depths);

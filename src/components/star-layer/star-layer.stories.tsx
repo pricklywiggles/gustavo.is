@@ -1,11 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { StarLayer } from "@/components/star-layer";
 
-/**
- * Deterministic seeded starfield: the same seed always scatters the same
- * sky, so tweak the controls freely and note the field never reshuffles on
- * re-render. Depths stacks three layers the way the landfall descent does.
- */
 const meta = {
 	title: "Components/Star layer",
 	component: StarLayer,

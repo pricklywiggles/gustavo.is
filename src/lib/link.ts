@@ -10,8 +10,7 @@ const textLinkVariants = cva("site-link", {
 	},
 });
 
-/** The site's one text-link recipe; the look lives unlayered in globals.css (`.site-link*`)
- * so the typography plugin's underline can't resurface. `tone` names the ground. */
+/** `.site-link*` is unlayered in globals.css: the typography plugin would otherwise win. */
 export function textLink({
 	tone,
 }: Omit<VariantProps<typeof textLinkVariants>, "tone"> & { tone: Tone }) {

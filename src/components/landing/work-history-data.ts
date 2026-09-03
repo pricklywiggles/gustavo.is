@@ -1,16 +1,10 @@
 import type gsap from "gsap";
 import type { CSSProperties } from "react";
 
-// Career data hand-normalized from tmp/work-history.xlsx; blank spreadsheet cells inherit
-// from the row above.
+// Career data hand-normalized from tmp/work-history.xlsx; blank cells inherit from the row above.
 
-// Panorama layers are trimmed exports from the authored canvas: full-width bands anchor to
-// the canvas bottom, sprites carry canvas-percentage positions, array order is z-order
-// bottom to top.
-/**
- * Below-sm placement overrides, rendered as custom properties behind max-sm: classes: no JS
- * runs on breakpoint flips, and phase builders that measure config read the desktop values.
- */
+// Trimmed canvas exports: positions are canvas percentages, array order is z-order bottom to top.
+/** Below-sm overrides as max-sm: custom properties; builders that measure config see desktop. */
 export type MobilePlacement = {
 	left?: string;
 	top?: string;
@@ -22,32 +16,28 @@ export type PanoramaLayer = {
 	style: CSSProperties;
 	/** Requires left, top, and width in `style`; missing mobile axes fall back to desktop. */
 	mobile?: MobilePlacement;
-	/** Scroll-in beat; absent for drift (own clock) and year-cued layers. */
+	/** Absent for drift (own clock) and year-cued layers. */
 	step?: number;
 	from?: gsap.TweenVars;
 	origin?: string;
-	/** Entrance ease; the cascade's default is power1.out. */
+	/** Entrance ease; defaults to power1.out. */
 	ease?: string;
 	/** Entrance length override, in viewport-heights; defaults to durVh. */
 	dur?: number;
 	/** Enters when the time scrub reaches this year instead of during the cascade. */
 	yearCue?: number;
-	/** Clouds: wrap in a sway element that drifts/breathes forever. */
+	/** Clouds: wrapped in a sway element that drifts forever. */
 	ambient?: boolean;
 	/** Vessels (ferry, sailboats): time-based sail-in, decoupled from the scrub. */
 	drift?: boolean;
-	/**
-	 * Post-landing parallax shift as a fraction of stage height, positive down. Sea-level
-	 * layers hold as the pivot; z-above rises, z-below sinks to open the HUD band.
-	 */
+	/** Fraction of stage height, positive down; sea level holds, z-above rises, z-below sinks. */
 	parallax?: number;
 	/** Flat-color extension below a rising band so the exposed stage reads as the page surface. */
 	fill?: string;
 };
 
-/** A boat that sails in on real time once its cue layer has landed. */
 export type VesselConfig = {
-	/** src of the drift layer this vessel animates. */
+	/** Matches the drift layer's src. */
 	src: string;
 	/** Casts off when the cascade beat at this step has landed. */
 	cueStep: number;
@@ -58,7 +48,7 @@ export type VesselConfig = {
 	widthPct: number;
 };
 
-/** Programmatic sun disc behind every layer; it lowers and grows across the time scrub. */
+/** Programmatic sun disc behind every layer, lowering and growing across the scrub. */
 export type SunConfig = {
 	/** Resting disc CENTER and diameter, in canvas percentages. */
 	left: number;
@@ -68,8 +58,8 @@ export type SunConfig = {
 	endLeft: number;
 	endTop: number;
 	/**
-	 * Dusk descent target (disc-center canvas %): the swollen disc's top edge must finish
-	 * below the occluding hill's crest. Absent, dusk continues at the scrub's descent speed.
+	 * The swollen disc's top edge must finish below the occluding hill's crest (disc-center
+	 * canvas %). Absent, dusk continues at the scrub's descent speed.
 	 */
 	duskEndTop?: number;
 	/** Scale when dusk finishes; the growth is one arc from growthStart through the end of dusk. */
@@ -79,31 +69,24 @@ export type SunConfig = {
 	/** Growth-arc start as a fraction of the scrub's descent (0 first year, 1 dusk). Default 0.5. */
 	growthStart?: number;
 	/**
-	 * Below-sm RESTING disc center (canvas %). Deltas still come from the desktop numbers,
-	 * so the whole arc translates rigidly; no size knob, or the crown arc would desync.
+	 * Below-sm RESTING disc center (canvas %). Deltas stay desktop so the arc translates rigidly;
+	 * no size knob, or the crown arc desyncs.
 	 */
 	mobile?: { left?: number; top?: number };
 };
 
-/** A city's full animation spec: every timing lives here so each panorama has its own rhythm. */
 export type PanoramaConfig = {
 	aspect: string;
-	/**
-	 * Canvas x-fraction the below-sm crop centers on (default 0.5). Any value is safe: the
-	 * stage offset clamps to real coverage slack, degrading to an edge-flush crop.
-	 */
+	/** Canvas x-fraction the below-sm crop centers on, default 0.5; any value clamps to slack. */
 	mobileFocusX?: number;
 	layers: PanoramaLayer[];
-	/** Per-layer entrance length, in viewport-heights of scroll. */
+	/** Per-layer entrance length. */
 	durVh: number;
-	/** Beat spacing between layer entrances, in viewport-heights. */
+	/** Beat spacing between layer entrances. */
 	stepVh: number;
 	/** Highest `step` in layers: the cascade's last beat. */
 	lastStep: number;
-	/**
-	 * Rises are authored to stop at sea level: never amplify for band clearance, or short
-	 * viewports push water tops past the horizon. The band is whatever the rises reveal.
-	 */
+	/** Rises stop at sea level: amplifying for band clearance pushes water past the horizon. */
 	horizonLocked?: boolean;
 	vessels?: VesselConfig[];
 	sun?: SunConfig;
@@ -114,15 +97,14 @@ export type LogoArt = { src: string; width: number; height: number };
 
 export type Stint = {
 	company: string;
-	/** Omitted while the asset doesn't exist yet. */
 	companyLogo?: LogoArt;
 	role: string;
 	product: string;
-	/** Path under public/, omitted while the asset doesn't exist yet. */
+	/** Path under public/. */
 	productLogo?: string;
 	/** [start, end) in fractional years. */
 	years: [number, number];
-	/** Users this product reached; the HUD counter accumulates these. */
+	/** The HUD counter accumulates these across the career. */
 	usersReached?: number;
 };
 
@@ -135,10 +117,7 @@ export type CityChapter = {
 	stints: Stint[];
 };
 
-/**
- * Latest stint that has started at the given year; a gap between jobs holds the previous
- * stint rather than blanking the bar.
- */
+/** A gap between jobs holds the previous stint rather than blanking the bar. */
 export function stintIndexAt(stints: Stint[], year: number): number {
 	for (let i = stints.length - 1; i > 0; i--) {
 		if (year >= stints[i].years[0]) return i;
@@ -146,10 +125,7 @@ export function stintIndexAt(stints: Stint[], year: number): number {
 	return 0;
 }
 
-/**
- * Years a users figure accrues over: a company-wide figure (Microsoft's 200M) extends
- * through following same-company stints until the next figure; per-product figures don't.
- */
+/** A company-wide figure (Microsoft's 200M) runs through same-company stints until the next. */
 function accrualWindow(stints: Stint[], index: number): [number, number] {
 	const start = stints[index].years[0];
 	let end = stints[index].years[1];
@@ -161,10 +137,7 @@ function accrualWindow(stints: Stint[], index: number): [number, number] {
 	return [start, end];
 }
 
-/**
- * Accrued smoothly across each figure's window so the counter climbs rather than jumping at
- * stint boundaries; quantized to three significant figures so scrolling doesn't thrash React.
- */
+/** Accrued smoothly; quantized to three significant figures so scrolling can't thrash React. */
 export function cumulativeUsersAt(stints: Stint[], year: number): number {
 	let total = 0;
 	stints.forEach((stint, index) => {
@@ -179,7 +152,7 @@ export function cumulativeUsersAt(stints: Stint[], year: number): number {
 	return Math.round(total / step) * step;
 }
 
-/** Prior chapters' final totals; the counter is cumulative across the whole career. */
+/** The counter is cumulative across the whole career. */
 export function carriedUsersBefore(
 	chapters: CityChapter[],
 	index: number,
@@ -334,8 +307,7 @@ const SEATTLE_PANORAMA: PanoramaConfig = {
 	],
 };
 
-// San Francisco positions were template-matched from the composed reference: the numbers are
-// the composition's own, never round or "tidy" them (oddities are cataloged in the README).
+// Template-matched from the composed reference: never round or "tidy" these numbers (README).
 const SF_BOAT_MIDDLE_LEFT_PCT = 35.43;
 const SF_BOAT_NEAR_LEFT_PCT = 60.39;
 const SF_BOAT_WIDTH_PCT = 12.6;
@@ -464,8 +436,8 @@ const SAN_FRANCISCO_PANORAMA: PanoramaConfig = {
 			step: 4,
 			from: { yPercent: 30, xPercent: -10 },
 		},
-		// Sea level is water-far's top edge: city-bridge, city-front, water-far, and
-		// bridge-front hold (no parallax) so the horizon never shears when the band opens.
+		// Sea level is water-far's top edge: city-bridge, city-front, water-far and bridge-front
+		// hold no parallax, or the horizon shears when the band opens.
 		{
 			src: "/san-francisco-panorama/15-city-front.webp",
 			style: { left: "-9.16%", top: "51.9%", width: "62.72%" },
@@ -484,8 +456,7 @@ const SAN_FRANCISCO_PANORAMA: PanoramaConfig = {
 			step: 7,
 			from: { yPercent: 30, xPercent: 12 },
 		},
-		// Rises are authored just under the sea-level cap (85.76), staggered so the bands
-		// compress toward the horizon; each boat is welded to its strip's shift.
+		// Rises stay under the sea-level cap (85.76); each boat is welded to its strip's shift.
 		{
 			src: "/san-francisco-panorama/18-water-middle.webp",
 			style: { left: 0, top: "88.42%", width: "100%" },
@@ -524,7 +495,7 @@ const SAN_FRANCISCO_PANORAMA: PanoramaConfig = {
 	],
 };
 
-// Los Angeles is template-matched like San Francisco: never round or "tidy" the numbers.
+// Template-matched like San Francisco: never round or "tidy" the numbers.
 // Sea level is near-city's top (57.59): it holds, haze and street-view rise, the rest sinks.
 const LA_PANORAMA: PanoramaConfig = {
 	aspect: "2688 / 1792",
@@ -533,8 +504,8 @@ const LA_PANORAMA: PanoramaConfig = {
 	stepVh: 0.3,
 	lastStep: 13,
 	horizonLocked: true,
-	// endLeft matches left on purpose: the center drops straight down. duskEndTop derives
-	// from far-hill's crest (28.86%) plus the swollen radius; re-derive if art moves.
+	// endLeft matches left on purpose: the center drops straight down. duskEndTop derives from
+	// far-hill's crest (28.86%) plus the swollen radius; re-derive if the art moves.
 	sun: {
 		left: 63.5,
 		top: 21.5,
@@ -593,8 +564,8 @@ const LA_PANORAMA: PanoramaConfig = {
 			from: { yPercent: 18 },
 			parallax: 0.02,
 		},
-		// Same step/parallax as near-hill so they stay one plane. yPercent is the hill's 18
-		// times the asset height ratio (2871/153); re-derive if either asset is re-trimmed.
+		// Same step/parallax as near-hill: one plane. yPercent is the hill's 18 times the asset
+		// height ratio (2871/153); re-derive if either asset is re-trimmed.
 		{
 			src: "/los-angeles-panorama/4-hollywood-sign.webp",
 			style: { left: "60.66%", top: "62.55%", width: "8.28%" },
@@ -603,7 +574,6 @@ const LA_PANORAMA: PanoramaConfig = {
 			from: { yPercent: 337.8 },
 			parallax: 0.02,
 		},
-		// The towers rise from behind the already-landed city masses; z-order stays as authored.
 		{
 			src: "/los-angeles-panorama/5-building-6.webp",
 			style: { left: "23%", top: "21.89%", width: "6.66%" },
@@ -707,7 +677,6 @@ const TARTLE_LOGO: LogoArt = {
 	height: 40,
 };
 
-// slide.com: a whole year per product after the photo app's two; one 20M figure spans the tenure.
 export const CHAPTERS: CityChapter[] = [
 	{
 		id: "seattle",
@@ -731,8 +700,7 @@ export const CHAPTERS: CityChapter[] = [
 				product: "Office",
 				productLogo: "/logos/office.svg",
 				years: [1999, 2000],
-				// The balance of Microsoft's 200M: a figure here ends Word's accrual window
-				// and opens one running through the rest of the Microsoft years.
+				// The balance of Microsoft's 200M; it ends Word's window and opens one for the rest.
 				usersReached: 125_000_000,
 			},
 			{
@@ -767,6 +735,7 @@ export const CHAPTERS: CityChapter[] = [
 		span: [2005, 2018],
 		panorama: SAN_FRANCISCO_PANORAMA,
 		stints: [
+			// A year per product after the photo app's two; the 20M figure spans the whole tenure.
 			{
 				company: "slide.com",
 				companyLogo: SLIDE_LOGO,

@@ -3,12 +3,6 @@ import { Mail } from "lucide-react";
 import { navPill } from "./cta";
 import type { Tone } from "./focus-ring";
 
-/**
- * The header/footer pill: text pills for nav links, icon pills for the
- * contact trigger, socials, and menu toggles. Color and hover classes come
- * from the bar theme at the call site (src/components/bar-themes.ts); the
- * tones below are the shipped themes.
- */
 const meta = {
 	title: "Buttons/Nav pill",
 	parameters: { layout: "fullscreen" },

@@ -7,7 +7,7 @@ import {
 	BLOG_PANO_SETTLED_VW,
 } from "./blog-panorama-data";
 
-// street-view's natural aspect (4032x1359): its rendered height in vw.
+// 4032x1359 is street-view's natural size.
 const STREET_VIEW_H_VW = 100 / (4032 / 1359);
 
 const streetView = BLOG_PANO_LAYERS.find((l) =>
@@ -40,15 +40,13 @@ describe("blog panorama data", () => {
 		const kiwi = BLOG_PANO_LAYERS.find((l) => l.src.includes("walking-kiwi"));
 		expect(kiwi).toBeDefined();
 		expect(kiwi?.dy).toBe(streetView?.dy);
-		// Feet flush with the settled container bottom.
 		const kiwiH = 8.26;
 		expect((kiwi?.top ?? 0) + kiwiH).toBeCloseTo(BLOG_PANO_SETTLED_VW, 1);
 	});
 
 	it("covers the hero's bottom edge through the whole entrance", () => {
 		if (!streetView) throw new Error("street-view layer missing");
-		// Linear blend t: 0 = initial composition, 1 = settled strip. The
-		// easing maps onto t, so covering all t covers every eased frame.
+		// The easing maps onto t, so sampling t linearly covers every eased frame.
 		for (let t = 0; t <= 1.001; t += 0.05) {
 			const heroH =
 				BLOG_PANO_INITIAL_VW +

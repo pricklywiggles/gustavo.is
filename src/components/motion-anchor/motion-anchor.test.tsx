@@ -18,8 +18,7 @@ describe("resolveAnchorIndex", () => {
 	});
 
 	it("ignores range overlap: only tops decide", () => {
-		// The landfall pull-up makes the descent's range overlap the projects
-		// section; the descent top still wins once scrolled past it.
+		// The landfall pull-up overlaps the descent's range with the projects section.
 		expect(resolveAnchorIndex([0, 5000, 4000 + 1000], 5200)).toBe(2);
 	});
 
@@ -32,14 +31,12 @@ describe("resolveAnchorIndex", () => {
 describe("compensatedScroll", () => {
 	it("preserves the pixel offset inside a stable anchor", () => {
 		expect(compensatedScroll(250, { top: 4000, height: 2000 }, 900)).toBe(4250);
-		// Past height minus viewport is still a real position (content below
-		// the anchor fills the frame): no clamp.
+		// Past height minus viewport is still real: content below the anchor fills the frame.
 		expect(compensatedScroll(388, { top: 4000, height: 1146 }, 900)).toBe(4388);
 	});
 
 	it("clamps into a collapsed anchor's new extent", () => {
-		// Deep in the motion descent (975vh of it gone): park at the static
-		// frame, not 9000px past it into the vista.
+		// Deep in the motion descent: park at the static frame, not 9000px into the vista.
 		expect(compensatedScroll(9000, { top: 4000, height: 900 }, 900)).toBe(4000);
 		expect(compensatedScroll(9000, { top: 4000, height: 1400 }, 900)).toBe(
 			4500,
@@ -53,8 +50,7 @@ describe("compensatedScroll", () => {
 
 describe("scrubFraction", () => {
 	it("measures normalized progress through the old scrollable extent", () => {
-		// 29700px pin region (33 x 900vh-viewports) at top 4000: halfway
-		// through its 28800px extent.
+		// 29700px = 33 x 900px viewports; halfway through the 28800px extent.
 		expect(scrubFraction(4000 + 14400, { top: 4000, height: 29700 }, 900)).toBe(
 			0.5,
 		);
@@ -67,8 +63,7 @@ describe("scrubFraction", () => {
 	});
 
 	it("floors the denominator at 1 for shorter-than-viewport anchors", () => {
-		// height minus viewport is negative; without the floor this divides
-		// by a negative and inverts the clamp.
+		// height minus viewport is negative; without the floor the division inverts the clamp.
 		expect(scrubFraction(4000, { top: 4000, height: 500 }, 900)).toBe(0);
 		expect(scrubFraction(4400, { top: 4000, height: 500 }, 900)).toBe(1);
 	});

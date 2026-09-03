@@ -18,7 +18,6 @@ describe("stintIndexAt", () => {
 	});
 
 	it("switches exactly on a stint's first year", () => {
-		// Six slide.com products, one per whole year after the photo app's two.
 		expect(sanFrancisco[1].product).toBe("Top Friends");
 		expect(sanFrancisco[2].product).toBe("SuperPoke");
 		expect(stintIndexAt(sanFrancisco, 2007.99)).toBe(1);
@@ -26,8 +25,7 @@ describe("stintIndexAt", () => {
 	});
 
 	it("holds the previous stint across a gap between jobs", () => {
-		// Nothing in the data covers 2017-2018; the bar keeps UP 3 through
-		// San Francisco's tail. Jawbone Health then opens Los Angeles.
+		// No stint covers 2017-2018, so UP 3 holds through San Francisco's tail.
 		expect(sanFrancisco[9].product).toBe("UP 3");
 		expect(stintIndexAt(sanFrancisco, 2017.5)).toBe(9);
 		expect(stintIndexAt(sanFrancisco, 2018)).toBe(9);
@@ -39,14 +37,12 @@ describe("stintIndexAt", () => {
 describe("cumulativeUsersAt", () => {
 	it("starts a chapter at zero and completes a figure at its window end", () => {
 		expect(cumulativeUsersAt(seattle, 1998)).toBe(0);
-		// Word's 75M accrues over 1998-1999 only, because Office carries its
-		// own figure and therefore closes Word's window.
+		// Word's 75M accrues over 1998-1999 only: Office's own figure closes Word's window.
 		expect(cumulativeUsersAt(seattle, 1999)).toBe(75_000_000);
 	});
 
 	it("spreads a company-wide figure across the stints that share it", () => {
-		// Office's 125M covers Office through VSTO (no later Microsoft stint
-		// has a figure), so 2001 sits 2 years into that 6-year window.
+		// Office's 125M spans Office through VSTO, so 2001 sits 2 years into a 6-year window.
 		expect(cumulativeUsersAt(seattle, 2001)).toBe(117_000_000);
 		expect(cumulativeUsersAt(seattle, 2005)).toBe(200_000_000);
 	});
@@ -57,8 +53,7 @@ describe("cumulativeUsersAt", () => {
 	});
 
 	it("keeps small totals exact instead of quantizing them", () => {
-		// Both Meaning stints close by 2021: three users each, delivered in
-		// full and never rounded away.
+		// Both Meaning stints close by 2021: three users each, delivered in full.
 		expect(cumulativeUsersAt(losAngeles, 2021)).toBe(6);
 	});
 
@@ -71,7 +66,6 @@ describe("cumulativeUsersAt", () => {
 describe("carriedUsersBefore", () => {
 	it("carries each chapter's final total into the next", () => {
 		expect(carriedUsersBefore(CHAPTERS, 0)).toBe(0);
-		// Seattle's 200M opens San Francisco.
 		expect(carriedUsersBefore(CHAPTERS, 1)).toBe(200_000_000);
 		// Plus SF's 20M slide.com run and 3M of Jawbone devices opens LA.
 		expect(carriedUsersBefore(CHAPTERS, 2)).toBe(223_000_000);
@@ -86,8 +80,7 @@ describe("CHAPTERS invariants", () => {
 	});
 
 	it("keeps every stint forward-running and inside its chapter's span", () => {
-		// Containment only: gaps between stints (SF's 2017-2018 tail) are the
-		// designed gap-hold semantics, so coverage is deliberately unasserted.
+		// Containment only: gaps between stints (SF's 2017-2018) are designed gap-hold semantics.
 		for (const { span, stints } of CHAPTERS) {
 			for (const stint of stints) {
 				expect(stint.years[0]).toBeLessThan(stint.years[1]);

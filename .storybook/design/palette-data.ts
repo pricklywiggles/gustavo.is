@@ -1,22 +1,18 @@
 import type { RampToken } from "@/lib/ramp";
 
-/** DESIGN.md's Colors subsections, in the order the reference page walks them. */
+/** DESIGN.md's Colors subsections. */
 export type TokenGroup = "core" | "neutral" | "mid" | "extended" | "cool";
 
 export type PaletteEntry = {
 	slug: RampToken;
 	name: string;
 	group: TokenGroup;
-	/** The role this token answers to in DESIGN.md, not a description of the colour. */
+	/** The role name DESIGN.md gives the token, not a colour description. */
 	label: string;
 	role: string;
 };
 
-/**
- * Every token in globals.css, with the prose DESIGN.md gives it. Values are not repeated
- * here: the page reads them from src/lib/ramp.ts, and design-tokens.test.ts fails when
- * this list and the ramp disagree about which tokens exist.
- */
+/** design-tokens.test.ts fails when this list and src/lib/ramp.ts disagree on tokens. */
 export const PALETTE: PaletteEntry[] = [
 	{
 		slug: "dusk-earth",

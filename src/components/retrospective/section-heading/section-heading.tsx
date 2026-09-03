@@ -1,7 +1,7 @@
 import { ScrollFadeIn } from "@/components/scroll-fade-in";
 import type { Tone } from "@/lib/focus-ring";
 
-/** `tone` is the ground the heading sits on, as everywhere else on the site. */
+/** `tone` is the ground the heading sits on. */
 export function SectionHeading({
 	children,
 	tone = "dark",

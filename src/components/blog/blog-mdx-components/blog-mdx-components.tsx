@@ -14,9 +14,7 @@ import { CurtainLink } from "@/components/curtain-link";
 import { textLink } from "@/lib/link";
 import { cn } from "@/lib/utils";
 
-/** The blog content link: every anchor in a post renders through this, wearing the
- * textLink recipe's dark tone. The unlayered `.site-link` color beats any `text-*` in
- * className, so callers can't recolor it. */
+/** The unlayered `.site-link` color beats any `text-*` in className: callers cannot recolor. */
 function MdxLink({
 	href = "",
 	className,
@@ -52,8 +50,7 @@ function MdxLink({
 	);
 }
 
-/** The scroll box wraps the table instead of restyling it: `display: block`
- * on the table itself strips its row/column semantics for AT. */
+/** A wrapper, not `display: block` on the table: that strips row/column semantics for AT. */
 function MdxTable(props: ComponentProps<"table">) {
 	return (
 		<div className="overflow-x-auto">
@@ -69,8 +66,7 @@ type MdxImageProps = Omit<ComponentProps<"img">, "src" | "width" | "height"> & {
 	height?: number | string;
 };
 
-/** Bridge from MDX's `img` (string src) to next/image: remarkImage hands imported files
- * over as objects, which a native <img> would stringify to "[object Object]". */
+/** A native <img> would stringify remarkImage's imported objects to "[object Object]". */
 function MdxImage({
 	src,
 	alt = "",
@@ -97,16 +93,14 @@ function MdxImage({
 	return <Image src={src} width={w} height={h} {...shared} />;
 }
 
-/** The CodeBlockTab* entries must match the element names remarkCodeTab
- * emits for tab="..." fences. */
+/** The CodeBlockTab* keys must match the element names remarkCodeTab emits. */
 export const blogMdxComponents: MDXComponents = {
 	a: MdxLink,
 	blockquote: Blockquote,
-	// MDX types img src as string only; the bridge widens it to StaticImageData.
+	// MDX types img src as string only.
 	img: MdxImage as MDXComponents["img"],
 	pre: CodeBlock,
 	table: MdxTable,
-	// Named too, so a post can pass its own mark: <Blockquote icon="...">.
 	Blockquote,
 	CodeBlockTab,
 	CodeBlockTabs,

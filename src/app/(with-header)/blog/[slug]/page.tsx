@@ -23,7 +23,6 @@ export async function generateMetadata({
 }): Promise<Metadata> {
 	const { slug } = await params;
 	const page = blogSource.getPage([slug]);
-	// Drafts 404 below, so their metadata must not leak into that response.
 	if (!page || page.data.draft) return {};
 	const cover = coverOf(page);
 	return pageMetadata({
@@ -46,10 +45,7 @@ export async function generateMetadata({
 	});
 }
 
-/**
- * One dark-earth surface end to end so arrival and the footer hand-off stay seamless
- * (the Unbroken Ground Rule); the hero owns the h1, authors start at h2.
- */
+/** The hero owns the h1; post bodies start at h2. */
 export default async function BlogPostPage({
 	params,
 }: {

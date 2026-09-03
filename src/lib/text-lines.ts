@@ -1,8 +1,5 @@
-/**
- * Groups already-laid-out character elements into the browser's visual lines (offsetTop
- * is read directly; pass elements in DOM order). A new line begins when a top drops past
- * `tolerance`, half a character box: over sub-pixel drift, under the line gap.
- */
+/** Call after layout, in DOM order: offsetTop is read directly.
+ * Default tolerance is half a character box: over sub-pixel drift, under the line gap. */
 export function groupIntoLines<T extends HTMLElement>(
 	chars: readonly T[],
 	tolerance?: number,

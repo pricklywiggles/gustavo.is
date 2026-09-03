@@ -5,10 +5,7 @@ import { PlayBadge } from "@/components/play-badge";
 import { EVENTS, track } from "@/lib/analytics";
 import { FOCUS_RING } from "@/lib/focus-ring";
 
-/**
- * Click-to-load facade: the old site mounted every walkthrough iframe at once,
- * so the page paid for five players nobody had asked for.
- */
+/** Click-to-load facade: the old site mounted all five walkthrough iframes at once. */
 export function VideoEmbed({
 	src,
 	title,

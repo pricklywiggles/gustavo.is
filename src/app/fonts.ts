@@ -1,7 +1,6 @@
 import localFont from "next/font/local";
 
-// The faces production ships: the role variables in globals.css resolve to these two.
-// Candidate faces for the dev font lab are added locally in components/font-lab-faces.ts.
+// Production faces only; the dev font lab's candidates live in components/font-lab-faces.ts.
 
 export const wotfard = localFont({
 	src: [
@@ -22,8 +21,7 @@ export const wotfard = localFont({
 	adjustFontFallback: "Arial",
 });
 
-// Licensed, prepared like Wotfard: Latin-subset WOFF2 via fonttools (140KB OTF to 24KB).
-// A real Bold cut, so it declares 700; nothing on the site asks for heavier.
+// Latin-subset WOFF2 via fonttools (140KB OTF to 24KB); a real Bold cut, so weight 700.
 export const kitora = localFont({
 	src: "../fonts/Kitora-Bold.woff2",
 	weight: "700",
@@ -32,5 +30,5 @@ export const kitora = localFont({
 	adjustFontFallback: "Arial",
 });
 
-/** The production faces' CSS variables; goes on <html>. */
+/** Goes on <html>. */
 export const fontVariables = `${wotfard.variable} ${kitora.variable}`;

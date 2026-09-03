@@ -1,10 +1,4 @@
-/**
- * Declarative scroll choreography: an ordered list of named phases, each with
- * a length in viewport-heights, resolved into absolute offsets from the pin
- * start. Sequential phases start where the cursor left off; a phase with
- * `with` anchors to another phase's start instead (plus `offset`), which is
- * how overlaps are expressed. Reordering the story is reordering the list.
- */
+/** Named phases in viewport-heights, resolved into absolute offsets from the pin start. */
 export type PhaseSpec = {
 	id: string;
 	len: number;

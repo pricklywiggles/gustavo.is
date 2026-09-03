@@ -1,5 +1,4 @@
-// Pose math for the hero year string, whose transform origin is its top-right corner.
-// Pure so the geometry is unit-testable; the caller measures the boxes.
+// Poses for the hero year string, whose transform origin is its top-right corner.
 
 export type Box = {
 	left: number;
@@ -20,8 +19,7 @@ export function heroPose(hero: Box, host: Box, target: number) {
 	};
 }
 
-// AnimateNumber pads its digits symmetrically, so their 1em line box is centered
-// in the box it reports; the string's own line box has no padding.
+// AnimateNumber pads symmetrically, so its 1em line box centers in the box it reports.
 export function dockPose(
 	hero: Box,
 	number: Box,

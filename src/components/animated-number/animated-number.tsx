@@ -4,10 +4,8 @@ import { AnimateNumber, type AnimateNumberProps } from "motion-plus/react";
 import { useEffect, useRef } from "react";
 
 /**
- * AnimateNumber locked to tabular digits so widths never jitter; GSAP never touches
- * these nodes. `trend` comes from the last COMMITTED value: the library mutates a ref
- * during render, which StrictMode's double-render zeroes, degrading every roll to a
- * shortest-path rewind.
+ * GSAP must never touch these nodes. `trend` uses the last COMMITTED value: the library's
+ * render-time ref is zeroed by StrictMode, degrading every roll to a shortest-path rewind.
  */
 export function AnimatedNumber({
 	className,

@@ -2,11 +2,10 @@
 
 import { useMediaQuery } from "@/components/use-media-query";
 
-/** Tailwind's sm breakpoint, as the media query the mobile HUD keys off. */
+/** Tailwind's sm breakpoint. */
 export const BELOW_SM = "(width < 40rem)";
 
-// Server snapshot says desktop: a phone briefly mounts the sm-and-up branch on the
-// first hydrated frame, corrected post-hydration (below the fold for every consumer).
+// Server snapshot is desktop: a phone paints the sm-and-up branch for one frame, below the fold.
 export function useBelowSm(): boolean {
 	return useMediaQuery(BELOW_SM);
 }

@@ -1,8 +1,4 @@
-/**
- * The hero's ground bands compressed to hairline seams that thicken
- * toward the article; `flip` mirrors the stack so the closing seam
- * thickens toward it too.
- */
+/** The hero's ground bands as hairline seams, thickening toward the article. */
 export function GroundStrata({ flip = false }: { flip?: boolean }) {
 	return (
 		<div

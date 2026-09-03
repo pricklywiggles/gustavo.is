@@ -7,11 +7,7 @@ import { type ElementType, type ReactNode, useRef } from "react";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-/**
- * `gsap.from`, not `to`: children are authored in their resting state, so the
- * copy reads with no JS and under reduced motion. Scroll-driven work is GSAP's
- * half of DESIGN.md's two-library rule.
- */
+/** `gsap.from`, so the copy reads at rest with no JS and under reduced motion. */
 export function ScrollFadeIn({
 	as,
 	className,

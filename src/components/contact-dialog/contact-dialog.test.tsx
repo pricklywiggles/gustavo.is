@@ -12,8 +12,7 @@ afterEach(() => {
 	reducedState.value = true;
 });
 
-// The app mounts the dialog under LazyMotion; without the provider `m` has no exit
-// feature and AnimatePresence unmounts instantly in both modes.
+// Without LazyMotion's provider, `m` has no exit feature and AnimatePresence unmounts instantly.
 const ui = (open: boolean) => (
 	<LazyMotion features={domMax}>
 		<ContactDialog
@@ -41,9 +40,7 @@ describe("ContactDialog close timing", () => {
 		const { rerender } = render(ui(true));
 		expect(await screen.findByRole("dialog")).toBeTruthy();
 		rerender(ui(false));
-		// The reduced path is gone in ~25ms and the motion exit holds ~300ms; sampling
-		// early keeps a loaded machine (a late timer against an elapsed-time tween)
-		// from landing after the exit.
+		// 60ms sits between the reduced path's ~25ms exit and the motion exit's ~300ms hold.
 		await new Promise((resolve) => setTimeout(resolve, 60));
 		expect(screen.queryByRole("dialog")).not.toBeNull();
 	});
