@@ -833,6 +833,7 @@ export function WorkHistorySection() {
 					>
 						<WorkHistoryHud
 							span={chapter.span}
+							stints={chapter.stints}
 							year={live ? year : rest.year}
 							stint={chapter.stints[live ? stintIndex : rest.stintIndex]}
 							usersTotal={live ? usersTotal : rest.usersTotal}

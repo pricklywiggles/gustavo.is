@@ -7,7 +7,7 @@ import {
 	m,
 	type Variants,
 } from "motion/react";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { AnimatedNumber } from "@/components/animated-number";
 import { OdometerNumber } from "@/components/landing/odometer-number";
 import { useBelowSm } from "@/components/landing/use-below-sm";
@@ -26,21 +26,28 @@ export function rulerTravel([from, to]: [number, number]): number {
 	return (to - from) * RULER_TICKS_PER_YEAR * RULER_PITCH;
 }
 
-// Scale and opacity only: the swap stays on the compositor.
+// Scale and opacity only: the swap stays on the compositor. Marks never unmount (a
+// remounted img refetches its file and pops pixel-less), so the pop waits out the fade.
+const SWAP_OUT = 0.15;
 const POP: Variants = {
-	initial: { opacity: 0, scale: 0.6 },
-	enter: {
-		opacity: 1,
-		scale: 1,
-		transition: {
-			scale: { type: "spring", bounce: 0.45, visualDuration: 0.4 },
-			opacity: { duration: 0.15, ease: "easeOut" },
-		},
-	},
-	exit: {
+	hidden: {
 		opacity: 0,
 		scale: 0.8,
-		transition: { duration: 0.15, ease: "easeIn" },
+		transition: { duration: SWAP_OUT, ease: "easeIn" },
+	},
+	shown: {
+		opacity: 1,
+		scale: [0.6, 1],
+		// A value's own transition replaces the variant's, so each carries the delay.
+		transition: {
+			scale: {
+				type: "spring",
+				bounce: 0.45,
+				visualDuration: 0.4,
+				delay: SWAP_OUT,
+			},
+			opacity: { duration: 0.15, ease: "easeOut", delay: SWAP_OUT },
+		},
 	},
 };
 
@@ -51,13 +58,90 @@ const FADE: Variants = {
 };
 
 // Fixed slot: marks run 6.5:1 to 1:1, the counter must not shift; w-40 fits 375px phones.
-const COMPANY_BOX = "flex h-13.75 w-40 shrink-0 items-center sm:w-50";
+const COMPANY_BOX = "relative h-13.75 w-40 shrink-0 sm:w-50";
 // Padding tracks viewport height from sm, so a landscape phone still fits the plate.
 const PRODUCT_PLATE =
 	"rounded-[2.5rem] bg-pale-dune/60 p-6 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.55)] ring-1 ring-white/40 backdrop-blur-md sm:p-[clamp(1.5rem,4.5vh,2.5rem)]";
 // Same height as the mark slot: font-derived content would drift with the legend face.
 const COUNTER_BOX =
 	"ml-auto hidden h-13.75 shrink-0 flex-col justify-center text-right sm:flex";
+
+type Mark = {
+	key: string;
+	label: string;
+	src?: string;
+	width?: number;
+	height?: number;
+};
+
+const productMark = (stint: Stint): Mark => ({
+	key: stint.productLogo ?? stint.product,
+	label: stint.product,
+	src: stint.productLogo,
+});
+
+const companyMark = (stint: Stint): Mark => ({
+	key: stint.companyLogo?.src ?? stint.company,
+	label: stint.company,
+	...stint.companyLogo,
+});
+
+// One element per distinct art: a mark carried across stints keeps it and never re-pops.
+function distinctMarks(
+	stints: readonly Stint[],
+	toMark: (stint: Stint) => Mark,
+): Mark[] {
+	const seen = new Set<string>();
+	return stints.flatMap((stint) => {
+		const mark = toMark(stint);
+		if (seen.has(mark.key)) return [];
+		seen.add(mark.key);
+		return [mark];
+	});
+}
+
+// The active mark pops in; the rest wait hidden and out of the accessibility tree.
+function MarkStack({
+	marks,
+	active,
+	variants,
+	imgClassName,
+	textClassName,
+}: {
+	marks: Mark[];
+	active: string;
+	variants: Variants | undefined;
+	imgClassName: string;
+	textClassName: string;
+}) {
+	return marks.map((mark) => {
+		const shown = mark.key === active;
+		const motion = {
+			variants,
+			initial: false as const,
+			animate: shown ? "shown" : "hidden",
+			"aria-hidden": shown ? undefined : true,
+		};
+		return mark.src ? (
+			// biome-ignore lint/performance/noImgElement: fixed-box scene sprite; next/image adds nothing here
+			<m.img
+				key={mark.key}
+				src={mark.src}
+				width={mark.width}
+				height={mark.height}
+				alt={mark.label}
+				loading="lazy"
+				decoding="async"
+				className={imgClassName}
+				{...motion}
+			/>
+		) : (
+			<m.span key={mark.key} className={textClassName} {...motion}>
+				{mark.label}
+			</m.span>
+		);
+	});
+}
 
 // The ~200 identical ticks otherwise rebuild on every readout push into the HUD.
 const RulerTicks = memo(function RulerTicks({ count }: { count: number }) {
@@ -82,12 +166,15 @@ const RulerTicks = memo(function RulerTicks({ count }: { count: number }) {
 // memo pays off because inactive chapters get constant props during a scrub.
 export const WorkHistoryHud = memo(function WorkHistoryHud({
 	span,
+	stints,
 	year,
 	stint,
 	usersTotal,
 }: {
 	/** [first, last] year. */
 	span: [number, number];
+	/** Every stint of the chapter: each distinct mark stays mounted across swaps. */
+	stints: readonly Stint[];
 	year: number;
 	stint: Stint;
 	usersTotal: number;
@@ -97,6 +184,8 @@ export const WorkHistoryHud = memo(function WorkHistoryHud({
 	const belowSm = useBelowSm();
 	const pop = reducedMotion ? undefined : POP;
 	const fade = reducedMotion ? undefined : FADE;
+	const products = useMemo(() => distinctMarks(stints, productMark), [stints]);
+	const companies = useMemo(() => distinctMarks(stints, companyMark), [stints]);
 	const tickCount =
 		RULER_LEAD + (span[1] - span[0]) * RULER_TICKS_PER_YEAR + RULER_TRAIL;
 	return (
@@ -152,8 +241,9 @@ export const WorkHistoryHud = memo(function WorkHistoryHud({
 					</p>
 				</div>
 
-				{/* Where the reader looks. Sized at rest (Safari rasters at layout size) and
-				    keyed on the art so carried marks never re-pop. */}
+				{/* Where the reader looks. Sized at rest (Safari rasters at layout size). Every
+				    mark of the chapter stays mounted: a remounted img refetches its file and
+				    pops pixel-less, a gap Gecko paints as the alt text. */}
 				<div
 					data-hud-product
 					className="absolute inset-0 flex items-center justify-center"
@@ -161,33 +251,14 @@ export const WorkHistoryHud = memo(function WorkHistoryHud({
 					{/* The marks span every palette; a frosted plate in the band's surface color
 					    keeps each one from clashing with or vanishing into its city. */}
 					<div className={PRODUCT_PLATE}>
-						<div className="h-[clamp(4rem,20vh,12rem)] w-[min(72vw,34rem)]">
-							<AnimatePresence mode="wait" initial={false}>
-								{stint.productLogo ? (
-									// biome-ignore lint/performance/noImgElement: fixed-box scene sprite; next/image adds nothing here
-									<m.img
-										key={stint.productLogo}
-										src={stint.productLogo}
-										alt={stint.product}
-										className="h-full w-full object-contain"
-										variants={pop}
-										initial="initial"
-										animate="enter"
-										exit="exit"
-									/>
-								) : (
-									<m.span
-										key={stint.product}
-										className="flex h-full items-center justify-center text-center font-bold font-display text-[clamp(1.75rem,4vw,3.5rem)] text-white leading-none"
-										variants={pop}
-										initial="initial"
-										animate="enter"
-										exit="exit"
-									>
-										{stint.product}
-									</m.span>
-								)}
-							</AnimatePresence>
+						<div className="relative h-[clamp(4rem,20vh,12rem)] w-[min(72vw,34rem)]">
+							<MarkStack
+								marks={products}
+								active={productMark(stint).key}
+								variants={pop}
+								imgClassName="absolute inset-0 h-full w-full object-contain"
+								textClassName="absolute inset-0 flex items-center justify-center text-center font-bold font-display text-[clamp(1.75rem,4vw,3.5rem)] text-white leading-none"
+							/>
 						</div>
 					</div>
 				</div>
@@ -222,37 +293,16 @@ export const WorkHistoryHud = memo(function WorkHistoryHud({
 				{/* The right padding is asymmetric on purpose: it clears the ruler. */}
 				<div data-hud-bar className="absolute inset-x-0 bottom-0">
 					<div className="mx-auto flex max-w-6xl items-center gap-4 py-[clamp(0.75rem,1.6vh,1.25rem)] pr-16 pl-6 sm:gap-7 sm:pl-10">
-						{/* width/height give the ratio before load, so a cold swap never pops from
-						    zero width; keyed on the art so carried marks never re-pop. */}
+						{/* width/height give the ratio before load, so the slot lays out at the
+						    final width; the stack never remounts a mark (see the product layer). */}
 						<div data-hud-slot className={COMPANY_BOX}>
-							<AnimatePresence mode="wait" initial={false}>
-								{stint.companyLogo ? (
-									// biome-ignore lint/performance/noImgElement: fixed-box scene sprite; next/image adds nothing here
-									<m.img
-										key={stint.companyLogo.src}
-										src={stint.companyLogo.src}
-										width={stint.companyLogo.width}
-										height={stint.companyLogo.height}
-										alt={stint.company}
-										className="h-full w-auto max-w-full object-contain"
-										variants={pop}
-										initial="initial"
-										animate="enter"
-										exit="exit"
-									/>
-								) : (
-									<m.span
-										key={stint.company}
-										className="flex h-full items-center font-semibold text-dusk-ink text-lg"
-										variants={pop}
-										initial="initial"
-										animate="enter"
-										exit="exit"
-									>
-										{stint.company}
-									</m.span>
-								)}
-							</AnimatePresence>
+							<MarkStack
+								marks={companies}
+								active={companyMark(stint).key}
+								variants={pop}
+								imgClassName="absolute inset-y-0 left-0 h-full w-auto max-w-full object-contain"
+								textClassName="absolute inset-0 flex items-center font-semibold text-dusk-ink text-lg"
+							/>
 						</div>
 
 						{/* Right aligned so digits arriving through the count-up grow leftward

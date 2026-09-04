@@ -16,6 +16,7 @@ describe("WorkHistoryHud on a reduced-motion client", () => {
 			return (
 				<WorkHistoryHud
 					span={chapter.span}
+					stints={chapter.stints}
 					year={chapter.span[0]}
 					stint={chapter.stints[0]}
 					usersTotal={200_000_000}
