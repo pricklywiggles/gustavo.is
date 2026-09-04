@@ -105,19 +105,31 @@ Bullets name the file.
   from clashing with or vanishing into its city while the art still reads
   through. GSAP reveals the layer with autoAlpha and `y` across `product-in@i`,
   which starts at the dock's end so the year holds the center until it
-  leaves, and never with a scale: the img inside is Motion's spring pop
-  (keyed on the art, so a mark carried across stints never re-pops), and
-  a scaled ancestor compounds it (the counter section's rule; the
-  work-history test pins the vars). Both marks pop from their box
-  center; the edge origins, `object-left`/`object-right`, and the bar's
-  divider went with the move. The bar keeps one slot, `h-13.75 w-40
-  sm:w-50` (a quarter larger; the counter box matches its height),
-  holding a shrink-to-fit img (`h-full w-auto max-w-full object-contain`)
-  whose `width`/`height` attributes come from `Stint.companyLogo`, now a
-  `LogoArt` (`src` plus intrinsic pixels) in work-history-data.ts: with
-  the ratio known before load, a cold swap pops at its final width
-  instead of growing from zero. `productLogo` stays a bare path; its box
-  is fixed on both axes.
+  leaves, and never with a scale: the marks inside are Motion's spring
+  pop, and a scaled ancestor compounds it (the counter section's rule;
+  the work-history test pins the vars). Every distinct mark of the
+  chapter stays mounted, stacked in the box, and Motion toggles each
+  between `shown` (pop from 0.6 after a 0.15s delay) and `hidden` (fade
+  to 0.8 over 0.15s), so a swap is exit-then-pop without ever remounting
+  an img. The earlier AnimatePresence `mode="wait"` swap mounted a new
+  img per stint, and a new img element refetches its file (`max-age=0`
+  on Vercel; Chromium revalidates on every mount, and a live `Image`
+  holding the URL does not help): the pop ran on a pixel-less box for
+  the round trip, which Gecko (Zen, Firefox) paints as the alt text and
+  Chromium and WebKit as an empty plate. A mark carried across
+  consecutive stints keeps its element and never re-pops; inactive
+  marks are `aria-hidden`. The imgs are `loading="lazy"` like the pano
+  layers, so the whole career's marks fetch as the section nears
+  rather than with the page. Both marks pop from their box center; the
+  edge origins, `object-left`/`object-right`, and the bar's divider went
+  with the move. The bar keeps one slot, `h-13.75 w-40 sm:w-50` (a
+  quarter larger; the counter box matches its height), stacking
+  shrink-to-fit imgs (`absolute h-full w-auto max-w-full
+  object-contain`) whose `width`/`height` attributes come from
+  `Stint.companyLogo`, a `LogoArt` (`src` plus intrinsic pixels) in
+  work-history-data.ts, so the slot lays out at the final width before
+  the file lands. `productLogo` stays a bare path; its box is fixed on
+  both axes.
 - `city-ledger.tsx`: the reduced-motion reading of a chapter (companies,
   positions, products, years) rendered under each static panorama;
   `display:none` under motion. See the reduced-motion section.

@@ -1,10 +1,10 @@
 import { render } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { BELOW_SM } from "../use-below-sm";
-import { CHAPTERS } from "../work-history-data";
+import { CHAPTERS, type Stint } from "../work-history-data";
 
 // use-below-sm caches its MediaQueryList at first use, so each side needs a fresh module graph.
-const renderHudAt = async (belowSm: boolean) => {
+const mountHud = async (belowSm: boolean) => {
 	vi.resetModules();
 	vi.stubGlobal("matchMedia", (query: string) => ({
 		matches: belowSm && query === BELOW_SM,
@@ -18,15 +18,23 @@ const renderHudAt = async (belowSm: boolean) => {
 	}));
 	const { WorkHistoryHud } = await import("./work-history-hud");
 	const chapter = CHAPTERS[0];
-	return render(
+	const hud = (stint: Stint) => (
 		<WorkHistoryHud
 			span={chapter.span}
+			stints={chapter.stints}
 			year={chapter.span[0]}
-			stint={chapter.stints[0]}
+			stint={stint}
 			usersTotal={0}
-		/>,
-	).container;
+		/>
+	);
+	const view = render(hud(chapter.stints[0]));
+	return {
+		container: view.container,
+		show: (stint: Stint) => view.rerender(hud(stint)),
+	};
 };
+const renderHudAt = async (belowSm: boolean) =>
+	(await mountHud(belowSm)).container;
 
 const odometers = (container: HTMLElement) => ({
 	bar:
@@ -62,9 +70,11 @@ describe("WorkHistoryHud marks", () => {
 		const container = await renderHudAt(false);
 		const product = container.querySelector("[data-hud-product]");
 		if (!product) throw new Error("no product layer");
-		expect(product.querySelector("img")?.getAttribute("alt")).toBe(
-			first.product,
-		);
+		expect(
+			product
+				.querySelector('img:not([aria-hidden="true"])')
+				?.getAttribute("alt"),
+		).toBe(first.product);
 		expect(
 			container.querySelectorAll(`img[alt="${first.product}"]`),
 		).toHaveLength(1);
@@ -81,6 +91,39 @@ describe("WorkHistoryHud marks", () => {
 		).toBeTruthy();
 	});
 
+	// A remounted img refetches its file and pops with no pixels (Gecko paints the alt
+	// text in that gap), so every distinct mark stays mounted and only toggles.
+	it("keeps every distinct mark mounted and swaps stints without remounting", async () => {
+		const { container, show } = await mountHud(false);
+		const stints = CHAPTERS[0].stints;
+		const product = container.querySelector("[data-hud-product]");
+		const slot = container.querySelector("[data-hud-bar] [data-hud-slot]");
+		if (!product || !slot) throw new Error("no mark boxes");
+		const distinct = (pick: (stint: Stint) => string) =>
+			new Set(stints.map(pick)).size;
+		expect(product.querySelectorAll("img, span")).toHaveLength(
+			distinct((stint) => stint.productLogo ?? stint.product),
+		);
+		expect(slot.querySelectorAll("img, span")).toHaveLength(
+			distinct((stint) => stint.companyLogo?.src ?? stint.company),
+		);
+		const activeMarks = (box: Element) =>
+			box.querySelectorAll(
+				'img:not([aria-hidden="true"]), span:not([aria-hidden="true"])',
+			);
+		const before = product.querySelector(`img[alt="${first.product}"]`);
+		expect(before?.getAttribute("aria-hidden")).toBeNull();
+
+		show(stints[1]);
+		expect(stints[1].product).not.toBe(first.product);
+		expect(product.querySelector(`img[alt="${first.product}"]`)).toBe(before);
+		expect(before?.getAttribute("aria-hidden")).toBe("true");
+		expect(activeMarks(product)).toHaveLength(1);
+		expect(activeMarks(product)[0].getAttribute("alt")).toBe(stints[1].product);
+		expect(activeMarks(slot)).toHaveLength(1);
+		expect(activeMarks(slot)[0].getAttribute("alt")).toBe(stints[1].company);
+	});
+
 	it("frosts a plate in the band's surface color behind the product mark", async () => {
 		const container = await renderHudAt(false);
 		const mark = container.querySelector("[data-hud-product] img");
@@ -95,7 +138,7 @@ describe("WorkHistoryHud marks", () => {
 	it("pops both marks from the box center", async () => {
 		const container = await renderHudAt(false);
 		const marks = container.querySelectorAll<HTMLImageElement>(
-			"[data-hud-product] img, [data-hud-bar] img",
+			'[data-hud-product] img:not([aria-hidden="true"]), [data-hud-bar] img:not([aria-hidden="true"])',
 		);
 		expect(marks).toHaveLength(2);
 		for (const mark of marks) {
@@ -110,7 +153,7 @@ describe("WorkHistoryHud marks", () => {
 		for (const cls of ["h-13.75", "w-40", "sm:w-50"]) {
 			expect(slot?.className).toContain(cls);
 		}
-		const mark = slot?.querySelector("img");
+		const mark = slot?.querySelector('img:not([aria-hidden="true"])');
 		expect(mark?.getAttribute("alt")).toBe(first.company);
 		expect(Number(mark?.getAttribute("width"))).toBeGreaterThan(0);
 		expect(Number(mark?.getAttribute("height"))).toBeGreaterThan(0);

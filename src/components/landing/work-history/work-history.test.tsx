@@ -281,9 +281,11 @@ describe("WorkHistorySection", () => {
 		huds.forEach((hud, i) => {
 			const products = hud.querySelectorAll("[data-hud-product]");
 			expect(products).toHaveLength(1);
-			expect(products[0].querySelector("img")?.getAttribute("alt")).toBe(
-				CHAPTERS[i].stints[0].product,
-			);
+			expect(
+				products[0]
+					.querySelector('img:not([aria-hidden="true"])')
+					?.getAttribute("alt"),
+			).toBe(CHAPTERS[i].stints[0].product);
 			expect(hud.querySelector("[data-hud-bar] [data-hud-product]")).toBeNull();
 		});
 		expect(container.querySelector("[data-hud-divider]")).toBeNull();
@@ -384,7 +386,7 @@ describe("WorkHistorySection", () => {
 			const huds = [...section.children].filter((el) =>
 				el.querySelector("[data-hud-year]"),
 			);
-			// The product mark sits behind AnimatePresence mode="wait", which never settles in jsdom.
+			// The bar's sr-only total is the rest state's plainest readout to assert on.
 			const totalOf = (hud: Element) =>
 				[...hud.querySelectorAll("[data-hud-bar] .sr-only")].at(-1)
 					?.textContent;
