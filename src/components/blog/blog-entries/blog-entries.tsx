@@ -18,10 +18,14 @@ export type BlogEntry = {
 /** Past the first viewport, entries rise with no delay instead of waiting out their index. */
 const STAGGER_BATCH = 4;
 
-/** 16:9 and wider lose at most 7% to the OG-shaped frame's crop; taller covers would lose
- * their subject, so they sit inside the frame at full height instead. */
+/** The OG card's shape: an OG-sized cover fills the frame edge to edge. */
+const FRAME_RATIO = 1200 / 630;
+
+/** Within a tenth of the frame (16:9 through 2:1) the crop stays under 10% and `sizes` stays
+ * truthful; further off, object-cover would crop the subject or scale the source past the
+ * fetched width, so the cover sits inside the frame instead. */
 export function coverFillsFrame(cover: PostCover) {
-	return cover.width / cover.height >= 16 / 9;
+	return Math.abs(cover.width / cover.height / FRAME_RATIO - 1) <= 0.1;
 }
 
 /** Rests visible from the server, so the list reads with JavaScript disabled. */
@@ -54,14 +58,17 @@ export function BlogEntries({ entries }: { entries: BlogEntry[] }) {
 							// width it fetches: no crop, no upscale. Bare ground behind it, so a
 							// transparent cover reads as art on the earth, never as a boxed picture.
 							<div className="mb-4 aspect-[1200/630] overflow-hidden rounded-lg sm:col-start-3 sm:row-start-1 sm:mb-0 sm:self-start">
-								{/* Decorative in the list: the title is the link's name. */}
+								{/* Decorative in the list: the title is the link's name. The first cover
+								    lands in a phone's first viewport, so it fetches early without a
+								    head preload. Below sm the column is 100vw minus the wrapper's px-6. */}
 								<Image
 									src={entry.cover.src}
 									width={entry.cover.width}
 									height={entry.cover.height}
 									alt=""
-									priority={index === 0}
-									sizes="(min-width: 40rem) 14rem, 100vw"
+									loading={index === 0 ? "eager" : undefined}
+									fetchPriority={index === 0 ? "high" : undefined}
+									sizes="(min-width: 40rem) 14rem, calc(100vw - 3rem)"
 									className={cn(
 										"size-full transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] motion-safe:group-hover:scale-[1.03] motion-safe:group-focus-visible:scale-[1.03]",
 										coverFillsFrame(entry.cover)

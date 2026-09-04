@@ -46,10 +46,8 @@ const ENTRIES: BlogEntry[] = [
 	},
 ];
 
-/** The OG card's own shape: fills the frame edge to edge. */
 const WIDE_COVER = { src: "/og/blog.jpg", width: 1200, height: 630, alt: "" };
 
-/** Taller than 16:9: sits inside the frame at full height on the bare ground. */
 const TALL_COVER = {
 	src: "/lego-hero.webp",
 	width: 1024,
@@ -61,7 +59,6 @@ export const Rail: Story = {
 	args: { entries: ENTRIES },
 };
 
-/** A wide cover, a text-only entry, then a tall cover: both shapes on one rail. */
 export const WithCovers: Story = {
 	args: {
 		entries: [

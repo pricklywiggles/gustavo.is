@@ -63,7 +63,7 @@ describe("BlogEntries", () => {
 		expect(withoutCover.querySelector("img")).toBeNull();
 	});
 
-	it("fills the frame with wide covers and insets tall ones", () => {
+	it("fills the frame with OG-shaped covers and insets tall ones", () => {
 		render(
 			<BlogEntries
 				entries={[
@@ -75,16 +75,34 @@ describe("BlogEntries", () => {
 		const [wide, tall] = screen
 			.getAllByRole("link")
 			.map((link) => link.querySelector("img"));
-		expect(wide?.className).toContain("object-cover");
-		expect(tall?.className).toContain("object-contain");
+		expect(wide?.classList.contains("object-cover")).toBe(true);
+		expect(tall?.classList.contains("object-contain")).toBe(true);
 	});
 
 	it("sizes the cover to its rendered frame, never to a square box", () => {
 		render(<BlogEntries entries={[{ ...ENTRIES[0], cover: OG_COVER }]} />);
 		// A box-width `sizes` under object-cover fetched a source the crop then upscaled.
 		expect(screen.getByRole("link").querySelector("img")?.sizes).toBe(
-			"(min-width: 40rem) 14rem, 100vw",
+			"(min-width: 40rem) 14rem, calc(100vw - 3rem)",
 		);
+	});
+
+	it("fetches only the first cover eagerly", () => {
+		render(
+			<BlogEntries
+				entries={[
+					{ ...ENTRIES[0], cover: OG_COVER },
+					{ ...ENTRIES[1], cover: OG_COVER },
+				]}
+			/>,
+		);
+		const [first, second] = screen
+			.getAllByRole("link")
+			.map((link) => link.querySelector("img"));
+		expect(first?.getAttribute("loading")).toBe("eager");
+		expect(first?.getAttribute("fetchpriority")).toBe("high");
+		expect(second?.getAttribute("loading")).toBe("lazy");
+		expect(second?.getAttribute("fetchpriority")).toBeNull();
 	});
 
 	it("keeps dates as machine-readable time elements", () => {
@@ -96,14 +114,23 @@ describe("BlogEntries", () => {
 });
 
 describe("coverFillsFrame", () => {
-	it("draws the line at 16:9", () => {
-		expect(coverFillsFrame(OG_COVER)).toBe(true);
-		expect(coverFillsFrame({ ...OG_COVER, width: 1600, height: 900 })).toBe(
-			true,
-		);
-		expect(coverFillsFrame({ ...OG_COVER, width: 1600, height: 901 })).toBe(
-			false,
-		);
+	const cover = (width: number, height: number) => ({
+		...OG_COVER,
+		width,
+		height,
+	});
+
+	it("accepts covers within a tenth of the frame's ratio", () => {
+		expect(coverFillsFrame(cover(1200, 630))).toBe(true);
+		expect(coverFillsFrame(cover(1466, 768))).toBe(true);
+		expect(coverFillsFrame(cover(1600, 900))).toBe(true);
+		expect(coverFillsFrame(cover(2000, 1000))).toBe(true);
+	});
+
+	it("insets covers that would crop or outscale the frame", () => {
+		expect(coverFillsFrame(cover(1700, 1000))).toBe(false);
+		expect(coverFillsFrame(cover(2560, 1080))).toBe(false);
+		expect(coverFillsFrame(cover(1600, 1200))).toBe(false);
 		expect(coverFillsFrame(TALL_COVER)).toBe(false);
 	});
 });
