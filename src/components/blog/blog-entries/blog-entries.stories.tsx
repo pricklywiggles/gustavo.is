@@ -46,20 +46,26 @@ const ENTRIES: BlogEntry[] = [
 	},
 ];
 
+const WIDE_COVER = { src: "/og/blog.jpg", width: 1200, height: 630, alt: "" };
+
+const TALL_COVER = {
+	src: "/lego-hero.webp",
+	width: 1024,
+	height: 1536,
+	alt: "",
+};
+
 export const Rail: Story = {
 	args: { entries: ENTRIES },
 };
 
 export const WithCovers: Story = {
 	args: {
-		entries: ENTRIES.map((entry, i) =>
-			i === 1
-				? entry
-				: {
-						...entry,
-						cover: { src: "/og/blog.jpg", width: 1200, height: 630, alt: "" },
-					},
-		),
+		entries: [
+			{ ...ENTRIES[0], cover: WIDE_COVER },
+			ENTRIES[1],
+			{ ...ENTRIES[2], cover: TALL_COVER },
+		],
 	},
 };
 
