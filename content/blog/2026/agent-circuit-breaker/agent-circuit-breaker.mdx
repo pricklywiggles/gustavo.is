@@ -1,0 +1,58 @@
+---
+title: Loop de loop.
+slug: agent-circuit-breaker
+date: 2026-09-04
+draft: false
+image: ./loop-de-loop.webp
+description: This DeepSeek Harness plugin stops Qwen's unrecoverable loopiness.
+tags: [ai]
+---
+
+Perplexity has been my Google replacement for search and deep research for a while
+but I wasn't getting the depth I wanted, so I decided to replace it with a locally
+run solution. I've been running Qwen 3.8 with Opencode and Hermes,
+and I noticed early on that 3.8 agents would go into these tool call loops you couldn't
+recover from even by interrupting them. I tried changing the llama.cpp flags thinking
+something might help with no luck. After looking into it, this is what I found out:
+
+<Blockquote icon="🤖">
+	<p>Repetition self-reinforces into a loop no instruction can break, and Qwen's
+	linear-attention layers, with their lossy precision-sensitive recall, fall in
+	more easily. Agent loops repeat whole tool calls, too far apart for any sampler
+	penalty to notice.</p>
+</Blockquote>
+
+So that's why setting up a deep research skill using this model will leave your harness
+making thousands of tool calls and getting nowhere.
+
+## Breaking the cycle
+
+I could probably fix this by using `tool.execute.before` in Opencode, but I'd been
+wanting to try [DeepSeek Harness](https://deepseekharness.io/) to see if its plugin
+system is as easy and powerful as 11,000 overenthusiastic tech bros will tell you on
+YouTube without backing it up with examples. And it was.
+
+It only took 100 lines of code. The plugin sits between the harness and its tools and
+fires before each tool call. The same call with the same significant
+arguments six times inside a sliding window gets denied, with an explanation
+handed back to the model. A per-agent lifetime cap stops loops that vary
+their arguments. It also strips annotation-only fields like bash's
+`description` before comparing, because the model rewrites those every call,
+and it can log each first denial to a JSONL file so a supervising agent can
+notice a stuck child and interrupt it.
+
+There's probably a plugin for this already but this was a fun project for understanding how to make one.
+I can see why DSH is getting so much traction. There have been many times when I've wanted to switch the
+plumbing in the Claude Code harness outside of hooks and skills.
+
+## Try it out
+Find it here: [dsh-circuit-breaker](https://github.com/pricklywiggles/dsh-circuit-breaker),
+to install:
+
+```sh
+dsh plugin --profile web add github:pricklywiggles/dsh-circuit-breaker
+```
+
+Knobs (limits, exemptions, the incident log) are documented in the
+readme, and the defaults are loose: normal repeats pass, only
+degenerate ones die. It's not specific to Qwen 3.8 but it works well with it.
