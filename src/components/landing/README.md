@@ -343,23 +343,34 @@ mount, so there is nothing to hydrate or refresh on a viewport flip.
 
 ## Projects showcase panel (FRA-189)
 
-Below md the showcase panel is a grid cell: the live article and six
-client-only measuring copies (`[data-project-measure]`, one per project,
-mounted behind `useMounted()` so the server HTML carries each
-description exactly once, invariant 13) stack on `col-start-1
-row-start-1`. The cell takes the tallest project's height at the current
+Every project's article stays mounted once hydrated, stacked on
+`col-start-1 row-start-1`, and Motion toggles each between `shown` and
+`hidden`; inactive articles are `aria-hidden`, `inert` and
+`pointer-events-none`. The earlier AnimatePresence `mode="wait"` swap
+mounted a new `img` per project, which refetches its file (max-age=0 on
+Vercel) and painted an empty frame for the round trip, the same failure
+the HUD marks had. The imgs are `loading="lazy"`, so all six fetch as the
+showcase nears rather than with the page. Hidden articles rest where an
+exit leaves them (earlier projects) or where an entrance starts (later
+ones), and the shown transition is delayed by one duration, so a scrub
+in either direction still reads as the old sequenced exit then enter.
+The grid cell is `overflow-x-clip` because the resting x offsets would
+otherwise widen the page on a phone.
+
+The server HTML carries only the staged project (FRA-183, invariant 13):
+`useMounted()` gates the other five, and the staged article's key is the
+same before and after the flip, so hydration keeps its element.
+
+Below md the stack sizes the cell to the tallest project at the current
 width, the sticky wrapper's `items-center` centers that constant block,
 and the content top-aligns inside it, so a project switch moves nothing.
-The copies carry the real description because on a phone it is the
-dominant height term (at 390 wide, Hone's panel is 378px against Ship
-it's 526px, and the image boxes converge anyway: the `40 * ratio vh`
-width cap makes every box 40vh tall once it binds). They render no
-heading, no `img` (screenshot and standby glyph are absolute and add no
-height), and nothing focusable, just spans in the same `cta()` classes;
-each copy matched its live panel's height to 0.01px from 1440x900 down
-to 360x780. The stack is `md:hidden` by measurement: at 844x390 the
-tallest cell is 416px against a 390px viewport, which would push every
-project's heading 13px above the fold, so md and up keeps today's
+On a phone the description is the dominant height term (at 390 wide,
+Hone's panel is 378px against Ship it's 526px, and the image boxes
+converge anyway: the `40 * ratio vh` width cap makes every box 40vh tall
+once it binds). From md the hidden articles are `md:absolute
+md:inset-x-0 md:top-0` and leave the flow, by measurement: at 844x390
+the tallest cell is 416px against a 390px viewport, which would push
+every project's heading 13px above the fold, so md and up keeps
 per-project heights, where the `min(32rem,85vh)` floor absorbs most of
 the variation.
 

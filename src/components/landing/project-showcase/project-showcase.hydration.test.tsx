@@ -29,9 +29,9 @@ describe("ProjectShowcase on a reduced-motion client", () => {
 			expect(result.html).not.toContain(project.description);
 		}
 		expect(result.html.match(/<h3/g)).toHaveLength(1);
-		expect(result.html).not.toContain("data-project-measure");
-		expect(
-			result.container.querySelectorAll("[data-project-measure]"),
-		).toHaveLength(PROJECTS.length);
+		// Post-hydration every project mounts, so its screenshot never refetches on a swap.
+		expect(result.container.querySelectorAll("article")).toHaveLength(
+			PROJECTS.length,
+		);
 	}, 20_000);
 });

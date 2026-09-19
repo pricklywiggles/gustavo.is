@@ -1,7 +1,6 @@
 "use client";
 
-import { AnimatePresence, domAnimation, LazyMotion, m } from "motion/react";
-import { useEffect, useRef } from "react";
+import { domAnimation, LazyMotion, m } from "motion/react";
 import { CurtainLink } from "@/components/curtain-link";
 import { BELOW_MD, useMediaQuery } from "@/components/use-media-query";
 import { useMounted } from "@/components/use-mounted";
@@ -29,22 +28,11 @@ function LinkArrow() {
 const headingClass =
 	"font-display text-[clamp(1.75rem,2.6vw,2.5rem)] text-pale-dune";
 
-/** `measure` renders a height-only copy: no heading, no image, nothing focusable. */
-function ProjectPanel({
-	project,
-	measure = false,
-}: {
-	project: Project;
-	measure?: boolean;
-}) {
+function ProjectPanel({ project }: { project: Project }) {
 	return (
 		<>
 			<div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-				{measure ? (
-					<p className={headingClass}>{project.name}</p>
-				) : (
-					<h3 className={headingClass}>{project.name}</h3>
-				)}
+				<h3 className={headingClass}>{project.name}</h3>
 				{project.tech && (
 					<span className="rounded-full border border-pale-dune/25 px-3 py-1 text-[0.8125rem] text-pale-dune/75">
 						{project.tech}
@@ -61,22 +49,22 @@ function ProjectPanel({
 					maxWidth: `min(100%, ${40 * (project.imageRatio ?? 1.6)}vh)`,
 				}}
 			>
-				{/* Glyph and screenshot are absolute and add no height; measure copies skip the eager loads. */}
-				{!measure && (
-					<div className="absolute inset-0 grid place-items-center">
-						<span
-							aria-hidden="true"
-							className="font-display text-[clamp(4rem,8vw,7rem)] text-pale-dune/10"
-						>
-							{project.name[0]}
-						</span>
-					</div>
-				)}
-				{!measure && project.image && (
-					// biome-ignore lint/performance/noImgElement: runtime-swapped screenshot with onError degradation to the standby frame; next/image adds nothing here
+				{/* Glyph and screenshot are absolute and add no height. */}
+				<div className="absolute inset-0 grid place-items-center">
+					<span
+						aria-hidden="true"
+						className="font-display text-[clamp(4rem,8vw,7rem)] text-pale-dune/10"
+					>
+						{project.name[0]}
+					</span>
+				</div>
+				{project.image && (
+					// biome-ignore lint/performance/noImgElement: fixed-box screenshot with onError degradation to the standby glyph; next/image adds nothing here
 					<img
 						src={project.image}
 						alt={`Screenshot of ${project.name}`}
+						loading="lazy"
+						decoding="async"
 						className="absolute inset-0 size-full bg-dusk-ink object-contain"
 						style={
 							project.imageBg ? { backgroundColor: project.imageBg } : undefined
@@ -100,14 +88,6 @@ function ProjectPanel({
 								? "bg-pale-dune text-dusk-ink hover:bg-noon-sun"
 								: "border-pale-dune/40 text-pale-dune hover:bg-pale-dune/10"
 						}`;
-						if (measure) {
-							return (
-								<span key={link.label} className={style}>
-									{link.label}
-									<LinkArrow />
-								</span>
-							);
-						}
 						// The retrospectives open behind CurtainLink's blinds.
 						if (link.url?.startsWith("/")) {
 							return (
@@ -155,27 +135,20 @@ export function ProjectShowcase({
 	const active = projects[activeIndex] ?? projects[0];
 
 	const stacked = useMediaQuery(BELOW_MD);
-
-	const previousIndex = useRef(activeIndex);
-	const direction = activeIndex >= previousIndex.current ? 1 : -1;
-	useEffect(() => {
-		previousIndex.current = activeIndex;
-	}, [activeIndex]);
-
-	const variants = {
-		enter: (dir: number) =>
-			reduced
-				? { opacity: 1 }
-				: stacked
-					? { opacity: 0, x: 28 * dir }
-					: { opacity: 0, y: 18 },
-		center: { opacity: 1, x: 0, y: 0 },
-		exit: (dir: number) =>
-			reduced
-				? { opacity: 1 }
-				: stacked
-					? { opacity: 0, x: -28 * dir }
-					: { opacity: 0, y: -14 },
+	const duration = reduced ? 0 : stacked ? 0.22 : 0.25;
+	// Every project stays mounted once hydrated: a remounted img refetches its file (max-age=0
+	// on Vercel), so the old AnimatePresence swap showed an empty frame for the round trip.
+	// The server HTML carries only the staged project (FRA-183); the active key is stable
+	// across the flip, so hydration keeps its element.
+	const panels = mounted ? projects : [active];
+	// Earlier projects rest where an exit leaves them, later ones where an entrance starts,
+	// so a scrub in either direction reads as the old sequenced enter and exit.
+	const hidden = (index: number) => {
+		if (reduced) return { opacity: 0, x: 0, y: 0 };
+		const before = index < activeIndex;
+		return stacked
+			? { opacity: 0, x: before ? -28 : 28, y: 0 }
+			: { opacity: 0, x: 0, y: before ? -14 : 18 };
 	};
 
 	return (
@@ -214,40 +187,43 @@ export function ProjectShowcase({
 				</ul>
 			</div>
 
-			<div className="grid min-w-0 flex-1 items-start md:min-h-[min(32rem,85vh)]">
+			{/* overflow-x-clip: the resting x offsets would otherwise widen the page on a phone. */}
+			<div className="grid min-w-0 flex-1 items-start overflow-x-clip md:min-h-[min(32rem,85vh)]">
 				<LazyMotion features={domAnimation}>
-					<AnimatePresence mode="wait" initial={false} custom={direction}>
-						<m.article
-							key={active.name}
-							className="col-start-1 row-start-1"
-							custom={direction}
-							variants={variants}
-							initial="enter"
-							animate="center"
-							exit="exit"
-							transition={{
-								duration: reduced ? 0 : stacked ? 0.22 : 0.25,
-								ease: [0.19, 1, 0.22, 1],
-							}}
-						>
-							<ProjectPanel project={active} />
-						</m.article>
-					</AnimatePresence>
+					{panels.map((project) => {
+						const index = projects.indexOf(project);
+						const shown = project === active;
+						return (
+							/* Below md the stack sizes the cell to the tallest project so a switch moves
+							   nothing (FRA-189); from md the hidden ones leave the flow, since at 844x390
+							   the tallest cell would push every heading above the fold. */
+							<m.article
+								key={project.name}
+								aria-hidden={shown ? undefined : true}
+								inert={!shown}
+								className={
+									shown
+										? "col-start-1 row-start-1"
+										: "pointer-events-none col-start-1 row-start-1 md:absolute md:inset-x-0 md:top-0"
+								}
+								variants={{
+									shown: { opacity: 1, x: 0, y: 0 },
+									hidden: hidden(index),
+								}}
+								initial={false}
+								animate={shown ? "shown" : "hidden"}
+								transition={{
+									duration,
+									ease: [0.19, 1, 0.22, 1],
+									// The entrance waits for the exit, as the old mode="wait" swap did.
+									delay: shown ? duration : 0,
+								}}
+							>
+								<ProjectPanel project={project} />
+							</m.article>
+						);
+					})}
 				</LazyMotion>
-				{/* Client-only so the server HTML carries each description once (invariant 13); the tallest
-				    copy sizes the cell so switches never jump. md:hidden since 844x390 overflows the fold. */}
-				{mounted &&
-					projects.map((project) => (
-						<div
-							key={project.name}
-							data-project-measure
-							aria-hidden="true"
-							inert
-							className="invisible col-start-1 row-start-1 md:hidden"
-						>
-							<ProjectPanel project={project} measure />
-						</div>
-					))}
 			</div>
 		</div>
 	);
