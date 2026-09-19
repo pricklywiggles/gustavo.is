@@ -20,7 +20,7 @@ A personal site — about, portfolio, and blog — that presents Gustavo Gallego
 
 26 years (since 2000) operating across product management, QA, engineering program management, and hands-on software development, at companies including Microsoft (Office, VSTO), Slide.com (SuperPoke Pets, Top Friends), Jawbone, Ponder, and Tartle. As AI collapses the value of narrow specialization, that full-spectrum range across the entire product lifecycle is the compounding advantage, not a lack of focus.
 
-**This is a strategic claim, not a line of copy.** The site should never state "I'm a new kind of generalist" outright — it demonstrates the range through the work itself (case studies that show PM thinking, QA rigor, program management, and engineering side by side) and lets a visitor arrive at the conclusion on their own.
+**This is a strategic claim, not a line of copy.** The site should never state "I'm a new kind of generalist" outright — it demonstrates the range through the work itself (case studies that show PM thinking, QA rigor, program management, and software engineering side by side) and lets a visitor arrive at the conclusion on their own.
 
 ## Conversion & proof
 
@@ -38,7 +38,7 @@ The cookie-cutter developer-portfolio template look — the GitHub-README-as-web
 
 ## Design Principles
 
-- **Show range, don't state it.** Every section demonstrates PM, QA, program management, and engineering thinking through what it contains and how it's built, never through a label or a claim of breadth.
+- **Show range, don't state it.** Every section demonstrates PM, QA, program management, and software engineering thinking through what it contains and how it's built, never through a label or a claim of breadth.
 - **Precision with warmth.** Meticulous execution paired with personality — never cold, never corporate, never sloppy.
 - **One clear ask.** Every page points at the contact form; nothing competes with it for the visitor's next action.
 - **Proof over adjectives.** Recognizable companies and real work carry the positioning; the copy doesn't have to.
