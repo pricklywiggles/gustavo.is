@@ -27,7 +27,7 @@ describe("ProjectShowcase", () => {
 			<ProjectShowcase projects={PROJECTS} activeIndex={5} />,
 		);
 		expect(getByRole("heading", { level: 3, name: "Ponder" })).toBeTruthy();
-		// Scoped to the live article: the measuring copies repeat the chip text.
+		// Scoped to the live article: the hidden projects repeat the chip text.
 		expect(
 			within(getByRole("article")).getByText("retrospective"),
 		).toBeTruthy();
@@ -40,34 +40,37 @@ describe("ProjectShowcase", () => {
 		}
 	});
 
-	it("sizes the panel to the tallest project with invisible, inert copies", () => {
+	it("keeps every project mounted, the inactive ones hidden and out of flow from md", () => {
 		const { container, getByRole } = render(
 			<ProjectShowcase projects={PROJECTS} activeIndex={0} />,
 		);
-		const copies = Array.from(
-			container.querySelectorAll("[data-project-measure]"),
-		);
-		expect(copies).toHaveLength(PROJECTS.length);
-		for (const copy of copies) {
-			expect(copy.getAttribute("aria-hidden")).toBe("true");
-			expect(copy.hasAttribute("inert")).toBe(true);
-			expect(copy.className).toContain("invisible");
-			expect(copy.className).toContain("col-start-1 row-start-1");
-			// md and up keeps the min-h floor instead of the stack (FRA-189).
-			expect(copy.className).toContain("md:hidden");
-			expect(copy.querySelector("img, a, button, h3")).toBeNull();
+		const articles = Array.from(container.querySelectorAll("article"));
+		expect(articles).toHaveLength(PROJECTS.length);
+		const active = getByRole("article");
+		expect(active.className).toContain("col-start-1 row-start-1");
+		expect(active.className).not.toContain("md:absolute");
+		expect(active.hasAttribute("inert")).toBe(false);
+		for (const article of articles.filter((a) => a !== active)) {
+			expect(article.getAttribute("aria-hidden")).toBe("true");
+			expect(article.hasAttribute("inert")).toBe(true);
+			expect(article.className).toContain("pointer-events-none");
+			// Below md the stack sizes the cell to the tallest project (FRA-189); from md the
+			// hidden ones leave the flow so the min-h floor sizes it instead.
+			expect(article.className).toContain("col-start-1 row-start-1");
+			expect(article.className).toContain("md:absolute");
 		}
 		for (const project of PROJECTS) {
 			expect(
-				copies.filter((copy) =>
-					copy.textContent?.includes(project.description),
-				),
+				articles.filter((a) => a.textContent?.includes(project.description)),
 			).toHaveLength(1);
 		}
-		const article = getByRole("article");
-		expect(article.className).toContain("col-start-1 row-start-1");
-		expect(article.parentElement?.className).toContain("grid");
-		expect(article.parentElement?.className).toContain("items-start");
+		// A remounted img refetches; every screenshot stays mounted and loads as the section nears.
+		const imgs = Array.from(container.querySelectorAll("img"));
+		expect(imgs).toHaveLength(PROJECTS.filter((p) => p.image).length);
+		for (const img of imgs) expect(img.getAttribute("loading")).toBe("lazy");
+		expect(active.parentElement?.className).toContain("grid");
+		expect(active.parentElement?.className).toContain("items-start");
+		expect(active.parentElement?.className).toContain("overflow-x-clip");
 	});
 
 	it("reports list selections through onSelect", () => {

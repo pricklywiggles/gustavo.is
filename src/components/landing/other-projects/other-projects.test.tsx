@@ -11,6 +11,10 @@ const iosState = { value: false };
 vi.mock("@/lib/ios-device", () => ({
 	isIOSDevice: () => iosState.value,
 }));
+// Every project mounts post-hydration, and Ponder's retrospective links use CurtainLink.
+vi.mock("next/navigation", () => ({
+	useRouter: () => ({ push: () => {} }),
+}));
 
 afterEach(() => {
 	iosState.value = false;
