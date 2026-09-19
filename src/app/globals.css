@@ -131,6 +131,14 @@ body {
 	}
 	html {
 		@apply font-sans;
+		/* No double-tap zoom: a fast tap-scroll on a phone otherwise lands in a zoomed state. */
+		touch-action: manipulation;
+	}
+	/* Pinch zoom breaks the pinned scroll story (the pin tracks the layout viewport, so a
+	   zoomed frame hangs off screen). Set on html so the fixed header counts; system zoom
+	   still works. */
+	html:has(main[data-landing]) {
+		touch-action: pan-y;
 	}
 	/* GSAP's pin spacer is unstyled; a fractional pin offset opens a hairline seam (FRA-193). */
 	.pin-spacer:has(> #work) {

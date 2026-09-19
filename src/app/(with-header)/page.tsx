@@ -22,7 +22,7 @@ export default function HomePage() {
 	return (
 		<>
 			<JsonLd data={siteJsonLd()} />
-			<main>
+			<main data-landing>
 				<h1 className="sr-only">Gustavo Gallegos</h1>
 				{/* Scroll compensation for live reduced-motion flips (data-motion-anchor). */}
 				<MotionAnchor />
